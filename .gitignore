@@ -22,6 +22,7 @@ env/
 float_cache.json
 chat_history.json
 last_update_id.json
+user_preferences.json
 
 # OS
 .DS_Store

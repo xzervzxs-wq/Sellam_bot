@@ -17,13 +17,14 @@ import time
 load_dotenv()
 EODHD_API_KEY = os.getenv("EODHD_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-TELEGRAM_BOT_TOKEN = "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg"
-TELEGRAM_CHAT_ID = "237657512"
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "237657512")
 
 MAX_WORKERS = 10  # زيادة السرعة
 FLOAT_CACHE_FILE = "float_cache.json"
 CHAT_HISTORY_FILE = "chat_history.json"
 LAST_UPDATE_ID_FILE = "last_update_id.json"
+USER_PREFERENCES_FILE = "user_preferences.json"
 
 # نماذج GPT المتاحة
 GPT_PREMIUM_MODEL = "gpt-4"  # النموذج المميز
@@ -73,19 +74,38 @@ def send_telegram_message(chat_id, text):
         print(f"❌ خطأ في إرسال الرسالة: {e}")
         return None
 
-def chat_with_gpt(user_message, use_premium=True):
+def get_user_preference(chat_id, key, default=None):
+    """الحصول على تفضيل مستخدم"""
+    prefs = load_json_file(USER_PREFERENCES_FILE)
+    user_prefs = prefs.get(str(chat_id), {})
+    return user_prefs.get(key, default)
+
+def set_user_preference(chat_id, key, value):
+    """حفظ تفضيل مستخدم"""
+    prefs = load_json_file(USER_PREFERENCES_FILE)
+    if str(chat_id) not in prefs:
+        prefs[str(chat_id)] = {}
+    prefs[str(chat_id)][key] = value
+    save_json_file(USER_PREFERENCES_FILE, prefs)
+
+def chat_with_gpt(user_message, use_premium=True, _retry_count=0):
     """
     الدردشة مع GPT مع دعم النماذج المميزة والقياسية
     
     Args:
         user_message: رسالة المستخدم
         use_premium: استخدام النموذج المميز (True) أو القياسي (False)
+        _retry_count: عداد داخلي لمنع التكرار اللانهائي
     
     Returns:
         tuple: (response_text, model_used, success)
     """
     if not OPENAI_API_KEY:
         return "⚠️ لم يتم تكوين مفتاح OpenAI API. يرجى إضافة OPENAI_API_KEY في ملف .env", None, False
+    
+    # منع التكرار اللانهائي
+    if _retry_count > 1:
+        return "❌ فشلت جميع محاولات الاتصال بالنماذج. يرجى المحاولة لاحقاً.", None, False
     
     model = GPT_PREMIUM_MODEL if use_premium else GPT_STANDARD_MODEL
     
@@ -119,19 +139,25 @@ def chat_with_gpt(user_message, use_premium=True):
         
         elif response.status_code == 429 or response.status_code == 403:
             # تجاوز حد الطلبات المميزة - التبديل إلى النموذج القياسي
-            error_data = response.json()
-            error_message = error_data.get("error", {}).get("message", "")
+            try:
+                error_data = response.json()
+                error_message = error_data.get("error", {}).get("message", "")
+            except:
+                error_message = response.text
             
-            if use_premium and "quota" in error_message.lower():
+            if use_premium and ("quota" in error_message.lower() or "allowance" in error_message.lower()):
                 print("⚠️ تجاوز حد الطلبات المميزة، التبديل إلى النموذج القياسي...")
                 # إعادة المحاولة مع النموذج القياسي
-                return chat_with_gpt(user_message, use_premium=False)
+                return chat_with_gpt(user_message, use_premium=False, _retry_count=_retry_count + 1)
             
             return f"❌ خطأ: {error_message}", model, False
         
         else:
-            error_data = response.json()
-            error_message = error_data.get("error", {}).get("message", "خطأ غير معروف")
+            try:
+                error_data = response.json()
+                error_message = error_data.get("error", {}).get("message", "خطأ غير معروف")
+            except:
+                error_message = f"خطأ HTTP {response.status_code}"
             return f"❌ خطأ من API: {error_message}", model, False
             
     except requests.exceptions.Timeout:
@@ -199,6 +225,12 @@ def process_telegram_messages():
                     "عند تجاوز حد الطلبات المميزة، سيتم التبديل تلقائياً إلى النموذج القياسي."
                 )
                 send_telegram_message(chat_id, help_msg)
+            elif text == "/premium":
+                set_user_preference(chat_id, "use_premium", True)
+                send_telegram_message(chat_id, "✅ تم التبديل إلى النموذج المميز GPT-4 🌟\n\nسيتم استخدام GPT-4 للرسائل القادمة.")
+            elif text == "/standard":
+                set_user_preference(chat_id, "use_premium", False)
+                send_telegram_message(chat_id, "✅ تم التبديل إلى النموذج القياسي GPT-3.5 ⚡\n\nسيتم استخدام GPT-3.5 للرسائل القادمة.")
             
             save_last_update_id(update_id)
             continue
@@ -211,8 +243,9 @@ def process_telegram_messages():
             json={"chat_id": chat_id, "action": "typing"}
         )
         
-        # الحصول على الرد من GPT (افتراضياً استخدام المميز مع التراجع التلقائي)
-        response_text, model_used, success = chat_with_gpt(text, use_premium=True)
+        # الحصول على تفضيل المستخدم للنموذج (افتراضياً استخدام المميز مع التراجع التلقائي)
+        use_premium = get_user_preference(chat_id, "use_premium", True)
+        response_text, model_used, success = chat_with_gpt(text, use_premium=use_premium)
         
         # إضافة معلومات عن النموذج المستخدم
         if success and model_used:
