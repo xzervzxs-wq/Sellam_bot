@@ -17,8 +17,14 @@ import time
 load_dotenv()
 EODHD_API_KEY = os.getenv("EODHD_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "237657512")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# التحقق من المتغيرات المطلوبة
+if not TELEGRAM_BOT_TOKEN:
+    raise ValueError("TELEGRAM_BOT_TOKEN is required. Please set it in your .env file.")
+if not TELEGRAM_CHAT_ID:
+    raise ValueError("TELEGRAM_CHAT_ID is required. Please set it in your .env file.")
 
 MAX_WORKERS = 10  # زيادة السرعة
 FLOAT_CACHE_FILE = "float_cache.json"
@@ -103,8 +109,8 @@ def chat_with_gpt(user_message, use_premium=True, _retry_count=0):
     if not OPENAI_API_KEY:
         return "⚠️ لم يتم تكوين مفتاح OpenAI API. يرجى إضافة OPENAI_API_KEY في ملف .env", None, False
     
-    # منع التكرار اللانهائي
-    if _retry_count > 1:
+    # منع التكرار اللانهائي - السماح بمحاولة واحدة فقط (التراجع من premium إلى standard)
+    if _retry_count > 0:
         return "❌ فشلت جميع محاولات الاتصال بالنماذج. يرجى المحاولة لاحقاً.", None, False
     
     model = GPT_PREMIUM_MODEL if use_premium else GPT_STANDARD_MODEL
@@ -142,7 +148,7 @@ def chat_with_gpt(user_message, use_premium=True, _retry_count=0):
             try:
                 error_data = response.json()
                 error_message = error_data.get("error", {}).get("message", "")
-            except:
+            except (json.JSONDecodeError, ValueError):
                 error_message = response.text
             
             if use_premium and ("quota" in error_message.lower() or "allowance" in error_message.lower()):
@@ -156,7 +162,7 @@ def chat_with_gpt(user_message, use_premium=True, _retry_count=0):
             try:
                 error_data = response.json()
                 error_message = error_data.get("error", {}).get("message", "خطأ غير معروف")
-            except:
+            except (json.JSONDecodeError, ValueError):
                 error_message = f"خطأ HTTP {response.status_code}"
             return f"❌ خطأ من API: {error_message}", model, False
             
