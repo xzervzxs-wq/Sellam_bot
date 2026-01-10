@@ -1776,8 +1776,21 @@
         let eraserCanvas = null;
 
         window.onload = async () => {
-            await document.fonts.ready;
-            await inlineStyles();
+            // Don't wait forever for fonts
+            try {
+                await Promise.race([
+                    document.fonts.ready,
+                    new Promise(resolve => setTimeout(resolve, 2000))
+                ]);
+            } catch(e) {}
+            
+            try {
+                await Promise.race([
+                    inlineStyles(),
+                    new Promise(resolve => setTimeout(resolve, 3000))
+                ]);
+            } catch(e) {}
+            
             resizeCardToFit();
             window.addEventListener('resize', resizeCardToFit);
             
@@ -1786,10 +1799,12 @@
                 initMushaf();
             }
             
-            setTimeout(() => {
-                document.getElementById('startup-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
-            }, 1000);
+            // Remove overlay immediately
+            const overlay = document.getElementById('startup-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 500);
+            }
 
             try {
                 const res = await fetch('https://api.alquran.cloud/v1/surah');
