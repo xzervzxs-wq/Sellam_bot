@@ -1050,15 +1050,15 @@
         $('pageSlider').oninput = (e) => { $('sliderValue').textContent = toAr(e.target.value); };
         $('pageSlider').onchange = (e) => { goToPage(parseInt(e.target.value)); };
 
-        // Touch swipe (عكس الاتجاه - نفس قراءة المصحف)
+        // Touch swipe
         let touchStartX = 0;
         $('mushaf').ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
         $('mushaf').ontouchend = (e) => {
             const diff = e.changedTouches[0].clientX - touchStartX;
             if (Math.abs(diff) > 80) {
-                // سحب لليمين = الصفحة التالية (رقم أصغر)
-                // سحب لليسار = الصفحة السابقة (رقم أكبر)
-                diff > 0 ? next() : prev();
+                // سحب لليسار = الصفحة التالية (رقم أصغر)
+                // سحب لليمين = الصفحة السابقة (رقم أكبر)
+                diff < 0 ? next() : prev();
             }
         };
 
