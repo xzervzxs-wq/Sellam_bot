@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=4.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="theme-color" content="#0a0a0a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>آية - مصحف المدينة</title>
@@ -13,7 +13,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            --bg: #1a1a1a;
+            --bg: #0a0a0a;
             --accent: #c9a227;
             --highlight: rgba(201, 162, 39, 0.5);
         }
@@ -26,24 +26,44 @@
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
+        /* ===== NIGHT MODE ===== */
+        body.night-mode {
+            --bg: #000;
+        }
+        body.night-mode .page-img {
+            filter: invert(1) hue-rotate(180deg) brightness(0.9);
+        }
+
         /* ===== MUSHAF ===== */
         .mushaf {
             height: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
-        .page-container {
-            position: relative;
-            max-width: 100%;
-            max-height: 100%;
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            width: 100%;
         }
 
+        .page-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* قص الإطار من الصورة */
         .page-img {
             display: block;
+            /* تكبير الصورة وقص الأطراف */
+            transform: scale(1.12);
             max-width: 100vw;
-            max-height: 100vh;
+            max-height: calc(100vh - 70px);
             width: auto;
             height: auto;
         }
@@ -51,10 +71,10 @@
         /* ===== AYAH LINES OVERLAY ===== */
         .lines-overlay {
             position: absolute;
-            top: 7%;
-            bottom: 5%;
-            left: 5%;
-            right: 5%;
+            top: 2%;
+            bottom: 2%;
+            left: 8%;
+            right: 8%;
             display: flex;
             flex-direction: column;
         }
@@ -64,7 +84,7 @@
             position: relative;
         }
 
-        /* ===== HIGHLIGHT - أوضح وأقوى ===== */
+        /* ===== HIGHLIGHT ===== */
         .line-highlight {
             position: absolute;
             top: 2px;
@@ -82,6 +102,37 @@
 
         .line-touch.active .line-highlight {
             opacity: 1;
+        }
+
+        /* ===== BOTTOM BAR (دائماً ظاهر) ===== */
+        .bottom-simple {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding: 12px 20px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            background: transparent;
+        }
+
+        .simple-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: rgba(50,50,50,0.6);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .simple-btn.active {
+            background: var(--accent);
+            color: #000;
         }
 
         /* ===== FLOATING ACTIONS ===== */
@@ -125,6 +176,90 @@
         .action-icon:active {
             background: rgba(201, 162, 39, 0.25);
             transform: scale(0.95);
+        }
+
+        /* ===== FULL MENU (يظهر بضغطتين) ===== */
+        .full-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            padding-top: max(16px, env(safe-area-inset-top));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .full-menu.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .menu-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: rgba(60,60,60,0.9);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .page-info {
+            text-align: center;
+        }
+
+        .surah-name {
+            color: var(--accent);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .page-num {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .full-nav {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .full-nav.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .nav-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: rgba(60,60,60,0.9);
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
         }
 
         /* ===== TAFSIR MODAL ===== */
@@ -230,93 +365,6 @@
             color: #888;
             text-align: center;
             padding: 40px;
-        }
-
-        /* ===== TOP BAR ===== */
-        .top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 12px 16px;
-            padding-top: max(12px, env(safe-area-inset-top));
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 50;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .top-bar.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .top-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 21px;
-            background: rgba(60,60,60,0.9);
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .page-info {
-            text-align: center;
-        }
-
-        .surah-name {
-            color: var(--accent);
-            font-size: 17px;
-            font-weight: 600;
-        }
-
-        .page-num {
-            color: rgba(255,255,255,0.7);
-            font-size: 13px;
-            margin-top: 3px;
-        }
-
-        /* ===== BOTTOM BAR ===== */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            z-index: 50;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .bottom-bar.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .nav-row {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-        }
-
-        .nav-btn {
-            width: 54px;
-            height: 54px;
-            border-radius: 27px;
-            background: rgba(60,60,60,0.9);
-            border: none;
-            color: #fff;
-            font-size: 22px;
-            cursor: pointer;
         }
 
         /* ===== INDEX ===== */
@@ -459,7 +507,7 @@
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            bottom: 100px;
+            bottom: 120px;
             left: 50%;
             transform: translateX(-50%) translateY(50px);
             background: #444;
@@ -511,9 +559,17 @@
 <body>
     <!-- Mushaf -->
     <div class="mushaf" id="mushaf">
-        <div class="page-container" id="pageContainer">
-            <img class="page-img" id="pageImg">
-            <div class="lines-overlay" id="linesOverlay"></div>
+        <div class="page-wrapper">
+            <div class="page-container" id="pageContainer">
+                <img class="page-img" id="pageImg">
+                <div class="lines-overlay" id="linesOverlay"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Simple Bar (always visible) -->
+        <div class="bottom-simple">
+            <button class="simple-btn" id="nightBtn" title="الوضع الليلي">🌙</button>
+            <button class="simple-btn" id="bookmarkBtn" title="علامة مرجعية">🔖</button>
         </div>
     </div>
 
@@ -521,26 +577,22 @@
     <div class="floating-actions" id="floatingActions">
         <button class="action-icon" id="btnPlay" title="استماع">▶️</button>
         <button class="action-icon" id="btnTafsir" title="تفسير">📖</button>
-        <button class="action-icon" id="btnBookmark" title="علامة">🔖</button>
         <button class="action-icon" id="btnCopy" title="نسخ">📋</button>
     </div>
 
-    <!-- Top Bar -->
-    <div class="top-bar" id="topBar">
-        <button class="top-btn" id="menuBtn">☰</button>
+    <!-- Full Menu (appears on double tap) -->
+    <div class="full-menu" id="fullMenu">
+        <button class="menu-btn" id="menuBtn">☰</button>
         <div class="page-info">
             <div class="surah-name" id="surahName">الفاتحة</div>
-            <div class="page-num" id="pageNum">١</div>
+            <div class="page-num" id="pageNum">صفحة ١</div>
         </div>
-        <button class="top-btn" id="jumpBtn">📖</button>
+        <button class="menu-btn" id="jumpBtn">📖</button>
     </div>
 
-    <!-- Bottom Bar -->
-    <div class="bottom-bar" id="bottomBar">
-        <div class="nav-row">
-            <button class="nav-btn" id="prevBtn">→</button>
-            <button class="nav-btn" id="nextBtn">←</button>
-        </div>
+    <div class="full-nav" id="fullNav">
+        <button class="nav-btn" id="prevBtn">←</button>
+        <button class="nav-btn" id="nextBtn">→</button>
     </div>
 
     <!-- Tafsir Modal -->
@@ -595,10 +647,12 @@
 
         // ========== STATE ==========
         let page = parseInt(localStorage.getItem('ayah_page')) || 1;
-        let uiVisible = false;
+        let menuVisible = false;
         let selectedLine = null;
         let ayatData = [];
         let currentAyah = null;
+        let nightMode = localStorage.getItem('ayah_night') === 'true';
+        let lastTap = 0;
 
         // ========== SURAHS ==========
         const surahs = [
@@ -724,10 +778,23 @@
         const imgUrl = p => CDN + String(p).padStart(3, '0') + '.png';
         const getSurah = () => surahs.filter(s => page >= s.p).pop() || surahs[0];
 
+        // ========== NIGHT MODE ==========
+        function applyNightMode() {
+            document.body.classList.toggle('night-mode', nightMode);
+            $('nightBtn').classList.toggle('active', nightMode);
+        }
+
+        function toggleNightMode() {
+            nightMode = !nightMode;
+            localStorage.setItem('ayah_night', nightMode);
+            applyNightMode();
+        }
+
         // ========== LOAD PAGE ==========
         function loadPage(p) {
             page = Math.max(1, Math.min(TOTAL, p));
             clearSelection();
+            hideMenu();
             
             const img = $('pageImg');
             img.src = imgUrl(page);
@@ -738,7 +805,7 @@
             
             updateInfo();
             localStorage.setItem('ayah_page', page);
-            ayatData = []; // Reset ayat cache
+            ayatData = [];
         }
 
         function updateInfo() {
@@ -768,21 +835,18 @@
         async function onLineClick(event, lineNum) {
             event.stopPropagation();
             
-            // If same line clicked, deselect
             if (selectedLine === lineNum) {
                 clearSelection();
                 return;
             }
             
-            // Clear previous and select new
             clearSelection();
+            hideMenu();
             selectedLine = lineNum;
             
-            // Highlight the line
             const lineEl = document.querySelector(`[data-line="${lineNum}"]`);
             lineEl.classList.add('active');
             
-            // Load ayat data if needed
             if (ayatData.length === 0) {
                 try {
                     const res = await fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?language=ar&words=true&word_fields=line_number&fields=text_uthmani`);
@@ -794,23 +858,18 @@
                 }
             }
             
-            // Find ayah for this line
             const ayah = ayatData.find(a => a.words?.some(w => w.line_number === lineNum));
             if (ayah) {
                 currentAyah = ayah;
                 
-                // Highlight ALL lines of this ayah
                 const lines = new Set();
                 ayah.words?.forEach(w => w.line_number && lines.add(w.line_number));
                 lines.forEach(ln => {
                     document.querySelector(`[data-line="${ln}"]`)?.classList.add('active');
                 });
                 
-                // Show floating actions near the touched point
                 showFloatingActions(event, lineNum);
             }
-            
-            hideUI();
         }
 
         // ========== SHOW FLOATING ACTIONS ==========
@@ -819,14 +878,12 @@
             const container = $('pageContainer');
             const rect = container.getBoundingClientRect();
             
-            // Position above the touched line
             const lineEl = document.querySelector(`[data-line="${lineNum}"]`);
             const lineRect = lineEl.getBoundingClientRect();
             
             let top = lineRect.top - 65;
             let left = rect.left + rect.width / 2;
             
-            // Adjust if too close to top
             if (top < 70) {
                 top = lineRect.bottom + 15;
             }
@@ -845,21 +902,33 @@
             $('floatingActions').classList.remove('visible');
         }
 
-        // ========== UI TOGGLE ==========
-        function toggleUI() {
+        // ========== MENU (Double Tap) ==========
+        function toggleMenu() {
             if (selectedLine) {
                 clearSelection();
                 return;
             }
-            uiVisible = !uiVisible;
-            $('topBar').classList.toggle('visible', uiVisible);
-            $('bottomBar').classList.toggle('visible', uiVisible);
+            menuVisible = !menuVisible;
+            $('fullMenu').classList.toggle('visible', menuVisible);
+            $('fullNav').classList.toggle('visible', menuVisible);
         }
 
-        function hideUI() {
-            uiVisible = false;
-            $('topBar').classList.remove('visible');
-            $('bottomBar').classList.remove('visible');
+        function hideMenu() {
+            menuVisible = false;
+            $('fullMenu').classList.remove('visible');
+            $('fullNav').classList.remove('visible');
+        }
+
+        // ========== DOUBLE TAP DETECTION ==========
+        function handleTap(event) {
+            const now = Date.now();
+            const timeDiff = now - lastTap;
+            lastTap = now;
+            
+            if (timeDiff < 300 && timeDiff > 0) {
+                // Double tap
+                toggleMenu();
+            }
         }
 
         // ========== TAFSIR ==========
@@ -875,7 +944,6 @@
             
             $('tafsirOverlay').classList.add('visible');
             
-            // Load Tafsir Al-Jalalayn (ID: 74)
             try {
                 const res = await fetch(`https://api.quran.com/api/v4/tafsirs/74/by_ayah/${currentAyah.verse_key}`);
                 const data = await res.json();
@@ -905,6 +973,7 @@
         function addBookmark() {
             localStorage.setItem('ayah_bookmark', page);
             toast('تم حفظ العلامة ✓');
+            $('bookmarkBtn').classList.add('active');
         }
 
         // ========== COPY ==========
@@ -957,21 +1026,25 @@
             setTimeout(() => $('toast').classList.remove('visible'), 2000);
         }
 
-        // ========== NAVIGATION ==========
-        function next() { loadPage(page + 1); }
-        function prev() { loadPage(page - 1); }
+        // ========== NAVIGATION (عكس الاتجاه - يمين = التالي، يسار = السابق) ==========
+        function next() { loadPage(page - 1); } // في المصحف العربي، الصفحة التالية على اليمين
+        function prev() { loadPage(page + 1); } // والصفحة السابقة على اليسار
 
         // ========== EVENTS ==========
-        $('mushaf').onclick = toggleUI;
+        $('mushaf').onclick = handleTap;
+        $('nightBtn').onclick = (e) => { e.stopPropagation(); toggleNightMode(); };
+        $('bookmarkBtn').onclick = (e) => { e.stopPropagation(); addBookmark(); };
+        
         $('menuBtn').onclick = (e) => { e.stopPropagation(); showIndex(); };
         $('jumpBtn').onclick = (e) => { e.stopPropagation(); showSlider(); };
         $('indexClose').onclick = closeIndex;
-        $('prevBtn').onclick = (e) => { e.stopPropagation(); prev(); };
-        $('nextBtn').onclick = (e) => { e.stopPropagation(); next(); };
+        
+        // Navigation buttons (عكس الاتجاه)
+        $('prevBtn').onclick = (e) => { e.stopPropagation(); prev(); }; // ← = الصفحة السابقة (رقم أكبر)
+        $('nextBtn').onclick = (e) => { e.stopPropagation(); next(); }; // → = الصفحة التالية (رقم أصغر)
 
         $('btnPlay').onclick = (e) => { e.stopPropagation(); playAyah(); };
         $('btnTafsir').onclick = (e) => { e.stopPropagation(); showTafsir(); };
-        $('btnBookmark').onclick = (e) => { e.stopPropagation(); addBookmark(); };
         $('btnCopy').onclick = (e) => { e.stopPropagation(); copyAyah(); };
 
         $('tafsirClose').onclick = closeTafsir;
@@ -981,24 +1054,34 @@
         $('pageSlider').oninput = (e) => { $('sliderValue').textContent = toAr(e.target.value); };
         $('pageSlider').onchange = (e) => { goToPage(parseInt(e.target.value)); };
 
-        // Touch swipe
+        // Touch swipe (عكس الاتجاه - نفس قراءة المصحف)
         let touchStartX = 0;
         $('mushaf').ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
         $('mushaf').ontouchend = (e) => {
             const diff = e.changedTouches[0].clientX - touchStartX;
             if (Math.abs(diff) > 80) {
-                diff > 0 ? prev() : next();
+                // سحب لليمين = الصفحة التالية (رقم أصغر)
+                // سحب لليسار = الصفحة السابقة (رقم أكبر)
+                diff > 0 ? next() : prev();
             }
         };
 
-        // Keyboard
+        // Keyboard (عكس الاتجاه)
         document.onkeydown = (e) => {
-            if (e.key === 'ArrowLeft') next();
-            if (e.key === 'ArrowRight') prev();
-            if (e.key === 'Escape') { closeTafsir(); closeIndex(); closeSlider(); clearSelection(); }
+            if (e.key === 'ArrowLeft') prev();  // يسار = صفحة سابقة
+            if (e.key === 'ArrowRight') next(); // يمين = صفحة تالية
+            if (e.key === 'Escape') { closeTafsir(); closeIndex(); closeSlider(); clearSelection(); hideMenu(); }
         };
 
         // ========== INIT ==========
+        applyNightMode();
+        
+        // Check if bookmark exists
+        const bookmark = localStorage.getItem('ayah_bookmark');
+        if (bookmark == page) {
+            $('bookmarkBtn').classList.add('active');
+        }
+        
         loadPage(page);
     </script>
 </body>
