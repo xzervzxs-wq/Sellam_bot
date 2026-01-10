@@ -908,11 +908,17 @@
     </div>
 
     <!-- Start Overlay -->
-    <div id="startup-overlay" style="position:fixed; inset:0; background:#1a472a; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s;">
+    <div id="startup-overlay" style="position:fixed; inset:0; background:#1a472a; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s; animation: fadeOut 1.5s forwards;">
         <i class="fas fa-kaaba text-[#c5a059] text-6xl mb-4 animate-pulse"></i>
         <div class="text-white font-bold text-xl mt-4 font-serif">القرآن الكريم</div>
         <div class="text-[#c5a059] text-sm">تطبيق متكامل</div>
     </div>
+    <style>
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+    </style>
     
     <!-- Export Overlay with Progress Bar -->
     <div id="export-overlay" style="display:none; position:fixed; inset:0; background:rgba(26,71,42,0.98); z-index:100000; flex-direction:column; justify-content:center; align-items:center;">
