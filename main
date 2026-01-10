@@ -9,17 +9,32 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import concurrent.futures
+import time
 
 # ==============================================================================
 # 🔑 إعدادات البيئة
 # ==============================================================================
 load_dotenv()
 EODHD_API_KEY = os.getenv("EODHD_API_KEY")
-TELEGRAM_BOT_TOKEN = "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg"
-TELEGRAM_CHAT_ID = "237657512"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# التحقق من المتغيرات المطلوبة
+if not TELEGRAM_BOT_TOKEN:
+    raise ValueError("TELEGRAM_BOT_TOKEN is required. Please set it in your .env file.")
+if not TELEGRAM_CHAT_ID:
+    raise ValueError("TELEGRAM_CHAT_ID is required. Please set it in your .env file.")
 
 MAX_WORKERS = 10  # زيادة السرعة
 FLOAT_CACHE_FILE = "float_cache.json"
+CHAT_HISTORY_FILE = "chat_history.json"
+LAST_UPDATE_ID_FILE = "last_update_id.json"
+USER_PREFERENCES_FILE = "user_preferences.json"
+
+# نماذج GPT المتاحة
+GPT_PREMIUM_MODEL = "gpt-4"  # النموذج المميز
+GPT_STANDARD_MODEL = "gpt-3.5-turbo"  # النموذج القياسي (مجاني مع الخطة)
 
 # ==============================================================================
 # 🛠️ أدوات التنظيف والجلب
@@ -37,6 +52,221 @@ def save_json_file(filename, data):
     except: pass
 
 float_cache = load_json_file(FLOAT_CACHE_FILE)
+
+# ==============================================================================
+# 💬 دوال الدردشة مع GPT
+# ==============================================================================
+def load_last_update_id():
+    """تحميل آخر معرف تحديث من ملف"""
+    data = load_json_file(LAST_UPDATE_ID_FILE)
+    return data.get("last_update_id", 0)
+
+def save_last_update_id(update_id):
+    """حفظ آخر معرف تحديث"""
+    save_json_file(LAST_UPDATE_ID_FILE, {"last_update_id": update_id})
+
+def send_telegram_message(chat_id, text):
+    """إرسال رسالة عبر تليجرام"""
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "Markdown"
+    }
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        return response.json()
+    except Exception as e:
+        print(f"❌ خطأ في إرسال الرسالة: {e}")
+        return None
+
+def get_user_preference(chat_id, key, default=None):
+    """الحصول على تفضيل مستخدم"""
+    prefs = load_json_file(USER_PREFERENCES_FILE)
+    user_prefs = prefs.get(str(chat_id), {})
+    return user_prefs.get(key, default)
+
+def set_user_preference(chat_id, key, value):
+    """حفظ تفضيل مستخدم"""
+    prefs = load_json_file(USER_PREFERENCES_FILE)
+    if str(chat_id) not in prefs:
+        prefs[str(chat_id)] = {}
+    prefs[str(chat_id)][key] = value
+    save_json_file(USER_PREFERENCES_FILE, prefs)
+
+def chat_with_gpt(user_message, use_premium=True, _retry_count=0):
+    """
+    الدردشة مع GPT مع دعم النماذج المميزة والقياسية
+    
+    Args:
+        user_message: رسالة المستخدم
+        use_premium: استخدام النموذج المميز (True) أو القياسي (False)
+        _retry_count: عداد داخلي لمنع التكرار اللانهائي
+    
+    Returns:
+        tuple: (response_text, model_used, success)
+    """
+    if not OPENAI_API_KEY:
+        return "⚠️ لم يتم تكوين مفتاح OpenAI API. يرجى إضافة OPENAI_API_KEY في ملف .env", None, False
+    
+    # منع التكرار اللانهائي - السماح بمحاولة واحدة فقط (التراجع من premium إلى standard)
+    if _retry_count > 0:
+        return "❌ فشلت جميع محاولات الاتصال بالنماذج. يرجى المحاولة لاحقاً.", None, False
+    
+    model = GPT_PREMIUM_MODEL if use_premium else GPT_STANDARD_MODEL
+    
+    headers = {
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "أنت مساعد ذكي ومفيد. أجب على الأسئلة باللغة العربية عندما يكون ذلك مناسباً."},
+            {"role": "user", "content": user_message}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 1000
+    }
+    
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            answer = data["choices"][0]["message"]["content"]
+            return answer, model, True
+        
+        elif response.status_code == 429 or response.status_code == 403:
+            # تجاوز حد الطلبات المميزة - التبديل إلى النموذج القياسي
+            try:
+                error_data = response.json()
+                error_message = error_data.get("error", {}).get("message", "")
+            except (json.JSONDecodeError, ValueError):
+                error_message = response.text
+            
+            if use_premium and ("quota" in error_message.lower() or "allowance" in error_message.lower()):
+                print("⚠️ تجاوز حد الطلبات المميزة، التبديل إلى النموذج القياسي...")
+                # إعادة المحاولة مع النموذج القياسي
+                return chat_with_gpt(user_message, use_premium=False, _retry_count=_retry_count + 1)
+            
+            return f"❌ خطأ: {error_message}", model, False
+        
+        else:
+            try:
+                error_data = response.json()
+                error_message = error_data.get("error", {}).get("message", "خطأ غير معروف")
+            except (json.JSONDecodeError, ValueError):
+                error_message = f"خطأ HTTP {response.status_code}"
+            return f"❌ خطأ من API: {error_message}", model, False
+            
+    except requests.exceptions.Timeout:
+        return "⏱️ انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.", model, False
+    except Exception as e:
+        return f"❌ حدث خطأ: {str(e)}", model, False
+
+def get_telegram_updates(offset=None):
+    """الحصول على التحديثات من تليجرام"""
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
+    params = {
+        "timeout": 30,
+        "allowed_updates": ["message"]
+    }
+    if offset:
+        params["offset"] = offset
+    
+    try:
+        response = requests.get(url, params=params, timeout=35)
+        if response.status_code == 200:
+            return response.json().get("result", [])
+    except Exception as e:
+        print(f"❌ خطأ في جلب التحديثات: {e}")
+    
+    return []
+
+def process_telegram_messages():
+    """معالجة رسائل تليجرام الواردة"""
+    last_update_id = load_last_update_id()
+    updates = get_telegram_updates(offset=last_update_id + 1 if last_update_id else None)
+    
+    for update in updates:
+        update_id = update.get("update_id")
+        message = update.get("message", {})
+        chat_id = message.get("chat", {}).get("id")
+        text = message.get("text", "")
+        
+        if not text or not chat_id:
+            continue
+        
+        # تجاهل الأوامر الخاصة بالبوت (مثل /start)
+        if text.startswith("/"):
+            if text == "/start":
+                welcome_msg = (
+                    "👋 مرحباً! أنا بوت سلام للدردشة الذكية.\n\n"
+                    "💡 يمكنك:\n"
+                    "• إرسال أي سؤال وسأجيب عليه\n"
+                    "• استخدام /premium للتبديل إلى النموذج المميز GPT-4\n"
+                    "• استخدام /standard للتبديل إلى النموذج القياسي GPT-3.5\n"
+                    "• استخدام /help لعرض المساعدة\n\n"
+                    "🎯 أرسل رسالتك الآن!"
+                )
+                send_telegram_message(chat_id, welcome_msg)
+            elif text == "/help":
+                help_msg = (
+                    "📚 **مساعدة بوت سلام**\n\n"
+                    "**الأوامر المتاحة:**\n"
+                    "• /start - بدء المحادثة\n"
+                    "• /premium - التبديل إلى GPT-4 (مميز)\n"
+                    "• /standard - التبديل إلى GPT-3.5 (قياسي)\n"
+                    "• /help - عرض هذه المساعدة\n\n"
+                    "**حول النماذج:**\n"
+                    "• GPT-4: نموذج متقدم بقدرات فائقة (محدود الطلبات)\n"
+                    "• GPT-3.5: نموذج قياسي سريع وموثوق (مجاني)\n\n"
+                    "عند تجاوز حد الطلبات المميزة، سيتم التبديل تلقائياً إلى النموذج القياسي."
+                )
+                send_telegram_message(chat_id, help_msg)
+            elif text == "/premium":
+                set_user_preference(chat_id, "use_premium", True)
+                send_telegram_message(chat_id, "✅ تم التبديل إلى النموذج المميز GPT-4 🌟\n\nسيتم استخدام GPT-4 للرسائل القادمة.")
+            elif text == "/standard":
+                set_user_preference(chat_id, "use_premium", False)
+                send_telegram_message(chat_id, "✅ تم التبديل إلى النموذج القياسي GPT-3.5 ⚡\n\nسيتم استخدام GPT-3.5 للرسائل القادمة.")
+            
+            save_last_update_id(update_id)
+            continue
+        
+        print(f"📨 رسالة جديدة من {chat_id}: {text}")
+        
+        # إرسال رسالة "يكتب..."
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendChatAction",
+            json={"chat_id": chat_id, "action": "typing"}
+        )
+        
+        # الحصول على تفضيل المستخدم للنموذج (افتراضياً استخدام المميز مع التراجع التلقائي)
+        use_premium = get_user_preference(chat_id, "use_premium", True)
+        response_text, model_used, success = chat_with_gpt(text, use_premium=use_premium)
+        
+        # إضافة معلومات عن النموذج المستخدم
+        if success and model_used:
+            model_name = "GPT-4 🌟" if model_used == GPT_PREMIUM_MODEL else "GPT-3.5 ⚡"
+            full_response = f"{response_text}\n\n_النموذج المستخدم: {model_name}_"
+        else:
+            full_response = response_text
+        
+        # إرسال الرد
+        send_telegram_message(chat_id, full_response)
+        
+        # حفظ آخر معرف تحديث
+        save_last_update_id(update_id)
+        print(f"✅ تم الرد على الرسالة باستخدام {model_used}")
+
 
 def get_float_shares_safe(symbol):
     if symbol in float_cache: return float_cache[symbol]
@@ -104,9 +334,8 @@ def evaluate_strategy(ticker):
 # ==============================================================================
 # 🚀 المشغل الرئيسي
 # ==============================================================================
-def main():
-    # هنا ضع الأسهم التي تريد مراقبتها (أو اربطها بـ Finviz)
-    # سأضع أمثلة لأسهم تتحرك الآن
+def run_stock_monitor():
+    """تشغيل مراقبة الأسهم"""
     watch_list = ["TSLA", "NBY", "SIDU", "MVIS", "AAPL", "AMD", "NVDA", "RIVN", "MARA", "RIOT"]
 
     print(f"📡 بدء المراقبة الحية لـ {len(watch_list)} سهم...")
@@ -118,12 +347,49 @@ def main():
             if msg:
                 print("✅ تم العثور على فرصة!")
                 # إرسال لتليجرام
-                url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-                requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "Markdown"})
-            else:
-                pass
+                send_telegram_message(TELEGRAM_CHAT_ID, msg)
 
-    print("🏁 انتهت دورة الفحص.")
+    print("🏁 انتهت دورة فحص الأسهم.")
+
+def main():
+    """المشغل الرئيسي - دمج مراقبة الأسهم والدردشة"""
+    print("🤖 بوت سلام - بدء التشغيل...")
+    print(f"📱 معرف التليجرام: {TELEGRAM_CHAT_ID}")
+    
+    if OPENAI_API_KEY:
+        print("✅ مفتاح OpenAI API متوفر - الدردشة مفعلة")
+    else:
+        print("⚠️ مفتاح OpenAI API غير متوفر - الدردشة معطلة")
+    
+    print("\n🔄 بدء حلقة المعالجة الرئيسية...")
+    print("💬 معالجة رسائل الدردشة...")
+    print("📊 مراقبة الأسهم كل 5 دقائق...\n")
+    
+    last_stock_check = 0
+    stock_check_interval = 300  # 5 دقائق
+    
+    try:
+        while True:
+            # معالجة رسائل تليجرام
+            try:
+                process_telegram_messages()
+            except Exception as e:
+                print(f"❌ خطأ في معالجة الرسائل: {e}")
+            
+            # فحص الأسهم كل 5 دقائق
+            current_time = time.time()
+            if current_time - last_stock_check >= stock_check_interval:
+                try:
+                    run_stock_monitor()
+                except Exception as e:
+                    print(f"❌ خطأ في مراقبة الأسهم: {e}")
+                last_stock_check = current_time
+            
+            # انتظار قصير قبل الدورة التالية
+            time.sleep(2)
+            
+    except KeyboardInterrupt:
+        print("\n🛑 تم إيقاف البوت بواسطة المستخدم")
 
 if __name__ == "__main__":
     main()
