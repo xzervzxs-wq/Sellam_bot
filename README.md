@@ -1,1 +1,1 @@
-# Sellam_bot
+المصحف القرآني صفحات بدقة عالية للمصحف Quran Pages Svg 
