@@ -1,4 +1,56 @@
 {
+  "001": {
+    "path38": {
+      "surah": 1,
+      "ayah": 1
+    },
+    "path42": {
+      "surah": 1,
+      "ayah": 2
+    },
+    "path50": {
+      "surah": 1,
+      "ayah": 3
+    },
+    "path46": {
+      "surah": 1,
+      "ayah": 4
+    },
+    "path54": {
+      "surah": 1,
+      "ayah": 5
+    },
+    "path58": {
+      "surah": 1,
+      "ayah": 6
+    },
+    "path62": {
+      "surah": 1,
+      "ayah": 7
+    }
+  },
+  "002": {
+    "path38": {
+      "surah": 2,
+      "ayah": 1
+    },
+    "path50": {
+      "surah": 2,
+      "ayah": 2
+    },
+    "path54": {
+      "surah": 2,
+      "ayah": 3
+    },
+    "path46": {
+      "surah": 2,
+      "ayah": 4
+    },
+    "path42": {
+      "surah": 2,
+      "ayah": 5
+    }
+  },
   "003": {
     "path22": {
       "surah": 2,
