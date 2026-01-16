@@ -475,6 +475,66 @@
       "ayah": 141
     }
   },
+  "022": {
+    "path26": {
+      "surah": 2,
+      "ayah": 142
+    },
+    "path30": {
+      "surah": 2,
+      "ayah": 143
+    },
+    "path34": {
+      "surah": 2,
+      "ayah": 144
+    },
+    "path38": {
+      "surah": 2,
+      "ayah": 145
+    }
+  },
+  "024": {
+    "path26": {
+      "surah": 2,
+      "ayah": 154
+    },
+    "path30": {
+      "surah": 2,
+      "ayah": 155
+    },
+    "path34": {
+      "surah": 2,
+      "ayah": 156
+    },
+    "path38": {
+      "surah": 2,
+      "ayah": 157
+    },
+    "path42": {
+      "surah": 2,
+      "ayah": 158
+    },
+    "path46": {
+      "surah": 2,
+      "ayah": 159
+    },
+    "path50": {
+      "surah": 2,
+      "ayah": 160
+    },
+    "path54": {
+      "surah": 2,
+      "ayah": 161
+    },
+    "path58": {
+      "surah": 2,
+      "ayah": 162
+    },
+    "path62": {
+      "surah": 2,
+      "ayah": 163
+    }
+  },
   "025": {
     "path22": {
       "surah": 2,
