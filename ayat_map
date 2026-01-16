@@ -510,5 +510,141 @@
       "surah": 3,
       "ayah": 37
     }
+  },
+  "055": {
+    "path22": {
+      "surah": 3,
+      "ayah": 38
+    },
+    "path26": {
+      "surah": 3,
+      "ayah": 39
+    },
+    "path30": {
+      "surah": 3,
+      "ayah": 40
+    },
+    "path34": {
+      "surah": 3,
+      "ayah": 41
+    },
+    "path38": {
+      "surah": 3,
+      "ayah": 42
+    },
+    "path42": {
+      "surah": 3,
+      "ayah": 43
+    },
+    "path46": {
+      "surah": 3,
+      "ayah": 44
+    },
+    "path50": {
+      "surah": 3,
+      "ayah": 45
+    }
+  },
+  "057": {
+    "path22": {
+      "surah": 3,
+      "ayah": 53
+    },
+    "path26": {
+      "surah": 3,
+      "ayah": 54
+    },
+    "path30": {
+      "surah": 3,
+      "ayah": 55
+    },
+    "path34": {
+      "surah": 3,
+      "ayah": 56
+    },
+    "path38": {
+      "surah": 3,
+      "ayah": 57
+    },
+    "path42": {
+      "surah": 3,
+      "ayah": 58
+    },
+    "path46": {
+      "surah": 3,
+      "ayah": 59
+    },
+    "path50": {
+      "surah": 3,
+      "ayah": 60
+    },
+    "path54": {
+      "surah": 3,
+      "ayah": 61
+    }
+  },
+  "058": {
+    "path22": {
+      "surah": 3,
+      "ayah": 62
+    },
+    "path26": {
+      "surah": 3,
+      "ayah": 63
+    },
+    "path30": {
+      "surah": 3,
+      "ayah": 64
+    },
+    "path34": {
+      "surah": 3,
+      "ayah": 65
+    },
+    "path38": {
+      "surah": 3,
+      "ayah": 66
+    },
+    "path42": {
+      "surah": 3,
+      "ayah": 67
+    },
+    "path46": {
+      "surah": 3,
+      "ayah": 68
+    },
+    "path50": {
+      "surah": 3,
+      "ayah": 69
+    },
+    "path54": {
+      "surah": 3,
+      "ayah": 70
+    }
+  },
+  "060": {
+    "path22": {
+      "surah": 3,
+      "ayah": 78
+    },
+    "path26": {
+      "surah": 3,
+      "ayah": 79
+    },
+    "path30": {
+      "surah": 3,
+      "ayah": 80
+    },
+    "path34": {
+      "surah": 3,
+      "ayah": 81
+    },
+    "path38": {
+      "surah": 3,
+      "ayah": 82
+    },
+    "path42": {
+      "surah": 3,
+      "ayah": 83
+    }
   }
 }
