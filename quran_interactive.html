@@ -453,6 +453,11 @@
             const pageStr = String(currentPage).padStart(3, '0');
             const verseData = ayatMap[pageStr];
 
+            if (!verseData) {
+                showError('البيانات غير متوفرة لهذه الصفحة');
+                return;
+            }
+
             // Highlight all paths of current verse
             highlightVerse(verseData);
 
@@ -482,17 +487,25 @@
 
             // Remove previous highlights
             svgEl.querySelectorAll('path, g').forEach(el => {
+                el.style.fill = '';
                 el.style.opacity = '1';
                 el.classList.remove('highlighted');
             });
 
-            // Highlight all paths of current verse
-            for (const [pathId, data] of Object.entries(verseData)) {
-                if (data.ayah === currentVerse && data.surah === currentSurah) {
-                    const element = svgEl.getElementById(pathId);
-                    if (element) {
-                        element.style.opacity = '0.5';
-                        element.classList.add('highlighted');
+            // Highlight ALL paths of current verse from ayatMap
+            const pageStr = String(currentPage).padStart(3, '0');
+            const pageAyat = ayatMap[pageStr];
+
+            if (pageAyat) {
+                for (const [pathId, data] of Object.entries(pageAyat)) {
+                    // إذا كانت نفس السورة والآية، ظلل الـ path
+                    if (data.ayah === currentVerse && data.surah === currentSurah) {
+                        const element = svgEl.getElementById(pathId);
+                        if (element) {
+                            element.style.fill = 'rgba(197, 160, 89, 0.5)';
+                            element.style.opacity = '1';
+                            element.classList.add('highlighted');
+                        }
                     }
                 }
             }
