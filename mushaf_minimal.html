@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#e8dcc8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>المصحف الرقمي</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            background: #e8dcc8;
+            color: #333;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            transition: background-color 0.3s ease;
+        }
+        
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Mushaf Viewer --- */
+        .mushaf-viewer {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: #e8dcc8;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        
+        body.dark-mode .mushaf-viewer {
+            background: #1a1a1a;
+        }
+
+        .page-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: filter 0.3s;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        
+        body.dark-mode .page-image {
+            filter: invert(0.9) hue-rotate(180deg);
+        }
+
+        /* --- Bottom Control Bar --- */
+        .control-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            border-top: 1px solid #d4c4b0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        body.dark-mode .control-bar {
+            background: #222;
+            border-top-color: #444;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .control-btn:active {
+            color: #c5a059;
+            transform: scale(0.9);
+        }
+        
+        body.dark-mode .control-btn {
+            color: #999;
+        }
+
+        /* --- Ayah Context Menu --- */
+        .ayah-menu {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+            display: none;
+            z-index: 200;
+            min-width: 280px;
+            animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        body.dark-mode .ayah-menu {
+            background: #222;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .ayah-menu.visible {
+            display: block;
+        }
+
+        .menu-text {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #333;
+            font-family: 'Amiri', serif;
+        }
+        
+        body.dark-mode .menu-text {
+            color: #ddd;
+        }
+
+        .menu-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .menu-btn {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 60px;
+            white-space: nowrap;
+        }
+
+        .menu-btn.tafsir {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        .menu-btn.tafsir:active {
+            background: #1a472a;
+            transform: scale(0.95);
+        }
+
+        .menu-btn.listen {
+            background: #c5a059;
+            color: white;
+        }
+
+        .menu-btn.listen:active {
+            background: #a0843a;
+            transform: scale(0.95);
+        }
+
+        .menu-btn.bookmark {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .menu-btn.bookmark:active {
+            background: #e0e0e0;
+            transform: scale(0.95);
+        }
+        
+        body.dark-mode .menu-btn.bookmark {
+            background: #333;
+            color: #999;
+        }
+
+        .menu-btn.close {
+            background: #ef4444;
+            color: white;
+            width: 40px;
+            padding: 0;
+            min-width: unset;
+        }
+
+        .menu-btn.close:active {
+            background: #dc2626;
+            transform: scale(0.95);
+        }
+
+        /* --- Tafsir Panel --- */
+        .tafsir-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 60px;
+            background: white;
+            overflow-y: auto;
+            z-index: 150;
+            padding: 20px;
+            display: none;
+        }
+        
+        body.dark-mode .tafsir-panel {
+            background: #1a1a1a;
+            color: #ddd;
+        }
+
+        .tafsir-panel.show {
+            display: block;
+        }
+
+        .tafsir-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #c5a059;
+        }
+
+        .tafsir-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #c5a059;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .tafsir-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #c5a059;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tafsir-content {
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        body.dark-mode .tafsir-content {
+            color: #ddd;
+        }
+
+        /* --- Fullscreen Mode --- */
+        .fullscreen-mode .control-bar {
+            display: none;
+        }
+
+        .fullscreen-mode .ayah-menu {
+            display: none !important;
+        }
+
+        /* --- Loader --- */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 71, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 2000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #c5a059;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            color: white;
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* --- Hidden Elements --- */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+        <p class="loader-text">جاري تحميل المصحف...</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Mushaf Viewer -->
+        <div class="mushaf-viewer">
+            <div class="page-container">
+                <img id="mushaf-page" class="page-image" src="" alt="صفحة المصحف" />
+            </div>
+        </div>
+
+        <!-- Control Bar -->
+        <div class="control-bar">
+            <button class="control-btn" id="dark-mode-btn" title="وضع ليلي">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="control-btn" id="bookmark-btn" title="علامة مرجعية">
+                <i class="fas fa-bookmark"></i>
+            </button>
+        </div>
+
+        <!-- Ayah Context Menu -->
+        <div class="ayah-menu" id="ayah-menu">
+            <div class="menu-text" id="menu-ayah-text"></div>
+            <div class="menu-buttons">
+                <button class="menu-btn listen" id="btn-listen" title="استماع">
+                    <i class="fas fa-play"></i> استماع
+                </button>
+                <button class="menu-btn tafsir" id="btn-tafsir" title="تفسير">
+                    <i class="fas fa-book"></i> تفسير
+                </button>
+                <button class="menu-btn bookmark" id="btn-bookmark-menu" title="حفظ">
+                    <i class="fas fa-bookmark"></i>
+                </button>
+                <button class="menu-btn close" id="btn-close-menu" title="إغلاق">
+                    ✕
+                </button>
+            </div>
+        </div>
+
+        <!-- Tafsir Panel -->
+        <div class="tafsir-panel" id="tafsir-panel">
+            <div class="tafsir-header">
+                <div class="tafsir-title" id="tafsir-title">التفسير</div>
+                <button class="tafsir-close" id="tafsir-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tafsir-content" id="tafsir-content">جاري تحميل التفسير...</div>
+        </div>
+    </div>
+
+    <script>
+        // ============= CONFIG & STATE =============
+        const QURAN_SVG_BASE = 'https://raw.githubusercontent.com/batoulapps/quran-svg/main/svg/';
+        const TOTAL_PAGES = 604;
+        
+        let currentPage = 1;
+        let bookmarks = JSON.parse(localStorage.getItem('quran_bookmarks')) || [];
+        let darkMode = localStorage.getItem('dark_mode') === 'true';
+        let fullscreenMode = false;
+        let currentAyah = null;
+        let tapCount = 0;
+        let tapTimer = null;
+
+        // ============= INITIALIZATION =============
+        window.addEventListener('load', async () => {
+            await initializeApp();
+        });
+
+        async function initializeApp() {
+            applyDarkMode(darkMode);
+            
+            // Load first page
+            await loadMushafPage(1);
+            
+            // Setup event listeners
+            setupPageNavigation();
+            setupDarkModeButton();
+            setupBookmarkButton();
+            setupAyahMenu();
+            setupTafsirPanel();
+            
+            // Hide loader
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 500);
+        }
+
+        // ============= PAGE LOADING =============
+        async function loadMushafPage(pageNum) {
+            if (pageNum < 1 || pageNum > TOTAL_PAGES) return;
+            currentPage = pageNum;
+            
+            const paddedNum = String(pageNum).padStart(3, '0');
+            const url = `${QURAN_SVG_BASE}${paddedNum}.svg`;
+            
+            const img = document.getElementById('mushaf-page');
+            img.src = url;
+            
+            // Reset ayah menu when page changes
+            document.getElementById('ayah-menu').classList.remove('visible');
+        }
+
+        // ============= PAGE NAVIGATION =============
+        function setupPageNavigation() {
+            const viewer = document.querySelector('.mushaf-viewer');
+            let touchStartX = 0;
+            let touchStartTime = 0;
+
+            // Touch swipe
+            viewer.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartTime = Date.now();
+            }, { passive: true });
+
+            viewer.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndTime = Date.now();
+                
+                const distance = Math.abs(touchEndX - touchStartX);
+                const time = touchEndTime - touchStartTime;
+                
+                if (distance > 50 && time < 300) {
+                    if (touchEndX < touchStartX) {
+                        nextPage();
+                    } else {
+                        prevPage();
+                    }
+                }
+            }, { passive: true });
+
+            // Mouse drag
+            let isMouseDown = false;
+            let startX = 0;
+
+            viewer.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                startX = e.clientX;
+            });
+
+            viewer.addEventListener('mousemove', (e) => {
+                if (!isMouseDown) return;
+                const diff = startX - e.clientX;
+                if (Math.abs(diff) > 100) {
+                    isMouseDown = false;
+                    if (diff > 0) nextPage();
+                    else prevPage();
+                }
+            });
+
+            viewer.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
+
+            viewer.addEventListener('mouseleave', () => {
+                isMouseDown = false;
+            });
+
+            // Double tap for fullscreen
+            viewer.addEventListener('click', handleDoubleTap);
+        }
+
+        function nextPage() {
+            if (currentPage < TOTAL_PAGES) {
+                loadMushafPage(currentPage + 1);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                loadMushafPage(currentPage - 1);
+            }
+        }
+
+        function handleDoubleTap() {
+            tapCount++;
+            
+            clearTimeout(tapTimer);
+            
+            if (tapCount === 2) {
+                toggleFullscreen();
+                tapCount = 0;
+            } else {
+                tapTimer = setTimeout(() => {
+                    tapCount = 0;
+                }, 300);
+            }
+        }
+
+        function toggleFullscreen() {
+            fullscreenMode = !fullscreenMode;
+            document.querySelector('.main-container').classList.toggle('fullscreen-mode', fullscreenMode);
+        }
+
+        // ============= DARK MODE =============
+        function setupDarkModeButton() {
+            document.getElementById('dark-mode-btn').addEventListener('click', toggleDarkMode);
+        }
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            localStorage.setItem('dark_mode', darkMode ? 'true' : 'false');
+            applyDarkMode(darkMode);
+        }
+
+        function applyDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        // ============= BOOKMARKS =============
+        function setupBookmarkButton() {
+            document.getElementById('bookmark-btn').addEventListener('click', addBookmark);
+        }
+
+        function addBookmark() {
+            if (!bookmarks.includes(currentPage)) {
+                bookmarks.push(currentPage);
+                bookmarks.sort((a, b) => a - b);
+                localStorage.setItem('quran_bookmarks', JSON.stringify(bookmarks));
+                showToast('تم إضافة علامة مرجعية ✓');
+            } else {
+                removeBookmark(currentPage);
+                showToast('تم حذف العلامة المرجعية');
+            }
+        }
+
+        function removeBookmark(page) {
+            bookmarks = bookmarks.filter(b => b !== page);
+            localStorage.setItem('quran_bookmarks', JSON.stringify(bookmarks));
+        }
+
+        // ============= AYAH MENU =============
+        function setupAyahMenu() {
+            document.getElementById('btn-tafsir').addEventListener('click', showTafsirFromMenu);
+            document.getElementById('btn-bookmark-menu').addEventListener('click', addBookmarkFromMenu);
+            document.getElementById('btn-close-menu').addEventListener('click', hideAyahMenu);
+            document.getElementById('btn-listen').addEventListener('click', playAudio);
+        }
+
+        function showAyahMenu(surah, ayah) {
+            currentAyah = { surah, ayah };
+            document.getElementById('menu-ayah-text').textContent = `سورة ${surah} - الآية ${ayah}`;
+            document.getElementById('ayah-menu').classList.add('visible');
+        }
+
+        function hideAyahMenu() {
+            document.getElementById('ayah-menu').classList.remove('visible');
+        }
+
+        function showTafsirFromMenu() {
+            if (!currentAyah) return;
+            hideAyahMenu();
+            showTafsir(currentAyah.surah, currentAyah.ayah);
+        }
+
+        function addBookmarkFromMenu() {
+            addBookmark();
+            hideAyahMenu();
+        }
+
+        function playAudio() {
+            if (!currentAyah) return;
+            const url = `https://cdn.alquran.cloud/media/audio/en.alafasy/${currentAyah.surah}_${currentAyah.ayah}.mp3`;
+            const audio = new Audio(url);
+            audio.play().catch(() => showToast('خطأ في تشغيل الصوت'));
+            hideAyahMenu();
+        }
+
+        // ============= TAFSIR PANEL =============
+        function setupTafsirPanel() {
+            document.getElementById('tafsir-close').addEventListener('click', closeTafsir);
+        }
+
+        let tafsirCache = {};
+
+        async function loadTafsir(surah, ayah) {
+            const key = `${surah}:${ayah}`;
+            
+            if (tafsirCache[key]) {
+                return tafsirCache[key];
+            }
+            
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/en.asad`);
+                const data = await res.json();
+                
+                if (data.data) {
+                    const text = data.data.text || 'لم يتم العثور على تفسير';
+                    tafsirCache[key] = text;
+                    return text;
+                }
+            } catch(e) {
+                console.error('Tafsir load error:', e);
+            }
+            
+            return 'حدث خطأ في تحميل التفسير';
+        }
+
+        async function showTafsir(surah, ayah) {
+            const panel = document.getElementById('tafsir-panel');
+            panel.classList.add('show');
+            
+            document.getElementById('tafsir-title').textContent = `سورة ${surah} - الآية ${ayah}`;
+            document.getElementById('tafsir-content').textContent = 'جاري تحميل التفسير...';
+            
+            const tafsirText = await loadTafsir(surah, ayah);
+            document.getElementById('tafsir-content').textContent = tafsirText;
+        }
+
+        function closeTafsir() {
+            document.getElementById('tafsir-panel').classList.remove('show');
+        }
+
+        // ============= UTILS =============
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-family: 'Cairo', sans-serif;
+                z-index: 300;
+                animation: slideUp 0.3s ease-out;
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideDown 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') nextPage();
+            if (e.key === 'ArrowRight') prevPage();
+            if (e.key === 'Escape' && fullscreenMode) toggleFullscreen();
+        });
+    </script>
+</body>
+</html>

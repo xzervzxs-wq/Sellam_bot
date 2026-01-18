@@ -1,0 +1,350 @@
+#!/usr/bin/env python3
+"""
+🔥 Pattern Matcher - مطابقة الأنماط شمعة بشمعة
+يطابق الرسمة بالضبط مع سماحية بسيطة لكل شمعة
+"""
+
+import pandas as pd
+import numpy as np
+
+# =========================================================
+# تحويل الشمعة إلى "بصمة" (Fingerprint)
+# =========================================================
+def candle_fingerprint(candle, prev_candle=None):
+    """
+    استخراج بصمة الشمعة:
+    - اتجاه (خضراء/حمراء)
+    - نسبة الجسم من المدى الكلي
+    - نسبة الذيل العلوي
+    - نسبة الذيل السفلي
+    - هل القاع صاعد؟
+    - هل القمة صاعدة؟
+    """
+    o, h, l, c = candle['open'], candle['high'], candle['low'], candle['close']
+    
+    body = c - o
+    total_range = h - l if h > l else 0.0001
+    
+    upper_wick = h - max(o, c)
+    lower_wick = min(o, c) - l
+    
+    fp = {
+        'direction': 1 if body >= 0 else -1,  # خضراء = 1، حمراء = -1
+        'body_ratio': abs(body) / total_range,
+        'upper_wick_ratio': upper_wick / total_range,
+        'lower_wick_ratio': lower_wick / total_range,
+        'higher_low': None,
+        'higher_high': None,
+    }
+    
+    if prev_candle is not None:
+        fp['higher_low'] = 1 if l > prev_candle['low'] else -1
+        fp['higher_high'] = 1 if h > prev_candle['high'] else -1
+    
+    return fp
+
+# =========================================================
+# مقارنة شمعتين (هل متشابهتين؟)
+# =========================================================
+def compare_candles(fp1, fp2, tolerance=0.15):
+    """
+    مقارنة بصمتين
+    tolerance: السماحية في النسب (15% افتراضياً)
+    
+    Returns: (is_match, score, reason)
+    """
+    score = 0
+    
+    # 1. الاتجاه (لازم يتطابق 100%)
+    if fp1['direction'] != fp2['direction']:
+        dir1 = "🟢" if fp1['direction'] == 1 else "🔴"
+        dir2 = "🟢" if fp2['direction'] == 1 else "🔴"
+        return False, 0, f"اتجاه مختلف ({dir1} vs {dir2})"
+    score += 1
+    
+    # 2. نسبة الجسم (مع سماحية)
+    diff = abs(fp1['body_ratio'] - fp2['body_ratio'])
+    if diff > tolerance:
+        return False, score, f"جسم مختلف ({fp1['body_ratio']:.2f} vs {fp2['body_ratio']:.2f})"
+    score += 1 - (diff / tolerance) * 0.5
+    
+    # 3. الذيل العلوي (مع سماحية)
+    diff = abs(fp1['upper_wick_ratio'] - fp2['upper_wick_ratio'])
+    if diff > tolerance:
+        return False, score, f"ذيل علوي مختلف ({fp1['upper_wick_ratio']:.2f} vs {fp2['upper_wick_ratio']:.2f})"
+    score += 1 - (diff / tolerance) * 0.5
+    
+    # 4. الذيل السفلي (مع سماحية)
+    diff = abs(fp1['lower_wick_ratio'] - fp2['lower_wick_ratio'])
+    if diff > tolerance:
+        return False, score, f"ذيل سفلي مختلف ({fp1['lower_wick_ratio']:.2f} vs {fp2['lower_wick_ratio']:.2f})"
+    score += 1 - (diff / tolerance) * 0.5
+    
+    # 5. القاع الصاعد (لازم يتطابق إذا موجود)
+    if fp1['higher_low'] is not None and fp2['higher_low'] is not None:
+        if fp1['higher_low'] != fp2['higher_low']:
+            hl1 = "↗" if fp1['higher_low'] == 1 else "↘"
+            hl2 = "↗" if fp2['higher_low'] == 1 else "↘"
+            return False, score, f"قاع مختلف ({hl1} vs {hl2})"
+        score += 1
+    
+    # 6. القمة الصاعدة (لازم تتطابق إذا موجودة)
+    if fp1['higher_high'] is not None and fp2['higher_high'] is not None:
+        if fp1['higher_high'] != fp2['higher_high']:
+            hh1 = "↗" if fp1['higher_high'] == 1 else "↘"
+            hh2 = "↗" if fp2['higher_high'] == 1 else "↘"
+            return False, score, f"قمة مختلفة ({hh1} vs {hh2})"
+        score += 1
+    
+    return True, score, "✅"
+
+# =========================================================
+# مقارنة نمطين كاملين (6 شموع)
+# =========================================================
+def compare_patterns(test_candles, pattern_candles, tolerance=0.15):
+    """
+    مقارنة نمطين شمعة بشمعة
+    
+    Returns: (is_match, total_score, failed_candle, reason)
+    """
+    if len(test_candles) != 6 or len(pattern_candles) != 6:
+        return False, 0, 0, "عدد الشموع غير صحيح (لازم 6)"
+    
+    total_score = 0
+    
+    for i in range(6):
+        # البصمة للشمعة الحالية
+        prev_test = test_candles[i-1] if i > 0 else None
+        prev_pattern = pattern_candles[i-1] if i > 0 else None
+        
+        fp_test = candle_fingerprint(test_candles[i], prev_test)
+        fp_pattern = candle_fingerprint(pattern_candles[i], prev_pattern)
+        
+        # المقارنة
+        is_match, score, reason = compare_candles(fp_test, fp_pattern, tolerance)
+        
+        if not is_match:
+            return False, total_score, i + 1, f"شمعة {i+1}: {reason}"
+        
+        total_score += score
+    
+    return True, total_score, 0, "تطابق كامل! ✅"
+
+# =========================================================
+# تحميل الأنماط الناجحة
+# =========================================================
+def load_patterns():
+    """تحميل الأنماط من الملف"""
+    df = pd.read_csv('successful_patterns_clean.csv')
+    
+    patterns = {}
+    for symbol in df['symbol'].unique():
+        sym_df = df[df['symbol'] == symbol]
+        
+        # التأكد من 6 شموع
+        if len(sym_df) != 6:
+            print(f"⚠️ {symbol}: {len(sym_df)} شموع (تجاهل)")
+            continue
+        
+        candles = []
+        for _, row in sym_df.iterrows():
+            candles.append({
+                'open': row['open'],
+                'high': row['high'],
+                'low': row['low'],
+                'close': row['close']
+            })
+        
+        # حساب التغير الكلي
+        total_change = (candles[-1]['close'] - candles[0]['open']) / candles[0]['open'] * 100
+        
+        patterns[symbol] = {
+            'candles': candles,
+            'total_change': total_change
+        }
+    
+    return patterns
+
+# =========================================================
+# البحث عن أفضل تطابق
+# =========================================================
+def find_match(test_candles, patterns, tolerance=0.15):
+    """
+    البحث عن نمط مطابق
+    """
+    best_match = None
+    best_score = 0
+    best_reason = "لا يوجد تطابق"
+    
+    # أفضل فشل (للتوضيح)
+    best_fail_candle = 0
+    best_fail_reason = ""
+    
+    for name, pattern_data in patterns.items():
+        is_match, score, fail_candle, reason = compare_patterns(
+            test_candles, 
+            pattern_data['candles'], 
+            tolerance
+        )
+        
+        if is_match:
+            if score > best_score:
+                best_match = name
+                best_score = score
+                best_reason = reason
+        else:
+            # حفظ أين فشل (للتوضيح)
+            if fail_candle > best_fail_candle:
+                best_fail_candle = fail_candle
+                best_fail_reason = reason
+    
+    if not best_match and best_fail_reason:
+        best_reason = best_fail_reason
+    
+    return best_match, best_score, best_reason
+
+# =========================================================
+# عرض بصمة الشموع
+# =========================================================
+def print_fingerprints(candles, name):
+    """طباعة بصمات الشموع"""
+    print(f"📊 {name}:")
+    prev = None
+    for i, c in enumerate(candles):
+        fp = candle_fingerprint(c, prev)
+        
+        color = "🟢" if fp['direction'] == 1 else "🔴"
+        hl = ""
+        hh = ""
+        if prev:
+            hl = "↗" if fp['higher_low'] == 1 else "↘"
+            hh = "↗" if fp['higher_high'] == 1 else "↘"
+        
+        print(f"   {i+1}. {color} جسم:{fp['body_ratio']:4.0%} | ذيل↑:{fp['upper_wick_ratio']:4.0%} | ذيل↓:{fp['lower_wick_ratio']:4.0%} | قاع:{hl} قمة:{hh}")
+        prev = c
+    
+    change = (candles[-1]['close'] - candles[0]['open']) / candles[0]['open'] * 100
+    print(f"   📈 التغير: {change:+.1f}%")
+    print()
+
+# =========================================================
+# الأنماط الضعيفة (للحذف)
+# =========================================================
+WEAK_PATTERNS = ['EFA', 'GOGO', 'TRP', 'PM', 'SLV']
+
+# =========================================================
+# الاختبار الرئيسي
+# =========================================================
+if __name__ == "__main__":
+    print("=" * 70)
+    print("🔥 Pattern Matcher - مطابقة شمعة بشمعة")
+    print("=" * 70)
+    print()
+    
+    # تحميل الأنماط
+    patterns = load_patterns()
+    print(f"📊 تم تحميل {len(patterns)} نمط")
+    
+    # حذف الضعيفة
+    for weak in WEAK_PATTERNS:
+        if weak in patterns:
+            del patterns[weak]
+    print(f"✅ بعد التنظيف: {len(patterns)} نمط قوي")
+    print()
+    
+    # عرض الأنماط
+    print("📋 الأنماط المتاحة:")
+    for name, data in sorted(patterns.items(), key=lambda x: x[1]['total_change'], reverse=True):
+        print(f"   • {name}: +{data['total_change']:.1f}%")
+    print()
+    
+    # تحميل بيانات الاختبار
+    test_df = pd.read_csv('test_candles_dec19.csv')
+    test_df['date'] = pd.to_datetime(test_df['date'])
+    
+    symbols = test_df['symbol'].unique()
+    print(f"🧪 اختبار على {len(symbols)} سهم")
+    print("-" * 70)
+    print()
+    
+    # السماحية (15% = مرونة بسيطة)
+    TOLERANCE = 0.15
+    
+    results = []
+    
+    for symbol in symbols:
+        sym_df = test_df[test_df['symbol'] == symbol].head(6)  # أول 6 شموع فقط
+        
+        if len(sym_df) < 6:
+            print(f"{symbol:6} | ❌ أقل من 6 شموع")
+            continue
+        
+        # تحويل لقائمة
+        test_candles = []
+        for _, row in sym_df.iterrows():
+            test_candles.append({
+                'open': row['open'],
+                'high': row['high'],
+                'low': row['low'],
+                'close': row['close']
+            })
+        
+        # حساب التغير الفعلي
+        actual_change = (test_candles[-1]['close'] - test_candles[0]['open']) / test_candles[0]['open'] * 100
+        
+        # البحث عن تطابق
+        match_name, score, reason = find_match(test_candles, patterns, TOLERANCE)
+        
+        if match_name:
+            status = f"✅ يشبه {match_name}"
+            expected = patterns[match_name]['total_change']
+        else:
+            status = "❌ لا تطابق"
+            expected = 0
+        
+        results.append({
+            'symbol': symbol,
+            'match': match_name,
+            'score': score,
+            'actual': actual_change,
+            'expected': expected,
+            'reason': reason
+        })
+        
+        print(f"{symbol:6} | {status:20} | فعلي: {actual_change:+6.1f}% | {reason}")
+    
+    print()
+    print("=" * 70)
+    print("📊 الملخص")
+    print("=" * 70)
+    
+    matched = [r for r in results if r['match']]
+    not_matched = [r for r in results if not r['match']]
+    
+    print(f"✅ متطابق: {len(matched)}")
+    print(f"❌ غير متطابق: {len(not_matched)}")
+    print()
+    
+    if matched:
+        print("🎯 الأسهم المتطابقة:")
+        correct = 0
+        for r in matched:
+            if r['actual'] > 0:
+                correct += 1
+                mark = "✅"
+            else:
+                mark = "❌"
+            print(f"   {mark} {r['symbol']} → {r['match']} | فعلي: {r['actual']:+.1f}%")
+        
+        print(f"\n   📈 نسبة النجاح: {correct}/{len(matched)}")
+    
+    # الفرص الضائعة
+    print()
+    print("⚠️ الفرص الضائعة (>5%):")
+    missed = 0
+    for r in not_matched:
+        if r['actual'] > 5:
+            missed += 1
+            print(f"   ⚠️ {r['symbol']}: +{r['actual']:.1f}% | {r['reason']}")
+    if missed == 0:
+        print("   🎉 لا توجد!")

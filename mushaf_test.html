@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مصحف المدينة المصور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .mushaf-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s ease-out;
+        }
+
+        .page {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+        }
+
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .page-number {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: #c5a059;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .page-number.show { opacity: 1; }
+
+        .nav-hint {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 40px;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .nav-hint.left { left: 10px; }
+        .nav-hint.right { right: 10px; }
+        .nav-hint.show { opacity: 1; }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 40px 20px 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: 200;
+        }
+
+        .bottom-bar.show { transform: translateY(0); }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            direction: ltr;
+        }
+
+        .slider-container input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #c5a059;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .page-info {
+            color: white;
+            font-size: 14px;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .buttons button {
+            background: rgba(197, 160, 89, 0.2);
+            color: #c5a059;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .buttons button:active {
+            background: #c5a059;
+            color: #000;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            z-index: 300;
+        }
+
+        .loading i {
+            font-size: 60px;
+            color: #c5a059;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .loading span {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mushaf-container" id="container">
+        <div class="page-wrapper" id="wrapper">
+            <!-- Pages will be inserted here -->
+        </div>
+    </div>
+
+    <div class="page-number" id="pageNum">صفحة ١ من ٦٠٤</div>
+    
+    <div class="nav-hint left" id="hintLeft"><i class="fas fa-chevron-left"></i></div>
+    <div class="nav-hint right" id="hintRight"><i class="fas fa-chevron-right"></i></div>
+
+    <div class="bottom-bar" id="bottomBar">
+        <div class="slider-container">
+            <span class="page-info" id="sliderInfo">1 / 604</span>
+            <input type="range" id="slider" min="1" max="604" value="1">
+        </div>
+        <div class="buttons">
+            <button onclick="goTo(1)"><i class="fas fa-angle-double-right"></i> الأولى</button>
+            <button onclick="goTo(604)"><i class="fas fa-angle-double-left"></i> الأخيرة</button>
+            <button onclick="saveBookmark()"><i class="fas fa-bookmark"></i> حفظ</button>
+            <button onclick="loadBookmark()"><i class="fas fa-book-reader"></i> استرجاع</button>
+            <button onclick="showIndex()"><i class="fas fa-list"></i> الفهرس</button>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>جاري تحميل المصحف...</span>
+    </div>
+
+    <script>
+        const CDN = 'https://www.mp3quran.net/api/quran_pages_arabic/';
+        let currentPage = 1;
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        let barVisible = false;
+
+        // Arabic numbers
+        const toArabic = (n) => n.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+
+        // Load saved
+        const saved = localStorage.getItem('mushaf_current');
+        if (saved) currentPage = parseInt(saved);
+
+        // Image URL
+        const imgUrl = (p) => CDN + String(p).padStart(3, '0') + '.png';
+
+        // Create pages
+        function createPages() {
+            const wrapper = document.getElementById('wrapper');
+            wrapper.innerHTML = '';
+            
+            for (let i = 1; i <= 604; i++) {
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.id = 'page-' + i;
+                
+                if (Math.abs(i - currentPage) <= 2) {
+                    page.innerHTML = `<img src="${imgUrl(i)}" alt="صفحة ${i}" onload="hideLoading()" onerror="this.src=''; this.alt='خطأ في التحميل'">`;
+                }
+                
+                wrapper.appendChild(page);
+            }
+            
+            updatePosition(false);
+        }
+
+        function loadNearbyPages() {
+            for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                if (i >= 1 && i <= 604) {
+                    const page = document.getElementById('page-' + i);
+                    if (page && !page.querySelector('img')) {
+                        page.innerHTML = `<img src="${imgUrl(i)}" alt="صفحة ${i}">`;
+                    }
+                }
+            }
+        }
+
+        function updatePosition(animate = true) {
+            const wrapper = document.getElementById('wrapper');
+            wrapper.style.transition = animate ? 'transform 0.4s ease-out' : 'none';
+            wrapper.style.transform = `translateX(${(currentPage - 1) * 100}%)`;
+            
+            // Update UI
+            document.getElementById('pageNum').textContent = `صفحة ${toArabic(currentPage)} من ٦٠٤`;
+            document.getElementById('sliderInfo').textContent = `${currentPage} / 604`;
+            document.getElementById('slider').value = currentPage;
+            
+            localStorage.setItem('mushaf_current', currentPage);
+            loadNearbyPages();
+        }
+
+        function showPageNumber() {
+            const el = document.getElementById('pageNum');
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2000);
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function goTo(page) {
+            if (page < 1 || page > 604) return;
+            currentPage = page;
+            updatePosition();
+            showPageNumber();
+        }
+
+        function nextPage() {
+            if (currentPage < 604) {
+                currentPage++;
+                updatePosition();
+                showPageNumber();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePosition();
+                showPageNumber();
+            }
+        }
+
+        function toggleBar() {
+            barVisible = !barVisible;
+            document.getElementById('bottomBar').classList.toggle('show', barVisible);
+        }
+
+        function saveBookmark() {
+            localStorage.setItem('mushaf_bookmark', currentPage);
+            alert('تم حفظ الصفحة ' + currentPage + ' ✓');
+        }
+
+        function loadBookmark() {
+            const bm = localStorage.getItem('mushaf_bookmark');
+            if (bm) {
+                goTo(parseInt(bm));
+                toggleBar();
+            } else {
+                alert('لا توجد علامة محفوظة');
+            }
+        }
+
+        function showIndex() {
+            const page = prompt('أدخل رقم الصفحة (1-604):', currentPage);
+            if (page) {
+                const num = parseInt(page);
+                if (num >= 1 && num <= 604) {
+                    goTo(num);
+                    toggleBar();
+                }
+            }
+        }
+
+        // Touch Events
+        const container = document.getElementById('container');
+
+        container.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            currentX = startX;
+            isDragging = true;
+            document.getElementById('wrapper').style.transition = 'none';
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+            const offset = (currentPage - 1) * 100;
+            const dragPercent = (diff / window.innerWidth) * 100;
+            
+            document.getElementById('wrapper').style.transform = `translateX(${offset + dragPercent}%)`;
+            
+            // Show hints
+            if (diff > 30 && currentPage > 1) {
+                document.getElementById('hintRight').classList.add('show');
+            } else {
+                document.getElementById('hintRight').classList.remove('show');
+            }
+            
+            if (diff < -30 && currentPage < 604) {
+                document.getElementById('hintLeft').classList.add('show');
+            } else {
+                document.getElementById('hintLeft').classList.remove('show');
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchend', () => {
+            isDragging = false;
+            document.getElementById('hintLeft').classList.remove('show');
+            document.getElementById('hintRight').classList.remove('show');
+            
+            const diff = currentX - startX;
+            
+            if (Math.abs(diff) > 60) {
+                if (diff > 0) {
+                    prevPage();
+                } else {
+                    nextPage();
+                }
+            } else {
+                updatePosition();
+                if (Math.abs(diff) < 10) {
+                    toggleBar();
+                }
+            }
+        });
+
+        // Slider
+        document.getElementById('slider').addEventListener('input', (e) => {
+            goTo(parseInt(e.target.value));
+        });
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') nextPage();
+            if (e.key === 'ArrowRight') prevPage();
+        });
+
+        // Initialize
+        createPages();
+        showPageNumber();
+    </script>
+</body>
+</html>

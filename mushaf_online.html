@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>مصحف المدينة المنورة | مجمع الملك فهد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --gold: #c5a059;
+            --gold-light: #d4af61;
+            --dark: #0a0a0a;
+            --dark-soft: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        /* Container */
+        .mushaf-container {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Page Wrapper */
+        .page-wrapper {
+            display: flex;
+            height: 100%;
+            will-change: transform;
+        }
+
+        .page-wrapper.animating {
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Single Page */
+        .page {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--dark);
+            position: relative;
+        }
+
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        /* Page placeholder */
+        .page-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            gap: 15px;
+        }
+
+        .page-placeholder i {
+            font-size: 40px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Page Number Badge */
+        .page-badge {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: var(--gold);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .page-badge.show { opacity: 1; }
+
+        /* Surah Name */
+        .surah-badge {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(197, 160, 89, 0.15);
+            color: var(--gold-light);
+            padding: 6px 18px;
+            border-radius: 15px;
+            font-size: 13px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .surah-badge.show { opacity: 1; }
+
+        /* Navigation Arrows */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(197, 160, 89, 0.4);
+            font-size: 35px;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .nav-arrow.left { left: 15px; }
+        .nav-arrow.right { right: 15px; }
+        .nav-arrow.show { 
+            opacity: 1; 
+            color: var(--gold);
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 60%, transparent);
+            padding: 50px 20px 25px;
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            z-index: 200;
+        }
+
+        .bottom-bar.show { transform: translateY(0); }
+
+        /* Slider */
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .page-label {
+            color: white;
+            font-size: 15px;
+            min-width: 75px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.15);
+            border-radius: 4px;
+            direction: ltr;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--gold);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: rgba(197, 160, 89, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(197, 160, 89, 0.25);
+            padding: 12px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            background: var(--gold);
+            color: var(--dark);
+            transform: scale(0.95);
+        }
+
+        .action-btn i {
+            font-size: 16px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            transition: opacity 0.5s;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        .loading-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--gold);
+            animation: fadeIn 1s infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .loading-sub {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+        }
+
+        /* Index Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 400;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal-content {
+            background: var(--dark-soft);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow: hidden;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+
+        .modal-header {
+            background: rgba(197, 160, 89, 0.1);
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+        }
+
+        .modal-header h3 {
+            color: var(--gold);
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-body {
+            padding: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 3px;
+        }
+
+        .surah-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .surah-item {
+            background: rgba(255,255,255,0.05);
+            padding: 14px 16px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .surah-item:active {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .surah-item:active .surah-page {
+            color: var(--dark);
+        }
+
+        .surah-name {
+            color: white;
+            font-size: 16px;
+        }
+
+        .surah-page {
+            color: var(--gold);
+            font-size: 13px;
+        }
+
+        /* Quick Nav */
+        .quick-nav {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .quick-nav.show { opacity: 1; }
+
+        .quick-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 10px;
+            color: var(--gold);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-btn:active {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        /* Juz indicator */
+        .juz-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: var(--gold);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 50;
+        }
+
+        .juz-badge.show { opacity: 1; }
+
+        /* Responsive adjustments */
+        @media (max-height: 600px) {
+            .bottom-bar {
+                padding: 30px 15px 15px;
+            }
+            .action-btn {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mushaf-container" id="container">
+        <div class="page-wrapper" id="wrapper"></div>
+    </div>
+
+    <div class="page-badge" id="pageBadge">صفحة ١</div>
+    <div class="surah-badge" id="surahBadge"></div>
+    <div class="juz-badge" id="juzBadge"></div>
+
+    <div class="nav-arrow left" id="navLeft"><i class="fas fa-chevron-left"></i></div>
+    <div class="nav-arrow right" id="navRight"><i class="fas fa-chevron-right"></i></div>
+
+    <div class="quick-nav" id="quickNav">
+        <button class="quick-btn" onclick="goTo(1)" title="الصفحة الأولى"><i class="fas fa-angle-double-right"></i></button>
+        <button class="quick-btn" onclick="showIndex()" title="فهرس السور"><i class="fas fa-list"></i></button>
+        <button class="quick-btn" onclick="loadBookmark()" title="علامتي"><i class="fas fa-bookmark"></i></button>
+        <button class="quick-btn" onclick="goTo(604)" title="الصفحة الأخيرة"><i class="fas fa-angle-double-left"></i></button>
+    </div>
+
+    <div class="bottom-bar" id="bottomBar">
+        <div class="slider-row">
+            <span class="page-label" id="sliderLabel">1 / 604</span>
+            <input type="range" id="slider" min="1" max="604" value="1">
+        </div>
+        <div class="action-buttons">
+            <button class="action-btn" onclick="goTo(1)"><i class="fas fa-angle-double-right"></i> الأولى</button>
+            <button class="action-btn" onclick="saveBookmark()"><i class="fas fa-bookmark"></i> حفظ العلامة</button>
+            <button class="action-btn" onclick="showIndex()"><i class="fas fa-list"></i> الفهرس</button>
+            <button class="action-btn" onclick="goTo(604)"><i class="fas fa-angle-double-left"></i> الأخيرة</button>
+        </div>
+    </div>
+
+    <!-- Index Modal -->
+    <div class="modal-overlay" id="indexModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-quran"></i> فهرس السور</h3>
+                <button class="modal-close" onclick="closeIndex()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="surah-list" id="surahList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-icon">
+            <svg viewBox="0 0 100 100">
+                <path d="M50 5 L60 35 L95 35 L67 55 L77 90 L50 70 L23 90 L33 55 L5 35 L40 35 Z"/>
+            </svg>
+        </div>
+        <div class="loading-text">مصحف المدينة المنورة</div>
+        <div class="loading-sub">جاري التحميل...</div>
+    </div>
+
+    <script>
+        // ========== CONFIG ==========
+        // صور مجمع الملك فهد - دقة عالية 1063x1520
+        const CDN = 'https://www.mp3quran.net/api/quran_pages_arabic/';
+        const TOTAL_PAGES = 604;
+        const PRELOAD_RANGE = 3;
+
+        // ========== STATE ==========
+        let currentPage = 1;
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        let barVisible = false;
+
+        // ========== SURAHS DATA ==========
+        const surahs = [
+            { name: "الفاتحة", page: 1 },
+            { name: "البقرة", page: 2 },
+            { name: "آل عمران", page: 50 },
+            { name: "النساء", page: 77 },
+            { name: "المائدة", page: 106 },
+            { name: "الأنعام", page: 128 },
+            { name: "الأعراف", page: 151 },
+            { name: "الأنفال", page: 177 },
+            { name: "التوبة", page: 187 },
+            { name: "يونس", page: 208 },
+            { name: "هود", page: 221 },
+            { name: "يوسف", page: 235 },
+            { name: "الرعد", page: 249 },
+            { name: "إبراهيم", page: 255 },
+            { name: "الحجر", page: 262 },
+            { name: "النحل", page: 267 },
+            { name: "الإسراء", page: 282 },
+            { name: "الكهف", page: 293 },
+            { name: "مريم", page: 305 },
+            { name: "طه", page: 312 },
+            { name: "الأنبياء", page: 322 },
+            { name: "الحج", page: 332 },
+            { name: "المؤمنون", page: 342 },
+            { name: "النور", page: 350 },
+            { name: "الفرقان", page: 359 },
+            { name: "الشعراء", page: 367 },
+            { name: "النمل", page: 377 },
+            { name: "القصص", page: 385 },
+            { name: "العنكبوت", page: 396 },
+            { name: "الروم", page: 404 },
+            { name: "لقمان", page: 411 },
+            { name: "السجدة", page: 415 },
+            { name: "الأحزاب", page: 418 },
+            { name: "سبأ", page: 428 },
+            { name: "فاطر", page: 434 },
+            { name: "يس", page: 440 },
+            { name: "الصافات", page: 446 },
+            { name: "ص", page: 453 },
+            { name: "الزمر", page: 458 },
+            { name: "غافر", page: 467 },
+            { name: "فصلت", page: 477 },
+            { name: "الشورى", page: 483 },
+            { name: "الزخرف", page: 489 },
+            { name: "الدخان", page: 496 },
+            { name: "الجاثية", page: 499 },
+            { name: "الأحقاف", page: 502 },
+            { name: "محمد", page: 507 },
+            { name: "الفتح", page: 511 },
+            { name: "الحجرات", page: 515 },
+            { name: "ق", page: 518 },
+            { name: "الذاريات", page: 520 },
+            { name: "الطور", page: 523 },
+            { name: "النجم", page: 526 },
+            { name: "القمر", page: 528 },
+            { name: "الرحمن", page: 531 },
+            { name: "الواقعة", page: 534 },
+            { name: "الحديد", page: 537 },
+            { name: "المجادلة", page: 542 },
+            { name: "الحشر", page: 545 },
+            { name: "الممتحنة", page: 549 },
+            { name: "الصف", page: 551 },
+            { name: "الجمعة", page: 553 },
+            { name: "المنافقون", page: 554 },
+            { name: "التغابن", page: 556 },
+            { name: "الطلاق", page: 558 },
+            { name: "التحريم", page: 560 },
+            { name: "الملك", page: 562 },
+            { name: "القلم", page: 564 },
+            { name: "الحاقة", page: 566 },
+            { name: "المعارج", page: 568 },
+            { name: "نوح", page: 570 },
+            { name: "الجن", page: 572 },
+            { name: "المزمل", page: 574 },
+            { name: "المدثر", page: 575 },
+            { name: "القيامة", page: 577 },
+            { name: "الإنسان", page: 578 },
+            { name: "المرسلات", page: 580 },
+            { name: "النبأ", page: 582 },
+            { name: "النازعات", page: 583 },
+            { name: "عبس", page: 585 },
+            { name: "التكوير", page: 586 },
+            { name: "الانفطار", page: 587 },
+            { name: "المطففين", page: 587 },
+            { name: "الانشقاق", page: 589 },
+            { name: "البروج", page: 590 },
+            { name: "الطارق", page: 591 },
+            { name: "الأعلى", page: 591 },
+            { name: "الغاشية", page: 592 },
+            { name: "الفجر", page: 593 },
+            { name: "البلد", page: 594 },
+            { name: "الشمس", page: 595 },
+            { name: "الليل", page: 595 },
+            { name: "الضحى", page: 596 },
+            { name: "الشرح", page: 596 },
+            { name: "التين", page: 597 },
+            { name: "العلق", page: 597 },
+            { name: "القدر", page: 598 },
+            { name: "البينة", page: 598 },
+            { name: "الزلزلة", page: 599 },
+            { name: "العاديات", page: 599 },
+            { name: "القارعة", page: 600 },
+            { name: "التكاثر", page: 600 },
+            { name: "العصر", page: 601 },
+            { name: "الهمزة", page: 601 },
+            { name: "الفيل", page: 601 },
+            { name: "قريش", page: 602 },
+            { name: "الماعون", page: 602 },
+            { name: "الكوثر", page: 602 },
+            { name: "الكافرون", page: 603 },
+            { name: "النصر", page: 603 },
+            { name: "المسد", page: 603 },
+            { name: "الإخلاص", page: 604 },
+            { name: "الفلق", page: 604 },
+            { name: "الناس", page: 604 }
+        ];
+
+        const juzPages = [1, 22, 42, 62, 82, 102, 121, 142, 162, 182, 201, 222, 242, 262, 282, 302, 322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582];
+
+        // ========== UTILITIES ==========
+        const toArabic = (n) => n.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+        const imgUrl = (p) => CDN + String(p).padStart(3, '0') + '.png';
+
+        // Load saved page
+        const savedPage = localStorage.getItem('mushaf_page');
+        if (savedPage) currentPage = parseInt(savedPage);
+
+        // ========== DOM ELEMENTS ==========
+        const $ = id => document.getElementById(id);
+        const container = $('container');
+        const wrapper = $('wrapper');
+
+        // ========== PAGE MANAGEMENT ==========
+        function createPages() {
+            wrapper.innerHTML = '';
+            
+            for (let i = 1; i <= TOTAL_PAGES; i++) {
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.id = `page-${i}`;
+                page.innerHTML = `<div class="page-placeholder"><i class="fas fa-spinner fa-spin"></i></div>`;
+                wrapper.appendChild(page);
+            }
+            
+            loadNearbyPages();
+            updatePosition(false);
+        }
+
+        function loadNearbyPages() {
+            for (let i = currentPage - PRELOAD_RANGE; i <= currentPage + PRELOAD_RANGE; i++) {
+                if (i >= 1 && i <= TOTAL_PAGES) {
+                    const page = $(`page-${i}`);
+                    if (page && !page.querySelector('img')) {
+                        const img = document.createElement('img');
+                        img.src = imgUrl(i);
+                        img.alt = `صفحة ${i}`;
+                        img.onload = function() {
+                            if (i === currentPage) hideLoading();
+                        };
+                        img.onerror = function() {
+                            this.alt = 'خطأ في التحميل - حاول مرة أخرى';
+                        };
+                        page.innerHTML = '';
+                        page.appendChild(img);
+                    }
+                }
+            }
+        }
+
+        function updatePosition(animate = true) {
+            if (animate) {
+                wrapper.classList.add('animating');
+            } else {
+                wrapper.classList.remove('animating');
+            }
+            
+            wrapper.style.transform = `translateX(${(currentPage - 1) * 100}%)`;
+            
+            // Update badges
+            $('pageBadge').textContent = `صفحة ${toArabic(currentPage)} من ٦٠٤`;
+            $('sliderLabel').textContent = `${currentPage} / 604`;
+            $('slider').value = currentPage;
+            
+            // Show surah name
+            const surah = getCurrentSurah();
+            if (surah) {
+                $('surahBadge').textContent = `سورة ${surah.name}`;
+            }
+            
+            // Show juz
+            const juz = getCurrentJuz();
+            $('juzBadge').textContent = `الجزء ${toArabic(juz)}`;
+            
+            localStorage.setItem('mushaf_page', currentPage);
+            loadNearbyPages();
+        }
+
+        function getCurrentSurah() {
+            for (let i = surahs.length - 1; i >= 0; i--) {
+                if (currentPage >= surahs[i].page) {
+                    return surahs[i];
+                }
+            }
+            return surahs[0];
+        }
+
+        function getCurrentJuz() {
+            for (let i = juzPages.length - 1; i >= 0; i--) {
+                if (currentPage >= juzPages[i]) {
+                    return i + 1;
+                }
+            }
+            return 1;
+        }
+
+        // ========== NAVIGATION ==========
+        function goTo(page) {
+            if (page < 1 || page > TOTAL_PAGES) return;
+            currentPage = page;
+            updatePosition();
+            showBadges();
+        }
+
+        function nextPage() {
+            if (currentPage < TOTAL_PAGES) {
+                currentPage++;
+                updatePosition();
+                showBadges();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePosition();
+                showBadges();
+            }
+        }
+
+        function showBadges() {
+            [$('pageBadge'), $('surahBadge'), $('juzBadge')].forEach(el => {
+                el.classList.add('show');
+            });
+            setTimeout(() => {
+                [$('pageBadge'), $('surahBadge'), $('juzBadge')].forEach(el => {
+                    el.classList.remove('show');
+                });
+            }, 2500);
+        }
+
+        // ========== UI CONTROLS ==========
+        function toggleBar() {
+            barVisible = !barVisible;
+            $('bottomBar').classList.toggle('show', barVisible);
+            $('quickNav').classList.toggle('show', barVisible);
+        }
+
+        function hideLoading() {
+            $('loadingOverlay').classList.add('hidden');
+        }
+
+        function saveBookmark() {
+            localStorage.setItem('mushaf_bookmark', currentPage);
+            const surah = getCurrentSurah();
+            alert(`✓ تم حفظ العلامة\n\nالصفحة: ${currentPage}\nسورة ${surah.name}`);
+        }
+
+        function loadBookmark() {
+            const bm = localStorage.getItem('mushaf_bookmark');
+            if (bm) {
+                goTo(parseInt(bm));
+                if (barVisible) toggleBar();
+            } else {
+                alert('لا توجد علامة محفوظة');
+            }
+        }
+
+        // ========== INDEX MODAL ==========
+        function showIndex() {
+            const list = $('surahList');
+            list.innerHTML = surahs.map((s, i) => `
+                <div class="surah-item" onclick="goToSurah(${s.page})">
+                    <span class="surah-name">${i + 1}. ${s.name}</span>
+                    <span class="surah-page">صفحة ${s.page}</span>
+                </div>
+            `).join('');
+            $('indexModal').classList.add('show');
+        }
+
+        function closeIndex() {
+            $('indexModal').classList.remove('show');
+        }
+
+        function goToSurah(page) {
+            closeIndex();
+            if (barVisible) toggleBar();
+            setTimeout(() => goTo(page), 200);
+        }
+
+        // ========== TOUCH EVENTS ==========
+        container.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            currentX = startX;
+            isDragging = true;
+            wrapper.classList.remove('animating');
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+            const offset = (currentPage - 1) * 100;
+            const dragPercent = (diff / window.innerWidth) * 100;
+            
+            wrapper.style.transform = `translateX(${offset + dragPercent}%)`;
+            
+            // Show navigation hints
+            if (diff > 40 && currentPage > 1) {
+                $('navRight').classList.add('show');
+            } else {
+                $('navRight').classList.remove('show');
+            }
+            
+            if (diff < -40 && currentPage < TOTAL_PAGES) {
+                $('navLeft').classList.add('show');
+            } else {
+                $('navLeft').classList.remove('show');
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchend', () => {
+            isDragging = false;
+            $('navLeft').classList.remove('show');
+            $('navRight').classList.remove('show');
+            
+            const diff = currentX - startX;
+            const threshold = window.innerWidth * 0.15; // 15% of screen width
+            
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    prevPage();
+                } else {
+                    nextPage();
+                }
+            } else {
+                updatePosition();
+                if (Math.abs(diff) < 15) {
+                    toggleBar();
+                }
+            }
+        });
+
+        // ========== SLIDER ==========
+        $('slider').addEventListener('input', (e) => {
+            goTo(parseInt(e.target.value));
+        });
+
+        // ========== KEYBOARD ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') nextPage();
+            if (e.key === 'ArrowRight') prevPage();
+            if (e.key === 'Escape') {
+                if ($('indexModal').classList.contains('show')) {
+                    closeIndex();
+                } else if (barVisible) {
+                    toggleBar();
+                }
+            }
+        });
+
+        // Close modal on backdrop click
+        $('indexModal').addEventListener('click', (e) => {
+            if (e.target === $('indexModal')) closeIndex();
+        });
+
+        // ========== INITIALIZATION ==========
+        createPages();
+        showBadges();
+    </script>
+</body>
+</html>

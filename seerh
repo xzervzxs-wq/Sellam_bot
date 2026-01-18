@@ -1,0 +1,372 @@
+import React, { useState } from 'react';
+import { Book, Moon, Sun, MapPin, Shield, Heart, ArrowUp, Star, Scroll } from 'lucide-react';
+
+const SeerahTimeline = () => {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [activePhase, setActivePhase] = useState('all'); // all, makkah, madinah
+
+  // تعريف كائن التنسيقات
+  const styles = {
+    fontFamily: "'Amiri', 'Traditional Arabic', serif",
+    paperBg: "bg-[#fdfbf7]", // لون الورق القديم
+    goldAccent: "text-[#b4975a]",
+    darkText: "text-[#2c2c2c]",
+    greenIslamic: "bg-[#1a472a]",
+  };
+
+  // بيانات السيرة
+  const events = [
+    {
+      id: 1,
+      year: "عام الفيل",
+      yearHijri: "53 ق.هـ",
+      title: "مولد النور ﷺ",
+      phase: "makkah",
+      type: "birth",
+      description: "وُلد النبي ﷺ في مكة في شهر ربيع الأول. كان عاماً مشهوداً نجى الله فيه الكعبة من جيش أبرهة.",
+      details: "ولد يتيماً، فكفله جده عبد المطلب ثم عمه أبو طالب. نشأ في رعاية الله محفوظاً من أدناس الجاهلية.",
+      source: "الرحيق المختوم - المباركفوري",
+      Icon: Star
+    },
+    {
+      id: 2,
+      year: "40 من المولد",
+      yearHijri: "13 ق.هـ",
+      title: "نزول الوحي (البعثة)",
+      phase: "makkah",
+      type: "revelation",
+      description: "نزل عليه جبريل عليه السلام وهو يتعبد في غار حراء بأول آيات القرآن الكريم: {اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ}.",
+      details: "رجف فؤاده ﷺ ورجع إلى خديجة رضي الله عنها وقال: 'زملوني زملوني'.",
+      source: "صحيح البخاري (حديث بدء الوحي)",
+      Icon: Book
+    },
+    {
+      id: 3,
+      year: "السنة 5 للبعثة",
+      yearHijri: "8 ق.هـ",
+      title: "الهجرة الأولى إلى الحبشة",
+      phase: "makkah",
+      type: "migration",
+      description: "لما اشتد الأذى بالصحابة، أذن لهم النبي ﷺ بالهجرة إلى الحبشة لأن فيها ملكاً لا يُظلم عنده أحد.",
+      details: "كانت أول هجرة في الإسلام، حفاظاً على الدين والنفس من بطش قريش.",
+      source: "سيرة ابن هشام / الرحيق المختوم",
+      Icon: MapPin
+    },
+    {
+      id: 4,
+      year: "السنة 10 للبعثة",
+      yearHijri: "3 ق.هـ",
+      title: "عام الحزن & الإسراء والمعراج",
+      phase: "makkah",
+      type: "sorrow",
+      description: "توفيت خديجة رضي الله عنها وعمه أبو طالب. ثم أكرمه الله برحلة الإسراء والمعراج.",
+      details: "فُرضت الصلوات الخمس في هذه الرحلة العظيمة من فوق سبع سماوات.",
+      source: "صحيح مسلم (حديث الإسراء)",
+      Icon: Moon
+    },
+    {
+      id: 5,
+      year: "السنة 13 للبعثة",
+      yearHijri: "1 هـ",
+      title: "الهجرة النبوية المباركة",
+      phase: "madinah",
+      type: "major",
+      description: "هاجر النبي ﷺ وصاحبه أبو بكر الصديق من مكة إلى المدينة، وبها تأسست دولة الإسلام الأولى.",
+      details: "في هذا العام بنى المسجد النبوي وآخى بين المهاجرين والأنصار.",
+      source: "صحيح البخاري (باب هجرة النبي)",
+      Icon: ArrowUp
+    },
+    {
+      id: 6,
+      year: "السنة 2 هـ",
+      yearHijri: "2 هـ",
+      title: "غزوة بدر الكبرى",
+      phase: "madinah",
+      type: "battle",
+      description: "أول معركة فاصلة بين الحق والباطل، نصر الله فيها الفئة القليلة المؤمنة على كفار قريش.",
+      details: "قال النبي ﷺ لأهل بدر: 'لعل الله اطلع على أهل بدر فقال: اعملوا ما شئتم فقد غفرت لكم'.",
+      source: "صحيح البخاري / مسلم",
+      Icon: Shield
+    },
+    {
+      id: 7,
+      year: "السنة 3 هـ",
+      yearHijri: "3 هـ",
+      title: "غزوة أحد",
+      phase: "madinah",
+      type: "battle",
+      description: "ابتلاء وتمحيص للمؤمنين، واستشهاد سيد الشهداء حمزة بن عبد المطلب.",
+      details: "تعلم المسلمون درساً قاسياً في أهمية طاعة أمر الرسول ﷺ وعدم الانشغال بالدنيا.",
+      source: "الرحيق المختوم",
+      Icon: Shield
+    },
+    {
+      id: 8,
+      year: "السنة 6 هـ",
+      yearHijri: "6 هـ",
+      title: "صلح الحديبية",
+      phase: "madinah",
+      type: "peace",
+      description: "اتفاق هدنة مع قريش سماه الله 'فتحاً مبيناً'، مهد الطريق لانتشار الإسلام في الجزيرة.",
+      details: "نزلت فيه سورة الفتح، وبايع الصحابة بيعة الرضوان تحت الشجرة.",
+      source: "صحيح البخاري",
+      Icon: Scroll
+    },
+    {
+      id: 9,
+      year: "السنة 8 هـ",
+      yearHijri: "8 هـ",
+      title: "فتح مكة",
+      phase: "madinah",
+      type: "victory",
+      description: "دخول مكة وتطهير الكعبة من الأصنام، وعفو النبي ﷺ عن قريش.",
+      details: "قال ﷺ: 'اذهبوا فأنتم الطلقاء'. وجاء نصر الله والفتح ودخل الناس في دين الله أفواجاً.",
+      source: "سيرة ابن هشام / صحيح مسلم",
+      Icon: MapPin
+    },
+    {
+      id: 10,
+      year: "السنة 10 هـ",
+      yearHijri: "10 هـ",
+      title: "حجة الوداع",
+      phase: "madinah",
+      type: "speech",
+      description: "الحجة الوحيدة التي حجها النبي ﷺ، وفيها خطب خطبته العظيمة التي أرسى فيها قواعد الإسلام.",
+      details: "قال ﷺ: 'إن دماءكم وأموالكم حرام عليكم كحرمة يومكم هذا'. ونزلت: {الْيَوْمَ أَكْمَلْتُ لَكُمْ دِينَكُمْ}.",
+      source: "صحيح البخاري / مسلم",
+      Icon: Sun
+    },
+    {
+      id: 11,
+      year: "السنة 11 هـ",
+      yearHijri: "11 هـ",
+      title: "الوفاة والرفيق الأعلى",
+      phase: "madinah",
+      type: "death",
+      description: "التحاق النبي ﷺ بالرفيق الأعلى في المدينة المنورة يوم الاثنين من ربيع الأول.",
+      details: "قالت عائشة رضي الله عنها: مات النبي ﷺ بين سحري ونحري. وانقطع الوحي من السماء.",
+      source: "صحيح البخاري",
+      Icon: Heart
+    }
+  ];
+
+  const filteredEvents = activePhase === 'all' 
+    ? events 
+    : events.filter(e => e.phase === activePhase);
+
+  return (
+    <div className={`min-h-screen ${styles.paperBg} ${styles.darkText} relative overflow-hidden`} dir="rtl">
+      
+      {/* Background Texture Effect */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none" 
+           style={{ backgroundImage: 'radial-gradient(#b4975a 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+      </div>
+
+      {/* Header Area */}
+      <header className="relative z-10 pt-10 pb-6 text-center px-4">
+        <h1 
+          className="text-4xl md:text-6xl font-bold text-[#1a472a] mb-2 drop-shadow-sm" 
+          style={{ fontFamily: styles.fontFamily }} 
+        >
+          السيرة النبوية العطرة
+        </h1>
+        <p className="text-lg text-[#8c7335] font-medium mt-2">
+          مقتبس من صحيح البخاري ومسلم وكتاب الرحيق المختوم
+        </p>
+        
+        {/* Phase Filter */}
+        <div className="flex justify-center gap-4 mt-8">
+          <button 
+            onClick={() => setActivePhase('all')}
+            className={`px-6 py-2 rounded-full transition-all duration-300 font-bold ${activePhase === 'all' ? 'bg-[#1a472a] text-white shadow-lg' : 'bg-white border border-[#b4975a] text-[#b4975a]'}`}
+          >
+            الكل
+          </button>
+          <button 
+            onClick={() => setActivePhase('makkah')}
+            className={`px-6 py-2 rounded-full transition-all duration-300 font-bold ${activePhase === 'makkah' ? 'bg-[#1a472a] text-white shadow-lg' : 'bg-white border border-[#b4975a] text-[#b4975a]'}`}
+          >
+            العهد المكي
+          </button>
+          <button 
+            onClick={() => setActivePhase('madinah')}
+            className={`px-6 py-2 rounded-full transition-all duration-300 font-bold ${activePhase === 'madinah' ? 'bg-[#1a472a] text-white shadow-lg' : 'bg-white border border-[#b4975a] text-[#b4975a]'}`}
+          >
+            العهد المدني
+          </button>
+        </div>
+      </header>
+
+      {/* Timeline Container */}
+      <div className="max-w-4xl mx-auto px-4 py-12 relative z-10">
+        
+        {/* The Central Line */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-[#b4975a] opacity-30 rounded hidden md:block"></div>
+
+        <div className="space-y-12">
+          {filteredEvents.map((event, index) => {
+            // Assign Icon to a variable to ensure correct JSX rendering
+            const EventIcon = event.Icon;
+            
+            return (
+              <div key={event.id} className={`flex flex-col md:flex-row items-center justify-between ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} group`}>
+                
+                {/* Date Bubble (Mobile) */}
+                <div className="md:hidden mb-4 bg-[#1a472a] text-white px-4 py-1 rounded-full text-sm font-bold shadow-md">
+                  {event.year}
+                </div>
+
+                {/* Content Card */}
+                <div className="w-full md:w-5/12">
+                  <div 
+                    className={`relative bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-t-4 cursor-pointer ${selectedEvent?.id === event.id ? 'border-[#b4975a] scale-105' : 'border-transparent'}`}
+                    onClick={() => setSelectedEvent(event)}
+                  >
+                    {/* Decorative corner */}
+                    <div className="absolute top-0 right-0 w-16 h-16 opacity-10 pointer-events-none">
+                      <svg viewBox="0 0 100 100" fill="#b4975a">
+                        <path d="M0 0 L100 0 L100 100 Z" />
+                      </svg>
+                    </div>
+
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg ${event.phase === 'makkah' ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'}`}>
+                        <EventIcon className="w-6 h-6" />
+                      </div>
+                      <span className="text-sm font-semibold text-gray-400">{event.yearHijri}</span>
+                    </div>
+
+                    <h3 
+                      className="text-xl font-bold text-[#1a472a] mb-2" 
+                      style={{ fontFamily: styles.fontFamily }} 
+                    >
+                      {event.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+                      {event.description}
+                    </p>
+                    
+                    <div className="mt-4 flex justify-between items-center">
+                      <span className="text-xs text-[#b4975a] font-medium bg-[#fdfbf7] px-2 py-1 rounded border border-[#efe9d9]">
+                        {event.phase === 'makkah' ? 'مكة المكرمة' : 'المدينة المنورة'}
+                      </span>
+                      <span className="text-xs text-gray-400 hover:text-[#1a472a] transition-colors">
+                        اقرأ المزيد &larr;
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Central Connector (Desktop) */}
+                <div className="hidden md:flex flex-col items-center justify-center w-2/12 relative">
+                  <div className={`w-12 h-12 rounded-full border-4 flex items-center justify-center bg-white z-20 transition-colors duration-300 ${event.phase === 'makkah' ? 'border-orange-200 text-orange-700' : 'border-green-200 text-green-700'}`}>
+                    <span className="text-xs font-bold">{index + 1}</span>
+                  </div>
+                  <div className="absolute top-14 text-xs font-bold text-[#b4975a] bg-[#fdfbf7] px-2 py-0.5 rounded border border-[#efe9d9] mt-2 whitespace-nowrap z-20 shadow-sm">
+                    {event.year}
+                  </div>
+                </div>
+
+                {/* Empty Space for Alignment */}
+                <div className="w-full md:w-5/12 hidden md:block"></div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Event Details Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedEvent(null)}>
+          <div 
+            className="bg-[#fdfbf7] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden relative" 
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header Image/Pattern Area */}
+            <div className={`h-32 ${selectedEvent.phase === 'makkah' ? 'bg-gradient-to-r from-orange-900 to-amber-700' : 'bg-gradient-to-r from-[#1a472a] to-emerald-700'} flex items-center justify-center relative`}>
+               <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'url("https://www.transparenttextures.com/patterns/arabesque.png")'}}></div>
+               <h2 
+                 className="text-3xl font-bold text-white relative z-10 drop-shadow-md" 
+                 style={{ fontFamily: styles.fontFamily }} 
+               >
+                 {selectedEvent.title}
+               </h2>
+               <button 
+                onClick={() => setSelectedEvent(null)}
+                className="absolute top-4 left-4 text-white/80 hover:text-white bg-black/20 hover:bg-black/40 rounded-full p-2 transition-all"
+               >
+                 ✕
+               </button>
+            </div>
+
+            <div className="p-8">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[#efe9d9]">
+                <div className="text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wider">التاريخ</span>
+                  <span className="block font-bold text-[#1a472a]">{selectedEvent.year}</span>
+                </div>
+                <div className="w-px h-10 bg-[#efe9d9]"></div>
+                <div className="text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wider">المكان</span>
+                  <span className="block font-bold text-[#b4975a]">{selectedEvent.phase === 'makkah' ? 'مكة' : 'المدينة'}</span>
+                </div>
+              </div>
+
+              <div className="prose prose-lg max-w-none">
+                <p 
+                  className="text-xl text-gray-700 leading-loose mb-6 font-medium" 
+                  style={{ fontFamily: styles.fontFamily }} 
+                >
+                  {selectedEvent.description}
+                </p>
+                
+                <div className="bg-white p-6 rounded-lg border-r-4 border-[#b4975a] shadow-sm mb-6">
+                  <h4 className="text-sm font-bold text-[#b4975a] mb-2 flex items-center gap-2">
+                    <Book className="w-4 h-4" />
+                    تفاصيل ومواقف
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed">
+                    {selectedEvent.details}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 text-xs text-gray-400 mt-8 pt-4 border-t border-[#efe9d9]">
+                  <Shield className="w-3 h-3" />
+                  <span>المصدر: {selectedEvent.source}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="text-center py-8 text-[#1a472a] opacity-60 text-sm relative z-10">
+        <p>تم التصميم بحب لخدمة السيرة النبوية</p>
+        <p className="text-xs mt-1">نسأل الله القبول والإخلاص</p>
+      </footer>
+
+      {/* Global Styles for Font */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #d4c498; 
+          border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #b4975a; 
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default SeerahTimeline;
