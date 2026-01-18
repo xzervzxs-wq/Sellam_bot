@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "إطارات",
+    "category": "frames",
+    "html": "<svg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><rect x='5' y='5' width='90' height='90' fill='none' stroke='#6366f1' stroke-width='3' rx='5'/></svg>",
+    "type": "svg"
+  },
+  {
+    "id": 2,
+    "name": "إطار مزخرف",
+    "category": "frames",
+    "html": "<svg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><rect x='5' y='5' width='90' height='90' fill='none' stroke='#ec4899' stroke-width='2' rx='10'/><circle cx='10' cy='10' r='3' fill='#ec4899'/><circle cx='90' cy='10' r='3' fill='#ec4899'/><circle cx='10' cy='90' r='3' fill='#ec4899'/><circle cx='90' cy='90' r='3' fill='#ec4899'/></svg>",
+    "type": "svg"
+  },
+  {
+    "id": 3,
+    "name": "قلب أحمر",
+    "category": "hearts",
+    "html": "<svg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'><path d='M40 70 C 20 55, 10 45, 10 35 C 10 25, 15 15, 25 15 C 32 15, 38 20, 40 27 C 42 20, 48 15, 55 15 C 65 15, 70 25, 70 35 C 70 45, 60 55, 40 70 Z' fill='#ef4444'/></svg>",
+    "type": "svg"
+  },
+  {
+    "id": 4,
+    "name": "قلب وردي",
+    "category": "hearts",
+    "html": "<svg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'><path d='M40 70 C 20 55, 10 45, 10 35 C 10 25, 15 15, 25 15 C 32 15, 38 20, 40 27 C 42 20, 48 15, 55 15 C 65 15, 70 25, 70 35 C 70 45, 60 55, 40 70 Z' fill='#ec4899'/></svg>",
+    "type": "svg"
+  },
+  {
+    "id": 5,
+    "name": "نجمة ذهبية",
+    "category": "decorations",
+    "html": "<svg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'><polygon points='40,10 50,35 75,35 55,50 65,75 40,60 15,75 25,50 5,35 30,35' fill='#fbbf24'/></svg>",
+    "type": "svg"
+  },
+  {
+    "id": 6,
+    "name": "زخرفة دائرية",
+    "category": "decorations",
+    "html": "<svg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><circle cx='50' cy='50' r='45' fill='none' stroke='#a78bfa' stroke-width='2'/><circle cx='50' cy='50' r='35' fill='none' stroke='#a78bfa' stroke-width='1'/><circle cx='50' cy='50' r='25' fill='#a78bfa' opacity='0.3'/></circle></svg>",
+    "type": "svg"
+  }
+]
