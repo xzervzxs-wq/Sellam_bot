@@ -2101,56 +2101,82 @@
                 // إنشاء قسم لكل فئة مع عرض العناصر مباشرة
                 for (const [category, data] of Object.entries(allTemplateCategories)) {
                     const categoryDiv = document.createElement('div');
-                    categoryDiv.className = 'elements-category';
+                    categoryDiv.style.cssText = 'margin-bottom: 24px;';
                     
                     // العنوان (اسم القسم)
                     const titleDiv = document.createElement('h3');
-                    titleDiv.className = 'elements-category-title';
+                    titleDiv.style.cssText = `
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #1e293b;
+                        margin: 0 0 12px 0;
+                        padding-bottom: 8px;
+                        border-bottom: 2px solid #e2e8f0;
+                    `;
                     titleDiv.textContent = `${data.icon} ${category}`;
                     categoryDiv.appendChild(titleDiv);
 
-                    // حاوية العناصر
+                    // حاوية العناصر - grid صغير ونظيف
                     const itemsContainer = document.createElement('div');
-                    itemsContainer.className = 'elements-items-grid';
-                    itemsContainer.style.display = 'grid';
-                    itemsContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
-                    itemsContainer.style.gap = '8px';
+                    itemsContainer.style.cssText = `
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                        gap: 12px;
+                        padding: 8px;
+                        background: #f8fafc;
+                        border-radius: 8px;
+                    `;
 
-                    // إضافة كل عنصر كصورة قابلة للنقر
+                    // إضافة كل عنصر كأيقونة صغيرة
                     data.items.forEach((item, idx) => {
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'elements-item';
                         itemDiv.style.cssText = `
-                            border: 2px solid #e2e8f0;
-                            border-radius: 8px;
-                            padding: 8px;
+                            border: 2px solid #cbd5e1;
+                            border-radius: 6px;
+                            padding: 6px;
                             cursor: pointer;
                             display: flex;
                             flex-direction: column;
                             align-items: center;
-                            gap: 6px;
-                            transition: all 0.2s;
+                            gap: 4px;
+                            transition: all 0.2s ease;
+                            background: white;
+                            min-height: 80px;
+                            justify-content: space-between;
                         `;
                         
                         itemDiv.onmouseover = () => {
-                            itemDiv.style.borderColor = '#64748b';
-                            itemDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                            itemDiv.style.borderColor = '#0ea5e9';
+                            itemDiv.style.boxShadow = '0 2px 6px rgba(14, 165, 233, 0.2)';
+                            itemDiv.style.transform = 'translateY(-2px)';
                         };
                         
                         itemDiv.onmouseout = () => {
-                            itemDiv.style.borderColor = '#e2e8f0';
+                            itemDiv.style.borderColor = '#cbd5e1';
                             itemDiv.style.boxShadow = 'none';
+                            itemDiv.style.transform = 'translateY(0)';
                         };
 
-                        // صورة/محتوى العنصر
+                        // صورة/محتوى العنصر - صغيرة جداً
                         const itemContent = document.createElement('div');
-                        itemContent.style.cssText = 'width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden;';
+                        itemContent.style.cssText = `
+                            width: 50px;
+                            height: 50px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            overflow: hidden;
+                            flex-shrink: 0;
+                        `;
                         
                         const imgOrHtml = item.html || item.svg || item.url || item.src || item.image;
                         if (imgOrHtml) {
                             if (imgOrHtml.includes('<svg') || imgOrHtml.includes('<div')) {
-                                itemContent.innerHTML = imgOrHtml;
-                                itemContent.style.zoom = '0.5';
+                                const wrapper = document.createElement('div');
+                                wrapper.style.cssText = 'zoom: 0.35; transform-origin: center; width: auto; height: auto;';
+                                wrapper.innerHTML = imgOrHtml;
+                                itemContent.appendChild(wrapper);
                             } else if (imgOrHtml.startsWith('data:')) {
                                 const img = document.createElement('img');
                                 img.src = imgOrHtml;
@@ -2163,14 +2189,24 @@
                                 itemContent.appendChild(img);
                             }
                         } else {
-                            itemContent.textContent = item.name || '⬚';
+                            const emoji = document.createElement('div');
+                            emoji.textContent = '📦';
+                            emoji.style.fontSize = '24px';
+                            itemContent.appendChild(emoji);
                         }
                         
                         itemDiv.appendChild(itemContent);
 
-                        // اسم العنصر
+                        // اسم العنصر - صغير جداً
                         const nameDiv = document.createElement('small');
-                        nameDiv.style.cssText = 'font-size: 11px; color: #64748b; text-align: center; word-break: break-word; width: 100%;';
+                        nameDiv.style.cssText = `
+                            font-size: 10px;
+                            color: #64748b;
+                            text-align: center;
+                            word-break: break-word;
+                            width: 100%;
+                            line-height: 1.2;
+                        `;
                         nameDiv.textContent = item.name || `عنصر ${idx + 1}`;
                         itemDiv.appendChild(nameDiv);
 
@@ -2178,20 +2214,20 @@
                         itemDiv.onclick = () => {
                             // إلغاء التحديد السابق
                             document.querySelectorAll('.elements-item').forEach(el => {
-                                el.style.borderColor = '#e2e8f0';
-                                el.style.backgroundColor = 'transparent';
+                                el.style.borderColor = '#cbd5e1';
+                                el.style.backgroundColor = 'white';
                             });
                             
                             // تحديد العنصر الحالي
-                            itemDiv.style.borderColor = '#3b82f6';
-                            itemDiv.style.backgroundColor = '#eff6ff';
+                            itemDiv.style.borderColor = '#0ea5e9';
+                            itemDiv.style.backgroundColor = '#f0f9ff';
                             
                             // حفظ البيانات
                             selectedElementData = item;
                             selectedElementName = item.name || `عنصر ${idx + 1}`;
                             selectedElementCategory = category;
                             
-                            console.log('تم اختيار:', {category, item: selectedElementName});
+                            console.log('✅ تم اختيار:', selectedElementName);
                         };
 
                         itemsContainer.appendChild(itemDiv);
