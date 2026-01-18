@@ -2049,20 +2049,26 @@
         // إغلاق النافذة
         function closeElementsChoiceModal() {
             document.getElementById('elements-choice-modal').classList.remove('show');
-            document.getElementById('element-preview').style.display = 'none';
             
-            // إعادة تعيين جميع الـ selects
-            for (const category of Object.keys(allTemplateCategories)) {
-                const select = document.getElementById(`select-${category}`);
-                if (select) {
-                    select.value = '';
-                }
-            }
+            // إعادة تعيين المتغيرات
+            selectedElementData = null;
+            selectedElementName = '';
+            selectedElementCategory = '';
+            
+            // إعادة تعيين التحديد البصري
+            document.querySelectorAll('.elements-item').forEach(el => {
+                el.style.borderColor = '#e2e8f0';
+                el.style.backgroundColor = 'transparent';
+            });
+        }
         }
 
         // تحميل العناصر من مجلد TEMPLATES على GitHub
         let allTemplateCategories = {};
         let templateLoaded = false;
+        let selectedElementData = null;
+        let selectedElementName = '';
+        let selectedElementCategory = '';
 
         async function loadElementsIntoSelects() {
             try {
@@ -2089,41 +2095,111 @@
                     templateLoaded = true;
                 }
 
-                // إعادة بناء جميع اختيارات العناصر
-                const selectsContainer = document.getElementById('elements-choice-content');
-                selectsContainer.innerHTML = '';
+                // إعادة بناء العناصر المباشرة بدون Select
+                const container = document.getElementById('elements-choice-content');
+                container.innerHTML = '';
 
-                // إنشاء قسم لكل فئة
+                // إنشاء قسم لكل فئة مع عرض العناصر مباشرة
                 for (const [category, data] of Object.entries(allTemplateCategories)) {
                     const categoryDiv = document.createElement('div');
                     categoryDiv.className = 'elements-category';
                     
+                    // العنوان (اسم القسم)
                     const titleDiv = document.createElement('h3');
                     titleDiv.className = 'elements-category-title';
                     titleDiv.textContent = `${data.icon} ${category}`;
                     categoryDiv.appendChild(titleDiv);
 
-                    const select = document.createElement('select');
-                    select.className = 'elements-select';
-                    select.id = `select-${category}`;
-                    select.onchange = () => updateElementPreview(category);
-                    
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.text = `اختر من ${category}...`;
-                    select.appendChild(defaultOption);
+                    // حاوية العناصر
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'elements-items-grid';
+                    itemsContainer.style.display = 'grid';
+                    itemsContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
+                    itemsContainer.style.gap = '8px';
 
-                    // إضافة عناصر الفئة
+                    // إضافة كل عنصر كصورة قابلة للنقر
                     data.items.forEach((item, idx) => {
-                        const option = document.createElement('option');
-                        option.value = `${category}_${idx}`;
-                        option.text = item.name || `عنصر ${idx + 1}`;
-                        option.dataset.element = JSON.stringify(item);
-                        select.appendChild(option);
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'elements-item';
+                        itemDiv.style.cssText = `
+                            border: 2px solid #e2e8f0;
+                            border-radius: 8px;
+                            padding: 8px;
+                            cursor: pointer;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 6px;
+                            transition: all 0.2s;
+                        `;
+                        
+                        itemDiv.onmouseover = () => {
+                            itemDiv.style.borderColor = '#64748b';
+                            itemDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                        };
+                        
+                        itemDiv.onmouseout = () => {
+                            itemDiv.style.borderColor = '#e2e8f0';
+                            itemDiv.style.boxShadow = 'none';
+                        };
+
+                        // صورة/محتوى العنصر
+                        const itemContent = document.createElement('div');
+                        itemContent.style.cssText = 'width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden;';
+                        
+                        const imgOrHtml = item.html || item.svg || item.url || item.src || item.image;
+                        if (imgOrHtml) {
+                            if (imgOrHtml.includes('<svg') || imgOrHtml.includes('<div')) {
+                                itemContent.innerHTML = imgOrHtml;
+                                itemContent.style.zoom = '0.5';
+                            } else if (imgOrHtml.startsWith('data:')) {
+                                const img = document.createElement('img');
+                                img.src = imgOrHtml;
+                                img.style.cssText = 'max-width: 100%; max-height: 100%; object-fit: contain;';
+                                itemContent.appendChild(img);
+                            } else {
+                                const img = document.createElement('img');
+                                img.src = imgOrHtml;
+                                img.style.cssText = 'max-width: 100%; max-height: 100%; object-fit: contain;';
+                                itemContent.appendChild(img);
+                            }
+                        } else {
+                            itemContent.textContent = item.name || '⬚';
+                        }
+                        
+                        itemDiv.appendChild(itemContent);
+
+                        // اسم العنصر
+                        const nameDiv = document.createElement('small');
+                        nameDiv.style.cssText = 'font-size: 11px; color: #64748b; text-align: center; word-break: break-word; width: 100%;';
+                        nameDiv.textContent = item.name || `عنصر ${idx + 1}`;
+                        itemDiv.appendChild(nameDiv);
+
+                        // معالج النقر
+                        itemDiv.onclick = () => {
+                            // إلغاء التحديد السابق
+                            document.querySelectorAll('.elements-item').forEach(el => {
+                                el.style.borderColor = '#e2e8f0';
+                                el.style.backgroundColor = 'transparent';
+                            });
+                            
+                            // تحديد العنصر الحالي
+                            itemDiv.style.borderColor = '#3b82f6';
+                            itemDiv.style.backgroundColor = '#eff6ff';
+                            
+                            // حفظ البيانات
+                            selectedElementData = item;
+                            selectedElementName = item.name || `عنصر ${idx + 1}`;
+                            selectedElementCategory = category;
+                            
+                            console.log('تم اختيار:', {category, item: selectedElementName});
+                        };
+
+                        itemsContainer.appendChild(itemDiv);
                     });
 
-                    categoryDiv.appendChild(select);
-                    selectsContainer.appendChild(categoryDiv);
+                    categoryDiv.appendChild(itemsContainer);
+                    container.appendChild(categoryDiv);
                 }
 
             } catch (error) {
@@ -2132,74 +2208,17 @@
             }
         }
 
-        // تحديث المعاينة عند الاختيار
-        function updateElementPreview(category) {
-            const selectElement = document.getElementById(`select-${category}`);
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const preview = document.getElementById('element-preview');
-            const previewContent = document.getElementById('preview-content');
 
-            if (selectElement.value === '') {
-                preview.style.display = 'none';
-                return;
-            }
-
-            try {
-                const element = JSON.parse(selectedOption.dataset.element);
-                let imgSrc = element.html || element.svg || element.url || element.src || element.image;
-
-                previewContent.innerHTML = '';
-                
-                if (imgSrc) {
-                    if (imgSrc.includes('<svg')) {
-                        const svg = btoa(unescape(encodeURIComponent(imgSrc)));
-                        const img = document.createElement('img');
-                        img.src = `data:image/svg+xml;base64,${svg}`;
-                        previewContent.appendChild(img);
-                    } else if (imgSrc.startsWith('data:')) {
-                        const img = document.createElement('img');
-                        img.src = imgSrc;
-                        previewContent.appendChild(img);
-                    } else {
-                        const img = document.createElement('img');
-                        img.src = imgSrc;
-                        previewContent.appendChild(img);
-                    }
-                } else {
-                    previewContent.textContent = element.name || 'عنصر';
-                }
-
-                preview.style.display = 'block';
-            } catch (error) {
-                console.error('خطأ في المعاينة:', error);
-                preview.style.display = 'none';
-            }
-        }
-
-        // إدراج العنصر المختار
+        // حذف دالة closeElementsChoiceModal التالية وتحديثها لإعادة تعيين المتغيرات        // إدراج العنصر المختار
         function insertSelectedElement() {
-            let elementData = null;
-            let selectedCategory = null;
-
-            // البحث عن أي select فيه عنصر مختار
-            for (const [category, data] of Object.entries(allTemplateCategories)) {
-                const selectElement = document.getElementById(`select-${category}`);
-                if (selectElement && selectElement.value !== '') {
-                    const selectedOption = selectElement.options[selectElement.selectedIndex];
-                    elementData = JSON.parse(selectedOption.dataset.element);
-                    selectedCategory = category;
-                    break;
-                }
-            }
-
-            if (!elementData) {
+            if (!selectedElementData) {
                 alert('❌ يرجى اختيار عنصر أولاً');
                 return;
             }
 
             try {
-                let imgSrc = elementData.html || elementData.svg || elementData.url || elementData.src || elementData.image;
-                addElementToCanvas(imgSrc, 'svg', elementData.name, selectedCategory);
+                let imgSrc = selectedElementData.html || selectedElementData.svg || selectedElementData.url || selectedElementData.src || selectedElementData.image;
+                addElementToCanvas(imgSrc, 'svg', selectedElementName, selectedElementCategory);
                 closeElementsChoiceModal();
             } catch (error) {
                 console.error('خطأ في إدراج العنصر:', error);
