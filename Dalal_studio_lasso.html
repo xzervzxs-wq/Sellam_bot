@@ -347,6 +347,15 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .login-container {
@@ -4087,7 +4096,7 @@
                             sessionStorage.setItem('sessionId', sessionId);
                             
                             updateStudioName(userData.name);
-                            document.getElementById('login-overlay').style.display = 'none';
+                            document.getElementById('login-overlay').classList.add('hidden');
                             showWelcomeNotification(userData.name);
                         } else {
                             const formattedDate = expiryDate.toLocaleDateString('ar-SA');
@@ -4106,7 +4115,7 @@
                     sessionStorage.setItem('sessionId', sessionId);
                     
                     updateStudioName('مصمم');
-                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('login-overlay').classList.add('hidden');
                     showWelcomeNotification('مصمم');
                 }
             } catch (error) {
@@ -4121,10 +4130,14 @@
         
         // تحديث اسم الاستوديو في الصفحة
         function updateStudioName(name) {
-            document.title = `أستوديو ${name} | Dalal Studio`;
-            const studioNameDisplay = document.getElementById('studio-name-display');
-            if (studioNameDisplay) {
-                studioNameDisplay.textContent = `أستوديو ${name}`;
+            try {
+                document.title = `أستوديو ${name} | Dalal Studio`;
+                const studioNameDisplay = document.getElementById('studio-name-display');
+                if (studioNameDisplay) {
+                    studioNameDisplay.textContent = `أستوديو ${name}`;
+                }
+            } catch (e) {
+                console.error('خطأ في تحديث اسم الأستوديو:', e);
             }
         }
         
