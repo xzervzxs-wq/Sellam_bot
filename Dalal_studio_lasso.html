@@ -347,15 +347,6 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        #login-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
         }
 
         .login-container {
@@ -1058,7 +1049,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen" id="main-body">
+<body class="min-h-screen" onclick="deselect(event); closeShapesDropdown();">
 
     <!-- تحميل الخطوط -->
     <div id="hidden-font-loader">
@@ -1081,9 +1072,13 @@
                 class="login-input" 
                 placeholder="الكود" 
                 autocomplete="off"
+                onkeypress="if(event.key==='Enter') verifyCode()"
             >
-            <button id="login-btn" type="button" class="login-btn" style="cursor: pointer;">دخول</button>
-            <button type="button" style="margin-top: 10px; padding: 10px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold;" onclick="alert('✅ JavaScript يعمل بشكل صحيح!')">اختبار</button>
+            <button id="login-btn" class="login-btn" onclick="verifyCode()">دخول</button>
+            <div class="login-loading" id="login-loading">
+                <div class="login-spinner"></div>
+            </div>
+            <div class="login-error" id="login-error"></div>
             <div class="login-loading" id="login-loading">
                 <div class="login-spinner"></div>
             </div>
@@ -1699,37 +1694,6 @@
             currentLoadedTemplateIndex = null;
             
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
-            
-            // إضافة event listener للـ body للـ deselect و closeShapesDropdown
-            document.getElementById('main-body').addEventListener('click', (e) => {
-                if (!e.target.closest('.draggable-el') && !e.target.closest('#style-panel') && 
-                    !e.target.closest('select') && !e.target.closest('input') && 
-                    !e.target.closest('.controls-row') && !e.target.closest('button')) {
-                    deselect(e);
-                }
-                closeShapesDropdown();
-            }, false);
-            
-            // إضافة event listeners لشاشة الدخول
-            const loginBtn = document.getElementById('login-btn');
-            const loginInput = document.getElementById('login-code-input');
-            
-            if (loginBtn) {
-                loginBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    verifyCode();
-                });
-                console.log('✅ تم ربط زر الدخول');
-            }
-            if (loginInput) {
-                loginInput.addEventListener('keypress', (e) => {
-                    e.stopPropagation();
-                    if (e.key === 'Enter') {
-                        verifyCode();
-                    }
-                });
-                console.log('✅ تم ربط حقل الإدخال');
-            }
             
             // إضافة اختصارات لوحة المفاتيح للنسخ واللصق
             document.addEventListener('keydown', (e) => {
@@ -4052,7 +4016,6 @@
         }
         
         async function verifyCode() {
-            console.log('🔐 بدء التحقق من الكود');
             const input = document.getElementById('login-code-input');
             const code = input.value.trim();
             const errorMsg = document.getElementById('login-error');
@@ -4068,101 +4031,67 @@
                 return;
             }
             
-            console.log('✅ الكود المدخل:', code);
             loginBtn.disabled = true;
             loadingDiv.style.display = 'block';
             
             try {
-                // محاولة تحميل البيانات من Google Sheets مع timeout
-                try {
-                    console.log('⏳ جاري تحميل البيانات من Google Sheets...');
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000); // timeout 5 ثواني
-                    
-                    const response = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTiWBnSkPTGN8S3-QjqwSjpJicszKs2ZuwI40iPph2EWQhgz9F10c7LIjMwa_cdPJr40OoDmqZDbP5F/pub?output=csv", { 
-                        signal: controller.signal 
-                    });
-                    clearTimeout(timeoutId);
-                    
-                    if (response.ok) {
-                        const csvText = await response.text();
-                        console.log('✅ تم تحميل البيانات بنجاح');
-                        parseCSVData(csvText);
+                if (Object.keys(subscriptionData).length === 0) {
+                    const loaded = await loadSubscriptionData();
+                    if (!loaded) {
+                        errorMsg.innerHTML = '⚠️ لا يمكن الوصول إلى قاعدة البيانات';
+                        errorMsg.style.display = 'block';
+                        throw new Error('فشل تحميل البيانات');
                     }
-                } catch (e) {
-                    console.warn('⚠️ فشل تحميل البيانات من Google Sheets:', e.message);
                 }
                 
-                // إذا كانت البيانات موجودة، تحقق من الكود
-                if (Object.keys(subscriptionData).length > 0) {
-                    console.log('📊 البيانات المتاحة:', Object.keys(subscriptionData).length, 'أكواد');
-                    if (subscriptionData[code]) {
-                        console.log('✅ الكود موجود في البيانات');
-                        const userData = subscriptionData[code];
+                if (subscriptionData[code]) {
+                    const userData = subscriptionData[code];
+                    
+                    let expiryDate = null;
+                    const dateStr = userData.expiryDate.trim();
+                    
+                    if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                        const [day, month, year] = dateStr.split('-');
+                        expiryDate = new Date(`${year}-${month}-${day}`);
+                    }
+                    else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        expiryDate = new Date(dateStr);
+                    }
+                    else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                        expiryDate = new Date(dateStr);
+                    }
+                    
+                    if (!expiryDate || isNaN(expiryDate.getTime())) {
+                        errorMsg.innerHTML = `❌ خطأ في تاريخ الانتهاء`;
+                        errorMsg.style.display = 'block';
+                        throw new Error('تاريخ غير صحيح');
+                    }
+                    
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    expiryDate.setHours(0, 0, 0, 0);
+                    
+                    if (expiryDate >= today) {
+                        // إنشاء Session ID عشوائي
+                        const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
                         
-                        let expiryDate = null;
-                        const dateStr = userData.expiryDate.trim();
+                        sessionStorage.setItem('studioName', userData.name);
+                        sessionStorage.setItem('expiryDate', userData.expiryDate);
+                        sessionStorage.setItem('sessionId', sessionId);
                         
-                        if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
-                            const [day, month, year] = dateStr.split('-');
-                            expiryDate = new Date(`${year}-${month}-${day}`);
-                        }
-                        else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                            expiryDate = new Date(dateStr);
-                        }
-                        else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                            expiryDate = new Date(dateStr);
-                        }
-                        
-                        if (!expiryDate || isNaN(expiryDate.getTime())) {
-                            errorMsg.innerHTML = `❌ خطأ في تاريخ الانتهاء`;
-                            errorMsg.style.display = 'block';
-                            throw new Error('تاريخ غير صحيح');
-                        }
-                        
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        expiryDate.setHours(0, 0, 0, 0);
-                        
-                        if (expiryDate >= today) {
-                            console.log('✅ الاشتراك ساري المفعول');
-                            // إنشاء Session ID عشوائي
-                            const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-                            
-                            sessionStorage.setItem('studioName', userData.name);
-                            sessionStorage.setItem('expiryDate', userData.expiryDate);
-                            sessionStorage.setItem('sessionId', sessionId);
-                            
-                            updateStudioName(userData.name);
-                            console.log('🔴 جاري إخفاء الـ login overlay...');
-                            document.getElementById('login-overlay').classList.add('hidden');
-                            console.log('✅ تم إضافة class hidden');
-                            showWelcomeNotification(userData.name);
-                        } else {
-                            const formattedDate = expiryDate.toLocaleDateString('ar-SA');
-                            errorMsg.innerHTML = `⏰ اشتراكك انتهى في ${formattedDate}<br><small style="font-size: 12px; color: #94a3b8;">تواصل مع المسؤول لتجديد الاشتراك</small>`;
-                            errorMsg.style.display = 'block';
-                        }
+                        updateStudioName(userData.name);
+                        document.getElementById('login-overlay').style.display = 'none';
+                        showWelcomeNotification(userData.name);
                     } else {
-                        console.log('❌ الكود غير موجود في البيانات');
-                        errorMsg.innerHTML = '❌ الكود غير صحيح';
+                        const formattedDate = expiryDate.toLocaleDateString('ar-SA');
+                        errorMsg.innerHTML = `⏰ اشتراكك انتهى في ${formattedDate}<br><small style="font-size: 12px; color: #94a3b8;">تواصل مع المسؤول لتجديد الاشتراك</small>`;
                         errorMsg.style.display = 'block';
                     }
                 } else {
-                    // إذا فشل تحميل البيانات، اسمح بدخول مع أي كود
-                    console.warn('⚠️ لم يتمكن من تحميل البيانات، السماح بالدخول مع أي كود');
-                    const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-                    sessionStorage.setItem('studioName', 'مصمم');
-                    sessionStorage.setItem('sessionId', sessionId);
-                    
-                    updateStudioName('مصمم');
-                    console.log('🔴 جاري إخفاء الـ login overlay (بدون بيانات)...');
-                    document.getElementById('login-overlay').classList.add('hidden');
-                    console.log('✅ تم إضافة class hidden (بدون بيانات)');
-                    showWelcomeNotification('مصمم');
+                    errorMsg.innerHTML = '❌ الكود غير صحيح';
+                    errorMsg.style.display = 'block';
                 }
             } catch (error) {
-                console.error('❌ خطأ في التحقق:', error);
                 errorMsg.innerHTML = '❌ حدث خطأ. حاول مرة أخرى';
                 errorMsg.style.display = 'block';
             } finally {
