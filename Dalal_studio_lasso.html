@@ -1342,11 +1342,42 @@
 
             <!-- أدوات الإضافة -->
             <div class="grid grid-cols-3 gap-2">
+                <!-- خانة القوالب المحفوظة -->
+                <div class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0] col-span-3">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleTemplates()">
+                        <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
+                            <i class="fas fa-save text-[#6366f1]"></i> القوالب المحفوظة
+                        </label>
+                        <i id="templates-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200"></i>
+                    </div>
+                    
+                    <div id="templates-content" class="hidden mt-3 flex flex-col gap-2">
+                        <!-- القائمة المنسدلة -->
+                        <div class="w-full">
+                            <select id="template-select" class="w-full p-2 text-[11px] font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]">
+                                <option value="">📂 اختر قالباً...</option>
+                            </select>
+                        </div>
+
+                        <!-- أزرار التحكم -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="loadSelectedTemplate()" class="px-3 py-2 bg-[#10b981] text-white text-[10px] font-bold rounded-lg hover:bg-[#059669] transition flex items-center gap-1 justify-center">
+                                <i class="fas fa-folder-open"></i> فتح
+                            </button>
+                            <button onclick="deleteSelectedTemplate()" class="px-3 py-2 bg-[#ef4444] text-white text-[10px] font-bold rounded-lg hover:bg-[#dc2626] transition flex items-center gap-1 justify-center">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- باقي الأزرار -->
                 <label class="bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition group">
                     <i class="fas fa-image text-lg text-[#6366f1] group-hover:scale-110 transition-transform"></i> صورة
                     <input type="file" onchange="addRegularImage(this)" class="hidden" accept="image/*">
                 </label>
                 <button onclick="toggleReadyElementsPanel()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-shapes text-[#6366f1] group-hover:scale-110 transition-transform"></i> عناصر</button>
+                <button onclick="saveCurrentAsTemplate()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-bookmark text-[#6366f1] group-hover:scale-110 transition-transform"></i> حفظ قالب</button>
                 <button onclick="createNewProject()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-file-circle-plus text-[#6366f1] group-hover:scale-110 transition-transform"></i> جديد</button>
                 <button onclick="addFrame()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="far fa-square text-[#6366f1] group-hover:scale-110 transition-transform"></i> إطار</button>
                 
@@ -4892,6 +4923,203 @@
                 input.value = '';
             }
         }
+
+        // ===== إدارة القوالب المحفوظة =====
+        const MAX_TEMPLATES = 10;
+        let currentLoadedTemplateIndex = null;
+
+        function getTemplates() {
+            try {
+                return JSON.parse(localStorage.getItem('dalal_templates') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveTemplates(templates) {
+            localStorage.setItem('dalal_templates', JSON.stringify(templates));
+            updateTemplateList();
+        }
+
+        function updateTemplateList() {
+            const templates = getTemplates();
+            const select = document.getElementById('template-select');
+            
+            // إبقاء الخيار الأول فقط
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            templates.forEach((t, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                const date = new Date(t.id).toLocaleDateString('ar-SA');
+                option.text = `${t.name} (${date})`;
+                select.add(option);
+            });
+        }
+
+        function toggleTemplates() {
+            const content = document.getElementById('templates-content');
+            const arrow = document.getElementById('templates-arrow');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                content.classList.add('flex');
+                arrow.style.transform = 'rotate(-90deg)';
+            } else {
+                content.classList.add('hidden');
+                content.classList.remove('flex');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function saveCurrentAsTemplate() {
+            const templates = getTemplates();
+            const card = document.getElementById('card');
+            
+            // تنظيف HTML من خصائص الأحداث
+            let cleanedHTML = card.innerHTML;
+            cleanedHTML = cleanedHTML.replace(/\s*data-events-bound="[^"]*"/g, '');
+            cleanedHTML = cleanedHTML.replace(/\s*data-element-id="[^"]*"/g, '');
+            
+            // إذا كان هناك قالب محمل حالياً، نسأل هل تريد تحديثه
+            if (currentLoadedTemplateIndex !== null && currentLoadedTemplateIndex >= 0) {
+                if (confirm('🔄 تم تحميل قالب موجود.\n\nهل تريد تحديث هذا القالب بالتعديلات الحالية؟\n\n✅ نعم = تحديث القالب الموجود\n❌ لا = حفظ كقالب جديد')) {
+                    // تحديث القالب الموجود
+                    templates[currentLoadedTemplateIndex].html = cleanedHTML;
+                    templates[currentLoadedTemplateIndex].width = card.style.width;
+                    templates[currentLoadedTemplateIndex].height = card.style.height;
+                    templates[currentLoadedTemplateIndex].wVal = card.getAttribute('data-card-width');
+                    templates[currentLoadedTemplateIndex].hVal = card.getAttribute('data-card-height');
+                    templates[currentLoadedTemplateIndex].customW = document.getElementById('custom-width').value;
+                    templates[currentLoadedTemplateIndex].customH = document.getElementById('custom-height').value;
+                    
+                    try {
+                        saveTemplates(templates);
+                        alert(`✅ تم تحديث القالب "${templates[currentLoadedTemplateIndex].name}" بنجاح!`);
+                        return;
+                    } catch(e) {
+                        console.error(e);
+                        alert('❌ عذراً، حدث خطأ في تحديث القالب.');
+                        return;
+                    }
+                }
+            }
+            
+            // حفظ كقالب جديد
+            if (templates.length >= MAX_TEMPLATES) {
+                alert('⚠️ عذراً، وصلت للحد الأقصى (10 قوالب). يرجى حذف قالب قديم أولاً.');
+                return;
+            }
+            
+            const name = prompt('أدخل اسم القالب الجديد:');
+            if (!name || name.trim() === '') return;
+
+            const template = {
+                id: Date.now(),
+                name: name.trim(),
+                html: cleanedHTML,
+                width: card.style.width,
+                height: card.style.height,
+                wVal: card.getAttribute('data-card-width'),
+                hVal: card.getAttribute('data-card-height'),
+                customW: document.getElementById('custom-width').value,
+                customH: document.getElementById('custom-height').value
+            };
+
+            try {
+                templates.push(template);
+                saveTemplates(templates);
+                alert('✅ تم حفظ القالب الجديد بنجاح!');
+                currentLoadedTemplateIndex = templates.length - 1;
+            } catch(e) {
+                console.error(e);
+                alert('❌ عذراً، مساحة التخزين ممتلئة.');
+            }
+        }
+
+        function loadSelectedTemplate() {
+            const select = document.getElementById('template-select');
+            const index = select.value;
+            if (index === "") {
+                alert('يرجى اختيار قالب من القائمة أولاً.');
+                return;
+            }
+            loadTemplate(index);
+        }
+
+        function loadTemplate(index) {
+            if (index === "") return;
+            
+            if(!confirm('هل أنت متأكد من فتح القالب؟ سيتم استبدال العمل الحالي.')) {
+                return;
+            }
+
+            const templates = getTemplates();
+            const template = templates[index];
+            
+            if (template) {
+                const card = document.getElementById('card');
+                
+                // استعادة الأبعاد
+                card.style.width = template.width;
+                card.style.height = template.height;
+                card.setAttribute('data-card-width', template.wVal);
+                card.setAttribute('data-card-height', template.hVal);
+                
+                // استعادة المحتوى
+                card.innerHTML = template.html;
+                
+                // استعادة قيم الحقول
+                if (template.customW) document.getElementById('custom-width').value = template.customW;
+                if (template.customH) document.getElementById('custom-height').value = template.customH;
+                
+                // تحديث الأبعاد
+                const w = parseFloat(template.wVal);
+                const h = parseFloat(template.hVal);
+                setCardSize(w, h);
+                
+                // إعادة تفعيل الأحداث للعناصر
+                rebindEvents();
+                
+                // تسجيل القالب المحمل حالياً
+                currentLoadedTemplateIndex = index;
+                
+                // إعادة تصفير الاختيار
+                document.getElementById('template-select').value = "";
+                undoStack = [];
+                redoStack = [];
+                
+                alert('✅ تم تحميل القالب بنجاح!');
+            }
+        }
+
+        function deleteSelectedTemplate() {
+            const select = document.getElementById('template-select');
+            const index = select.value;
+            
+            if (index === "") {
+                alert('يرجى اختيار قالب من القائمة أولاً لحذفه.');
+                return;
+            }
+            
+            if(confirm('هل أنت متأكد من حذف هذا القالب؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                const templates = getTemplates();
+                const templateName = templates[index].name;
+                templates.splice(index, 1);
+                saveTemplates(templates);
+                alert(`✅ تم حذف القالب "${templateName}".`);
+                select.value = "";
+                
+                // إعادة تعيين المؤشر إذا كان القالب المحذوف هو المحمل حالياً
+                if (currentLoadedTemplateIndex === parseInt(index)) {
+                    currentLoadedTemplateIndex = null;
+                }
+            }
+        }
+
+        // استدعاء تحديث قائمة القوالب عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', updateTemplateList);
     </script>
 </body>
 </html>
