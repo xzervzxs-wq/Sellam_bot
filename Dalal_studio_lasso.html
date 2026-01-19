@@ -1058,7 +1058,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen" onclick="deselect(event); closeShapesDropdown();">
+<body class="min-h-screen" id="main-body">
 
     <!-- تحميل الخطوط -->
     <div id="hidden-font-loader">
@@ -1082,7 +1082,8 @@
                 placeholder="الكود" 
                 autocomplete="off"
             >
-            <button id="login-btn" class="login-btn">دخول</button>
+            <button id="login-btn" type="button" class="login-btn" style="cursor: pointer;">دخول</button>
+            <button type="button" style="margin-top: 10px; padding: 10px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold;" onclick="alert('✅ JavaScript يعمل بشكل صحيح!')">اختبار</button>
             <div class="login-loading" id="login-loading">
                 <div class="login-spinner"></div>
             </div>
@@ -1699,16 +1700,30 @@
             
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
             
+            // إضافة event listener للـ body للـ deselect و closeShapesDropdown
+            document.getElementById('main-body').addEventListener('click', (e) => {
+                if (!e.target.closest('.draggable-el') && !e.target.closest('#style-panel') && 
+                    !e.target.closest('select') && !e.target.closest('input') && 
+                    !e.target.closest('.controls-row') && !e.target.closest('button')) {
+                    deselect(e);
+                }
+                closeShapesDropdown();
+            }, false);
+            
             // إضافة event listeners لشاشة الدخول
             const loginBtn = document.getElementById('login-btn');
             const loginInput = document.getElementById('login-code-input');
             
             if (loginBtn) {
-                loginBtn.addEventListener('click', verifyCode);
+                loginBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    verifyCode();
+                });
                 console.log('✅ تم ربط زر الدخول');
             }
             if (loginInput) {
                 loginInput.addEventListener('keypress', (e) => {
+                    e.stopPropagation();
                     if (e.key === 'Enter') {
                         verifyCode();
                     }
