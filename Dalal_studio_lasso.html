@@ -1081,9 +1081,8 @@
                 class="login-input" 
                 placeholder="الكود" 
                 autocomplete="off"
-                onkeypress="if(event.key==='Enter') verifyCode()"
             >
-            <button id="login-btn" class="login-btn" onclick="verifyCode()">دخول</button>
+            <button id="login-btn" class="login-btn">دخول</button>
             <div class="login-loading" id="login-loading">
                 <div class="login-spinner"></div>
             </div>
@@ -1699,6 +1698,23 @@
             currentLoadedTemplateIndex = null;
             
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
+            
+            // إضافة event listeners لشاشة الدخول
+            const loginBtn = document.getElementById('login-btn');
+            const loginInput = document.getElementById('login-code-input');
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', verifyCode);
+                console.log('✅ تم ربط زر الدخول');
+            }
+            if (loginInput) {
+                loginInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        verifyCode();
+                    }
+                });
+                console.log('✅ تم ربط حقل الإدخال');
+            }
             
             // إضافة اختصارات لوحة المفاتيح للنسخ واللصق
             document.addEventListener('keydown', (e) => {
