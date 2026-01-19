@@ -4015,6 +4015,88 @@
             }
         }
         
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTiWBnSkPTGN8S3-QjqwSjpJicszKs2ZuwI40iPph2EWQhgz9F10c7LIjMwa_cdPJr40OoDmqZDbP5F/pub?output=csv";
+        const CORS_PROXIES = [
+            "https://cors-anywhere.herokuapp.com/",
+            "https://api.allorigins.win/raw?url=",
+            "https://thingproxy.freeboard.io/fetch/"
+        ];
+        
+        let subscriptionData = {};
+        
+        async function loadSubscriptionData() {
+            try {
+                let response = null;
+                let csvText = null;
+                
+                try {
+                    response = await fetch(SHEET_CSV_URL, { mode: 'cors' });
+                    if (response.ok) {
+                        csvText = await response.text();
+                    }
+                } catch (e) {
+                    // لا شيء
+                }
+                
+                if (!csvText) {
+                    for (let proxy of CORS_PROXIES) {
+                        try {
+                            let proxyUrl = proxy + encodeURIComponent(SHEET_CSV_URL);
+                            response = await fetch(proxyUrl);
+                            if (response.ok) {
+                                csvText = await response.text();
+                                break;
+                            }
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                }
+                
+                if (csvText) {
+                    parseCSVData(csvText);
+                    return true;
+                } else {
+                    throw new Error('فشل الوصول إلى البيانات');
+                }
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        function parseCSVData(csvText) {
+            try {
+                const lines = csvText.trim().split('\n');
+                if (lines.length < 2) return;
+                
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                
+                const codeIndex = headers.findIndex(h => h.includes('code'));
+                const nameIndex = headers.findIndex(h => h.includes('name'));
+                const expiryIndex = headers.findIndex(h => h.includes('expiry'));
+                
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    
+                    const cells = lines[i].split(',').map(c => c.trim());
+                    if (codeIndex >= 0 && nameIndex >= 0 && expiryIndex >= 0) {
+                        const code = cells[codeIndex];
+                        const name = cells[nameIndex];
+                        const expiryDate = cells[expiryIndex];
+                        
+                        if (code && name && expiryDate) {
+                            subscriptionData[code] = {
+                                name: name,
+                                expiryDate: expiryDate
+                            };
+                        }
+                    }
+                }
+            } catch (error) {
+                // لا شيء
+            }
+        }
+        
         async function verifyCode() {
             const input = document.getElementById('login-code-input');
             const code = input.value.trim();
@@ -4035,29 +4117,16 @@
             loadingDiv.style.display = 'block';
             
             try {
-                // محاولة تحميل البيانات مع timeout قصير جداً (2 ثانية)
                 if (Object.keys(subscriptionData).length === 0) {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 2000);
-                        
-                        const response = await fetch(SHEET_CSV_URL, { 
-                            mode: 'cors',
-                            signal: controller.signal
-                        });
-                        clearTimeout(timeoutId);
-                        
-                        if (response.ok) {
-                            const csvText = await response.text();
-                            parseCSVData(csvText);
-                        }
-                    } catch (e) {
-                        console.warn('فشل تحميل البيانات:', e.message);
+                    const loaded = await loadSubscriptionData();
+                    if (!loaded) {
+                        errorMsg.innerHTML = '⚠️ لا يمكن الوصول إلى قاعدة البيانات';
+                        errorMsg.style.display = 'block';
+                        throw new Error('فشل تحميل البيانات');
                     }
                 }
                 
-                // التحقق من الكود
-                if (Object.keys(subscriptionData).length > 0 && subscriptionData[code]) {
+                if (subscriptionData[code]) {
                     const userData = subscriptionData[code];
                     
                     let expiryDate = null;
@@ -4077,7 +4146,7 @@
                     if (!expiryDate || isNaN(expiryDate.getTime())) {
                         errorMsg.innerHTML = `❌ خطأ في تاريخ الانتهاء`;
                         errorMsg.style.display = 'block';
-                        return;
+                        throw new Error('تاريخ غير صحيح');
                     }
                     
                     const today = new Date();
@@ -4105,7 +4174,6 @@
                     errorMsg.style.display = 'block';
                 }
             } catch (error) {
-                console.error('خطأ:', error);
                 errorMsg.innerHTML = '❌ حدث خطأ. حاول مرة أخرى';
                 errorMsg.style.display = 'block';
             } finally {
@@ -4113,6 +4181,23 @@
                 loadingDiv.style.display = 'none';
             }
         }
+        
+        // تحديث اسم الاستوديو في الصفحة
+        function updateStudioName(name) {
+            document.title = `أستوديو ${name} | Dalal Studio`;
+            const studioNameDisplay = document.getElementById('studio-name-display');
+            if (studioNameDisplay) {
+                studioNameDisplay.textContent = `أستوديو ${name}`;
+            }
+        }
+        
+        function showWelcomeNotification(name) {
+            console.log(`مرحباً بك في أستوديو ${name}`);
+        }
+        
+        window.addEventListener('load', async () => {
+            loadSubscriptionData();
+        });
         
         // تحديث اسم الاستوديو في الصفحة
         function updateStudioName(name) {
