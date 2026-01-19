@@ -4021,6 +4021,7 @@
         }
         
         async function verifyCode() {
+            console.log('🔐 بدء التحقق من الكود');
             const input = document.getElementById('login-code-input');
             const code = input.value.trim();
             const errorMsg = document.getElementById('login-error');
@@ -4036,12 +4037,14 @@
                 return;
             }
             
+            console.log('✅ الكود المدخل:', code);
             loginBtn.disabled = true;
             loadingDiv.style.display = 'block';
             
             try {
                 // محاولة تحميل البيانات من Google Sheets مع timeout
                 try {
+                    console.log('⏳ جاري تحميل البيانات من Google Sheets...');
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 5000); // timeout 5 ثواني
                     
@@ -4052,15 +4055,18 @@
                     
                     if (response.ok) {
                         const csvText = await response.text();
+                        console.log('✅ تم تحميل البيانات بنجاح');
                         parseCSVData(csvText);
                     }
                 } catch (e) {
-                    console.warn('فشل تحميل البيانات من Google Sheets:', e);
+                    console.warn('⚠️ فشل تحميل البيانات من Google Sheets:', e.message);
                 }
                 
                 // إذا كانت البيانات موجودة، تحقق من الكود
                 if (Object.keys(subscriptionData).length > 0) {
+                    console.log('📊 البيانات المتاحة:', Object.keys(subscriptionData).length, 'أكواد');
                     if (subscriptionData[code]) {
+                        console.log('✅ الكود موجود في البيانات');
                         const userData = subscriptionData[code];
                         
                         let expiryDate = null;
@@ -4088,6 +4094,7 @@
                         expiryDate.setHours(0, 0, 0, 0);
                         
                         if (expiryDate >= today) {
+                            console.log('✅ الاشتراك ساري المفعول');
                             // إنشاء Session ID عشوائي
                             const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
                             
@@ -4096,7 +4103,9 @@
                             sessionStorage.setItem('sessionId', sessionId);
                             
                             updateStudioName(userData.name);
+                            console.log('🔴 جاري إخفاء الـ login overlay...');
                             document.getElementById('login-overlay').classList.add('hidden');
+                            console.log('✅ تم إضافة class hidden');
                             showWelcomeNotification(userData.name);
                         } else {
                             const formattedDate = expiryDate.toLocaleDateString('ar-SA');
@@ -4104,22 +4113,25 @@
                             errorMsg.style.display = 'block';
                         }
                     } else {
+                        console.log('❌ الكود غير موجود في البيانات');
                         errorMsg.innerHTML = '❌ الكود غير صحيح';
                         errorMsg.style.display = 'block';
                     }
                 } else {
                     // إذا فشل تحميل البيانات، اسمح بدخول مع أي كود
-                    console.warn('لم يتمكن من تحميل البيانات، السماح بالدخول مع أي كود');
+                    console.warn('⚠️ لم يتمكن من تحميل البيانات، السماح بالدخول مع أي كود');
                     const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
                     sessionStorage.setItem('studioName', 'مصمم');
                     sessionStorage.setItem('sessionId', sessionId);
                     
                     updateStudioName('مصمم');
+                    console.log('🔴 جاري إخفاء الـ login overlay (بدون بيانات)...');
                     document.getElementById('login-overlay').classList.add('hidden');
+                    console.log('✅ تم إضافة class hidden (بدون بيانات)');
                     showWelcomeNotification('مصمم');
                 }
             } catch (error) {
-                console.error('خطأ في التحقق:', error);
+                console.error('❌ خطأ في التحقق:', error);
                 errorMsg.innerHTML = '❌ حدث خطأ. حاول مرة أخرى';
                 errorMsg.style.display = 'block';
             } finally {
