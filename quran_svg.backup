@@ -65,6 +65,54 @@
             overflow: hidden;
         }
 
+        /* --- NEW: Bookmark Ribbon Style (Professional Theme) --- */
+        #bookmark-ribbon {
+            position: absolute;
+            top: -2px; /* ملاصق للحافة العلوية */
+            left: 30px; 
+            width: 36px;
+            height: 0; /* مخفي افتراضياً */
+            
+            /* تدرج لوني أخضر ملكي (نفس ثيم التطبيق) مع تأثير ثلاثي الأبعاد */
+            background: linear-gradient(90deg, #0d2818 0%, #1a472a 40%, #1a472a 60%, #0d2818 100%);
+            
+            /* قص الشريط من الأسفل (ذيل السمكة) */
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+            
+            z-index: 50; 
+            transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* حركة مطاطية سلسة */
+            
+            /* ظل واقعي */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+        
+        #bookmark-ribbon.active {
+            height: 130px; /* طول النزول */
+        }
+
+        /* تطريز خيط ذهبي على الجوانب */
+        #bookmark-ribbon::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 15px; left: 4px; right: 4px;
+            border-left: 1px dashed rgba(197, 160, 89, 0.5);
+            border-right: 1px dashed rgba(197, 160, 89, 0.5);
+        }
+        
+        /* شعار ذهبي صغير أسفل الشريط */
+        #bookmark-ribbon::before {
+            content: '۞'; /* رمز زخرفي إسلامي */
+            position: absolute;
+            bottom: 22px; left: 50%;
+            transform: translateX(-50%);
+            color: #c5a059;
+            font-size: 14px;
+            opacity: 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: opacity 0.3s 0.2s; /* يظهر بتأخير بسيط */
+        }
+        #bookmark-ribbon.active::before { opacity: 1; }
+
         #quran-slider-container {
             position: relative; width: 100%; height: 100%;
             overflow: hidden; z-index: 10;
@@ -342,25 +390,49 @@
 
         /* --- NEW: Ayah Options Modal --- */
         #ayah-options-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 4000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .ayah-options-card { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: popIn 0.3s; position: relative; }
-        .ayah-info-header { margin-bottom: 20px; }
-        .ayah-info-text { font-family: 'Amiri', serif; color: #2d3748; font-size: 18px; margin-bottom: 5px; }
-        .ayah-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .option-btn { background: #f8f8f8; border: 1px solid #eee; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        /* تم تصغير النافذة لتكون "صغيرة" وأنيقة */
+        .ayah-options-card { 
+            background: white; 
+            padding: 15px; /* تقليل الحواشي */
+            border-radius: 16px; 
+            width: auto; 
+            min-width: 250px;
+            max-width: 300px; /* عرض أقصى أصغر */
+            text-align: center; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25); 
+            animation: popIn 0.3s; 
+            position: relative; 
+        }
+        .ayah-info-header { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .ayah-info-text { font-family: 'Amiri', serif; color: #2d3748; font-size: 16px; margin-bottom: 2px; }
+        
+        /* أزرار أصغر ومتقاربة */
+        .ayah-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .option-btn { 
+            background: #f8f8f8; 
+            border: 1px solid #eee; 
+            padding: 12px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+        }
         .option-btn:active { transform: scale(0.95); background: #f0fdf4; border-color: var(--green-deep); }
-        .option-icon { font-size: 24px; color: var(--green-deep); }
-        .option-label { font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 14px; color: #555; }
+        .option-icon { font-size: 20px; color: var(--green-deep); }
+        .option-label { font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 12px; color: #555; }
         
         /* Audio Player View inside Modal */
-        #audio-player-view { display: none; flex-direction: column; align-items: center; gap: 15px; width: 100%; }
-        .reciter-name { font-family: 'Cairo', sans-serif; font-weight: bold; color: var(--green-deep); font-size: 14px; margin-top: 5px; }
-        .player-controls { display: flex; align-items: center; gap: 20px; margin-top: 10px; }
-        .play-btn-large { width: 50px; height: 50px; border-radius: 50%; background: var(--green-deep); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(26, 71, 42, 0.3); }
-        .audio-settings-btn { color: #888; cursor: pointer; transition: 0.3s; font-size: 18px; padding: 5px; }
-        .audio-settings-btn:hover { color: var(--gold-primary); transform: rotate(45deg); }
+        #audio-player-view { display: none; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+        .reciter-name { font-family: 'Cairo', sans-serif; font-weight: bold; color: var(--green-deep); font-size: 13px; margin-top: 0; }
+        .player-controls { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
+        .play-btn-large { width: 45px; height: 45px; border-radius: 50%; background: var(--green-deep); color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 0 4px 10px rgba(26, 71, 42, 0.3); }
+        .audio-settings-btn { color: #888; cursor: pointer; transition: 0.3s; font-size: 16px; padding: 5px; }
         
         /* Reciter Menu */
-        #reciter-menu { position: absolute; top: 60px; left: 20px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border: 1px solid #eee; z-index: 4010; display: none; overflow: hidden; animation: slideDown 0.2s ease-out; max-height: 250px; overflow-y: auto; }
+        #reciter-menu { position: absolute; top: 50px; left: 10px; right: 10px; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); border: 1px solid #eee; z-index: 4010; display: none; overflow: hidden; animation: slideDown 0.2s ease-out; max-height: 200px; overflow-y: auto; }
         body.dark-mode .ayah-options-card, body.dark-mode #reciter-menu { background: #333; color: white; }
         body.dark-mode .option-btn { background: #3d3d3d; border-color: #444; }
         body.dark-mode .option-label, body.dark-mode .ayah-info-text { color: #eee; }
@@ -566,7 +638,12 @@
         <i class="fas fa-kaaba text-[#c5a059] text-6xl mb-4 animate-pulse"></i>
         <div class="text-white font-bold text-xl mt-4 font-serif">المصمم القرآني</div>
         <div class="text-white/80 text-xs font-serif mt-1">النسخة الذكية</div>
-        <div class="text-[#c5a059] text-sm mt-4">جاري التحميل...</div>
+        
+        <!-- شريط التحميل (نفس نمط المودل) -->
+        <div class="progress-container" style="width: 180px; margin-top: 25px; background: rgba(0,0,0,0.3);">
+            <div class="progress-bar" style="width: 0%; animation: simpleLoad 0.8s ease-out forwards;"></div>
+        </div>
+        <style> @keyframes simpleLoad { to { width: 100%; } } </style>
     </div>
 
     <!-- Export Overlay -->
@@ -624,6 +701,8 @@
         </div>
 
         <div class="mushaf-page-frame">
+             <!-- NEW: Bookmark Ribbon Element -->
+             <div id="bookmark-ribbon"></div>
              <div id="quran-slider-container"></div>
         </div>
 
@@ -926,17 +1005,18 @@
         };
 
         // --- Audio Settings ---
-        // تم تغيير الافتراضي للعفاسي لضمان العمل، وتم تصحيح معرفات السديس والشريم
-        let currentReciter = 'ar.alafasy';
+        // تم جعل الشريم هو الافتراضي
+        let currentReciter = 'ar.saoodshuraym';
         let audioPlayer = new Audio();
         let isAudioPlaying = false;
         // Promise variable to track play requests
         let playPromise = undefined;
         
         const reciters = {
-            'ar.alhudhaify': 'علي الحذيفي',
-            'ar.abdurrahmaansudais': 'عبد الرحمن السديس', // تم التصحيح
-            'ar.saoodshuraym': 'سعود الشريم', // تم التصحيح
+            'ar.husary': 'محمود خليل الحصري', // تم استبدال الحذيفي بالحصري
+            'ar.abdurrahmaansudais': 'عبد الرحمن السديس',
+            'ar.saoodshuraym': 'سعود الشريم',
+            'ar.abdullahbasfar': 'عبد الله بصفر',
             'ar.minshawi': 'محمد صديق المنشاوي',
             'ar.alafasy': 'مشاري العفاسي',
             'ar.ahmedajamy': 'أحمد بن علي العجمي'
@@ -980,7 +1060,7 @@
                 if (quickSel) quickSel.innerHTML = options;
                 if (designerSel) designerSel.innerHTML = options;
                 
-                checkBookmark();
+                checkBookmark(); // Check bookmark on initial load to ensure persistence
                 renderTafsirMenu();
                 renderReciterMenu(); // Init reciter menu
                 resizeCardToFit();
@@ -1094,11 +1174,16 @@
         function checkBookmark() {
             const savedBookmark = localStorage.getItem('bookmark');
             const btn = document.getElementById('bookmark-btn');
+            const ribbon = document.getElementById('bookmark-ribbon');
+
             if(btn) {
-                if (savedBookmark == currentPage) {
+                // Ensure comparison between numbers works correctly
+                if (savedBookmark && parseInt(savedBookmark) === currentPage) {
                     btn.classList.add('active');
+                    if(ribbon) ribbon.classList.add('active');
                 } else {
                     btn.classList.remove('active');
+                    if(ribbon) ribbon.classList.remove('active');
                 }
             }
         }

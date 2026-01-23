@@ -202,7 +202,7 @@
         /* طبقات الصور والنصوص والإطارات */
         .image-layer { /* z-index يتم التحكم به من JavaScript */ }
         .image-layer.bg-image { width: 100% !important; height: 100% !important; top: 0 !important; left: 0 !important; transform: none !important; z-index: 1 !important; }
-        .image-layer img { width: 100%; height: 100%; object-fit: cover; pointer-events: auto; }
+        .image-layer img { width: 100%; height: 100%; object-fit: fill; pointer-events: auto; }
         
         /* العناصر القابلة للتلوين */
         .image-layer[data-colorable="true"] { 
@@ -257,16 +257,16 @@
         .resize-s { bottom: -13px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
         .resize-w { top: 50%; left: -13px; transform: translateY(-50%); cursor: w-resize; }
         
-        .control-btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(calc(1 / var(--card-zoom, 1))); transform-origin: center center; }
-        .control-btn:hover { transform: scale(calc(1.1 / var(--card-zoom, 1))); }
+        .control-btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+        .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .delete-btn { top: -50px; left: -18px; background: #ef4444; }
         .duplicate-btn { top: -50px; left: 28px; background: #3b82f6; }
         .rotate-btn { top: -50px; left: 74px; background: #8b5cf6; }
         .layer-up-btn { top: -50px; left: 120px; background: #64748b; }
         .layer-down-btn { top: -50px; left: 166px; background: #64748b; }
-        .move-handle { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) scale(calc(1 / var(--card-zoom, 1))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
-        .move-handle:hover { transform: translateX(-50%) scale(calc(1.1 / var(--card-zoom, 1))); }
-        .handle { transform: scale(calc(1 / var(--card-zoom, 1))); transform-origin: center center; }
+        .move-handle { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
+        .move-handle:hover { transform: translateX(-50%) scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
+        .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
 
         
         .draggable-el.selected .control-btn, .draggable-el.selected .move-handle { display: flex; }
@@ -298,6 +298,16 @@
             display: none;
             flex-direction: column;
             overflow: hidden;
+        }
+        /* نمط الشطرنج للخلفية الشفافة */
+        .transparent-pattern {
+            background-image: linear-gradient(45deg, #e0e0e0 25%, transparent 25%), 
+                              linear-gradient(-45deg, #e0e0e0 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #e0e0e0 75%), 
+                              linear-gradient(-45deg, transparent 75%, #e0e0e0 75%) !important;
+            background-size: 20px 20px !important;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px !important;
+            background-color: #ffffff !important;
         }
         #asset-header {
             background: #1e293b;
@@ -980,8 +990,9 @@
                             </div>
                         </label>
                         <div class="w-px h-4 bg-[#cbd5e1]"></div>
-                        <button onclick="setCardTransparent()" class="text-[#64748b] hover:text-[#6366f1] transition p-1 rounded hover:bg-white" title="خلفية شفافة">
-                            <i class="fas fa-chess-board text-sm"></i>
+                        <!-- زر الشفافية -->
+                        <button onclick="toggleTransparentMode()" id="btn-transparent" class="px-3 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تفعيل/إلغاء الشفافية">
+                            <i class="fas fa-chess-board"></i> بلا خلفية
                         </button>
                     </div>
                 </div>
@@ -1712,7 +1723,7 @@
                 imgEl.src = src;
                 imgEl.style.width = '100%';
                 imgEl.style.height = '100%';
-                imgEl.style.objectFit = 'contain';
+                imgEl.style.objectFit = 'fill';
                 imgEl.draggable = false;
                 
                 // جميع العناصر قابلة للتلوين ما عدا اللي محددة بـ colorable: false
@@ -2343,12 +2354,21 @@
                 const card = document.getElementById('card');
                 await new Promise(r => setTimeout(r, 200));
 
+                // إزالة نمط الشطرنج مؤقتاً إذا كان موجوداً
+                const hadTransparentPattern = card.classList.contains('transparent-pattern');
+                if (hadTransparentPattern) {
+                    card.classList.remove('transparent-pattern');
+                    card.style.backgroundImage = 'none';
+                    card.style.backgroundColor = 'transparent';
+                }
+
                 // الحفظ بالحجم الفعلي بدقة 300 DPI
                 const pixelRatio = 4; // للحفاظ على جودة عالية
                 const actualWidth = parseInt(card.getAttribute('data-card-width')) || card.offsetWidth;
                 const actualHeight = parseInt(card.getAttribute('data-card-height')) || card.offsetHeight;
                 
-                const dataUrl = await htmlToImage.toPng(card, {
+                // إعدادات التصدير
+                const options = {
                     pixelRatio: pixelRatio, 
                     cacheBust: true,
                     width: actualWidth,
@@ -2357,9 +2377,24 @@
                         transform: 'none', 
                         boxShadow: 'none', 
                         margin: '0',
-                        border: 'none'
+                        border: 'none',
+                        backgroundImage: 'none'
                     }
-                });
+                };
+                
+                // إذا لم يكن شفافاً، نضيف خلفية بيضاء
+                if (!isTransparent) {
+                    options.backgroundColor = '#ffffff';
+                }
+                
+                const dataUrl = await htmlToImage.toPng(card, options);
+
+                // إعادة نمط الشطرنج
+                if (hadTransparentPattern) {
+                    card.classList.add('transparent-pattern');
+                    card.style.backgroundImage = '';
+                    card.style.backgroundColor = 'transparent';
+                }
 
                 const link = document.createElement('a');
                 link.download = `design-${Date.now()}.png`;
@@ -2387,43 +2422,108 @@
 
         async function generateA4Sheet() {
             const loadingText = document.querySelector('#export-overlay .text-white');
-            if(loadingText) loadingText.innerText = "جاري تحضير صفحة A4...";
+            if(loadingText) loadingText.innerText = "جاري معالجة الصور والخطوط...";
             
             const overlay = document.getElementById('export-overlay');
             overlay.style.display = 'flex';
 
             deselect();
             
-            // حفظ مستوى الزوم الحالي في متغير عام
+            // حفظ مستوى الزوم الحالي
             savedZoomBeforeA4 = window.currentZoom || 100;
             const card = document.getElementById('card');
             
             try {
-                // إعادة تعيين الزوم إلى 100% لضمان دقة الطباعة
+                // 1. إعادة تعيين الزوم (مهم جداً للدقة)
                 setCustomZoom(100);
                 
-                // انتظار ذكي لصور المحتوى (حد أقصى 3 ثواني)
-                await Promise.race([
-                    waitForImagesLoad(card),
-                    new Promise(r => setTimeout(r, 3000))
-                ]);
+                // 2. انتظار تحميل الخطوط (حل لمشكلة الخطوط في الآيفون)
+                if (document.fonts) {
+                    await document.fonts.ready;
+                }
                 
-                // تأخير بسيط لانعاش الواجهة
-                await new Promise(r => setTimeout(r, 200));
+                // 3. تحويل جميع الصور إلى Base64 (حل لمشكلة اختفاء الصور في الآيفون)
+                // هذا يمنع المتصفح من حظر الصور الخارجية أثناء التصدير
+                await convertAllImagesToDataURL(card);
+                
+                // 4. إزالة نمط الشطرنج مؤقتاً قبل التصوير (لكي تكون الصورة شفافة فعلاً)
+                const hadTransparentPattern = card.classList.contains('transparent-pattern');
+                if (hadTransparentPattern) {
+                    card.classList.remove('transparent-pattern');
+                    // إزالة الـ inline styles المتعلقة بالخلفية أيضاً
+                    card.style.backgroundImage = 'none';
+                    card.style.backgroundColor = 'transparent';
+                }
+                
+                // --- إضافة تكتيك "الإحماء" المستوحى من ملفات القرآن ---
+                try {
+                    // دورة "إحماء" وهمية لتجهيز المتصفح ومحرك الرسم
+                    await htmlToImage.toPng(card, { 
+                        quality: 0.1, 
+                        pixelRatio: 0.5,
+                        width: 100, // حجم صغير جداً
+                        height: 100
+                    });
+                } catch(e) {
+                    // نتجاهل الـ error هنا، المهم المحاولة
+                }
+                
+                // تأخير بسيط للاستقرار بعد الإحماء
+                await new Promise(r => setTimeout(r, 500));
+
+                if(loadingText) loadingText.innerText = "جاري إنشاء الملف...";
 
                 let cardDataUrl = null;
 
-                // --- استراتيجية التوليد المتعدد (فشل -> محاولة أخرى) ---
+                // كشف بسيط للجوال
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 800;
+                // الآيفون يحتاج جودة أقل قليلاً لتفادي الانهيار، لكن التحويل لـ Base64 أعلاه هو الحل الحقيقي
+                const qualityScale = isMobile ? 1.5 : 2;
+
+                // --- استراتيجية التوليد المتعدد ---
+
+                // دالة مساعدة لتشغيل htmlToImage
+                const tryHtmlToImage = async (pixelRatioVal = 2) => {
+                    if (typeof htmlToImage === 'undefined') throw new Error("htmlToImage missing");
+                    
+                    // إعدادات التصدير
+                    const options = {
+                        pixelRatio: pixelRatioVal,
+                        cacheBust: false,
+                        skipAutoScale: true,
+                        width: card.offsetWidth,
+                        height: card.offsetHeight,
+                        style: { 
+                            transform: 'none', 
+                            boxShadow: 'none', 
+                            margin: '0',
+                            backgroundImage: 'none' // منع نمط الشطرنج
+                        },
+                        filter: (node) => {
+                            return !node.classList || !node.classList.contains('control-box');
+                        }
+                    };
+                    
+                    // إذا كان المستخدم اختار الشفافية، لا نضيف backgroundColor
+                    // وإذا أراد خلفية، نضيفها بيضاء
+                    if (!isTransparent) {
+                        options.backgroundColor = '#ffffff';
+                    }
+                    // لا نضيف backgroundColor إطلاقاً للشفافية (هذا يجعل PNG شفاف)
+                    
+                    return await htmlToImage.toPng(card, options);
+                };
                 
                 // دالة مساعدة لتشغيل html2canvas
                 const tryHtml2Canvas = async (scaleVal = 2) => {
                     if (typeof html2canvas === 'undefined') throw new Error("html2canvas missing");
+                    // html2canvas أحياناً أفضل في التعامل مع التحويلات المعقدة
                     const canvas = await html2canvas(card, {
                         scale: scaleVal,
                         useCORS: true, 
                         allowTaint: true,
-                        backgroundColor: '#ffffff',
-                        logging: false, // تعطيل السجلات لتخفيف الضغط
+                        backgroundColor: null, // شفاف
+                        logging: false,
                         scrollX: 0, scrollY: 0, x: 0, y: 0,
                         width: card.offsetWidth,
                         height: card.offsetHeight
@@ -2431,49 +2531,41 @@
                     return canvas.toDataURL('image/png');
                 };
 
-                // دالة مساعدة لتشغيل htmlToImage
-                const tryHtmlToImage = async (pixelRatioVal = 2) => {
-                    if (typeof htmlToImage === 'undefined') throw new Error("htmlToImage missing");
-                    return await htmlToImage.toPng(card, {
-                        pixelRatio: pixelRatioVal,
-                        cacheBust: true,
-                        allowTaint: true,
-                        useCORS: true,
-                        backgroundColor: '#ffffff',
-                        width: card.offsetWidth,
-                        height: card.offsetHeight,
-                        style: { transform: 'none', boxShadow: 'none', margin: '0' }
-                    });
-                };
-
-                // 1. المحاولة الأولى: htmlToImage (الأفضل للنصوص العربية)
+                // محاولة التوليد
                 try {
+                     // نبدأ بـ htmlToImage لأنها أدق للنصوص
                     cardDataUrl = await Promise.race([
-                        tryHtmlToImage(2),
-                        new Promise((_, r) => setTimeout(() => r(new Error('Timeout 1')), 10000))
+                        tryHtmlToImage(qualityScale),
+                        new Promise((_, r) => setTimeout(() => r(new Error('Timeout 1')), 15000))
                     ]);
                 } catch (err1) {
-                    console.warn("فشلت المحاولة الأولى (htmlToImage)، جاري تجربة html2canvas...", err1);
-                    
-                    // 2. المحاولة الثانية: html2canvas (بديل)
+                    console.warn("فشلت المحاولة الأولى، جاري تجربة html2canvas...", err1);
                     try {
                         cardDataUrl = await Promise.race([
-                            tryHtml2Canvas(2),
-                            new Promise((_, r) => setTimeout(() => r(new Error('Timeout 2')), 7000))
+                            tryHtml2Canvas(qualityScale),
+                            new Promise((_, r) => setTimeout(() => r(new Error('Timeout 2')), 10000))
                         ]);
                     } catch (err2) {
-                        console.warn("فشلت المحاولة الثانية، جاري تجربة جودة أقل...", err2);
-                        
-                        // 3. المحاولة الثالثة: htmlToImage (جودة أقل) - الملاذ الأخير
+                        // محاولة أخيرة بجودة منخفضة
                         try {
                              cardDataUrl = await Promise.race([
                                 tryHtmlToImage(1),
                                 new Promise((_, r) => setTimeout(() => r(new Error('Timeout 3')), 5000))
                             ]);
                         } catch (err3) {
-                            throw new Error("فشلت جميع محاولات إنشاء الصورة. تأكد من أن الصور المستخدمة صالحة.");
+                            throw new Error("فشلت جميع محاولات إنشاء الصورة.");
                         }
                     }
+                }
+                
+                // --- استعادة الصور الأصلية (مهم لتخفيف الذاكرة) ---
+                restoreOriginalImages(card);
+                
+                // --- إعادة نمط الشطرنج إذا كان موجوداً ---
+                if (hadTransparentPattern) {
+                    card.classList.add('transparent-pattern');
+                    card.style.backgroundImage = ''; // إعادة تفعيل CSS
+                    card.style.backgroundColor = 'transparent';
                 }
 
                 if (!cardDataUrl) throw new Error("لم يتم إنشاء بيانات الصورة");
@@ -2601,8 +2693,11 @@
             canvas.height = currentA4Layout.canvasH;
             const ctx = canvas.getContext('2d');
 
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // إذا كان المستخدم اختار شفافية، نترك الكانفس شفاف، وإلا نملأه بالأبيض
+            if (!isTransparent) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
             
             const totalW = currentA4Layout.cols * currentA4Layout.cardW + (currentA4Layout.cols - 1) * currentA4Layout.gap;
             const totalH = currentA4Layout.rows * currentA4Layout.cardH + (currentA4Layout.rows - 1) * currentA4Layout.gap;
@@ -2635,7 +2730,9 @@
             }
             
             const saveImg = document.getElementById('save-img');
-            saveImg.src = canvas.toDataURL('image/png');
+            // إذا كان التصميم شفاف، استخدم PNG. وإلا استخدم JPEG بجودة 85% لتقليل الحجم
+            const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.85);
+            saveImg.src = imgData;
         }
         
         function downloadPDF() {
@@ -2645,10 +2742,36 @@
             const pdf = new jsPDF('p', 'mm', 'a4');
             const width = pdf.internal.pageSize.getWidth();
             const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, 'PNG', 0, 0, width, height);
             
-            const randomNum = Math.floor(Math.random() * 1000000);
-            pdf.save(`template_${randomNum}.pdf`);
+            // حساب النسبة الصحيحة بناءً على حجم الصورة الفعلي
+            const img = new Image();
+            img.onload = function() {
+                const imgWidth = img.width;
+                const imgHeight = img.height;
+                const imgAspectRatio = imgWidth / imgHeight;
+                const pageAspectRatio = width / height;
+                
+                let finalWidth = width;
+                let finalHeight = height;
+                
+                if(imgAspectRatio > pageAspectRatio) {
+                    // الصورة أعرض
+                    finalHeight = width / imgAspectRatio;
+                } else {
+                    // الصورة أطول
+                    finalWidth = height * imgAspectRatio;
+                }
+                
+                // وضع الصورة في الوسط
+                const x = (width - finalWidth) / 2;
+                const y = (height - finalHeight) / 2;
+                
+                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                
+                const randomNum = Math.floor(Math.random() * 1000000);
+                pdf.save(`template_${randomNum}.pdf`);
+            };
+            img.src = imgData;
         }
 
         async function sendToTelegramPDF(btnElement) {
@@ -2669,33 +2792,62 @@
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const width = pdf.internal.pageSize.getWidth();
                 const height = pdf.internal.pageSize.getHeight();
-                pdf.addImage(imgData, 'PNG', 0, 0, width, height);
                 
-                // تحويل الـ PDF إلى Blob
-                const pdfBlob = pdf.output('blob');
-                
-                const randomNum = Math.floor(Math.random() * 1000000);
-                
-                // تجهيز البيانات للإرسال
-                const formData = new FormData();
-                formData.append("chat_id", TG_CHAT_ID);
-                formData.append("document", pdfBlob, `template_${randomNum}.pdf`);
-                formData.append("caption", "تم إرسال التصميم 🎨✨");
+                // حساب النسبة الصحيحة بناءً على حجم الصورة الفعلي
+                const img = new Image();
+                img.onload = async function() {
+                    const imgWidth = img.width;
+                    const imgHeight = img.height;
+                    const imgAspectRatio = imgWidth / imgHeight;
+                    const pageAspectRatio = width / height;
+                    
+                    let finalWidth = width;
+                    let finalHeight = height;
+                    
+                    if(imgAspectRatio > pageAspectRatio) {
+                        // الصورة أعرض
+                        finalHeight = width / imgAspectRatio;
+                    } else {
+                        // الصورة أطول
+                        finalWidth = height * imgAspectRatio;
+                    }
+                    
+                    // وضع الصورة في الوسط
+                    const x = (width - finalWidth) / 2;
+                    const y = (height - finalHeight) / 2;
+                    
+                    pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                    
+                    // تحويل الـ PDF إلى Blob
+                    const pdfBlob = pdf.output('blob');
+                    
+                    const randomNum = Math.floor(Math.random() * 1000000);
+                    
+                    // تجهيز البيانات للإرسال
+                    const formData = new FormData();
+                    formData.append("chat_id", TG_CHAT_ID);
+                    formData.append("document", pdfBlob, `template_${randomNum}.pdf`);
+                    formData.append("caption", "تم إرسال التصميم 🎨✨");
 
-                // الإرسال إلى تليجرام
-                const response = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument`, {
-                    method: 'POST',
-                    body: formData
-                });
+                    // الإرسال إلى تليجرام
+                    const response = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument`, {
+                        method: 'POST',
+                        body: formData
+                    });
 
-                const result = await response.json();
-                
-                if (result.ok) {
-                    alert("✅ تم الإرسال بنجاح إلى تليجرام!");
-                } else {
-                    console.error(result);
-                    alert("❌ فشل الإرسال: " + (result.description || "خطأ غير معروف"));
-                }
+                    const result = await response.json();
+                    
+                    if (result.ok) {
+                        alert("✅ تم الإرسال بنجاح إلى تليجرام!");
+                    } else {
+                        console.error(result);
+                        alert("❌ فشل الإرسال: " + (result.description || "خطأ غير معروف"));
+                    }
+                };
+                img.onerror = function() {
+                    alert("❌ فشل تحميل الصورة");
+                };
+                img.src = imgData;
 
             } catch (error) {
                 console.error(error);
@@ -2708,6 +2860,98 @@
         }
 
         // --- باقي الوظائف الأساسية ---
+
+        // Helper functions for Image Pre-processing (Critical for iOS)
+        
+        async function convertAllImagesToDataURL(element) {
+            const images = Array.from(element.querySelectorAll('img'));
+            
+            // استخدام تسلسل للمعالجة لتخفيف الضغط على المعالج في الآيفون
+            // بدلاً من معالجة كل الصور دفعة واحدة
+            for (const img of images) {
+                // تجاهل الصور المخفية تماماً
+                if (img.style.display === 'none' || getComputedStyle(img).opacity === '0') continue;
+
+                // حفظ الرابط الأصلي للاستعادة
+                if (!img.dataset.originalSrc) {
+                    img.dataset.originalSrc = img.src;
+                }
+
+                try {
+                    // 1. تحضير الصورة في الذاكرة (Canvas)
+                    const dataUrl = await new Promise((resolve, reject) => {
+                        const tempImg = new Image();
+                        tempImg.crossOrigin = "Anonymous";
+                        
+                        tempImg.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            // تقليل الحجم أكثر للأمان في الآيفون (800px كافية جداً للطباعة المصغرة في A4)
+                            const MAX_DIMENSION = 800; 
+                            let width = tempImg.naturalWidth;
+                            let height = tempImg.naturalHeight;
+
+                            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                                const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+                                width *= ratio;
+                                height *= ratio;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(tempImg, 0, 0, width, height);
+                            
+                            resolve(canvas.toDataURL('image/png'));
+                        };
+                        
+                        tempImg.onerror = () => {
+                            // محاولة أخيرة عبر fetch المباشر
+                             fetch(img.src, { mode: 'cors' })
+                                .then(r => r.blob())
+                                .then(b => {
+                                    const fr = new FileReader();
+                                    fr.onload = () => resolve(fr.result);
+                                    fr.readAsDataURL(b);
+                                })
+                                .catch(() => resolve(img.src)); // ابق على القديم
+                        };
+
+                        // كسر الكاش بقوة
+                        const src = img.src;
+                        if (src.startsWith('data:')) {
+                            tempImg.src = src;
+                        } else {
+                            tempImg.src = src + (src.includes('?') ? '&' : '?') + 't=' + Date.now();
+                        }
+                    });
+
+                    // 2. الخطوة الأهم: تعيين المصدر والانتظار حتى "يفهم" المتصفح الصورة الجديدة
+                    img.src = dataUrl;
+                    img.srcset = ""; 
+                    
+                    // إجبار المتصفح على فك تشفير الصورة قبل الانتقال للتالية
+                    if (img.decode) {
+                        await img.decode().catch(() => {});
+                    } else if (!img.complete) {
+                        await new Promise(r => { img.onload = r; img.onerror = r; setTimeout(r, 1000); });
+                    }
+                    
+                } catch (e) {
+                    console.warn('Error converting image:', e);
+                }
+            }
+        }
+        
+        function restoreOriginalImages(element) {
+            const images = element.querySelectorAll('img');
+            images.forEach(img => {
+                if (img.dataset.originalSrc) {
+                    img.src = img.dataset.originalSrc;
+                    delete img.dataset.originalSrc;
+                }
+            });
+        }
 
         // يُستدعى بعد أي تغيير لحفظ الحالة الجديدة
         function saveState() {
@@ -3006,7 +3250,7 @@
                     img.loading = "eager";
                     img.style.width = '100%';
                     img.style.height = '100%';
-                    img.style.objectFit = 'cover';
+                    img.style.objectFit = 'fill';
                     img.style.pointerEvents = 'none';
                     wrapper.appendChild(img);
                     const card = document.getElementById('card');
@@ -4400,6 +4644,11 @@
             if(el.classList.contains('image-layer') && el.getAttribute('data-colorable') !== 'false') {
                 document.getElementById('colorable-controls-toolbar').classList.remove('hidden');
                 document.getElementById('colorable-controls-toolbar').classList.add('flex');
+                
+                // إظهار زر التدرج للصور أيضاً
+                document.getElementById('gradient-toggle-row').classList.remove('hidden');
+                document.getElementById('gradient-toggle-row').classList.add('flex');
+
                 // تحديث لون الـ input من لون الخلفية الحالي
                 const currentBg = el.style.backgroundColor;
                 if(currentBg && currentBg !== 'transparent') {
@@ -5007,8 +5256,8 @@
                 contentWrapper.style.backgroundImage = 'none';
                 contentWrapper.style.webkitMaskImage = `url(${img.src})`;
                 contentWrapper.style.maskImage = `url(${img.src})`;
-                contentWrapper.style.webkitMaskSize = 'contain';
-                contentWrapper.style.maskSize = 'contain';
+                contentWrapper.style.webkitMaskSize = '100% 100%';
+                contentWrapper.style.maskSize = '100% 100%';
                 contentWrapper.style.webkitMaskRepeat = 'no-repeat';
                 contentWrapper.style.maskRepeat = 'no-repeat';
                 contentWrapper.style.webkitMaskPosition = 'center';
@@ -5040,8 +5289,8 @@
                 contentWrapper.style.backgroundColor = 'transparent';
                 contentWrapper.style.webkitMaskImage = `url(${img.src})`;
                 contentWrapper.style.maskImage = `url(${img.src})`;
-                contentWrapper.style.webkitMaskSize = 'contain';
-                contentWrapper.style.maskSize = 'contain';
+                contentWrapper.style.webkitMaskSize = '100% 100%';
+                contentWrapper.style.maskSize = '100% 100%';
                 contentWrapper.style.webkitMaskRepeat = 'no-repeat';
                 contentWrapper.style.maskRepeat = 'no-repeat';
                 contentWrapper.style.webkitMaskPosition = 'center';
@@ -5300,10 +5549,33 @@
                     activeEl.style.color = ''; 
                 }
             } else if(activeEl.classList.contains('image-layer') && activeEl.querySelector('img')) {
-                // للصور: لا نطبق التدرج لأنه لا يظهر بشكل صحيح
-                // التدرج للعناصر القابلة للتلوين فقط يتم من شريط أدواتها الخاص
-                showInfoModal('التدرج غير متاح للصور العادية. استخدم التدرج العام من أعلى أو أضف عناصر قابلة للتلوين من المكتبة.', 'تنبيه', '💡');
-                return;
+                // تفعيل التدرج للصور باستخدام Mask
+                const img = activeEl.querySelector('img');
+                const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
+                
+                // حفظ الحالة السابقة
+                if (!activeEl.hasAttribute('data-has-gradient')) {
+                     activeEl.setAttribute('data-prev-opacity', img.style.opacity || '1');
+                }
+                
+                // تطبيق التدرج كخلفية
+                contentWrapper.style.backgroundImage = gradient;
+                contentWrapper.style.backgroundColor = 'transparent';
+                
+                // استخدام الصورة كـ Mask
+                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
+                contentWrapper.style.maskImage = `url(${img.src})`;
+                
+                contentWrapper.style.webkitMaskSize = '100% 100%';
+                contentWrapper.style.maskSize = '100% 100%';
+                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
+                contentWrapper.style.maskRepeat = 'no-repeat';
+                contentWrapper.style.webkitMaskPosition = 'center';
+                contentWrapper.style.maskPosition = 'center';
+                
+                // إخفاء الصورة الأصلية
+                img.style.opacity = '0';
+
             } else {
                 if (!activeEl.hasAttribute('data-has-gradient')) {
                      let bg = activeEl.style.backgroundColor;
@@ -5341,6 +5613,18 @@
                     textDiv.style.color = prevColor && prevColor !== 'transparent' ? prevColor : '#1e293b'; 
                     textDiv.style.display = 'block';
                 }
+            } else if (activeEl.classList.contains('image-layer')) {
+                const img = activeEl.querySelector('img');
+                const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
+                
+                contentWrapper.style.backgroundImage = 'none';
+                contentWrapper.style.webkitMaskImage = 'none';
+                contentWrapper.style.maskImage = 'none';
+                
+                if (img) img.style.opacity = '1';
+                activeEl.style.backgroundColor = 'transparent';
+                if(contentWrapper !== activeEl) contentWrapper.style.backgroundColor = 'transparent';
+                
             } else {
                 activeEl.style.backgroundImage = 'none';
                 
@@ -5451,18 +5735,50 @@
             grad.style.height = height + '%';
         }
 
+        // متغير لحفظ لون الخلفية السابق
+        let savedBgColor = '#ffffff';
+
         function setCardBackgroundColor(color) {
             isTransparent = false;
-            document.getElementById('card').style.backgroundColor = color;
+            savedBgColor = color; // حفظ اللون
+            const card = document.getElementById('card');
+            card.style.backgroundColor = color;
+            card.classList.remove('transparent-pattern');
             const preview = document.getElementById('bg-color-preview');
             if(preview) preview.style.backgroundColor = color;
+            // إعادة مظهر زر الشفافية للوضع العادي
+            const btn = document.getElementById('btn-transparent');
+            if (btn) {
+                btn.classList.remove('bg-[#6366f1]', 'text-white');
+                btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+            }
             saveState();
         }
 
         function setCardTransparent() {
             isTransparent = true;
-            document.getElementById('card').style.backgroundColor = 'transparent';
+            const card = document.getElementById('card');
+            card.style.backgroundColor = 'transparent';
+            card.classList.add('transparent-pattern');
+            // تحديث مظهر الزر
+            const btn = document.getElementById('btn-transparent');
+            if (btn) {
+                btn.classList.add('bg-[#6366f1]', 'text-white');
+                btn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+            }
             saveState();
+        }
+        
+        // دالة التبديل بين الشفافية والخلفية العادية
+        function toggleTransparentMode() {
+            const card = document.getElementById('card');
+            if (isTransparent) {
+                // إعادة اللون السابق
+                setCardBackgroundColor(savedBgColor);
+            } else {
+                // تفعيل الشفافية
+                setCardTransparent();
+            }
         }
 
         function setCardSize(w, h) {
@@ -6082,7 +6398,7 @@
                     img.loading = "eager";
                     img.style.width = '100%';
                     img.style.height = '100%';
-                    img.style.objectFit = 'cover';
+                    img.style.objectFit = 'fill';
                     img.style.pointerEvents = 'none';
                     wrapper.appendChild(img);
                     const card = document.getElementById('card');
