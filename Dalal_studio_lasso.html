@@ -255,6 +255,7 @@
         .resize-n { top: -13px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
         .resize-e { top: 50%; right: -13px; transform: translateY(-50%); cursor: e-resize; }
         .resize-s { bottom: -13px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+        .resize-w { top: 50%; left: -13px; transform: translateY(-50%); cursor: w-resize; }
         
         .control-btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(calc(1 / var(--card-zoom, 1))); transform-origin: center center; }
         .control-btn:hover { transform: scale(calc(1.1 / var(--card-zoom, 1))); }
@@ -2848,6 +2849,7 @@
                 <div class="handle resize-n"></div>
                 <div class="handle resize-e"></div>
                 <div class="handle resize-s"></div>
+                <div class="handle resize-w"></div>
             `;
             div.innerHTML = controls;
             
@@ -4244,7 +4246,7 @@
                     let potentialW = startW + dx;
                     newW = Math.max(20, potentialW);
                     newLeft = startLeft + (newW - startW) / 2;
-                } else if (handle.classList.contains('resize-nw') || handle.classList.contains('resize-sw')) { 
+                } else if (handle.classList.contains('resize-w') || handle.classList.contains('resize-nw') || handle.classList.contains('resize-sw')) { 
                     let potentialW = startW - dx;
                     newW = Math.max(20, potentialW);
                     newLeft = startLeft - (newW - startW) / 2;
@@ -4292,7 +4294,7 @@
                     }
                 } else {
                     // للكائنات الأخرى (صور، إطارات)
-                    // الحفاظ على نسبة العرض الارتفاع عند السحب من الزوايا
+                    // التحجيم من الزوايا = الحفاظ على نسبة العرض للارتفاع
                     if ((handle.classList.contains('resize-ne') || handle.classList.contains('resize-se') || 
                          handle.classList.contains('resize-nw') || handle.classList.contains('resize-sw')) && !e.shiftKey) {
                         
@@ -4313,13 +4315,15 @@
                              // الارتفاع هو الأساس
                              newW = newH * aspectRatio;
 
-                             if (handle.classList.contains('resize-nw') || handle.classList.contains('resize-sw')) { 
+                             if (handle.classList.contains('resize-nw') || handle.classList.contains('resize-sw') || handle.classList.contains('resize-w')) { 
                                 newLeft = startLeft - (newW - startW) / 2;
                              } else { 
                                 newLeft = startLeft + (newW - startW) / 2;
                              }
                         }
                     }
+                    // التحجيم من الجوانب = تغيير حر (العرض أو الارتفاع فقط)
+                    // لا نحتاج تعديل إضافي لأن القيم محسوبة مسبقاً
 
                     el.style.width = newW + 'px';
                     el.style.height = newH + 'px';
