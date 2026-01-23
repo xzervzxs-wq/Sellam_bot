@@ -1709,9 +1709,11 @@
                 imgEl.style.objectFit = 'contain';
                 imgEl.draggable = false;
                 
-                // إذا كان قابل للتلوين، نضيف علامة لتلوينه لاحقاً
-                if (colorable) {
+                // جميع العناصر قابلة للتلوين ما عدا اللي محددة بـ colorable: false
+                if (colorable !== false) {
                     wrapper.setAttribute('data-colorable', 'true');
+                } else {
+                    wrapper.setAttribute('data-colorable', 'false');
                 }
                 
                 // إضافة الصورة داخل content-wrapper
@@ -3037,6 +3039,8 @@
                     img.style.imageRendering = 'high-quality';
                     
                     wrapper.setAttribute('data-original-image', e.target.result);
+                    // الصور المرفوعة قابلة للتلوين افتراضياً
+                    wrapper.setAttribute('data-colorable', 'true');
                     
                     contentWrapper.appendChild(img);
                     document.getElementById('card').appendChild(wrapper);
