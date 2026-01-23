@@ -483,23 +483,32 @@
         .locked-item {
             position: relative;
             transition: all 0.3s ease;
-            cursor: not-allowed !important;
+            cursor: pointer !important;
+            opacity: 0.7 !important;
         }
 
         .locked-item:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
+            opacity: 0.9 !important;
+            transform: scale(1.02);
         }
 
         .locked-item::after {
-            content: '🔒';
+            content: '🔐';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 20px;
+            top: 8px;
+            right: 8px;
+            font-size: 12px;
             pointer-events: none;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            opacity: 0.6;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .locked-item:hover::after {
+            opacity: 0.9;
+            background: rgba(99, 102, 241, 0.15);
         }
 
         /* تنسيق الخيارات المعطلة في الـ Select */

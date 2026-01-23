@@ -9,7 +9,7 @@
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
-        const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
+        const ITEMS_PER_CATEGORY_FREE = 4; // عدد العناصر المفتوحة في المجاني
         
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
@@ -34,14 +34,6 @@
                 userTier = 'free';
             }
             setTimeout(applyTierRestrictions, 500);
-            
-            // إظهار رسالة ترحيب للـ free tier
-            if (userTier === 'free' && !localStorage.getItem('freeTierWelcomeShown')) {
-                setTimeout(() => {
-                    showInfoModal('لديك 10 خطوط + 10 أشكال مفتوحة. اشترك الآن للوصول لجميع المميزات! 🚀', '📌 النسخة المجانية', '🎨');
-                    localStorage.setItem('freeTierWelcomeShown', 'true');
-                }, 1000);
-            }
         });
         // ==========================================
 
