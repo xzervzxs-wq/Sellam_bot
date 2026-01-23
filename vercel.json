@@ -1,20 +1,7 @@
 {
   "version": 2,
   "name": "despro-studio",
-  "builds": [
-    {
-      "src": "despro/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(?!despro)",
-      "status": 404
-    },
-    {
-      "src": "/despro/(.*)",
-      "dest": "/despro/$1"
-    }
-  ]
+  "public": "despro",
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": "despro"
 }
