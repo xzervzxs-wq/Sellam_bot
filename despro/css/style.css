@@ -527,46 +527,9 @@
             }
             to {
                 transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-        }
-
         @keyframes fadeOut {
             to {
                 opacity: 0;
                 transform: scale(0.95);
             }
-        }
-
-        /* ========================================
-           Freemium - Premium Options Styling
-           ======================================== */
-
-        /* تنسيق الخيارات العادية */
-        select option {
-            color: #1e293b;
-            background-color: white;
-            padding: 5px 10px;
-        }
-
-        /* تنسيق الخيارات المعطلة (PREMIUM) */
-        select option:disabled {
-            color: #6366f1;
-            background-color: #f0f4ff;
-            font-weight: bold;
-            background-image: linear-gradient(#f0f4ff, #f0f4ff);
-            background-color: #f0f4ff;
-        }
-
-        /* تنسيق عند التحديد */
-        select option:checked {
-            background: linear-gradient(#6366f1, #6366f1);
-            background-color: #6366f1;
-            color: white;
-        }
-
-        select option:checked:disabled {
-            background: linear-gradient(#6366f1, #6366f1);
-            background-color: #6366f1;
-            color: white;
         }

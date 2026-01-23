@@ -5329,9 +5329,7 @@
                     if (index >= ITEMS_PER_CATEGORY_FREE && option.value && option.value !== '') {
                         option.disabled = true;
                         if (!option.textContent.includes('PREMIUM')) {
-                            option.textContent = '[PREMIUM] - ' + option.textContent;
-                            option.style.color = '#6366f1';
-                            option.style.fontWeight = 'bold';
+                            option.textContent = '⛔ PREMIUM: ' + option.textContent;
                         }
                     }
                 });
