@@ -77,10 +77,10 @@
                 </p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <!-- إدارة الاشتراك -->
-                    <button onclick="toggleSubscriptionModal()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
+                    <a href="subscriptions.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
                         <i class="fas fa-credit-card" style="font-size: 16px;"></i>
                         إدارة الاشتراك
-                    </button>
+                    </a>
                     
                     <!-- الاقتراحات -->
                     <a href="https://wa.me/966531333714?text=لدي%20اقتراح" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
@@ -100,90 +100,6 @@
                         استفسارات
                     </a>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Subscription Modal -->
-    <div id="subscription-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); z-index: 100000; align-items: center; justify-content: center; backdrop-filter: blur(3px);">
-        <div style="bg-white rounded-3xl shadow-2xl border border-indigo-100 p-8 max-w-4xl mx-4 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-            <!-- Header with back button -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0;">
-                <div>
-                    <h2 style="font-size: 28px; font-weight: bold; color: #1e293b; font-family: 'Cairo', sans-serif; margin: 0;">✨ اشتراكات despro</h2>
-                    <p style="font-size: 14px; color: #64748b; font-family: 'Cairo', sans-serif; margin-top: 5px;">اختر الباقة المناسبة لك</p>
-                </div>
-                <button onclick="toggleSubscriptionModal()" style="background: none; border: none; color: #6366f1; font-size: 24px; cursor: pointer;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Pricing Cards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                <!-- 3 Months Plan -->
-                <div style="border: 2px solid #e2e8f0; border-radius: 16px; padding: 24px; transition: all 0.3s ease; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); cursor: pointer;" onmouseover="this.style.borderColor='#6366f1'; this.style.boxShadow='0 10px 30px rgba(99,102,241,0.2)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'">
-                    <h3 style="font-size: 18px; font-weight: bold; color: #1e293b; font-family: 'Cairo', sans-serif; margin: 0 0 10px 0;">🌟 الباقة الأساسية</h3>
-                    <div style="margin-bottom: 20px;">
-                        <p style="font-size: 32px; font-weight: bold; color: #6366f1; margin: 0;">99 <span style="font-size: 16px; color: #64748b;">ريال</span></p>
-                        <p style="font-size: 13px; color: #64748b; font-family: 'Cairo', sans-serif; margin: 5px 0 0 0;">لمدة 3 شهور</p>
-                    </div>
-                    <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                        <ul style="list-style: none; padding: 0; margin: 0;">
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>الوصول الكامل للأدوات</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>100+ قالب جاهز</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>دعم فني أساسي</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>تحديثات شهرية</li>
-                        </ul>
-                    </div>
-                    <button onclick="alert('سيتم توجيهك لصفحة الدفع')" style="width: 100%; padding: 12px; background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#4f46e5'" onmouseout="this.style.backgroundColor='#6366f1'">اشترك الآن</button>
-                </div>
-
-                <!-- 6 Months Plan - Popular -->
-                <div style="border: 3px solid #6366f1; border-radius: 16px; padding: 24px; transition: all 0.3s ease; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); position: relative; transform: scale(1.05);" onmouseover="this.style.boxShadow='0 20px 40px rgba(99,102,241,0.3)'" onmouseout="this.style.boxShadow='none'">
-                    <div style="position: absolute; top: -12px; right: 20px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; font-family: 'Cairo', sans-serif;">⭐ الأشهر</div>
-                    <h3 style="font-size: 18px; font-weight: bold; color: #1e293b; font-family: 'Cairo', sans-serif; margin: 0 0 10px 0;">💎 الباقة المميزة</h3>
-                    <div style="margin-bottom: 20px;">
-                        <p style="font-size: 32px; font-weight: bold; color: #6366f1; margin: 0;">180 <span style="font-size: 16px; color: #64748b;">ريال</span></p>
-                        <p style="font-size: 13px; color: #64748b; font-family: 'Cairo', sans-serif; margin: 5px 0 0 0;">لمدة 6 شهور</p>
-                        <p style="font-size: 12px; color: #10b981; font-family: 'Cairo', sans-serif; margin-top: 5px; font-weight: bold;">توفير 10%</p>
-                    </div>
-                    <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                        <ul style="list-style: none; padding: 0; margin: 0;">
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #6366f1; margin-right: 8px;"></i>كل مميزات الباقة الأساسية</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #6366f1; margin-right: 8px;"></i>200+ قالب حصري</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #6366f1; margin-right: 8px;"></i>دعم فني أولوية</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif;"><i class="fas fa-check" style="color: #6366f1; margin-right: 8px;"></i>عمليات تصدير غير محدودة</li>
-                        </ul>
-                    </div>
-                    <button onclick="alert('سيتم توجيهك لصفحة الدفع')" style="width: 100%; padding: 12px; background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#4f46e5'" onmouseout="this.style.backgroundColor='#6366f1'">اشترك الآن</button>
-                </div>
-
-                <!-- 12 Months Plan -->
-                <div style="border: 2px solid #e2e8f0; border-radius: 16px; padding: 24px; transition: all 0.3s ease; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); cursor: pointer;" onmouseover="this.style.borderColor='#6366f1'; this.style.boxShadow='0 10px 30px rgba(99,102,241,0.2)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'">
-                    <h3 style="font-size: 18px; font-weight: bold; color: #1e293b; font-family: 'Cairo', sans-serif; margin: 0 0 10px 0;">👑 باقة سنوية</h3>
-                    <div style="margin-bottom: 20px;">
-                        <p style="font-size: 32px; font-weight: bold; color: #6366f1; margin: 0;">300 <span style="font-size: 16px; color: #64748b;">ريال</span></p>
-                        <p style="font-size: 13px; color: #64748b; font-family: 'Cairo', sans-serif; margin: 5px 0 0 0;">لمدة سنة كاملة</p>
-                        <p style="font-size: 12px; color: #10b981; font-family: 'Cairo', sans-serif; margin-top: 5px; font-weight: bold;">توفير 17%</p>
-                    </div>
-                    <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                        <ul style="list-style: none; padding: 0; margin: 0;">
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>جميع المميزات المميزة</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>500+ قالب (جميعها)</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif; margin-bottom: 8px;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>دعم فني 24/7 VIP</li>
-                            <li style="font-size: 13px; color: #475569; font-family: 'Cairo', sans-serif;"><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>مميزات جديدة مجاني</li>
-                        </ul>
-                    </div>
-                    <button onclick="alert('سيتم توجيهك لصفحة الدفع')" style="width: 100%; padding: 12px; background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#4f46e5'" onmouseout="this.style.backgroundColor='#6366f1'">اشترك الآن</button>
-                </div>
-            </div>
-
-            <!-- Contact Section -->
-            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e2e8f0; background: linear-gradient(135deg, #f0f4ff 0%, #f5f3ff 100%); border-radius: 16px; padding: 24px; text-align: center;">
-                <p style="font-size: 14px; color: #475569; font-family: 'Cairo', sans-serif; margin: 0 0 15px 0;">هل لديك استفسار؟ تواصل معنا عبر الواتس اب</p>
-                <a href="https://wa.me/966531333714?text=أستفسر%20عن%20الباقات" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background-color: #10b981; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'">
-                    <i class="fab fa-whatsapp"></i> تواصل معنا
-                </a>
             </div>
         </div>
     </div>
