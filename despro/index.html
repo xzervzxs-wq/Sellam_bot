@@ -46,13 +46,12 @@
 
     <!-- شاشة تسجيل الدخول -->
     <div id="login-overlay" style="display: none;">
-        <div class="login-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div class="login-title" style="margin: 0;">🎨 استوديو المصممين</div>
-                <button onclick="toggleLoginOverlay()" style="background: none; border: none; color: #6366f1; font-size: 18px; cursor: pointer; transition: all 0.3s ease; padding: 5px 10px; hover-color: #4f46e5;" title="العودة">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
+        <div class="login-container" style="position: relative;">
+            <button onclick="toggleLoginOverlay()" style="position: absolute; top: 8px; right: 10px; background: none; border: none; color: #6366f1; font-size: 12px; cursor: pointer; transition: all 0.3s ease; padding: 5px 8px; font-family: 'Cairo', sans-serif; font-weight: bold;" title="العودة">
+                <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>
+                back
+            </button>
+            <div class="login-title">🎨 استوديو المصممين</div>
             <div style="text-align: center; font-size: 14px; color: #94a3b8; font-family: 'Cairo', sans-serif; margin-bottom: 20px;">
                 استوديو متخصص | مساحات للإبداع ✨
             </div>
