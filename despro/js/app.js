@@ -5329,11 +5329,17 @@
                     if (index >= ITEMS_PER_CATEGORY_FREE && option.value && option.value !== '') {
                         option.disabled = true;
                         if (!option.textContent.includes('PREMIUM')) {
-                            option.textContent = '⛔ PREMIUM: ' + option.textContent;
+                            option.textContent = '[PREMIUM] - ' + option.textContent;
                         }
                     }
                 });
             });
+            // تهيئة الـ custom dropdown
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCustomFontDropdown);
+            } else {
+                setTimeout(initCustomFontDropdown, 100);
+            }
         }
         
         function restrictShapes() {
@@ -5519,3 +5525,103 @@
             // إخفاء الـ overlay بعد الدخول الناجح
             document.getElementById('login-overlay').style.display = 'none';
         }
+        // ==========================================
+        // Custom Dropdown for Fonts with Lock Icon
+        // ==========================================
+        
+        function initCustomFontDropdown() {
+            const select = document.getElementById('top-font-family');
+            if (!select) return;
+
+            // الحصول على جميع الخيارات
+            const options = [];
+            const groups = select.querySelectorAll('optgroup');
+            
+            groups.forEach(group => {
+                const groupTitle = group.getAttribute('label');
+                const items = Array.from(group.querySelectorAll('option')).map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent,
+                    disabled: opt.disabled || (opt.textContent.includes('[PREMIUM]')),
+                    group: groupTitle
+                }));
+                
+                if (items.length > 0) {
+                    options.push({ title: groupTitle, items });
+                }
+            });
+
+            // إنشاء custom dropdown
+            const dropdown = document.createElement('div');
+            dropdown.className = 'custom-dropdown';
+            dropdown.innerHTML = `
+                <button class="dropdown-toggle" type="button">
+                    <span class="dropdown-value">اختر خط...</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu"></div>
+            `;
+
+            // إضافة الخيارات للمينو
+            const menu = dropdown.querySelector('.dropdown-menu');
+            options.forEach(group => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'dropdown-group';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'dropdown-group-title';
+                titleDiv.textContent = group.title;
+                groupDiv.appendChild(titleDiv);
+
+                group.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'dropdown-item';
+                    if (item.disabled) itemDiv.classList.add('locked');
+                    
+                    if (item.disabled) {
+                        itemDiv.innerHTML = `
+                            <span class="lock-icon">🔒</span>
+                            <span>${item.text.replace('[PREMIUM] - ', '')}</span>
+                        `;
+                    } else {
+                        itemDiv.textContent = item.text;
+                    }
+
+                    itemDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        if (!item.disabled) {
+                            select.value = item.value;
+                            handleFontSelection(select);
+                            dropdown.querySelector('.dropdown-value').textContent = item.text;
+                            itemDiv.classList.add('selected');
+                            menu.classList.remove('active');
+                        }
+                    };
+
+                    groupDiv.appendChild(itemDiv);
+                });
+
+                menu.appendChild(groupDiv);
+            });
+
+            // Toggle menu
+            dropdown.querySelector('.dropdown-toggle').onclick = () => {
+                menu.classList.toggle('active');
+            };
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+
+            // إخفاء select الأصلي وإضافة custom dropdown
+            select.style.display = 'none';
+            select.parentNode.insertBefore(dropdown, select);
+        }
+
+        // استدعاء عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initCustomFontDropdown, 500);
+        });
