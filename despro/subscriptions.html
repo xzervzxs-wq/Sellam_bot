@@ -19,166 +19,153 @@
 <body class="bg-gray-50">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3">
-                    <i class="fas fa-palette text-lg"></i>
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#6366f1] rounded-lg flex items-center justify-center text-white text-sm transform rotate-3">
+                    <i class="fas fa-palette text-xs"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-[#1e293b]">despro</h1>
+                <h1 class="text-lg font-bold text-[#1e293b]">despro</h1>
             </div>
-            <a href="index.html" class="text-[#6366f1] hover:text-[#4f46e5] transition flex items-center gap-2 font-semibold">
-                <i class="fas fa-arrow-right"></i>
-                العودة للاستوديو
+            <a href="index.html" class="text-[#6366f1] hover:text-[#4f46e5] transition text-xs font-semibold">
+                <i class="fas fa-arrow-right text-xs"></i> العودة
             </a>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-16">
+    <main class="max-w-6xl mx-auto px-4 py-12">
         <!-- Title Section -->
-        <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-[#1e293b] mb-4">✨ اشتراكات despro</h2>
-            <p class="text-xl text-[#64748b]">اختر الباقة المناسبة لك واستمتع بكل المميزات</p>
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-[#1e293b] mb-2">اشتراكات despro</h2>
+            <p class="text-[#64748b] text-sm">اختر المدة المناسبة لك واستمتع بكل المميزات</p>
         </div>
 
         <!-- Pricing Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <!-- 3 Months Plan -->
-            <div class="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-[#6366f1]">
-                <div class="p-8">
-                    <h3 class="text-2xl font-bold text-[#1e293b] mb-2">🌟 الباقة الأساسية</h3>
-                    <div class="mb-8">
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <span class="text-5xl font-bold text-[#6366f1]">99</span>
-                            <span class="text-xl text-[#64748b]">ريال</span>
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div class="p-6">
+                    <h3 class="text-lg font-bold text-[#1e293b] mb-3">3 شهور</h3>
+                    <div class="mb-6">
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-4xl font-bold text-[#6366f1]">99</span>
+                            <span class="text-sm text-[#64748b]">ريال</span>
                         </div>
-                        <p class="text-sm text-[#64748b]">لمدة 3 شهور</p>
+                        <p class="text-xs text-[#94a3b8]">33 ريال/شهر</p>
                     </div>
                     
                     <!-- Features -->
-                    <div class="bg-gray-50 rounded-xl p-6 mb-8 space-y-3">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">الوصول الكامل للأدوات</span>
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#10b981] text-xs mt-1"></i>
+                            <span class="text-xs text-[#475569]">الوصول الكامل لكل الأدوات</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">100+ قالب جاهز</span>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#10b981] text-xs mt-1"></i>
+                            <span class="text-xs text-[#475569]">دعم فني 24/7</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">دعم فني أساسي</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">تحديثات شهرية</span>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#10b981] text-xs mt-1"></i>
+                            <span class="text-xs text-[#475569]">تحديثات مستمرة</span>
                         </div>
                     </div>
                     
-                    <button onclick="subscribe('basic')" class="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white font-bold py-3 rounded-lg transition-colors duration-300">
-                        اشترك الآن
+                    <button onclick="subscribe('basic')" class="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white text-sm font-semibold py-2 rounded-lg transition-colors duration-300">
+                        اشترك
                     </button>
                 </div>
             </div>
 
             <!-- 6 Months Plan - Popular -->
-            <div class="bg-gradient-to-br from-[#6366f1] to-[#4f46e5] rounded-2xl shadow-2xl border-2 border-[#6366f1] overflow-hidden transform scale-105 relative">
-                <div class="absolute top-0 right-0 bg-[#fbbf24] text-[#1e293b] px-6 py-2 rounded-bl-2xl font-bold flex items-center gap-2">
-                    <i class="fas fa-star"></i> الأشهر
+            <div class="bg-gradient-to-br from-[#6366f1] to-[#4f46e5] rounded-xl shadow-lg border border-[#6366f1] overflow-hidden relative">
+                <div class="absolute top-0 right-0 bg-[#fbbf24] text-[#1e293b] px-3 py-1 rounded-bl-lg text-xs font-bold">
+                    الأفضل
                 </div>
-                <div class="p-8 text-white">
-                    <h3 class="text-2xl font-bold mb-2">💎 الباقة المميزة</h3>
-                    <div class="mb-8">
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <span class="text-5xl font-bold">180</span>
-                            <span class="text-xl opacity-90">ريال</span>
+                <div class="p-6 text-white">
+                    <h3 class="text-lg font-bold mb-3">6 شهور</h3>
+                    <div class="mb-6">
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-4xl font-bold">180</span>
+                            <span class="text-sm opacity-90">ريال</span>
                         </div>
-                        <p class="text-sm opacity-80">لمدة 6 شهور</p>
-                        <p class="text-sm text-[#fbbf24] font-bold mt-2">توفير 10%</p>
+                        <p class="text-xs opacity-80">30 ريال/شهر</p>
+                        <p class="text-xs text-[#fbbf24] font-semibold mt-1">توفير 10%</p>
                     </div>
                     
                     <!-- Features -->
-                    <div class="bg-white bg-opacity-10 rounded-xl p-6 mb-8 space-y-3 backdrop-blur">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#fbbf24] text-lg"></i>
-                            <span>كل مميزات الباقة الأساسية</span>
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#fbbf24] text-xs mt-1"></i>
+                            <span class="text-xs">الوصول الكامل لكل الأدوات</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#fbbf24] text-lg"></i>
-                            <span>200+ قالب حصري</span>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#fbbf24] text-xs mt-1"></i>
+                            <span class="text-xs">دعم فني 24/7</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#fbbf24] text-lg"></i>
-                            <span>دعم فني أولوية</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#fbbf24] text-lg"></i>
-                            <span>عمليات تصدير غير محدودة</span>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#fbbf24] text-xs mt-1"></i>
+                            <span class="text-xs">تحديثات مستمرة</span>
                         </div>
                     </div>
                     
-                    <button onclick="subscribe('premium')" class="w-full bg-white text-[#6366f1] hover:bg-gray-100 font-bold py-3 rounded-lg transition-colors duration-300">
-                        اشترك الآن
+                    <button onclick="subscribe('premium')" class="w-full bg-white text-[#6366f1] hover:bg-gray-100 text-sm font-semibold py-2 rounded-lg transition-colors duration-300">
+                        اشترك
                     </button>
                 </div>
             </div>
 
             <!-- 12 Months Plan -->
-            <div class="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-[#6366f1]">
-                <div class="p-8">
-                    <h3 class="text-2xl font-bold text-[#1e293b] mb-2">👑 باقة سنوية</h3>
-                    <div class="mb-8">
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <span class="text-5xl font-bold text-[#6366f1]">300</span>
-                            <span class="text-xl text-[#64748b]">ريال</span>
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div class="p-6">
+                    <h3 class="text-lg font-bold text-[#1e293b] mb-3">سنة كاملة</h3>
+                    <div class="mb-6">
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-4xl font-bold text-[#6366f1]">300</span>
+                            <span class="text-sm text-[#64748b]">ريال</span>
                         </div>
-                        <p class="text-sm text-[#64748b]">لمدة سنة كاملة</p>
-                        <p class="text-sm text-[#10b981] font-bold mt-2">توفير 17%</p>
+                        <p class="text-xs text-[#94a3b8]">25 ريال/شهر</p>
+                        <p class="text-xs text-[#10b981] font-semibold mt-1">توفير 17%</p>
                     </div>
                     
                     <!-- Features -->
-                    <div class="bg-gray-50 rounded-xl p-6 mb-8 space-y-3">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">جميع المميزات المميزة</span>
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#10b981] text-xs mt-1"></i>
+                            <span class="text-xs text-[#475569]">الوصول الكامل لكل الأدوات</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">500+ قالب (جميعها)</span>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#10b981] text-xs mt-1"></i>
+                            <span class="text-xs text-[#475569]">دعم فني 24/7</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">دعم فني 24/7 VIP</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-check text-[#10b981] text-lg"></i>
-                            <span class="text-[#475569]">مميزات جديدة مجاني</span>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check text-[#10b981] text-xs mt-1"></i>
+                            <span class="text-xs text-[#475569]">تحديثات مستمرة</span>
                         </div>
                     </div>
                     
-                    <button onclick="subscribe('yearly')" class="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white font-bold py-3 rounded-lg transition-colors duration-300">
-                        اشترك الآن
+                    <button onclick="subscribe('yearly')" class="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white text-sm font-semibold py-2 rounded-lg transition-colors duration-300">
+                        اشترك
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Contact Section -->
-        <div class="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-2xl p-12 text-center text-white">
-            <h3 class="text-2xl font-bold mb-4">هل لديك استفسار؟</h3>
-            <p class="text-lg opacity-90 mb-8">تواصل معنا عبر الواتس اب وسنساعدك في اختيار الباقة المناسبة</p>
-            <a href="https://wa.me/966531333714?text=أستفسر%20عن%20الباقات" target="_blank" class="inline-flex items-center gap-3 bg-white text-[#6366f1] hover:bg-gray-100 font-bold py-3 px-8 rounded-lg transition-colors duration-300">
-                <i class="fab fa-whatsapp text-xl"></i>
+        <div class="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-lg p-6 text-center text-white">
+            <h3 class="text-lg font-bold mb-2">هل لديك استفسار؟</h3>
+            <p class="text-sm opacity-90 mb-4">تواصل معنا عبر الواتس اب</p>
+            <a href="https://wa.me/966531333714?text=أستفسر%20عن%20الباقات" target="_blank" class="inline-flex items-center gap-2 bg-white text-[#6366f1] hover:bg-gray-100 text-sm font-semibold py-2 px-6 rounded-lg transition-colors duration-300">
+                <i class="fab fa-whatsapp"></i>
                 تواصل معنا
             </a>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="relative bg-gradient-to-r from-[#3730a3] to-[#312e81] text-white py-4 mt-12 border-t-2 border-[#4338ca] shadow-md">
-        <div class="max-w-7xl mx-auto px-4 relative z-10">
-            <div class="text-center text-sm text-white text-opacity-85">
-                <p>© جميع الحقوق محفوظة © despro.net 2026 • حيث الإبداع لا حدود له ✨</p>
+    <footer class="relative bg-gradient-to-r from-[#3730a3] to-[#312e81] text-white py-3 mt-8 border-t border-[#4338ca]">
+        <div class="max-w-6xl mx-auto px-4 relative z-10">
+            <div class="text-center text-xs text-white text-opacity-85">
+                <p>© despro.net 2026</p>
             </div>
         </div>
     </footer>
