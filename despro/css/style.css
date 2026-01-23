@@ -475,3 +475,54 @@
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
+
+        /* ==========================================
+           نظام الـ Freemium - أنماط العناصر المقفلة
+           ========================================== */
+        
+        .locked-item {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: not-allowed !important;
+        }
+
+        .locked-item:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .locked-item::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            pointer-events: none;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* تنسيق الخيارات المعطلة في الـ Select */
+        select option:disabled {
+            color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        /* animation للبوب أب */
+        @keyframes slideIn {
+            from {
+                transform: scale(0.9) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }

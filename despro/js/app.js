@@ -5,6 +5,36 @@
         const TG_CHAT_ID = "237657512";      
         // ==========================================
 
+        // ==========================================
+        //  نظام الـ Free Tier vs Premium
+        // ==========================================
+        let userTier = 'free'; // 'free' أو 'premium'
+        const ITEMS_PER_CATEGORY_FREE = 3; // عدد العناصر المفتوحة في المجاني
+        
+        function updateUserTier(isPremium) {
+            userTier = isPremium ? 'premium' : 'free';
+            localStorage.setItem('userTier', userTier);
+            applyTierRestrictions();
+        }
+        
+        function applyTierRestrictions() {
+            if (userTier === 'free') {
+                restrictFonts();
+                restrictShapes();
+                restrictFrames();
+            }
+        }
+        
+        // استعادة الـ tier من localStorage
+        window.addEventListener('load', () => {
+            const savedTier = localStorage.getItem('userTier');
+            if (savedTier === 'premium') {
+                userTier = 'premium';
+            }
+            setTimeout(applyTierRestrictions, 500);
+        });
+        // ==========================================
+
         const DPI_RATIO = 118.11;
         let activeEl = null;
         let undoStack = [];
@@ -3548,6 +3578,9 @@
                         sessionStorage.setItem('expiryDate', userData.expiryDate);
                         sessionStorage.setItem('sessionId', sessionId);
                         
+                        // تعديل الـ tier إلى premium
+                        setPremiumUser();
+                        
                         updateStudioName(userData.name);
                         document.getElementById('login-overlay').style.display = 'none';
                         showWelcomeNotification(userData.name);
@@ -3584,6 +3617,7 @@
         
         window.addEventListener('load', async () => {
             loadSubscriptionData();
+            applyTierRestrictions(); // تطبيق التقييدات عند التحميل
         });
 
         function deselect(e) {
@@ -5261,4 +5295,193 @@
         // استدعاء فوري في حالة عدم انطلاق الحدث (لأن الصفحة محملة مسبقاً)
         if(document.getElementById('floating-context-toolbar')) {
              makeElementDraggable(document.getElementById('floating-context-toolbar'), 'floating-toolbar-header');
+        }
+
+        // ==========================================
+        //  نظام الـ Freemium - دوال التقييد
+        // ==========================================
+        
+        function restrictFonts() {
+            const fontSelects = document.querySelectorAll('select[id*="font"]');
+            fontSelects.forEach(select => {
+                Array.from(select.options).forEach((option, index) => {
+                    // اترك أول 3 خيارات مفتوحة
+                    if (index >= ITEMS_PER_CATEGORY_FREE && option.value && option.value !== '') {
+                        option.disabled = true;
+                        option.textContent = '🔒 ' + option.textContent;
+                    }
+                });
+            });
+        }
+        
+        function restrictShapes() {
+            const shapesDropdown = document.getElementById('shapes-dropdown');
+            if (shapesDropdown && userTier === 'free') {
+                const items = shapesDropdown.querySelectorAll('[data-shape]');
+                items.forEach((item, index) => {
+                    if (index >= ITEMS_PER_CATEGORY_FREE) {
+                        item.classList.add('locked-item');
+                        item.style.opacity = '0.4';
+                        item.style.pointerEvents = 'auto';
+                        item.onclick = (e) => {
+                            e.stopPropagation();
+                            showPremiumModal('أشكال إضافية');
+                        };
+                    }
+                });
+            }
+        }
+        
+        function restrictFrames() {
+            const framesDropdown = document.getElementById('frames-dropdown');
+            if (framesDropdown && userTier === 'free') {
+                const items = framesDropdown.querySelectorAll('[data-frame]');
+                items.forEach((item, index) => {
+                    if (index >= ITEMS_PER_CATEGORY_FREE) {
+                        item.classList.add('locked-item');
+                        item.style.opacity = '0.4';
+                        item.style.pointerEvents = 'auto';
+                        item.onclick = (e) => {
+                            e.stopPropagation();
+                            showPremiumModal('إطارات إضافية');
+                        };
+                    }
+                });
+            }
+        }
+        
+        // عند فتح أي dropdown، تطبيق التقييد
+        function openDropdownWithRestrictions(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown && userTier === 'free') {
+                setTimeout(() => {
+                    if (dropdownId === 'shapes-dropdown') restrictShapes();
+                    if (dropdownId === 'frames-dropdown') restrictFrames();
+                }, 100);
+            }
+        }
+        
+        // عند الضغط على عنصر مقفل
+        function handleLockedItemClick(e, itemName) {
+            if (userTier === 'free') {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                // تأثير التكبير
+                const target = e.currentTarget;
+                target.style.transform = 'scale(1.1)';
+                setTimeout(() => target.style.transform = 'scale(1)', 300);
+                
+                // إظهار النافذة المشفوعة
+                showPremiumModal(itemName);
+            }
+        }
+        
+        // نافذة البريميوم المشفوعة
+        function showPremiumModal(featureName) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                backdrop-filter: blur(4px);
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+                    border-radius: 20px;
+                    padding: 30px;
+                    max-width: 400px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    text-align: center;
+                    border: 2px solid #6366f1;
+                    animation: slideIn 0.3s ease-out;
+                ">
+                    <div style="font-size: 40px; margin-bottom: 15px;">🔒</div>
+                    <h2 style="color: #1e293b; font-size: 20px; margin-bottom: 10px; font-weight: bold;">
+                        ميزة بريميوم
+                    </h2>
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
+                        "${featureName}" متاحة فقط لأعضاء البريميوم
+                    </p>
+                    
+                    <div style="background: #f0f4ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: right;">
+                        <div style="color: #6366f1; font-weight: bold; margin-bottom: 8px;">✨ مع البريميوم تحصل على:</div>
+                        <div style="color: #475569; font-size: 12px; text-align: right;">
+                            • خطوط وأشكال وإطارات غير محدودة<br>
+                            • تصدير بدون علامة مائية<br>
+                            • حفظ التصاميم<br>
+                            • جودة فائقة
+                        </div>
+                    </div>
+                    
+                    <button onclick="this.parentElement.parentElement.remove(); openPremiumLogin();" style="
+                        width: 100%;
+                        background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+                        color: white;
+                        border: none;
+                        padding: 12px;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        font-size: 14px;
+                        cursor: pointer;
+                        margin-bottom: 10px;
+                        transition: all 0.3s;
+                    " onmouseover="this.style.boxShadow='0 10px 25px rgba(99, 102, 241, 0.4)'" onmouseout="this.style.boxShadow='none'">
+                        ترقية لـ البريميوم الآن
+                    </button>
+                    
+                    <button onclick="this.parentElement.parentElement.remove();" style="
+                        width: 100%;
+                        background: #e2e8f0;
+                        color: #475569;
+                        border: none;
+                        padding: 10px;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    " onmouseover="this.style.background='#cbd5e1'" onmouseout="this.style.background='#e2e8f0'">
+                        إغلاق
+                    </button>
+                </div>
+                
+                <style>
+                    @keyframes slideIn {
+                        from {
+                            transform: scale(0.9) translateY(-20px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: scale(1) translateY(0);
+                            opacity: 1;
+                        }
+                    }
+                </style>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+        }
+        
+        // فتح صفحة الدخول البريميوم
+        function openPremiumLogin() {
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+        
+        // تحديث الـ tier بعد الدخول البريميوم
+        function setPremiumUser() {
+            updateUserTier(true);
+            // إزالة التقييدات
+            document.querySelectorAll('.locked-item').forEach(item => {
+                item.classList.remove('locked-item');
+                item.style.opacity = '1';
+            });
         }
