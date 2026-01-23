@@ -16,8 +16,8 @@
     <!-- إضافة مكتبة PDF.js لقراءة ملفات PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     
-    <!-- تحميل بيانات الأصول من GitHub -->
-    <script src="https://cdn.jsdelivr.net/gh/xzervzxs-wq/Sellam_bot@main/assets_data.js"></script>
+    <!-- تحميل بيانات الأصول من GitHub - يتم عبر fetch -->
+    <!-- سيتم تحميل official3.json عبر JavaScript -->
     
     <!-- مكتبة الأيقونات -->
     <link id="fa-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
@@ -115,6 +115,11 @@
             transform: scale(var(--card-zoom, 1));
             transition: transform 0.2s ease;
             display: inline-block;
+        }
+
+        /* Crop Overlay */
+        #crop-overlay {
+            z-index: 50000;
         }
 
         /* البطاقة الرئيسية */
@@ -863,12 +868,12 @@
                 <div class="grid grid-cols-2 gap-2 mb-2">
                     <div class="relative">
                         <label class="text-[9px] text-[#64748b] font-bold block mb-1">العرض (Width)</label>
-                        <input type="text" inputmode="numeric" id="custom-width" value="7" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
+                        <input type="text" inputmode="decimal" id="custom-width" value="6" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
                         <span class="absolute left-2 top-[26px] text-[12px] font-bold text-black">سم</span>
                     </div>
                     <div class="relative">
                         <label class="text-[9px] text-[#64748b] font-bold block mb-1">الارتفاع (Height)</label>
-                        <input type="text" inputmode="numeric" id="custom-height" value="7" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
+                        <input type="text" inputmode="decimal" id="custom-height" value="6" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
                         <span class="absolute left-2 top-[26px] text-[12px] font-bold text-black">سم</span>
                     </div>
                 </div>
@@ -991,6 +996,14 @@
                     <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
                         <i class="fas fa-cut"></i> <span class="ml-1 text-[9px] font-black">قص ذكي</span>
                     </button>
+                    <!-- زر القص (Crop) الجديد -->
+                    <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
+                        <i class="fas fa-crop"></i> <span class="ml-1 text-[9px] font-black">قص</span>
+                    </button>
+                    <!-- زر اليد (Hand Tool) للتحريك -->
+                    <button onclick="toggleHandMode()" id="btn-hand" class="w-8 h-8 rounded-lg text-lg bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center justify-center border border-[#e2e8f0] shadow-sm hover:shadow-md" title="أداة اليد - تحريك منطقة العمل">
+                        <i class="fa-regular fa-hand"></i>
+                    </button>
                     <!-- Universal File Input: Supports All Formats -->
                     <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".tif,.tiff,.pdf,.psd,.ai,.eps,.svg,.png,.jpg,.jpeg,.webp,.bmp">
                 </div>
@@ -1022,6 +1035,18 @@
                         <span id="text-color-section" class="hidden">
                              <input type="color" id="quick-color" oninput="updateStyle('color', this.value)">
                         </span>
+                    </div>
+
+                    <!-- إعدادات الإطار (تم نقلها هنا) -->
+                    <div id="frame-controls-toolbar" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
+                        <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
+                        <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
+                        <span class="text-[9px] font-bold text-[#1e293b]">سمك:</span>
+                        <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
+                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
+                        <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
+                        <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
                     </div>
                 </div>
 
@@ -1059,7 +1084,7 @@
                         <input type="range" min="0" max="1" step="0.1" value="1" id="grad-opacity" oninput="updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="شفافية التدرج">
                         
                         <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <button onclick="removeTextGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
+                        <button onclick="toggleGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
                             <i class="fas fa-times"></i> إلغاء
                         </button>
                     </div>
@@ -1117,6 +1142,33 @@
                     <div id="card" onmousedown="deselectOnCard(event)" ontouchstart="deselectOnCard(event); event.preventDefault(); event.stopPropagation();" ontouchend="event.preventDefault(); event.stopPropagation();">
                         <div id="card-gradient"></div>
                     </div>
+                    <!-- Crop Overlay -->
+                    <div id="crop-overlay" class="hidden absolute top-0 left-0 w-full h-full pointer-events-auto z-[50000]" style="background: rgba(0, 0, 0, 0.5);">
+                        <!-- Crop Area (draggable and resizable) -->
+                        <div id="crop-area" class="absolute border-2 border-yellow-400" style="box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), inset 0 0 0 1000px rgba(0, 0, 0, 0); cursor: move; background-color: transparent;">
+                            <!-- Top-left corner handle -->
+                            <div id="crop-handle-tl" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nwse-resize" style="top: -6px; left: -6px;"></div>
+                            <!-- Top-right corner handle -->
+                            <div id="crop-handle-tr" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nesw-resize" style="top: -6px; right: -6px;"></div>
+                            <!-- Bottom-left corner handle -->
+                            <div id="crop-handle-bl" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nesw-resize" style="bottom: -6px; left: -6px;"></div>
+                            <!-- Bottom-right corner handle -->
+                            <div id="crop-handle-br" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nwse-resize" style="bottom: -6px; right: -6px;"></div>
+                            <!-- Top edge handle -->
+                            <div id="crop-handle-t" class="absolute w-6 h-2 bg-yellow-400 border border-white cursor-ns-resize" style="top: -5px; left: 50%; transform: translateX(-50%);"></div>
+                            <!-- Bottom edge handle -->
+                            <div id="crop-handle-b" class="absolute w-6 h-2 bg-yellow-400 border border-white cursor-ns-resize" style="bottom: -5px; left: 50%; transform: translateX(-50%);"></div>
+                            <!-- Left edge handle -->
+                            <div id="crop-handle-l" class="absolute w-2 h-6 bg-yellow-400 border border-white cursor-ew-resize" style="left: -5px; top: 50%; transform: translateY(-50%);"></div>
+                            <!-- Right edge handle -->
+                            <div id="crop-handle-r" class="absolute w-2 h-6 bg-yellow-400 border border-white cursor-ew-resize" style="right: -5px; top: 50%; transform: translateY(-50%);"></div>
+                        </div>
+                        <!-- Crop Buttons -->
+                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-[50001]">
+                            <button onclick="applyCrop()" class="px-4 py-2 bg-green-500 text-white rounded font-bold text-sm hover:bg-green-600 transition">✓ تطبيق</button>
+                            <button onclick="exitCropMode()" class="px-4 py-2 bg-red-500 text-white rounded font-bold text-sm hover:bg-red-600 transition">✕ إلغاء</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1125,10 +1177,10 @@
     <!-- لا يوجد فوتر -->
 
     <!-- نافذة أدوات عائمة (بديلة عن الشريط العلوي لمنع إزاحة التصميم) -->
-    <div id="floating-context-toolbar" class="hidden fixed top-[18%] left-1/2 transform -translate-x-1/2 z-[99999] bg-white/95 backdrop-blur shadow-2xl rounded-2xl border border-indigo-100 p-2 flex flex-col gap-2 transition-all duration-300 pointer-events-auto min-w-[280px]" style="box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2);">
+    <div id="floating-context-toolbar" class="hidden fixed top-[18%] left-1/2 transform -translate-x-1/2 z-[99999] bg-white/95 backdrop-blur shadow-2xl rounded-2xl border border-indigo-100 p-2 flex flex-col gap-2 transition-all duration-300 pointer-events-auto min-w-[280px] max-h-[80vh] overflow-y-auto" style="box-shadow: 0 4px 16px -4px rgba(0,0,0,0.10);">
         
         <!-- Header with Close Button (Draggable Handle) -->
-        <div id="floating-toolbar-header" class="flex justify-between items-center px-1 mb-1 border-b border-gray-100 pb-1 cursor-move select-none" title="اضغط واسحب للتحريك">
+        <div id="floating-toolbar-header" class="flex justify-between items-center px-1 mb-1 border-b border-gray-100 pb-1 cursor-move select-none sticky top-0 bg-white/95" title="اضغط واسحب للتحريك">
             <span class="text-[10px] text-gray-400 font-bold pointer-events-none">خصائص العنصر</span>
             <button onclick="closeFloatingToolbar()" class="text-red-500 hover:text-red-700 w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-50 transition" title="إغلاق">
                 <i class="fas fa-times text-[12px]"></i>
@@ -1238,17 +1290,8 @@
             </div>
         </div>
 
-        <!-- إعدادات الإطار -->
-        <div id="frame-controls-toolbar" class="controls-row px-2 py-1.5 rounded-lg border border-[#e2e8f0] hidden items-center gap-2 justify-center">
-            <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
-            <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-            <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
-            <span class="text-[9px] font-bold text-[#1e293b]">سمك الحد:</span>
-            <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
-            <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
-            <span class="text-[9px] font-bold text-[#1e293b]">لون الشكل:</span>
-            <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-        </div>
+        <!-- إعدادات الإطار - تم نقلها للشريط العلوي -->
+
 
         <!-- إعدادات العناصر القابلة للتلوين -->
         <div id="colorable-controls-toolbar" class="controls-row bg-[#f1f5f9] px-2 py-1.5 rounded-lg border border-[#94a3b8] hidden items-center gap-2 justify-center">
@@ -1284,6 +1327,8 @@
         let eraserMode = false;
         let magicMode = false; 
         let lassoMode = false; // متغير القص الذكي
+        let cropMode = false; // متغير وضع القص
+        let handMode = false; // متغير وضع اليد للتحريك
         let eraserCanvas = null; 
         let lassoCanvas = null; // كانفاس القص
         let eraserSize = 30;
@@ -1291,6 +1336,18 @@
         let magicTolerance = 30; 
         let isSnappingEnabled = false;
         let currentZoom = 100; // متغير التحكم بـ zoom
+        
+        // Crop variables
+        let cropStartX = 0, cropStartY = 0;
+        let cropStartWidth = 100, cropStartHeight = 100;
+        let draggedHandle = null;
+        let isDraggingCrop = false;
+        let cropInitialX, cropInitialY;
+        
+        // Hand Tool variables
+        let isHandDragging = false;
+        let handStartX = 0, handStartY = 0;
+        let handScrollLeft = 0, handScrollTop = 0;
         
         // --- إدارة الألوان المفضلة ---
         let favoriteColors = JSON.parse(localStorage.getItem('dalal_fav_colors')) || [
@@ -1387,8 +1444,8 @@
                 setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
             }, 800);
             
-            // تعيين المقاس الافتراضي 10 سم * 10 سم
-            const defaultSize = Math.round(10 * DPI_RATIO);
+            // تعيين المقاس الافتراضي 6 سم * 6 سم
+            const defaultSize = Math.round(6 * DPI_RATIO);
             setCardSize(defaultSize, defaultSize);
             
             // إخفاء التدرج عند البدء
@@ -1402,6 +1459,9 @@
             updateTemplateList(); // تحميل القوالب
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
             renderFavoriteColors(); // تحميل الألوان المفضلة
+            
+            // حفظ الحالة الأولية (فارغة) لتمكين التراجع
+            saveState();
         };
 
         // --- إدارة القوالب (Templates) ---
@@ -1529,9 +1589,7 @@
             }
             
             // التحقق من وجود البيانات المحملة مسبقاً
-            if (typeof window.OFFICIAL_ASSETS !== 'undefined' && Array.isArray(window.OFFICIAL_ASSETS)) {
-                officialAssetsLibrary = window.OFFICIAL_ASSETS;
-                
+            if (officialAssetsLibrary && officialAssetsLibrary.length > 0) {
                 // ملء قائمة التصنيفات
                 select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
                 officialAssetsLibrary.forEach((category, index) => {
@@ -1546,23 +1604,36 @@
                 return;
             }
             
-            // إذا لم تكن البيانات موجودة، نعرض رسالة خطأ
-            grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>فشل تحميل المكتبة - جاري إعادة المحاولة...</p>';
+            // عرض رسالة تحميل
+            grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin ml-2"></i>جاري تحميل المكتبة...</p>';
             
-            // محاولة تحميل الملف ديناميكياً
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/gh/xzervzxs-wq/Sellam_bot@main/assets_data.js?t=' + Date.now();
-            script.onload = function() {
-                if (typeof window.OFFICIAL_ASSETS !== 'undefined') {
-                    loadAssetsLibraryFromGitHub(); // إعادة المحاولة
-                } else {
-                    grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>فشل تحميل البيانات</p>';
-                }
-            };
-            script.onerror = function() {
-                grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال</p>';
-            };
-            document.head.appendChild(script);
+            // تحميل ملف JSON عبر fetch
+            fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/Official.json?t=' + Date.now())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('فشل تحميل الملف');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    officialAssetsLibrary = data;
+                    
+                    // ملء قائمة التصنيفات
+                    select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
+                    officialAssetsLibrary.forEach((category, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = category.name;
+                        select.appendChild(option);
+                    });
+                    
+                    grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
+                    console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل المكتبة:', error);
+                    grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
+                });
         }
 
         function loadAssetsCategory() {
@@ -1991,15 +2062,18 @@
             card.innerHTML = '<div id="card-gradient"></div>'; // إعادة إنشاء التدرج مخفياً
             
             // إعادة تعيين الأبعاد الافتراضية
-            const defaultSize = Math.round(10 * DPI_RATIO); // 10cm افتراضي
-            document.getElementById('custom-width').value = '10';
-            document.getElementById('custom-height').value = '10';
+            const defaultSize = Math.round(6 * DPI_RATIO); // 6cm افتراضي
+            document.getElementById('custom-width').value = '6';
+            document.getElementById('custom-height').value = '6';
             
             setCardSize(defaultSize, defaultSize);
             
             // تصفير ال undo/redo
             undoStack = [];
             redoStack = [];
+            
+            // حفظ الحالة الأولية
+            saveState();
             
             // إعادة تعيين التدرج
             hasGradient = false;
@@ -2617,29 +2691,111 @@
 
         // --- باقي الوظائف الأساسية ---
 
+        // يُستدعى بعد أي تغيير لحفظ الحالة الجديدة
         function saveState() {
             const card = document.getElementById('card');
-            undoStack.push(card.innerHTML);
-            if (undoStack.length > 20) undoStack.shift();
+            const currentState = {
+                html: card.innerHTML,
+                width: card.style.width,
+                height: card.style.height
+            };
+            
+            // تجنب حفظ نفس الحالة مرتين متتاليتين
+            if (undoStack.length > 0) {
+                const lastState = undoStack[undoStack.length - 1];
+                if (lastState.html === currentState.html && 
+                    lastState.width === currentState.width && 
+                    lastState.height === currentState.height) {
+                    return; // نفس الحالة، لا داعي للحفظ
+                }
+            }
+            
+            undoStack.push(currentState);
+            // Keep max 50 states
+            if (undoStack.length > 50) undoStack.shift();
+            // Clear redo when new action is taken
             redoStack = [];
+            
+            console.log('State saved. Undo stack size:', undoStack.length);
+        }
+
+        function updateHistoryButtons() {
+            // Visual feedback (optional)
         }
 
         function undoAction() {
-            if(undoStack.length === 0) return;
+            console.log('Undo called. Stack size:', undoStack.length);
+            
+            // نحتاج على الأقل حالتين: الحالية والسابقة
+            if(undoStack.length < 2) {
+                console.log('Nothing to undo - need at least 2 states');
+                return;
+            }
+            
+            // الحالة الحالية (آخر عنصر) نضعها في redo
+            const currentState = undoStack.pop();
+            redoStack.push(currentState);
+            
+            // الحالة السابقة (الآن آخر عنصر بعد pop)
+            const previousState = undoStack[undoStack.length - 1];
+            
+            console.log('Restoring to previous state. Undo stack now:', undoStack.length);
+            
+            // استعادة الحالة السابقة
+            applyState(previousState);
+        }
+
+        function redoAction() {
+            console.log('Redo called. Stack size:', redoStack.length);
+            
+            if(redoStack.length === 0) {
+                console.log('Nothing to redo');
+                return;
+            }
+            
+            // استرجاع الحالة من redo
+            const nextState = redoStack.pop();
+            
+            // إضافتها إلى undo
+            undoStack.push(nextState);
+            
+            console.log('Restoring next state. Undo stack now:', undoStack.length);
+            
+            // تطبيق الحالة
+            applyState(nextState);
+        }
+
+        // تطبيق حالة بدون حفظها (لتجنب التكرار)
+        function applyState(state) {
             const card = document.getElementById('card');
-            redoStack.push(card.innerHTML);
-            card.innerHTML = undoStack.pop();
+            
+            if (typeof state === 'string') {
+                card.innerHTML = state;
+            } else {
+                card.innerHTML = state.html;
+                if (state.width && state.height) {
+                    const w = parseFloat(state.width);
+                    const h = parseFloat(state.height);
+                    setCardSize(w, h);
+                    
+                    const customWidth = document.getElementById('custom-width');
+                    const customHeight = document.getElementById('custom-height');
+                    if(customWidth && customHeight) {
+                        const cmW = w / DPI_RATIO;
+                        const cmH = h / DPI_RATIO;
+                        customWidth.value = cmW.toFixed(2);
+                        customHeight.value = cmH.toFixed(2);
+                    }
+                }
+            }
+            
             rebindEvents();
             deselect();
         }
 
-        function redoAction() {
-            if(redoStack.length === 0) return;
-            const card = document.getElementById('card');
-            undoStack.push(card.innerHTML);
-            card.innerHTML = redoStack.pop();
-            rebindEvents();
-            deselect();
+        // دالة قديمة للتوافقية
+        function restoreState(state) {
+            applyState(state);
         }
 
         function rebindEvents() {
@@ -3179,6 +3335,496 @@
             }
         }
 
+        // --- Crop Tool Functions ---
+        function toggleCropMode() {
+            cropMode = !cropMode;
+            const cropBtn = document.getElementById('btn-crop');
+            
+            if (cropMode) {
+                // Disable other modes
+                if (eraserMode) exitEraserMode();
+                if (lassoMode) exitLassoMode();
+                
+                // Show crop overlay
+                const overlay = document.getElementById('crop-overlay');
+                overlay.classList.remove('hidden');
+                
+                // Initialize crop area
+                const card = document.getElementById('card');
+                const cardRect = card.getBoundingClientRect();
+                const cardParentRect = document.getElementById('card-wrapper').getBoundingClientRect();
+                
+                // Set initial crop area (80% of card)
+                const w = card.offsetWidth * 0.8;
+                const h = card.offsetHeight * 0.8;
+                const x = (card.offsetWidth - w) / 2;
+                const y = (card.offsetHeight - h) / 2;
+                
+                const cropArea = document.getElementById('crop-area');
+                cropArea.style.left = x + 'px';
+                cropArea.style.top = y + 'px';
+                cropArea.style.width = w + 'px';
+                cropArea.style.height = h + 'px';
+                
+                cropStartX = x;
+                cropStartY = y;
+                cropStartWidth = w;
+                cropStartHeight = h;
+                
+                // Attach event listeners
+                attachCropEventListeners();
+                
+                // Update button style
+                cropBtn.classList.add('bg-[#6366f1]', 'text-white');
+                cropBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+            } else {
+                exitCropMode();
+            }
+        }
+
+        function attachCropEventListeners() {
+            const cropArea = document.getElementById('crop-area');
+            const handles = ['tl', 'tr', 'bl', 'br', 't', 'b', 'l', 'r'];
+            const card = document.getElementById('card');
+            
+            // Make crop area draggable
+            cropArea.addEventListener('mousedown', startDragCrop);
+            cropArea.addEventListener('touchstart', startDragCrop, { passive: false });
+            
+            // Make handles draggable
+            handles.forEach(handle => {
+                const el = document.getElementById('crop-handle-' + handle);
+                el.addEventListener('mousedown', (e) => startResizeCrop(e, handle));
+                el.addEventListener('touchstart', (e) => startResizeCrop(e, handle), { passive: false });
+            });
+            
+            function startDragCrop(e) {
+                if (handles.some(h => e.target.id === 'crop-handle-' + h)) return; // Don't drag from handles
+                isDraggingCrop = true;
+                cropInitialX = e.touches ? e.touches[0].clientX : e.clientX;
+                cropInitialY = e.touches ? e.touches[0].clientY : e.clientY;
+                cropStartX = parseFloat(cropArea.style.left);
+                cropStartY = parseFloat(cropArea.style.top);
+                
+                document.addEventListener('mousemove', dragCrop);
+                document.addEventListener('touchmove', dragCrop, { passive: false });
+                document.addEventListener('mouseup', stopDragCrop);
+                document.addEventListener('touchend', stopDragCrop);
+            }
+            
+            function dragCrop(e) {
+                if (!isDraggingCrop) return;
+                e.preventDefault();
+                
+                // حساب Scale لضمان دقة السحب مع التكبير
+                const zoomFactor = (window.currentZoom || 100) / 100;
+
+                const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                // نقسم الفرق على معامل التكبير لتحويل حركة الماوس (بكسل شاشة) إلى وحدات محلية
+                const deltaX = (currentX - cropInitialX) / zoomFactor;
+                const deltaY = (currentY - cropInitialY) / zoomFactor;
+                
+                let newX = cropStartX + deltaX;
+                let newY = cropStartY + deltaY;
+                
+                // Keep within bounds
+                newX = Math.max(0, Math.min(newX, card.offsetWidth - cropArea.offsetWidth));
+                newY = Math.max(0, Math.min(newY, card.offsetHeight - cropArea.offsetHeight));
+                
+                cropArea.style.left = newX + 'px';
+                cropArea.style.top = newY + 'px';
+                updateCropOverlay();
+            }
+            
+            function stopDragCrop() {
+                isDraggingCrop = false;
+                document.removeEventListener('mousemove', dragCrop);
+                document.removeEventListener('touchmove', dragCrop);
+                document.removeEventListener('mouseup', stopDragCrop);
+                document.removeEventListener('touchend', stopDragCrop);
+            }
+            
+            function startResizeCrop(e, handle) {
+                e.preventDefault();
+                e.stopPropagation();
+                draggedHandle = handle;
+                cropInitialX = e.touches ? e.touches[0].clientX : e.clientX;
+                cropInitialY = e.touches ? e.touches[0].clientY : e.clientY;
+                cropStartX = parseFloat(cropArea.style.left);
+                cropStartY = parseFloat(cropArea.style.top);
+                cropStartWidth = cropArea.offsetWidth;
+                cropStartHeight = cropArea.offsetHeight;
+                
+                document.addEventListener('mousemove', resizeCrop);
+                document.addEventListener('touchmove', resizeCrop, { passive: false });
+                document.addEventListener('mouseup', stopResizeCrop);
+                document.addEventListener('touchend', stopResizeCrop);
+            }
+            
+            function resizeCrop(e) {
+                if (!draggedHandle) return;
+                e.preventDefault();
+                
+                // حساب Scale لضمان دقة التحجيم مع التكبير
+                const zoomFactor = (window.currentZoom || 100) / 100;
+                
+                const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                // تصحيح الحركة بناء على الزووم
+                const deltaX = (currentX - cropInitialX) / zoomFactor;
+                const deltaY = (currentY - cropInitialY) / zoomFactor;
+                
+                let newX = cropStartX;
+                let newY = cropStartY;
+                let newW = cropStartWidth;
+                let newH = cropStartHeight;
+                
+                // Handle different corner/edge resizes
+                if (draggedHandle.includes('l')) {
+                    newX = Math.max(0, cropStartX + deltaX);
+                    newW = cropStartWidth - (newX - cropStartX);
+                }
+                if (draggedHandle.includes('r')) {
+                    newW = Math.max(20, cropStartWidth + deltaX);
+                }
+                if (draggedHandle.includes('t')) {
+                    newY = Math.max(0, cropStartY + deltaY);
+                    newH = cropStartHeight - (newY - cropStartY);
+                }
+                if (draggedHandle.includes('b')) {
+                    newH = Math.max(20, cropStartHeight + deltaY);
+                }
+                
+                // Keep within bounds
+                newW = Math.min(newW, card.offsetWidth - newX);
+                newH = Math.min(newH, card.offsetHeight - newY);
+                
+                cropArea.style.left = newX + 'px';
+                cropArea.style.top = newY + 'px';
+                cropArea.style.width = newW + 'px';
+                cropArea.style.height = newH + 'px';
+                updateCropOverlay();
+            }
+            
+            function stopResizeCrop() {
+                draggedHandle = null;
+                document.removeEventListener('mousemove', resizeCrop);
+                document.removeEventListener('touchmove', resizeCrop);
+                document.removeEventListener('mouseup', stopResizeCrop);
+                document.removeEventListener('touchend', stopResizeCrop);
+            }
+        }
+
+        function updateCropOverlay() {
+            const cropArea = document.getElementById('crop-area');
+            const cropOverlay = document.getElementById('crop-overlay');
+            const card = document.getElementById('card');
+            
+            // Update dimensions display (optional - for visual feedback)
+            const x = parseFloat(cropArea.style.left);
+            const y = parseFloat(cropArea.style.top);
+            const w = cropArea.offsetWidth;
+            const h = cropArea.offsetHeight;
+            
+            // Store for applying later
+            cropArea.dataset.x = x;
+            cropArea.dataset.y = y;
+            cropArea.dataset.w = w;
+            cropArea.dataset.h = h;
+        }
+
+        // Format number with thousand separators
+        function formatNumberWithSeparators(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function applyCrop() {
+            const cropArea = document.getElementById('crop-area');
+            const card = document.getElementById('card');
+            
+            const x = parseFloat(cropArea.style.left);
+            const y = parseFloat(cropArea.style.top);
+            const w = cropArea.offsetWidth;
+            const h = cropArea.offsetHeight;
+            
+            // Save current state
+            saveState();
+            
+            // First: Snapshot element dimensions to pixels to prevent distortion
+            const allElements = Array.from(card.querySelectorAll('.draggable-el'));
+            
+            allElements.forEach(el => {
+                // Get current logical size in pixels
+                const currentW = el.offsetWidth;
+                const currentH = el.offsetHeight;
+                
+                // Freeze dimensions with !important to override CSS classes like .bg-image
+                el.style.cssText += `width: ${currentW}px !important; height: ${currentH}px !important;`;
+                
+                // If it was a bg-image, it is no longer distinct from a normal image in terms of sizing
+                // We should also remove the class that forces position to 0,0 if we want it to move
+                if (el.classList.contains('bg-image')) {
+                    el.classList.remove('bg-image');
+                    el.classList.add('image-layer'); // Ensure it keeps base styling
+                    
+                    // We need to set its position explicitly because removing bg-image might reset it
+                    // bg-image forced left:0, top:0.
+                    // We want it to stay visually where it is (0,0 relative to OLD card).
+                    el.style.left = '0px';
+                    el.style.top = '0px';
+                    // Reset transform because bg-image usually has none, but we might have added some
+                    el.style.transform = 'none'; 
+                }
+            });
+
+            // Second: Adjust all elements positions relative to crop area BEFORE changing card size
+            const elementsToKeep = [];
+            
+            allElements.forEach(el => {
+                // Use offsetLeft/Top which are in logical (unzoomed) pixels relative to the card
+                // This fixes the issue where zoom level caused incorrect position calculations
+                // NOTE: 'offsetLeft' returns the visual Left edge only if there's no transform shifting it.
+                // Our elements have "transform: translate(-50%, -50%)" usually.
+                // IF element has that transform, offsetLeft is roughly the Center X position.
+                // IF element is bg-image (transform: none), offsetLeft is Left Edge.
+                
+                const hasCenterTransform = el.style.transform.includes('translate(-50%') || 
+                                          getComputedStyle(el).transform !== 'none' && el.style.transform.includes('-50%');
+
+                // We need the VISUAL bounding box relative to the card, in unzoomed CSS pixels.
+                // Standard offsetLeft/Top logic:
+                let visualX, visualY, visualW, visualH;
+                
+                // For bg-image (full width/height, no transform)
+                if (el.classList.contains('bg-image')) {
+                     visualX = 0; 
+                     visualY = 0;
+                     visualW = card.offsetWidth;
+                     visualH = card.offsetHeight;
+                } else {
+                    // Start with offset positions (usually center if transformed)
+                    let baseX = el.offsetLeft;
+                    let baseY = el.offsetTop;
+                    const wEl = el.offsetWidth;
+                    const hEl = el.offsetHeight;
+                    
+                    if (hasCenterTransform) {
+                        visualX = baseX - (wEl / 2);
+                        visualY = baseY - (hEl / 2);
+                    } else {
+                        visualX = baseX;
+                        visualY = baseY;
+                    }
+                    visualW = wEl;
+                    visualH = hEl;
+                }
+
+                // Intersection Check (AABB)
+                // Crop Box: x, y, w, h
+                
+                // Allow keeping if ANY part overlaps? Or mostly inside?
+                // Let's use Overlap.
+                const overlaps = (visualX < x + w) && (visualX + visualW > x) &&
+                                 (visualY < y + h) && (visualY + visualH > y);
+                                 
+                if (overlaps) {
+                    
+                    // Adjust position to new coordinate system
+                    // New Card 0,0 corresponds to Old Card x,y
+                    
+                    // If element was centered at (cx, cy) in old card.
+                    // It should be centered at (cx - x, cy - y) in new card.
+                    
+                    // IF element relies on Left/Top as Center:
+                    if (hasCenterTransform) {
+                         const currentLeft = el.offsetLeft; // Center X in old
+                         const currentTop = el.offsetTop;   // Center Y in old
+                         
+                         const newLeft = currentLeft - x;
+                         const newTop = currentTop - y;
+                         
+                         el.style.left = newLeft + 'px';
+                         el.style.top = newTop + 'px';
+                    } 
+                    else if (el.classList.contains('bg-image')) {
+                        // Background image special case:
+                        // It covers the whole old card.
+                        // We want it to cover the new card (cropped view).
+                        // BUT bg-image usually has "width: 100%, height: 100%".
+                        // If we just leave it, it will shrink to fit the new small card (distorted or just cropped automatically).
+                        // User expects "Crop" to act like a window.
+                        // So we should probably convert it to a regular image OR adjust object-position?
+                        
+                        // If it's an <img> inside a div.
+                        // If we want to maintain the specific visual crop:
+                        // The easiest way for bg-image is to let it fail/reset since it's "Background".
+                        // OR, if the user cropped the canvas, valid "bg-image" concepts implies it resizes.
+                        // BUT "Lasso/Crop studio" implies cutting the image.
+                        
+                        // Let's assume typical elements for now.
+                        // If it's bg-image, it auto-resizes.
+                    }
+                    else {
+                        // Standard positioning (Left/Top corner)
+                        const currentLeft = el.offsetLeft;
+                        const currentTop = el.offsetTop;
+                        
+                        const newLeft = currentLeft - x;
+                        const newTop = currentTop - y;
+                        
+                        el.style.left = newLeft + 'px';
+                        el.style.top = newTop + 'px';
+                    }
+                    
+                    elementsToKeep.push(el);
+                }
+            });
+            
+            // Remove elements that are outside crop area
+            allElements.forEach(el => {
+                if (!elementsToKeep.includes(el)) {
+                    el.remove();
+                }
+            });
+            
+            // Update card dimensions using DPI_RATIO
+            const customWidth = document.getElementById('custom-width');
+            const customHeight = document.getElementById('custom-height');
+            
+            // تحويل البكسل إلى سنتيمتر (DPI_RATIO هو بكسل لكل سم، وليس بكسل لكل إنش)
+            // DPI_RATIO = 118.11 px/cm
+            const newWidthMM = w / DPI_RATIO;
+            const newHeightMM = h / DPI_RATIO;
+            
+            customWidth.value = newWidthMM.toFixed(2);
+            customHeight.value = newHeightMM.toFixed(2);
+            
+            // Apply new card size
+            setCardSize(w, h);
+            
+            // Also adjust gradient overlay if exists
+            const gradientOverlay = document.getElementById('card-gradient');
+            if (gradientOverlay) {
+                gradientOverlay.style.width = w + 'px';
+                gradientOverlay.style.height = h + 'px';
+            }
+            
+            exitCropMode();
+            saveState();
+        }
+
+        function exitCropMode() {
+            cropMode = false;
+            const cropBtn = document.getElementById('btn-crop');
+            cropBtn.classList.remove('bg-[#6366f1]', 'text-white');
+            cropBtn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+            
+            const overlay = document.getElementById('crop-overlay');
+            overlay.classList.add('hidden');
+            
+            document.getElementById('card').style.cursor = 'default';
+        }
+
+        // --- Hand Tool Functions ---
+        function toggleHandMode() {
+            handMode = !handMode;
+            const handBtn = document.getElementById('btn-hand');
+            const previewArea = document.querySelector('.preview-area');
+            
+            if (handMode) {
+                // Disable other modes
+                if (eraserMode) exitEraserMode();
+                if (lassoMode) exitLassoMode();
+                if (cropMode) exitCropMode();
+                
+                // Update button style
+                handBtn.classList.add('bg-[#6366f1]', 'text-white');
+                handBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                
+                // Change cursor
+                previewArea.style.cursor = 'grab';
+                
+                // Add event listeners
+                previewArea.addEventListener('mousedown', startHandDrag);
+                previewArea.addEventListener('touchstart', startHandDrag, { passive: false });
+            } else {
+                exitHandMode();
+            }
+        }
+
+        function startHandDrag(e) {
+            if (!handMode) return;
+            
+            // Don't activate if clicking on elements inside card
+            if (e.target.closest('.draggable-el')) return;
+            
+            e.preventDefault();
+            isHandDragging = true;
+            
+            const previewArea = document.querySelector('.preview-area');
+            previewArea.style.cursor = 'grabbing';
+            
+            handStartX = e.touches ? e.touches[0].clientX : e.clientX;
+            handStartY = e.touches ? e.touches[0].clientY : e.clientY;
+            handScrollLeft = previewArea.scrollLeft;
+            handScrollTop = previewArea.scrollTop;
+            
+            document.addEventListener('mousemove', doHandDrag);
+            document.addEventListener('touchmove', doHandDrag, { passive: false });
+            document.addEventListener('mouseup', stopHandDrag);
+            document.addEventListener('touchend', stopHandDrag);
+        }
+
+        function doHandDrag(e) {
+            if (!isHandDragging) return;
+            e.preventDefault();
+            
+            const previewArea = document.querySelector('.preview-area');
+            const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+            const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const deltaX = currentX - handStartX;
+            const deltaY = currentY - handStartY;
+            
+            previewArea.scrollLeft = handScrollLeft - deltaX;
+            previewArea.scrollTop = handScrollTop - deltaY;
+        }
+
+        function stopHandDrag() {
+            isHandDragging = false;
+            
+            const previewArea = document.querySelector('.preview-area');
+            if (handMode) {
+                previewArea.style.cursor = 'grab';
+            }
+            
+            document.removeEventListener('mousemove', doHandDrag);
+            document.removeEventListener('touchmove', doHandDrag);
+            document.removeEventListener('mouseup', stopHandDrag);
+            document.removeEventListener('touchend', stopHandDrag);
+        }
+
+        function exitHandMode() {
+            handMode = false;
+            isHandDragging = false;
+            
+            const handBtn = document.getElementById('btn-hand');
+            if (handBtn) {
+                handBtn.classList.remove('bg-[#6366f1]', 'text-white');
+                handBtn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+            }
+            
+            const previewArea = document.querySelector('.preview-area');
+            previewArea.style.cursor = 'default';
+            
+            // Remove event listeners
+            previewArea.removeEventListener('mousedown', startHandDrag);
+            previewArea.removeEventListener('touchstart', startHandDrag);
+        }
+
         function initEraserCanvas() {
             const card = document.getElementById('card');
             if(eraserCanvas) eraserCanvas.remove();
@@ -3511,11 +4157,16 @@
 
                 function onMove(ev) {
                     ev.preventDefault();
+                    
+                    // حساب الزووم لضمان حركة متطابقة
+                    const zoomFactor = (window.currentZoom || 100) / 100;
+                    
                     const cx = isTouch ? ev.touches[0].clientX : ev.clientX;
                     const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
 
-                    const dx = cx - startX;
-                    const dy = cy - startY;
+                    // تقسيم الإزاحة على معامل الزووم
+                    const dx = (cx - startX) / zoomFactor;
+                    const dy = (cy - startY) / zoomFactor;
 
                     let newLeft = startLeft + dx;
                     let newTop = startTop + dy;
@@ -3686,11 +4337,11 @@
             lastSelectionTime = Date.now();
             lastSelectedElement = el; 
 
-            // إظهار النافذة العائمة وزر الإغلاق (إخفائها للصور)
+            // إظهار النافذة العائمة وزر الإغلاق (للنصوص فقط الآن)
             const floatToolbar = document.getElementById('floating-context-toolbar');
             const closeFloatBtn = document.getElementById('close-floating-toolbar');
             
-            if (el.classList.contains('image-layer')) {
+            if (el.classList.contains('image-layer') || el.classList.contains('frame-layer')) {
                  if(floatToolbar) floatToolbar.classList.add('hidden');
                  if(closeFloatBtn) closeFloatBtn.classList.add('hidden');
             } else {
@@ -4626,7 +5277,12 @@
                 return;
             } else {
                 if (!activeEl.hasAttribute('data-has-gradient')) {
-                     activeEl.setAttribute('data-prev-bg', activeEl.style.backgroundColor);
+                     let bg = activeEl.style.backgroundColor;
+                     // التأكد من حفظ اللون الأصلي حتى لو لم يكن محدداً في style
+                     if (!bg || bg === '') {
+                         bg = window.getComputedStyle(activeEl).backgroundColor;
+                     }
+                     activeEl.setAttribute('data-prev-bg', bg);
                 }
                 activeEl.style.backgroundImage = gradient;
                 activeEl.style.backgroundColor = 'transparent';
@@ -4660,12 +5316,19 @@
                 activeEl.style.backgroundImage = 'none';
                 
                 const prevBg = activeEl.getAttribute('data-prev-bg');
-                if (prevBg && prevBg !== 'transparent') {
+                if (prevBg && prevBg !== 'transparent' && prevBg !== 'rgba(0, 0, 0, 0)') {
                     activeEl.style.backgroundColor = prevBg;
                 } else {
-                    // إذا لم يكن هناك لون محفوظ، نعيد الشفافية (إطار) أو الأبيض كافتراضي
-                    // لكن بما أن المستخدم اشتكى من الأبيض (الشفاف)، نتركه شفافاً فقط إذا كان كذلك
-                    activeEl.style.backgroundColor = 'transparent';
+                    // إذا لم يكن هناك لون محفوظ، نحافظ على الشفافية فقط إذا كان الإطار شفافاً بالأصل
+                    // ولكن لتفادي مشكلة الاختفاء، إذا كان العنصر إطاراً له حدود، فالشفافية مقبولة
+                    // أما إذا كان شكلاً (بدون حدود تقريباً) فيجب أن يكون له لون
+                    const borderWidth = parseFloat(activeEl.style.borderWidth) || 0;
+                    if (borderWidth > 0) {
+                        activeEl.style.backgroundColor = 'transparent';
+                    } else {
+                         // افتراضي للأشكال إذا فقدنا اللون
+                        activeEl.style.backgroundColor = '#6366f1'; 
+                    }
                 }
             }
             
@@ -4704,8 +5367,14 @@
                 btn.classList.remove('bg-[#6366f1]', 'text-white');
                 btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
                 
-                // إخفاء لوحة الإعدادات
-                // (اختياري: يعتمد على ما إذا كنا نريد إخفاء الشريط بالكامل أم لا)
+                // إزالة التدرج عند الإغلاق
+                removeTextGradient();
+                
+                // إخفاء لوحة إعدادات العنصر وإظهار العامة
+                elementInputs.classList.add('hidden');
+                elementInputs.classList.remove('flex');
+                globalInputs.classList.remove('hidden');
+                globalInputs.classList.add('flex');
             } else {
                 // تشغيل التدرج
                 controls.classList.add('active');
@@ -4799,7 +5468,7 @@
             if (displayEl) {
                 const cmW = (w / DPI_RATIO).toFixed(2);
                 const cmH = (h / DPI_RATIO).toFixed(2);
-                displayEl.textContent = `${w} × ${h} px (${cmW} × ${cmH} سم)`;
+                displayEl.textContent = `${formatNumberWithSeparators(w)} × ${formatNumberWithSeparators(h)} px (${cmW} × ${cmH} سم)`;
             }
 
             // رسم المسطرة
@@ -5448,7 +6117,7 @@
                 settings.style.display = 'none';
                 btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
                 btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
-                btn.innerHTML = '<i class="fas fa-fill-drip"></i> تفعيل تدرج النص';
+                btn.innerHTML = '<i class="fas fa-fill-drip"></i> تدرج النص';
                 
                 // إعادة ألوان التدرج للقيم الافتراضية
                 document.getElementById('grad-start-color').value = '#6366f1';
@@ -5478,7 +6147,7 @@
                 settings.style.display = 'none';
                 btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
                 btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
-                btn.innerHTML = '<i class="fas fa-fill-drip"></i> تفعيل تدرج النص';
+                btn.innerHTML = '<i class="fas fa-fill-drip"></i> تدرج النص';
                 
                 removeTextGradient();
             }

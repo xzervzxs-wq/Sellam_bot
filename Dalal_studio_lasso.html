@@ -679,7 +679,7 @@
                          </button>
                      </div>
 
-                     <button onclick="document.getElementById('save-modal').style.display='none'" class="mt-3 text-slate-300 hover:text-white text-xs font-bold py-2 px-4 transition text-center hover:bg-slate-700/50 rounded-lg border border-slate-600 hover:border-slate-500">
+                     <button onclick="closeA4Modal()" class="mt-3 text-slate-300 hover:text-white text-xs font-bold py-2 px-4 transition text-center hover:bg-slate-700/50 rounded-lg border border-slate-600 hover:border-slate-500">
                          إغلاق النافذة
                      </button>
                  </div>
@@ -1422,6 +1422,7 @@
         let currentCardData = null;
         let currentA4Layout = null;
         let cachedCardImage = null;
+        let savedZoomBeforeA4 = null; // لحفظ الزوم قبل فتح مودال الطباعة
         
         // متغير لتتبع القالب المحمل الحالي
         let currentLoadedTemplateIndex = null;
@@ -2367,6 +2368,15 @@
              }
         }
 
+        // دالة إغلاق مودال الطباعة A4 مع استعادة الزوم
+        function closeA4Modal() {
+            document.getElementById('save-modal').style.display = 'none';
+            // استعادة الزوم إلى ما كان عليه قبل فتح المودال
+            if (savedZoomBeforeA4 !== null) {
+                setCustomZoom(savedZoomBeforeA4);
+            }
+        }
+
         async function generateA4Sheet() {
             const loadingText = document.querySelector('#export-overlay .text-white');
             if(loadingText) loadingText.innerText = "جاري تحضير صفحة A4...";
@@ -2376,8 +2386,8 @@
 
             deselect();
             
-            // حفظ مستوى الزوم الحالي
-            const savedZoom = window.currentZoom || 100;
+            // حفظ مستوى الزوم الحالي في متغير عام
+            savedZoomBeforeA4 = window.currentZoom || 100;
             const card = document.getElementById('card');
             
             try {
@@ -2512,7 +2522,7 @@
                     document.getElementById('save-modal').style.display = 'flex';
                     
                     // استعادة الزوم بعد النجاح
-                    setCustomZoom(savedZoom);
+                    setCustomZoom(savedZoomBeforeA4);
                 };
                 img.onerror = () => { throw new Error("فشل تحميل الصورة المنشأة"); };
                 img.src = cardDataUrl;
@@ -2521,7 +2531,7 @@
                 console.error("خطأ في A4:", err);
                 overlay.style.display = 'none';
                 // استعادة الزوم عند الفشل
-                setCustomZoom(savedZoom);
+                setCustomZoom(savedZoomBeforeA4);
                 showInfoModal('حدثت مشكلة أثناء المعالجة. حاول تقليل عدد العناصر أو جودة الصور.', 'عذراً', '⚠️');
             }
         }
