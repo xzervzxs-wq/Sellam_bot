@@ -1464,6 +1464,9 @@
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
             renderFavoriteColors(); // تحميل الألوان المفضلة
             
+            // تحميل مكتبة العناصر مباشرة مع بداية الصفحة
+            loadAssetsLibraryFromGitHub();
+            
             // حفظ الحالة الأولية (فارغة) لتمكين التراجع
             saveState();
         };
