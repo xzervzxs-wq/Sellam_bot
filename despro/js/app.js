@@ -377,9 +377,17 @@
                 return;
             }
             
-            category.items.forEach(item => {
+            category.items.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'asset-item bg-[#f1f5f9] rounded-lg p-2 cursor-pointer hover:bg-[#e2e8f0] transition-all relative group';
+                
+                // تحديد ما إذا كان العنصر مقفول
+                const isLocked = index >= 4 && userTier === 'free';
+                
+                if (isLocked) {
+                    div.classList.add('locked-item');
+                    div.style.opacity = '0.7';
+                }
                 
                 const img = document.createElement('img');
                 img.src = item.src;
@@ -388,7 +396,16 @@
                 
                 div.appendChild(img);
                 
-                div.onclick = () => addAssetToCanvas(item.src, item.colorable);
+                if (isLocked) {
+                    // إذا كان مقفول، عرض modal الاشتراك بدل إضافة العنصر
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        showPremiumModal('عناصر إضافية');
+                    };
+                } else {
+                    // إذا كان مفتوح، أضفه للـ canvas
+                    div.onclick = () => addAssetToCanvas(item.src, item.colorable);
+                }
                 
                 grid.appendChild(div);
             });
