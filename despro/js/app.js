@@ -9,7 +9,7 @@
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
-        const ITEMS_PER_CATEGORY_FREE = 3; // عدد العناصر المفتوحة في المجاني
+        const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
         
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
@@ -38,7 +38,7 @@
             // إظهار رسالة ترحيب للـ free tier
             if (userTier === 'free' && !localStorage.getItem('freeTierWelcomeShown')) {
                 setTimeout(() => {
-                    showInfoModal('لديك 3 عناصر مفتوحة من كل فئة. اشترك الآن للوصول لجميع المميزات! 🚀', '📌 النسخة المجانية', '🎨');
+                    showInfoModal('لديك 10 خطوط + 10 أشكال مفتوحة. اشترك الآن للوصول لجميع المميزات! 🚀', '📌 النسخة المجانية', '🎨');
                     localStorage.setItem('freeTierWelcomeShown', 'true');
                 }, 1000);
             }
@@ -5315,10 +5315,10 @@
             const fontSelects = document.querySelectorAll('select[id*="font"]');
             fontSelects.forEach(select => {
                 Array.from(select.options).forEach((option, index) => {
-                    // اترك أول 3 خيارات مفتوحة
+                    // اترك أول 10 خيارات مفتوحة
                     if (index >= ITEMS_PER_CATEGORY_FREE && option.value && option.value !== '') {
                         option.disabled = true;
-                        option.textContent = '🔒 ' + option.textContent;
+                        option.textContent = '🔐 ' + option.textContent;
                     }
                 });
             });
