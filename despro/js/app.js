@@ -30,8 +30,18 @@
             const savedTier = localStorage.getItem('userTier');
             if (savedTier === 'premium') {
                 userTier = 'premium';
+            } else {
+                userTier = 'free';
             }
             setTimeout(applyTierRestrictions, 500);
+            
+            // إظهار رسالة ترحيب للـ free tier
+            if (userTier === 'free' && !localStorage.getItem('freeTierWelcomeShown')) {
+                setTimeout(() => {
+                    showInfoModal('لديك 3 عناصر مفتوحة من كل فئة. اشترك الآن للوصول لجميع المميزات! 🚀', '📌 النسخة المجانية', '🎨');
+                    localStorage.setItem('freeTierWelcomeShown', 'true');
+                }, 1000);
+            }
         });
         // ==========================================
 
@@ -5476,6 +5486,16 @@
             document.getElementById('login-overlay').style.display = 'flex';
         }
         
+        // تبديل الـ overlay (إظهار/إخفاء)
+        function toggleLoginOverlay() {
+            const overlay = document.getElementById('login-overlay');
+            if (overlay.style.display === 'none' || overlay.style.display === '') {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+        
         // تحديث الـ tier بعد الدخول البريميوم
         function setPremiumUser() {
             updateUserTier(true);
@@ -5484,4 +5504,6 @@
                 item.classList.remove('locked-item');
                 item.style.opacity = '1';
             });
+            // إخفاء الـ overlay بعد الدخول الناجح
+            document.getElementById('login-overlay').style.display = 'none';
         }
