@@ -5329,6 +5329,7 @@
                         option.disabled = true;
                         if (!option.textContent.includes('PREMIUM')) {
                             option.textContent = '🔒 PREMIUM - ' + option.textContent;
+                            option.style.color = '#6366f1';
                         }
                     }
                 });
