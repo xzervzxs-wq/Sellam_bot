@@ -9,7 +9,7 @@
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
-        const ITEMS_PER_CATEGORY_FREE = 4; // عدد العناصر المفتوحة في المجاني
+        const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
         
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
@@ -5327,7 +5327,9 @@
                     // اترك أول 10 خيارات مفتوحة
                     if (index >= ITEMS_PER_CATEGORY_FREE && option.value && option.value !== '') {
                         option.disabled = true;
-                        option.textContent = '🔐 ' + option.textContent;
+                        if (!option.textContent.includes('PREMIUM')) {
+                            option.textContent = '🔒 PREMIUM - ' + option.textContent;
+                        }
                     }
                 });
             });
