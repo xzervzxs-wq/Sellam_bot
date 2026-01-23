@@ -5506,6 +5506,15 @@
                 overlay.style.display = 'none';
             }
         }
+
+        function toggleSubscriptionModal() {
+            const overlay = document.getElementById('subscription-overlay');
+            if (overlay.style.display === 'none' || overlay.style.display === '') {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
         
         // تحديث الـ tier بعد الدخول البريميوم
         function setPremiumUser() {
