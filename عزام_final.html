@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُعين الحفاظ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://www.transparenttextures.com/patterns/arabesque.png');
+        .font-quran { font-family: 'Amiri', serif; line-height: 2.2; }
+        .font-ui { font-family: 'Tajawal', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+</head>
+<body class="bg-[#f3ebd7] text-gray-800 font-ui" dir="rtl">
+    <div class="min-h-screen flex flex-col items-center relative" dir="rtl">
+        
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'); background-size: 300px;"></div>
+
+        <!-- Header -->
+        <header class="w-full bg-[#1e453e] text-amber-50 p-6 shadow-xl relative overflow-hidden font-ui z-10 border-b-4 border-amber-600/30">
+            <div class="absolute top-0 left-0 w-full h-full opacity-15" style="background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');"></div>
+            <div class="max-w-4xl mx-auto flex items-center justify-between relative z-10">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-book text-amber-400 text-2xl drop-shadow-md"></i>
+                    <h1 class="text-3xl font-bold tracking-wide">مُعين الحفاظ</h1>
+                </div>
+                <p class="text-emerald-100 text-sm hidden sm:block opacity-80">رفيقك الإلكتروني لحفظ كتاب الله</p>
+            </div>
+        </header>
+
+        <main class="w-full max-w-4xl p-4 space-y-6 flex-grow font-ui pb-32 z-10">
+            
+            <!-- Settings Card -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-amber-900/10 p-6">
+                <div class="flex items-center gap-2 mb-4 text-[#1e453e] border-b border-amber-900/10 pb-2">
+                    <i class="fas fa-cog text-lg"></i>
+                    <h2 class="font-bold text-lg">إعدادات الحفظ</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Surah Selection -->
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-600 font-medium">السورة</label>
+                        <div class="relative">
+                            <select id="surahSelect" onchange="updateSurah()" class="w-full p-3 pl-8 bg-[#fdfbf7] border border-amber-200 rounded-xl focus:ring-2 focus:ring-[#1e453e] focus:border-[#1e453e] transition-all outline-none appearance-none cursor-pointer text-[#1e453e] font-semibold">
+                                <option>اختر سورة...</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-sm"></i>
+                        </div>
+                    </div>
+
+                    <!-- Reciter Selection -->
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-600 font-medium">القارئ</label>
+                        <div class="relative">
+                            <select id="reciterSelect" class="w-full p-3 pl-8 bg-[#fdfbf7] border border-amber-200 rounded-xl focus:ring-2 focus:ring-[#1e453e] focus:border-[#1e453e] transition-all outline-none appearance-none cursor-pointer text-[#1e453e]">
+                                <option value="Abdullah_Basfar_192kbps">عبدالله بصفر (مرتل)</option>
+                                <option value="Abdurrahmaan_As-Sudais_192kbps">عبدالرحمن السديس (مرتل)</option>
+                                <option value="Saood_ash-Shuraym_128kbps">سعود الشريم (مرتل)</option>
+                                <option value="Minshawy_Murattal_128kbps">محمد صديق المنشاوي (مرتل)</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-sm"></i>
+                        </div>
+                    </div>
+
+                    <!-- Range Selection -->
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-sm text-gray-600 font-medium">نطاق الآيات</label>
+                        <div class="flex items-center gap-4 bg-[#fdfbf7] p-4 rounded-xl border border-amber-200 shadow-inner">
+                            <div class="flex-1 flex flex-col">
+                                <span class="text-sm font-bold text-[#1e453e] mb-1">من الآية</span>
+                                <select id="startAyah" onchange="validateAyahs()" class="w-full bg-transparent font-bold text-[#1e453e] outline-none border-b border-dashed border-gray-300 pb-1 hover:border-emerald-500 transition-colors">
+                                    <option value="1">1</option>
+                                </select>
+                            </div>
+                            <div class="text-amber-300">|</div>
+                            <div class="flex-1 flex flex-col text-left items-end">
+                                <span class="text-sm font-bold text-[#1e453e] mb-1">إلى الآية</span>
+                                <select id="endAyah" onchange="validateAyahs()" class="w-full bg-transparent font-bold text-[#1e453e] outline-none border-b border-dashed border-gray-300 pb-1 hover:border-emerald-500 transition-colors">
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Repeats -->
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-sm text-gray-600 font-medium">تكرار الآية الواحدة</label>
+                        <div class="flex gap-2">
+                            <button onclick="setRepeats(1)" class="repeat-btn flex-1 py-2 rounded-lg transition-all border font-medium bg-[#1e453e] text-white border-[#1e453e] shadow-md" data-repeats="1">1</button>
+                            <button onclick="setRepeats(3)" class="repeat-btn flex-1 py-2 rounded-lg transition-all border font-medium" data-repeats="3">3</button>
+                            <button onclick="setRepeats(5)" class="repeat-btn flex-1 py-2 rounded-lg transition-all border font-medium" data-repeats="5">5</button>
+                            <button onclick="setRepeats(10)" class="repeat-btn flex-1 py-2 rounded-lg transition-all border font-medium" data-repeats="10">10</button>
+                            <button onclick="setRepeats(20)" class="repeat-btn flex-1 py-2 rounded-lg transition-all border font-medium" data-repeats="20">20</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Display Area -->
+            <div class="bg-[#fffdf5] rounded-2xl shadow-lg border border-amber-100 p-8 text-center relative min-h-[300px] flex flex-col justify-center items-center overflow-hidden">
+                <div class="absolute top-0 left-0 w-24 h-24 border-t-4 border-l-4 border-amber-200/50 rounded-tl-3xl pointer-events-none"></div>
+                <div class="absolute bottom-0 right-0 w-24 h-24 border-b-4 border-r-4 border-amber-200/50 rounded-br-3xl pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-24 h-24 border-t-4 border-r-4 border-amber-200/50 rounded-tr-3xl pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 border-b-4 border-l-4 border-amber-200/50 rounded-bl-3xl pointer-events-none"></div>
+
+                <div id="basmala" class="font-quran text-2xl text-[#1e453e] mb-8 opacity-80"></div>
+
+                <div class="w-full z-10">
+                    <div class="font-quran text-3xl md:text-4xl lg:text-5xl text-gray-800 leading-[2.5] drop-shadow-sm mb-6 px-4">
+                        <span id="ayahText">اختر سورة لبدء التحفيظ</span>
+                        <span id="ayahNumber" class="inline-block mr-2 text-2xl text-amber-600 border border-amber-500 rounded-full w-10 h-10 leading-10 text-center font-ui shadow-sm bg-amber-50 hidden">1</span>
+                    </div>
+                    
+                    <div id="statusIndicator" class="inline-flex items-center gap-2 bg-amber-50 px-4 py-1.5 rounded-full text-amber-800 text-sm border border-amber-200 shadow-sm hidden">
+                        <i class="fas fa-sync text-xs"></i>
+                        <span class="font-medium">تكرار: <span id="loopCount">1</span> من <span id="repeatsDisplay">1</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Surah Context -->
+            <div id="surahContext" class="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-amber-900/10 h-64 overflow-y-auto custom-scrollbar">
+                <h3 class="text-sm font-bold text-gray-400 mb-2 sticky top-0 bg-white/95 p-2 backdrop-blur-sm border-b border-gray-100 z-10">سياق السورة</h3>
+                <div id="surahContent" class="font-quran text-xl text-gray-600 leading-loose text-justify px-2" dir="rtl">
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Floating Player Control Footer -->
+        <div class="fixed bottom-0 left-0 w-full bg-[#fdfbf7]/95 backdrop-blur-md border-t border-amber-200 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)] p-4 z-50">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs text-gray-500">القارئ الحالي</p>
+                        <p id="currentReciter" class="text-[#1e453e] font-bold text-sm">عبدالله بصفر</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button id="prevBtn" onclick="previousAyah()" class="p-3 text-gray-400 hover:text-[#1e453e] disabled:opacity-30 transition-colors" disabled>
+                        <i class="fas fa-chevron-right text-lg"></i>
+                    </button>
+
+                    <button id="playBtn" onclick="togglePlay()" class="w-14 h-14 bg-[#1e453e] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#16332e] hover:scale-105 transition-all active:scale-95 border-2 border-amber-400/50">
+                        <i class="fas fa-play text-lg ml-1"></i>
+                    </button>
+
+                    <button id="nextBtn" onclick="nextAyah()" class="p-3 text-gray-400 hover:text-[#1e453e] disabled:opacity-30 transition-colors" disabled>
+                        <i class="fas fa-chevron-left text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 w-32 hidden sm:flex">
+                    <i class="fas fa-volume-up text-[#1e453e] text-sm"></i>
+                    <div class="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-[#1e453e] w-3/4"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <audio id="audioPlayer"></audio>
+    </div>
+
+    <script>
+        const RECITERS = {
+            'Abdullah_Basfar_192kbps': 'عبدالله بصفر',
+            'Abdurrahmaan_As-Sudais_192kbps': 'عبدالرحمن السديس',
+            'Saood_ash-Shuraym_128kbps': 'سعود الشريم',
+            'Minshawy_Murattal_128kbps': 'محمد صديق المنشاوي'
+        };
+
+        let state = {
+            surahs: [],
+            surahText: [],
+            isPlaying: false,
+            currentAyah: 1,
+            loopCount: 0,
+            loading: false,
+            surahNumber: null,
+            startAyah: 1,
+            endAyah: 6,
+            repeats: 1,
+            reciter: 'Abdullah_Basfar_192kbps'
+        };
+
+        async function init() {
+            try {
+                const res = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await res.json();
+                state.surahs = data.data;
+                populateSurahs();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function populateSurahs() {
+            const select = document.getElementById('surahSelect');
+            state.surahs.forEach(surah => {
+                const option = document.createElement('option');
+                option.value = surah.number;
+                option.textContent = `${surah.number}. ${surah.name}`;
+                select.appendChild(option);
+            });
+        }
+
+        async function updateSurah() {
+            const surahNum = document.getElementById('surahSelect').value;
+            if (!surahNum) return;
+
+            state.surahNumber = surahNum;
+            state.loading = true;
+
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNum}/ar.alafasy`);
+                const data = await res.json();
+                state.surahText = data.data.ayahs;
+                state.currentAyah = 1;
+                state.loopCount = 0;
+
+                document.getElementById('endAyah').innerHTML = '';
+                for (let i = 1; i <= state.surahText.length; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = i;
+                    document.getElementById('endAyah').appendChild(opt);
+                }
+                document.getElementById('endAyah').value = Math.min(6, state.surahText.length);
+                state.endAyah = Math.min(6, state.surahText.length);
+
+                updateAyahDisplay();
+                renderSurahContext();
+            } catch (err) {
+                console.error(err);
+            } finally {
+                state.loading = false;
+            }
+        }
+
+        function updateAyahDisplay() {
+            if (state.surahText.length === 0) {
+                document.getElementById('ayahText').textContent = 'اختر سورة لبدء التحفيظ';
+                document.getElementById('ayahNumber').classList.add('hidden');
+                return;
+            }
+
+            const ayah = state.surahText[state.currentAyah - 1];
+            document.getElementById('ayahText').textContent = ayah.text;
+            document.getElementById('ayahNumber').textContent = state.currentAyah;
+            document.getElementById('ayahNumber').classList.remove('hidden');
+            document.getElementById('statusIndicator').classList.remove('hidden');
+            document.getElementById('loopCount').textContent = state.loopCount + 1;
+            document.getElementById('repeatsDisplay').textContent = state.repeats;
+
+            const basmala = surah.number !== 9 && state.currentAyah === 1 ? 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ' : '';
+            document.getElementById('basmala').textContent = basmala;
+
+            updateNavButtons();
+        }
+
+        function renderSurahContext() {
+            const container = document.getElementById('surahContent');
+            container.innerHTML = '';
+            state.surahText.forEach(ayah => {
+                const span = document.createElement('span');
+                span.id = `ayah-${ayah.numberInSurah}`;
+                span.className = `transition-all duration-300 rounded px-1 cursor-pointer ${
+                    ayah.numberInSurah === state.currentAyah 
+                    ? 'bg-amber-100 text-[#1e453e] shadow-sm scale-110 inline-block mx-1 font-bold border border-amber-200' 
+                    : 'hover:text-[#1e453e] hover:bg-gray-50'
+                } ${ayah.numberInSurah < state.startAyah || ayah.numberInSurah > state.endAyah ? 'opacity-40 grayscale' : ''}`;
+                span.onclick = () => {
+                    if (ayah.numberInSurah >= state.startAyah && ayah.numberInSurah <= state.endAyah) {
+                        state.currentAyah = ayah.numberInSurah;
+                        state.loopCount = 0;
+                        state.isPlaying = true;
+                        updateAyahDisplay();
+                        playAudio();
+                    }
+                };
+                span.innerHTML = `${ayah.text} <span class="text-amber-500 text-sm">۝${ayah.numberInSurah}</span>`;
+                container.appendChild(span);
+            });
+        }
+
+        function updateNavButtons() {
+            document.getElementById('prevBtn').disabled = state.currentAyah <= state.startAyah;
+            document.getElementById('nextBtn').disabled = state.currentAyah >= state.endAyah;
+        }
+
+        function previousAyah() {
+            if (state.currentAyah > state.startAyah) {
+                state.currentAyah--;
+                state.loopCount = 0;
+                updateAyahDisplay();
+                playAudio();
+            }
+        }
+
+        function nextAyah() {
+            if (state.currentAyah < state.endAyah) {
+                state.currentAyah++;
+                state.loopCount = 0;
+                updateAyahDisplay();
+                playAudio();
+            }
+        }
+
+        function togglePlay() {
+            if (state.isPlaying) {
+                document.getElementById('audioPlayer').pause();
+                state.isPlaying = false;
+                updatePlayButton();
+            } else {
+                playAudio();
+            }
+        }
+
+        function playAudio() {
+            if (state.surahText.length === 0) return;
+
+            const audio = document.getElementById('audioPlayer');
+            const audioUrl = `https://everyayah.com/data/${state.reciter}/${String(state.surahNumber).padStart(3, '0')}${String(state.currentAyah).padStart(3, '0')}.mp3`;
+            
+            audio.src = audioUrl;
+            audio.play().catch(err => console.error(err));
+
+            state.isPlaying = true;
+            updatePlayButton();
+        }
+
+        function updatePlayButton() {
+            const btn = document.getElementById('playBtn');
+            btn.innerHTML = state.isPlaying ? '<i class="fas fa-pause text-lg"></i>' : '<i class="fas fa-play text-lg ml-1"></i>';
+        }
+
+        function setRepeats(num) {
+            state.repeats = num;
+            document.querySelectorAll('.repeat-btn').forEach(btn => {
+                btn.classList.remove('bg-[#1e453e]', 'text-white', 'border-[#1e453e]', 'shadow-md');
+                btn.classList.add('bg-[#fdfbf7]', 'text-gray-600', 'border-amber-200', 'hover:bg-amber-50');
+            });
+            document.querySelector(`[data-repeats="${num}"]`).classList.add('bg-[#1e453e]', 'text-white', 'border-[#1e453e]', 'shadow-md');
+            document.querySelector(`[data-repeats="${num}"]`).classList.remove('bg-[#fdfbf7]', 'text-gray-600', 'border-amber-200', 'hover:bg-amber-50');
+        }
+
+        function validateAyahs() {
+            state.startAyah = parseInt(document.getElementById('startAyah').value) || 1;
+            state.endAyah = parseInt(document.getElementById('endAyah').value) || 6;
+        }
+
+        document.getElementById('reciterSelect').addEventListener('change', (e) => {
+            state.reciter = e.target.value;
+            document.getElementById('currentReciter').textContent = RECITERS[state.reciter];
+        });
+
+        document.getElementById('audioPlayer').onended = function() {
+            state.isPlaying = false;
+            state.loopCount++;
+
+            if (state.loopCount < state.repeats) {
+                setTimeout(playAudio, 500);
+            } else {
+                updatePlayButton();
+            }
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>

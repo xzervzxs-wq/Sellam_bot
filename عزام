@@ -1,0 +1,452 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Pause, RefreshCw, ChevronRight, ChevronLeft, Volume2, BookOpen, Settings } from 'lucide-react';
+
+const RECITERS = [
+  { id: 'Abdullah_Basfar_192kbps', name: 'عبدالله بصفر', type: 'مرتل' },
+  { id: 'Abdurrahmaan_As-Sudais_192kbps', name: 'عبدالرحمن السديس', type: 'مرتل' },
+  { id: 'Saood_ash-Shuraym_128kbps', name: 'سعود الشريم', type: 'مرتل' },
+  { id: 'Minshawy_Murattal_128kbps', name: 'محمد صديق المنشاوي', type: 'مرتل' },
+];
+
+export default function QuranMemorizer() {
+  // --- State Variables ---
+  const [surahs, setSurahs] = useState([]);
+  const [selectedSurah, setSelectedSurah] = useState(null);
+  const [surahText, setSurahText] = useState([]);
+  
+  const [settings, setSettings] = useState({
+    surahNumber: 114,
+    startAyah: 1,
+    endAyah: 6,
+    repeats: 3,
+    reciter: RECITERS[0].id
+  });
+
+  const [playback, setPlayback] = useState({
+    isPlaying: false,
+    currentAyah: 1,
+    loopCount: 0,
+    loading: false
+  });
+
+  const audioRef = useRef(null);
+  const scrollRef = useRef(null);
+
+  // --- Fetch Data ---
+  
+  // 1. Fetch Surah List on Load
+  useEffect(() => {
+    fetch('https://api.alquran.cloud/v1/surah')
+      .then(res => res.json())
+      .then(data => {
+        // Reverse the array so An-Nas is first (114 -> 1)
+        setSurahs(data.data.reverse());
+        // Note: selectedSurah will be handled by the second useEffect based on settings.surahNumber (default 1)
+      })
+      .catch(err => console.error("Error fetching surahs:", err));
+  }, []);
+
+  // 2. Fetch Surah Text when Surah changes
+  useEffect(() => {
+    if (!settings.surahNumber) return;
+    
+    setPlayback(prev => ({ ...prev, loading: true }));
+    
+    fetch(`https://api.alquran.cloud/v1/surah/${settings.surahNumber}`)
+      .then(res => res.json())
+      .then(data => {
+        setSurahText(data.data.ayahs);
+        setSelectedSurah(data.data);
+        // Reset range when surah changes (default to full surah or first 10)
+        setSettings(prev => ({
+          ...prev,
+          startAyah: 1,
+          endAyah: Math.min(data.data.numberOfAyahs, 7), 
+          currentAyah: 1
+        }));
+        setPlayback(prev => ({ ...prev, currentAyah: 1, loopCount: 0, loading: false }));
+      })
+      .catch(err => {
+        console.error("Error fetching text:", err);
+        setPlayback(prev => ({ ...prev, loading: false }));
+      });
+  }, [settings.surahNumber]);
+
+  // --- Audio Logic ---
+
+  // Generate Audio URL based on EveryAyah standard format
+  const getAudioUrl = (surahNum, ayahNum) => {
+    const padSurah = String(surahNum).padStart(3, '0');
+    const padAyah = String(ayahNum).padStart(3, '0');
+    return `https://everyayah.com/data/${settings.reciter}/${padSurah}${padAyah}.mp3`;
+  };
+
+  // Handle Play/Pause Toggle
+  const togglePlay = () => {
+    if (playback.isPlaying) {
+      audioRef.current.pause();
+      setPlayback(prev => ({ ...prev, isPlaying: false }));
+    } else {
+      audioRef.current.play().catch(e => console.error("Play error:", e));
+      setPlayback(prev => ({ ...prev, isPlaying: true }));
+    }
+  };
+
+  // Handle when audio finishes an ayah
+  const handleAudioEnded = () => {
+    const { currentAyah, loopCount } = playback;
+    const { startAyah, endAyah, repeats } = settings;
+
+    if (loopCount < repeats - 1) {
+      // Repeat same Ayah
+      setPlayback(prev => ({ ...prev, loopCount: prev.loopCount + 1 }));
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    } else {
+      // Move to next Ayah
+      if (currentAyah < endAyah) {
+        setPlayback(prev => ({
+          ...prev,
+          currentAyah: prev.currentAyah + 1,
+          loopCount: 0
+        }));
+        // The useEffect on currentAyah will trigger the play
+      } else {
+        // Finished the range
+        setPlayback(prev => ({ ...prev, isPlaying: false, currentAyah: startAyah, loopCount: 0 }));
+      }
+    }
+  };
+
+  // Auto-play when currentAyah changes if we are in playing state
+  useEffect(() => {
+    if (playback.isPlaying && audioRef.current) {
+      audioRef.current.src = getAudioUrl(settings.surahNumber, playback.currentAyah);
+      audioRef.current.play();
+      
+      // Scroll to active ayah text
+      if (scrollRef.current) {
+        const activeEl = document.getElementById(`ayah-${playback.currentAyah}`);
+        if (activeEl) {
+            activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+  }, [playback.currentAyah, settings.reciter, settings.surahNumber]);
+
+  // --- Handlers ---
+  
+  const handleSettingsChange = (field, value) => {
+    setSettings(prev => {
+      let newValue = parseInt(value);
+      
+      // Logic checks
+      if (field === 'startAyah' && newValue > prev.endAyah) return { ...prev, [field]: newValue, endAyah: newValue };
+      if (field === 'endAyah' && newValue < prev.startAyah) return { ...prev, [field]: newValue, startAyah: newValue };
+      
+      // If Surah changed, currentAyah resets
+      if (field === 'surahNumber') {
+          return { ...prev, [field]: newValue, startAyah: 1, endAyah: 1 }; 
+      }
+
+      return { ...prev, [field]: newValue || value }; 
+    });
+    
+    // Reset playback logic if settings change significantly
+    if (field === 'surahNumber' || field === 'startAyah') {
+       setPlayback(prev => ({ ...prev, isPlaying: false, loopCount: 0, currentAyah: field === 'startAyah' ? parseInt(value) : 1 }));
+    }
+  };
+
+  // --- Render Helpers ---
+
+  const getCurrentAyahText = () => {
+    if (!surahText.length) return "جاري التحميل...";
+    const ayahObj = surahText.find(a => a.numberInSurah === playback.currentAyah);
+    return ayahObj ? ayahObj.text : "";
+  };
+
+  // Generate array of numbers for ayah selection
+  const ayahOptions = selectedSurah ? Array.from({ length: selectedSurah.numberOfAyahs }, (_, i) => i + 1) : [1];
+
+  return (
+    // Updated Background Color to a warmer Parchment Beige (#f3ebd7)
+    <div className="min-h-screen bg-[#f3ebd7] text-gray-800 font-sans flex flex-col items-center relative" dir="rtl">
+      
+      {/* Background Pattern Overlay */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none" 
+           style={{ 
+             backgroundImage: `url("https://www.transparenttextures.com/patterns/arabesque.png")`,
+             backgroundSize: '300px'
+           }}>
+      </div>
+
+      {/* Import Arabic Font */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@400;500;700&display=swap');
+        .font-quran { font-family: 'Amiri', serif; line-height: 2.2; }
+        .font-ui { font-family: 'Tajawal', sans-serif; }
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+      `}</style>
+
+      {/* Header */}
+      <header className="w-full bg-[#1e453e] text-amber-50 p-6 shadow-xl relative overflow-hidden font-ui z-10 border-b-4 border-amber-600/30">
+        <div className="absolute top-0 left-0 w-full h-full opacity-15 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+        <div className="max-w-4xl mx-auto flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-8 h-8 text-amber-400 drop-shadow-md" />
+            <h1 className="text-3xl font-bold tracking-wide">مُعين الحفاظ</h1>
+          </div>
+          <p className="text-emerald-100 text-sm hidden sm:block opacity-80">رفيقك الإلكتروني لحفظ كتاب الله</p>
+        </div>
+      </header>
+
+      <main className="w-full max-w-4xl p-4 space-y-6 flex-grow font-ui pb-32 z-10">
+        
+        {/* Settings Card */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-amber-900/10 p-6">
+          <div className="flex items-center gap-2 mb-4 text-[#1e453e] border-b border-amber-900/10 pb-2">
+            <Settings className="w-5 h-5" />
+            <h2 className="font-bold text-lg">إعدادات الحفظ</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Surah Selection */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600 font-medium">السورة</label>
+              <div className="relative">
+                <select 
+                  className="w-full p-3 pl-8 bg-[#fdfbf7] border border-amber-200 rounded-xl focus:ring-2 focus:ring-[#1e453e] focus:border-[#1e453e] transition-all outline-none appearance-none cursor-pointer text-[#1e453e] font-semibold"
+                  value={settings.surahNumber}
+                  onChange={(e) => handleSettingsChange('surahNumber', e.target.value)}
+                >
+                  {surahs.map(s => (
+                    <option key={s.number} value={s.number}>
+                      {s.number}. {s.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <ChevronLeft size={16} className="-rotate-90" />
+                </div>
+              </div>
+            </div>
+
+            {/* Reciter Selection */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600 font-medium">القارئ</label>
+              <div className="relative">
+                <select 
+                  className="w-full p-3 pl-8 bg-[#fdfbf7] border border-amber-200 rounded-xl focus:ring-2 focus:ring-[#1e453e] focus:border-[#1e453e] transition-all outline-none appearance-none cursor-pointer text-[#1e453e]"
+                  value={settings.reciter}
+                  onChange={(e) => handleSettingsChange('reciter', e.target.value)}
+                >
+                  {RECITERS.map(r => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <ChevronLeft size={16} className="-rotate-90" />
+                </div>
+              </div>
+            </div>
+
+            {/* Range Selection (Dropdowns) */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm text-gray-600 font-medium">نطاق الآيات</label>
+              <div className="flex items-center gap-4 bg-[#fdfbf7] p-4 rounded-xl border border-amber-200 shadow-inner">
+                
+                {/* Start Ayah Dropdown */}
+                <div className="flex-1 flex flex-col">
+                  <span className="text-sm font-bold text-[#1e453e] mb-1">من الآية</span>
+                  <div className="relative w-full">
+                    <select 
+                      className="w-full bg-transparent font-bold text-[#1e453e] outline-none appearance-none cursor-pointer border-b border-dashed border-gray-300 pb-1 hover:border-emerald-500 transition-colors"
+                      value={settings.startAyah}
+                      onChange={(e) => handleSettingsChange('startAyah', e.target.value)}
+                    >
+                      {ayahOptions.map(num => (
+                        <option key={num} value={num}>{num}</option>
+                      ))}
+                    </select>
+                    <ChevronLeft size={12} className="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div className="text-amber-300">|</div>
+                
+                {/* End Ayah Dropdown */}
+                <div className="flex-1 flex flex-col text-left items-end">
+                  <span className="text-sm font-bold text-[#1e453e] mb-1">إلى الآية</span>
+                  <div className="relative w-full">
+                     <select 
+                      className="w-full bg-transparent font-bold text-[#1e453e] outline-none appearance-none cursor-pointer border-b border-dashed border-gray-300 pb-1 hover:border-emerald-500 transition-colors text-left"
+                      style={{direction: 'ltr'}}
+                      value={settings.endAyah}
+                      onChange={(e) => handleSettingsChange('endAyah', e.target.value)}
+                    >
+                      {ayahOptions.map(num => (
+                        <option key={num} value={num} disabled={num < settings.startAyah}>
+                          {num}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronLeft size={12} className="absolute right-0 top-1/2 -translate-y-1/2 -rotate-90 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Repeats */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm text-gray-600 font-medium">تكرار الآية الواحدة</label>
+              <div className="flex gap-2">
+                 {[1, 3, 5, 10, 20].map(num => (
+                   <button
+                    key={num}
+                    onClick={() => handleSettingsChange('repeats', num)}
+                    className={`flex-1 py-2 rounded-lg transition-all border font-medium ${
+                      settings.repeats === num 
+                      ? 'bg-[#1e453e] text-white border-[#1e453e] shadow-md' 
+                      : 'bg-[#fdfbf7] text-gray-600 border-amber-200 hover:bg-amber-50'
+                    }`}
+                   >
+                     {num}
+                   </button>
+                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Display Area */}
+        <div className="bg-[#fffdf5] rounded-2xl shadow-lg border border-amber-100 p-8 text-center relative min-h-[300px] flex flex-col justify-center items-center overflow-hidden">
+            {/* Corner Decorations */}
+            <div className="absolute top-0 left-0 w-24 h-24 border-t-4 border-l-4 border-amber-200/50 rounded-tl-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 border-b-4 border-r-4 border-amber-200/50 rounded-br-3xl pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 border-t-4 border-r-4 border-amber-200/50 rounded-tr-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 border-b-4 border-l-4 border-amber-200/50 rounded-bl-3xl pointer-events-none"></div>
+
+            {/* Basmala */}
+            {settings.surahNumber !== 9 && settings.startAyah === 1 && (
+                <div className="font-quran text-2xl text-[#1e453e] mb-8 opacity-80">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>
+            )}
+
+            {/* Current Ayah Large Text */}
+            <div className="w-full z-10">
+              <div className="font-quran text-3xl md:text-4xl lg:text-5xl text-gray-800 leading-[2.5] drop-shadow-sm mb-6 px-4">
+                {getCurrentAyahText()}
+                <span className="inline-block mr-2 text-2xl text-amber-600 border border-amber-500 rounded-full w-10 h-10 leading-10 text-center font-ui shadow-sm bg-amber-50">
+                    {playback.currentAyah}
+                </span>
+              </div>
+              
+              {/* Status Indicator */}
+              <div className="inline-flex items-center gap-2 bg-amber-50 px-4 py-1.5 rounded-full text-amber-800 text-sm border border-amber-200 shadow-sm">
+                <RefreshCw size={14} className={playback.isPlaying ? "animate-spin" : ""} />
+                <span className="font-medium">تكرار: {playback.loopCount + 1} من {settings.repeats}</span>
+              </div>
+            </div>
+        </div>
+
+        {/* Full Surah Context (Scrollable) */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-amber-900/10 h-64 overflow-y-auto custom-scrollbar" ref={scrollRef}>
+             <h3 className="text-sm font-bold text-gray-400 mb-2 sticky top-0 bg-white/95 p-2 backdrop-blur-sm border-b border-gray-100 z-10">سياق السورة</h3>
+             <div className="font-quran text-xl text-gray-600 leading-loose text-justify px-2" dir="rtl">
+                {surahText.map((ayah) => (
+                    <span 
+                        key={ayah.number} 
+                        id={`ayah-${ayah.numberInSurah}`}
+                        className={`transition-all duration-300 rounded px-1 ${
+                            ayah.numberInSurah === playback.currentAyah 
+                            ? 'bg-amber-100 text-[#1e453e] shadow-sm scale-110 inline-block mx-1 font-bold border border-amber-200' 
+                            : 'hover:text-[#1e453e] hover:bg-gray-50 cursor-pointer'
+                        } ${ayah.numberInSurah < settings.startAyah || ayah.numberInSurah > settings.endAyah ? 'opacity-40 grayscale' : ''}`}
+                        onClick={() => {
+                            if(ayah.numberInSurah >= settings.startAyah && ayah.numberInSurah <= settings.endAyah) {
+                                setPlayback(prev => ({...prev, currentAyah: ayah.numberInSurah, loopCount: 0, isPlaying: true}));
+                            }
+                        }}
+                    >
+                        {ayah.text} <span className="text-amber-500 text-sm">۝{ayah.numberInSurah}</span> 
+                    </span>
+                ))}
+             </div>
+        </div>
+
+      </main>
+
+      {/* Floating Player Control Footer */}
+      <div className="fixed bottom-0 left-0 w-full bg-[#fdfbf7]/95 backdrop-blur-md border-t border-amber-200 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)] p-4 z-50">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          
+          <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block">
+                  <p className="text-xs text-gray-500">القارئ الحالي</p>
+                  <p className="text-[#1e453e] font-bold text-sm">
+                      {RECITERS.find(r => r.id === settings.reciter)?.name}
+                  </p>
+              </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button 
+                onClick={() => {
+                    const prev = playback.currentAyah - 1;
+                    if(prev >= settings.startAyah) setPlayback({...playback, currentAyah: prev, loopCount: 0});
+                }}
+                disabled={playback.currentAyah <= settings.startAyah}
+                className="p-3 text-gray-400 hover:text-[#1e453e] disabled:opacity-30 transition-colors"
+            >
+                <ChevronRight size={24} />
+            </button>
+
+            <button 
+                onClick={togglePlay}
+                className="w-14 h-14 bg-[#1e453e] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#16332e] hover:scale-105 transition-all active:scale-95 border-2 border-amber-400/50"
+            >
+                {playback.loading ? (
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                    playback.isPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />
+                )}
+            </button>
+
+            <button 
+                onClick={() => {
+                    const next = playback.currentAyah + 1;
+                    if(next <= settings.endAyah) setPlayback({...playback, currentAyah: next, loopCount: 0});
+                }}
+                disabled={playback.currentAyah >= settings.endAyah}
+                className="p-3 text-gray-400 hover:text-[#1e453e] disabled:opacity-30 transition-colors"
+            >
+                <ChevronLeft size={24} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 w-32 hidden sm:flex">
+             <Volume2 size={18} className="text-[#1e453e]" />
+             <div className="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                 <div className="h-full bg-[#1e453e] w-3/4"></div>
+             </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Hidden Audio Element */}
+      <audio 
+        ref={audioRef}
+        src={settings.surahNumber ? getAudioUrl(settings.surahNumber, playback.currentAyah) : ""}
+        onEnded={handleAudioEnded}
+        onError={(e) => console.error("Audio Load Error", e)}
+      />
+
+    </div>
+  );
+}
