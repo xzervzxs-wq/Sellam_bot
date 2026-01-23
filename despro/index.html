@@ -321,12 +321,17 @@
         
         <!-- اللوحة الجانبية -->
         <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
-            <div class="flex items-center gap-3 border-b border-[#e2e8f0] pb-3">
-                <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3"><i class="fas fa-palette text-lg"></i></div>
-                <div>
-                    <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-lg">استوديو المصممين 🎨</h1>
-                    <p class="text-[10px] text-[#94a3b8] font-medium" style="font-family: 'Noto Serif Arabic', serif;">استوديو متخصص | مساحات للإبداع ✨</p>
+            <div class="flex items-center justify-between gap-3 border-b border-[#e2e8f0] pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3"><i class="fas fa-palette text-lg"></i></div>
+                    <div>
+                        <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-2xl">استوديو المصممين 🎨</h1>
+                        <p class="text-[10px] text-[#94a3b8] font-medium" style="font-family: 'Noto Serif Arabic', serif;">استوديو متخصص | مساحات للإبداع ✨</p>
+                    </div>
                 </div>
+                <button id="header-login-btn" onclick="toggleLoginOverlay()" class="px-3 py-1 bg-[#6366f1] text-white rounded-lg hover:bg-[#4f46e5] font-bold text-xs transition shadow-md flex items-center gap-1" title="دخول العضو">
+                    <i class="fas fa-sign-in-alt text-sm"></i>
+                </button>
             </div>
 
             <!-- إضافة النصوص -->
