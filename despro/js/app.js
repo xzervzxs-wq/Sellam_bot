@@ -330,8 +330,8 @@
             // عرض رسالة تحميل
             grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin ml-2"></i>جاري تحميل المكتبة...</p>';
             
-            // تحميل ملف JSON عبر fetch
-            fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/Official.json?t=' + Date.now())
+            // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
+            fetch('./Official.json?t=' + Date.now())
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('فشل تحميل الملف');
