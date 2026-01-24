@@ -124,6 +124,12 @@
             border-color: #1e293b !important;
             color: #e2e8f0 !important;
         }
+        
+        /* تأكيد إضافي لمربع لون الخلفية */
+        :root.dark-mode #bg-tools-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
