@@ -142,6 +142,18 @@
             background-color: #0f172a !important;
             border-color: #334155 !important;
         }
+        
+        /* تأكيد إضافي لمربع الزوم */
+        :root.dark-mode #zoom-container {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        
+        /* تأكيد إضافي لمربع مكتبة العناصر */
+        :root.dark-mode #assets-library-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
