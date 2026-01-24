@@ -1002,23 +1002,27 @@
             color: #cbd5e1;
             font-size: 10px;
         }
-/* Window Tabs Styles */
+/* Window Tabs Styles - Photoshop Like Update */
 .window-tab {
-    display: flex;
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 10px;
+    justify-content: center;
+    height: 28px;
+    padding: 0 24px 0 12px; /* Extra padding right for CLOSE button */
+    background: #e2e8f0;
+    border: 1px solid #cbd5e1;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    font-size: 11px;
     font-weight: bold;
     color: #64748b;
     cursor: pointer;
     transition: all 0.2s;
     user-select: none;
     white-space: nowrap;
-    min-width: 80px;
+    min-width: 90px;
+    margin-right: 2px;
 }
 
 .window-tab:hover {
@@ -1027,28 +1031,37 @@
 }
 
 .window-tab.active-tab {
-    background: #6366f1;
+    background: #6366f1; /* Active Color */
     color: #ffffff;
     border-color: #6366f1;
-    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+    z-index: 5;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
 }
 
 .window-tab .close-tab {
-    width: 16px;
-    height: 16px;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    margin-right: -4px;
+    border-radius: 3px;
     opacity: 0.6;
     transition: all 0.2s;
+    font-size: 8px;
+    color: inherit;
 }
 
 .window-tab .close-tab:hover {
     background: rgba(0,0,0,0.1);
     opacity: 1;
-    color: #ef4444; /* Red on hover */
+    color: #ef4444;
+}
+
+.window-tab.active-tab .close-tab {
+    color: rgba(255,255,255,0.8);
 }
 
 .window-tab.active-tab .close-tab:hover {

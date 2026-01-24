@@ -5657,7 +5657,7 @@ function initWindows() {
     // Save initial empty state as Window 1
     windows['win_1'] = {
         id: 'win_1',
-        name: 'نافذة 1',
+        name: 'مساحة العمل',
         html: card.innerHTML,
         width: card.style.width,
         height: card.style.height,
@@ -5725,7 +5725,7 @@ function addNewWindow() {
     
     windows[newId] = {
         id: newId,
-        name: 'نافذة ' + windowCounter,
+        name: 'مساحة (' + windowCounter + ')',
         html: '<div id="card-gradient" style="display:none;"></div>',
         width: card.style.width,
         height: card.style.height,
