@@ -136,6 +136,12 @@
             background-color: #0f172a !important;
             border-color: #334155 !important;
         }
+        
+        /* تأكيد إضافي لمربع إضافة النصوص */
+        :root.dark-mode #add-text-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
