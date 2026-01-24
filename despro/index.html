@@ -232,13 +232,29 @@
                          إغلاق النافذة
                      </button>
                      
-                     <div class="text-center mt-3 flex items-center justify-center gap-2">
+                     <div id="premium-badge" class="text-center mt-3 flex items-center justify-center gap-2">
                          <i class="fas fa-gem text-pink-400 text-sm"></i>
                          <div class="flex flex-col gap-0.5">
                              <p class="text-[9px] text-slate-400 font-medium">خاص بمشتركين</p>
                              <p class="text-[10px] text-pink-300 font-bold">PREMIUM</p>
                          </div>
                      </div>
+                     
+                     <script>
+                         // إخفاء نص البريميوم للأعضاء البريميوم
+                         function updatePremiumBadge() {
+                             const badge = document.getElementById('premium-badge');
+                             if (userTier === 'premium' && badge) {
+                                 badge.style.display = 'none';
+                             } else if (badge) {
+                                 badge.style.display = 'flex';
+                             }
+                         }
+                         // تحديث عند فتح النافذة
+                         const observer = new MutationObserver(() => updatePremiumBadge());
+                         observer.observe(document.getElementById('save-modal'), { attributes: true });
+                         setTimeout(updatePremiumBadge, 100);
+                     </script>
                  </div>
             </div>
             

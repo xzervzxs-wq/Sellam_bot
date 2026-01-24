@@ -1455,27 +1455,29 @@
                 }
             }
             
-            // إضافة العلامة المائية (Watermark)
-            ctx.save();
-            ctx.globalAlpha = 0.08; // شفافية 8% فقط
-            ctx.fillStyle = '#000000'; // لون أسود خفيف جداً
-            ctx.font = 'bold 180px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.rotate(-Math.PI / 4); // دوران 45 درجة
-            
-            // رسم النص على كامل الصفحة بمسافات أكبر (بدون تداخل)
-            const diagonalLength = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
-            const startPosX = -diagonalLength / 2;
-            const startPosY = -diagonalLength / 2;
-            
-            for (let x = startPosX; x < diagonalLength; x += 1000) {
-                for (let y = startPosY; y < diagonalLength; y += 800) {
-                    ctx.fillText('despro.net', x, y);
+            // إضافة العلامة المائية (Watermark) - فقط للمستخدمين المجانيين
+            if (userTier !== 'premium') {
+                ctx.save();
+                ctx.globalAlpha = 0.08; // شفافية 8% فقط
+                ctx.fillStyle = '#000000'; // لون أسود خفيف جداً
+                ctx.font = 'bold 180px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.rotate(-Math.PI / 4); // دوران 45 درجة
+                
+                // رسم النص على كامل الصفحة بمسافات أكبر (بدون تداخل)
+                const diagonalLength = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+                const startPosX = -diagonalLength / 2;
+                const startPosY = -diagonalLength / 2;
+                
+                for (let x = startPosX; x < diagonalLength; x += 1000) {
+                    for (let y = startPosY; y < diagonalLength; y += 800) {
+                        ctx.fillText('despro.net', x, y);
+                    }
                 }
+                
+                ctx.restore();
             }
-            
-            ctx.restore();
             
             const saveImg = document.getElementById('save-img');
             // إذا كان التصميم شفاف، استخدم PNG. وإلا استخدم JPEG بجودة 85% لتقليل الحجم
@@ -5348,6 +5350,19 @@
         // ==========================================
         
         function restrictFonts() {
+            // إذا كان المستخدم بريميوم، فتح كل شيء
+            if (userTier === 'premium') {
+                const fontSelects = document.querySelectorAll('select[id*="font"]');
+                fontSelects.forEach(select => {
+                    Array.from(select.options).forEach(option => {
+                        option.disabled = false;
+                        option.textContent = option.textContent.replace(' [PREMIUM]', '').replace('[PREMIUM] ', '');
+                    });
+                });
+                return;
+            }
+            
+            // للمستخدمين المجانيين - تطبيق التقييد
             const fontSelects = document.querySelectorAll('select[id*="font"]');
             fontSelects.forEach(select => {
                 // عد جميع الخيارات (بدون "إضافة خط مخصص")
@@ -5374,7 +5389,7 @@
                     }
                 });
                 
-                // تعطيل "إضافة خط مخصص" دائماً
+                // تعطيل "إضافة خط مخصص" دائماً للمجانيين
                 const customFontOption = Array.from(select.options).find(opt => 
                     opt.textContent.includes('إضافة خط مخصص') || 
                     opt.textContent.includes('Add Custom Font')
