@@ -5612,8 +5612,17 @@
             });
 
             // Toggle menu
-            dropdown.querySelector('.dropdown-toggle').onclick = () => {
+            dropdown.querySelector('.dropdown-toggle').onclick = (e) => {
+                e.stopPropagation();
                 menu.classList.toggle('active');
+                
+                // تحديث موضع الـ dropdown الثابت
+                if (menu.classList.contains('active')) {
+                    const rect = dropdown.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY) + 'px';
+                    menu.style.left = (rect.left + window.scrollX) + 'px';
+                    menu.style.width = rect.width + 'px';
+                }
             };
 
             // Close when clicking outside
