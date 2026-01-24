@@ -727,6 +727,20 @@
             const randomNum = Math.floor(Math.random() * 1000000);
             const defaultName = `template_${randomNum}`; 
             document.getElementById('save-as-name').value = defaultName;
+            
+            // إظهار خيار الملاحظات فقط إذا كان هناك ملاحظات
+            const notesField = document.getElementById('designer-notes');
+            const notesOption = document.getElementById('save-notes-option');
+            const notesPreview = document.getElementById('notes-preview');
+            
+            if (notesField && notesOption && notesField.value.trim()) {
+                notesOption.classList.remove('hidden');
+                // عرض معاينة مختصرة للملاحظات
+                const preview = notesField.value.trim().substring(0, 20);
+                notesPreview.textContent = preview + (notesField.value.trim().length > 20 ? '...' : '');
+            } else if (notesOption) {
+                notesOption.classList.add('hidden');
+            }
         }
 
         function closeSaveAsModal() {
@@ -788,6 +802,13 @@
                     timestamp: new Date().toLocaleString('ar-SA'),
                     version: "2.0" 
                 };
+                
+                // حفظ الملاحظات إذا اختار المستخدم ذلك
+                const saveWithNotes = document.getElementById('save-with-notes');
+                const notesField = document.getElementById('designer-notes');
+                if (saveWithNotes && saveWithNotes.checked && notesField && notesField.value.trim()) {
+                    projectData.notes = notesField.value.trim();
+                }
                 
                 // 1. التنزيل المباشر كملف JSON (.dalal) للمستخدم
                 const dataStr = JSON.stringify(projectData, null, 2);
@@ -977,10 +998,6 @@
             const templates = getTemplates();
             const template = templates[index];
             
-            // DEBUG: طباعة القالب كاملاً
-            console.log('🔍 القالب المحمّل:', JSON.stringify(template, null, 2));
-            console.log('📝 الملاحظات في القالب:', template ? template.notes : 'لا يوجد قالب');
-            
             if (template) {
                 const card = document.getElementById('card');
                 
@@ -998,23 +1015,13 @@
                 if (template.customH) document.getElementById('custom-height').value = template.customH;
                 
                 // استعادة الملاحظات من بيانات القالب نفسه فقط (JSON)
-                console.log('📝 تحميل الملاحظات من القالب:', template.notes); // debug
-                if (template.notes) {
-                    const notesField = document.getElementById('designer-notes');
-                    if(notesField) {
-                        notesField.value = template.notes;
-                        console.log('✅ تم تعيين الملاحظات بنجاح');
-                        updateCharCount();
-                    } else {
-                        console.warn('⚠️ لم يتم العثور على حقل الملاحظات');
-                    }
-                } else {
-                    console.log('ℹ️ لا توجد ملاحظات محفوظة');
-                    const notesField = document.getElementById('designer-notes');
-                    if(notesField) {
-                        notesField.value = '';
-                        updateCharCount();
-                    }
+                const notesField = document.getElementById('designer-notes');
+                if (template.notes && notesField) {
+                    notesField.value = template.notes;
+                    updateCharCount();
+                } else if (notesField) {
+                    notesField.value = '';
+                    updateCharCount();
                 }
                 
                 // تحديث المسطرة والزوم
