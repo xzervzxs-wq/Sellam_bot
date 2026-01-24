@@ -5324,33 +5324,23 @@
         function restrictFonts() {
             const fontSelects = document.querySelectorAll('select[id*="font"]');
             fontSelects.forEach(select => {
-                let optionIndex = 0;
+                // عد جميع الخيارات (بدون "إضافة خط مخصص")
+                let allOptions = Array.from(select.options).filter(opt => 
+                    !opt.textContent.includes('إضافة خط مخصص') && 
+                    !opt.textContent.includes('Add Custom Font')
+                );
                 
-                // معالجة جميع الخيارات من optgroups
-                Array.from(select.querySelectorAll('optgroup')).forEach(group => {
-                    Array.from(group.querySelectorAll('option')).forEach((option) => {
-                        if (optionIndex < ITEMS_PER_CATEGORY_FREE) {
-                            // أول 10 خطوط مفتوحة
-                            option.disabled = false;
-                            option.textContent = option.textContent.replace(' [PREMIUM]', '');
-                        } else {
-                            // آخر 6 خطوط مع [PREMIUM]
-                            option.disabled = true;
-                            if (!option.textContent.includes('[PREMIUM]')) {
-                                option.textContent = option.textContent + ' [PREMIUM]';
-                            }
-                        }
-                        optionIndex++;
-                    });
-                });
+                let totalFonts = allOptions.length;
+                let premiumStart = totalFonts - 6; // آخر 6 خطوط هي بريميوم
                 
-                // معالجة الخيارات خارج optgroups
-                Array.from(select.querySelectorAll('option:not(optgroup option)')).forEach((option, idx) => {
-                    const index = optionIndex + idx;
-                    if (index < ITEMS_PER_CATEGORY_FREE) {
+                // معالجة جميع الخيارات
+                allOptions.forEach((option, index) => {
+                    if (index < premiumStart) {
+                        // الخطوط المفتوحة
                         option.disabled = false;
                         option.textContent = option.textContent.replace(' [PREMIUM]', '');
                     } else {
+                        // آخر 6 خطوط = بريميوم
                         option.disabled = true;
                         if (!option.textContent.includes('[PREMIUM]')) {
                             option.textContent = option.textContent + ' [PREMIUM]';
