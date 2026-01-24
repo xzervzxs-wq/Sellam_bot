@@ -244,6 +244,11 @@
                     return '';
                 }
             });
+
+            // تحميل الملاحظات المحفوظة عند فتح الصفحة
+            setTimeout(() => {
+                loadDesignerNotes();
+            }, 500);
         };
 
         // --- إدارة القوالب (Templates) ---
@@ -596,7 +601,8 @@
                 wVal: card.getAttribute('data-card-width'),
                 hVal: card.getAttribute('data-card-height'),
                 customW: document.getElementById('custom-width').value,
-                customH: document.getElementById('custom-height').value
+                customH: document.getElementById('custom-height').value,
+                notes: document.getElementById('designer-notes').value // حفظ الملاحظات مع التصميم
             };
 
             try {
@@ -668,6 +674,45 @@
             const width = parseInt(card.style.width) / DPI_RATIO || 6;
             const height = parseInt(card.style.height) / DPI_RATIO || 6;
             document.getElementById('canvas-size').textContent = `${width.toFixed(1)} × ${height.toFixed(1)} سم`;
+
+            // تحديث حد الأحرف والملاحظات
+            updateCharCount();
+            loadDesignerNotes();
+        }
+
+        // === دوال ملاحظات المصمم ===
+        function getMaxCharLimit() {
+            return userTier === 'premium' ? 1000 : 280;
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('designer-notes');
+            const charCount = document.getElementById('char-count');
+            const maxLimit = getMaxCharLimit();
+            const currentLength = textarea.value.length;
+            
+            charCount.textContent = `${currentLength}/${maxLimit}`;
+            textarea.maxLength = maxLimit;
+            
+            // تحديث الألوان بناءً على الامتلاء
+            if (currentLength > maxLimit * 0.8) {
+                charCount.classList.remove('bg-[#f59e0b]');
+                charCount.classList.add('bg-red-500');
+            } else {
+                charCount.classList.remove('bg-red-500');
+                charCount.classList.add('bg-[#f59e0b]');
+            }
+        }
+
+        function updateDesignerNotes() {
+            const notes = document.getElementById('designer-notes').value;
+            localStorage.setItem('designer_notes', notes);
+        }
+
+        function loadDesignerNotes() {
+            const notes = localStorage.getItem('designer_notes') || '';
+            document.getElementById('designer-notes').value = notes;
+            updateCharCount();
         }
 
         // إعادة تعيين canvas بدون حفظ
@@ -944,6 +989,13 @@
                 // استعادة قيم الحقول
                 if (template.customW) document.getElementById('custom-width').value = template.customW;
                 if (template.customH) document.getElementById('custom-height').value = template.customH;
+                
+                // استعادة الملاحظات إن وجدت
+                if (template.notes) {
+                    localStorage.setItem('designer_notes', template.notes);
+                } else {
+                    localStorage.removeItem('designer_notes');
+                }
                 
                 // تحديث المسطرة والزوم
                 const w = parseFloat(template.wVal);

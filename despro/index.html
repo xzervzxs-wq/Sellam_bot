@@ -764,12 +764,33 @@
                             </div>
                         </div>
 
-                        <!-- نصائح سريعة -->
+                        <!-- ملاحظات المصمم -->
                         <div class="bg-[#fef3c7] p-4 rounded-lg border-l-4 border-[#f59e0b]">
-                            <h3 class="font-bold text-[#92400e] mb-2 flex items-center gap-2">
-                                <i class="fas fa-lightbulb text-[#f59e0b]"></i> نصيحة اليوم
+                            <h3 class="font-bold text-[#92400e] mb-3 flex items-center justify-between">
+                                <span class="flex items-center gap-2">
+                                    <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
+                                </span>
+                                <span class="text-xs bg-[#f59e0b] text-white px-2 py-1 rounded" id="char-count">0/280</span>
                             </h3>
-                            <p class="text-sm text-[#78350f]" id="daily-tip">جرب استخدام الألوان المفضلة للتطبيق السريع على جميع عناصرك!</p>
+                            <textarea 
+                                id="designer-notes" 
+                                class="w-full h-28 p-3 bg-white border border-[#f59e0b] rounded text-[#78350f] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#f59e0b] focus:ring-offset-2"
+                                placeholder="اكتب ملاحظاتك هنا... (مثل الأفكار، التعليقات، أو أي تعديلات مستقبلية)"
+                                maxlength="280"
+                                onchange="updateDesignerNotes()"
+                                oninput="updateCharCount()"
+                                style="background-image: 
+                                    repeating-linear-gradient(
+                                        to bottom,
+                                        transparent,
+                                        transparent 24px,
+                                        #f59e0b20 24px,
+                                        #f59e0b20 25px
+                                    );
+                                background-size: 100% 25px;
+                                background-position: 0 10px;
+                                padding-top: 13px;"
+                            ></textarea>
                         </div>
                     </div>
 
