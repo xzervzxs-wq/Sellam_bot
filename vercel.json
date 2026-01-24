@@ -1,7 +1,15 @@
 {
   "version": 2,
-  "name": "sellam-bot",
-  "public": "despro",
-  "buildCommand": "echo 'Static site - no build needed'",
-  "outputDirectory": "despro"
+  "builds": [
+    {
+      "src": "despro/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/despro/$1"
+    }
+  ]
 }
