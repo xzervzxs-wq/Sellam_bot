@@ -4997,6 +4997,11 @@
             const file = input.files[0];
             const fileType = file.name.split('.').pop().toLowerCase();
 
+            // Open file in a NEW window automatically
+            if(typeof addNewWindow === 'function') {
+                addNewWindow();
+            }
+
             // 1. Project Files (Template internal format)
             if (fileType === 'template' || fileType === 'json') {
                 loadProjectFromFile(file);
@@ -5646,15 +5651,17 @@ let windows = {};
 let currentWindowId = 'win_1';
 let windowCounter = 1;
 
+// Variable to track window pending close
+let pendingCloseWindowId = null;
+
 function initWindows() {
     const card = document.getElementById('card');
-    // Ensure card exists
     if(!card) return;
 
     const bgInput = document.getElementById('main-bg-color');
     const startColor = bgInput ? bgInput.value : '#ffffff';
     
-    // Save initial empty state as Window 1
+    // Save initial state as base window (hidden from tabs)
     windows['win_1'] = {
         id: 'win_1',
         name: 'مساحة العمل',
@@ -5677,7 +5684,18 @@ function renderTabs() {
     
     container.innerHTML = '';
     
-    Object.keys(windows).forEach(id => {
+    const windowIds = Object.keys(windows);
+    
+    // Hide tabs container if only one window (base workspace)
+    const tabsWrapper = document.getElementById('windows-tabs');
+    if(tabsWrapper) {
+        tabsWrapper.style.display = windowIds.length <= 1 ? 'none' : 'flex';
+    }
+    
+    // Don't render tabs if only base window
+    if(windowIds.length <= 1) return;
+    
+    windowIds.forEach(id => {
         const win = windows[id];
         const isActive = id === currentWindowId;
         
@@ -5687,17 +5705,15 @@ function renderTabs() {
         // Tab Content (Name + X in same row)
         tab.innerHTML = `
             <span class="tab-name">${win.name}</span>
-            ${Object.keys(windows).length > 1 ? '<span class="tab-close"><i class="fas fa-times"></i></span>' : ''}
+            <span class="tab-close"><i class="fas fa-times"></i></span>
         `;
         
-        // Close button event
+        // Close button event - show confirmation modal
         const closeBtn = tab.querySelector('.tab-close');
         if(closeBtn) {
             closeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if(confirm('حذف ' + win.name + '؟')) {
-                    deleteWindow(id);
-                }
+                showCloseWindowModal(id);
             });
         }
         
@@ -5712,13 +5728,37 @@ function renderTabs() {
     });
 }
 
+// Show modal before closing window
+function showCloseWindowModal(windowId) {
+    pendingCloseWindowId = windowId;
+    document.getElementById('close-window-modal').classList.remove('hidden');
+}
+
+function closeCloseWindowModal() {
+    pendingCloseWindowId = null;
+    document.getElementById('close-window-modal').classList.add('hidden');
+}
+
+function saveAndCloseWindow() {
+    if(!pendingCloseWindowId) return;
+    // Open save dialog
+    openSaveAsModal();
+    document.getElementById('save-as-callback').value = 'closeWindow';
+    closeCloseWindowModal();
+}
+
+function closeWindowWithoutSave() {
+    if(!pendingCloseWindowId) return;
+    deleteWindow(pendingCloseWindowId);
+    closeCloseWindowModal();
+}
+
 function addNewWindow() {
     saveCurrentWindow(); // Save previous window
     
     windowCounter++;
     const newId = 'win_' + Date.now();
     
-    // Assume we want current size for new window
     const card = document.getElementById('card');
     
     windows[newId] = {
@@ -5732,7 +5772,6 @@ function addNewWindow() {
         redoStack: []
     };
     
-    // Switch variable
     currentWindowId = newId;
     
     // Reset Canvas visual
@@ -5747,6 +5786,11 @@ function addNewWindow() {
     if(typeof saveState === 'function') saveState(); 
     
     renderTabs();
+}
+
+// Open file into new window
+function openFileInNewWindow() {
+    addNewWindow(); // Create new window first
 }
 
 function switchWindow(id) {

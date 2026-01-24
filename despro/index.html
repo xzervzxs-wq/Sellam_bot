@@ -292,6 +292,35 @@
         </div>
     </div>
 
+    <!-- مودال إغلاق النافذة - نفس تصميم نافذة المشروع الجديد -->
+    <div id="close-window-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onclick="if(event.target.id === 'close-window-modal') closeCloseWindowModal()">
+        <div class="bg-white rounded-2xl p-5 shadow-lg max-w-sm w-full mx-4" onclick="event.stopPropagation()">
+            <!-- الرأس البسيط -->
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold text-[#1e293b]">هل تريد حفظ العمل؟</h2>
+                <p class="text-xs text-[#94a3b8] mt-1">سيتم إغلاق مساحة العمل هذه</p>
+            </div>
+            
+            <!-- الأزرار الثلاث بجانب بعض -->
+            <div class="flex gap-2 justify-center">
+                <button onclick="saveAndCloseWindow()" class="flex-1 bg-[#ec4899] text-white px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#db2777] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-save group-hover:scale-110 transition-transform"></i>
+                    <span>حفظ العمل</span>
+                </button>
+                
+                <button onclick="closeWindowWithoutSave()" class="flex-1 bg-white border border-[#ef4444] text-[#ef4444] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#fef2f2] hover:border-[#dc2626] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-trash-alt group-hover:scale-110 transition-transform"></i>
+                    <span>عدم الحفظ</span>
+                </button>
+                
+                <button onclick="closeCloseWindowModal()" class="flex-1 bg-white border border-[#cbd5e1] text-[#64748b] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#f8fafc] hover:border-[#94a3b8] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-times group-hover:scale-110 transition-transform"></i>
+                    <span>إلغاء</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- مودال حفظ باسم - ناعم وخفيف مع لون وردي -->
     <div id="save-as-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onclick="if(event.target.id === 'save-as-modal') closeSaveAsModal()">
         <div class="bg-white rounded-2xl p-5 shadow-lg max-w-sm w-full mx-4" onclick="event.stopPropagation()">
