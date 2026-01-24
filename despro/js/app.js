@@ -229,6 +229,9 @@
             
             // تحميل مكتبة العناصر مباشرة مع بداية الصفحة
             loadAssetsLibraryFromGitHub();
+
+            // تهيئة نظام النوافذ
+            initWindows();
             
             // حفظ الحالة الأولية (فارغة) لتمكين التراجع
             saveState();
@@ -5634,146 +5637,190 @@
         }
         // ==========================================
 
-        // ==========================================
-        //  نظام نوافذ العمل المتعددة (Multi-Windows)
-        // ==========================================
-        let windows = {
-            1: { content: '', undoStack: [], redoStack: [] }
-        };
-        let activeWindowId = 1;
-        let windowCounter = 1;
-
-        function saveCurrentWindow() {
-            // حفظ محتوى النافذة الحالية
-            const card = document.getElementById('card');
-            windows[activeWindowId].content = card.innerHTML;
-            windows[activeWindowId].undoStack = [...undoStack];
-            windows[activeWindowId].redoStack = [...redoStack];
-        }
-
-        function loadWindow(windowId) {
-            // تحميل محتوى النافذة المختارة
-            const card = document.getElementById('card');
-            card.innerHTML = windows[windowId].content || '<div id="card-gradient"></div>';
-            undoStack = [...(windows[windowId].undoStack || [])];
-            redoStack = [...(windows[windowId].redoStack || [])];
-            
-            // إعادة تفعيل أحداث العناصر القابلة للسحب
-            setTimeout(() => {
-                document.querySelectorAll('.draggable').forEach(el => {
-                    // العناصر تحتفظ بوظائفها تلقائياً من خلال الـ attributes
-                    if (!el.hasAttribute('data-initialized')) {
-                        el.setAttribute('data-initialized', 'true');
-                    }
-                });
-            }, 100);
-        }
-
-        function switchWindow(windowId) {
-            if (activeWindowId === windowId) return;
-            
-            // حفظ النافذة الحالية
-            saveCurrentWindow();
-            
-            // تغيير النافذة النشطة
-            activeWindowId = windowId;
-            
-            // تحديث الأزرار
-            document.querySelectorAll('.window-tab').forEach(tab => {
-                tab.classList.remove('active-tab');
-            });
-            document.getElementById('window-tab-' + windowId).classList.add('active-tab');
-            
-            // تحميل النافذة الجديدة
-            loadWindow(windowId);
-        }
-
-        function addNewWindow() {
-            // حفظ النافذة الحالية
-            saveCurrentWindow();
-            
-            windowCounter++;
-            const newWindowId = windowCounter;
-            
-            // إنشاء نافذة جديدة
-            windows[newWindowId] = { content: '<div id="card-gradient"></div>', undoStack: [], redoStack: [] };
-            
-            // إضافة زر النافذة
-            const tabsContainer = document.getElementById('windows-tabs');
-            const newTab = document.createElement('button');
-            newTab.id = 'window-tab-' + newWindowId;
-            newTab.className = 'window-tab px-3 py-1.5 rounded text-[10px] font-bold transition-all whitespace-nowrap';
-            newTab.innerHTML = `<i class="fas fa-file"></i> نافذة ${newWindowId}`;
-            
-            // ربط حدث التبديل
-            newTab.addEventListener('click', function(e) {
-                // إذا كانت النقرة على زر الحذف، لا تبدّل
-                if (e.target.classList.contains('fa-times') || e.target.closest('.delete-window-btn')) {
-                    return;
-                }
-                switchWindow(newWindowId);
-            });
-            
-            // إضافة زر حذف
-            const closeBtn = document.createElement('span');
-            closeBtn.className = 'delete-window-btn ml-1';
-            closeBtn.innerHTML = '<i class="fas fa-times text-[8px] hover:text-red-500 cursor-pointer"></i>';
-            closeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                deleteWindow(newWindowId);
-            });
-            newTab.appendChild(closeBtn);
-            
-            tabsContainer.appendChild(newTab);
-            
-            // التبديل للنافذة الجديدة
-            switchWindow(newWindowId);
-        }
-
-        function deleteWindow(windowId) {
-            if (Object.keys(windows).length === 1) {
-                alert('لا يمكن حذف النافذة الأخيرة!');
-                return;
-            }
-            
-            delete windows[windowId];
-            document.getElementById('window-tab-' + windowId).remove();
-            
-            // إذا كانت النافذة المحذوفة هي النشطة، انتقل لأول نافذة
-            if (activeWindowId === windowId) {
-                const firstWindowId = parseInt(Object.keys(windows)[0]);
-                switchWindow(firstWindowId);
-            }
-        }
-
-        // حفظ تلقائي قبل التصدير (تعديل آمن)
-        if (typeof saveWorkDirectly !== 'undefined') {
-            const originalSaveWorkDirectly = saveWorkDirectly;
-            window.saveWorkDirectly = function() {
-                saveCurrentWindow();
-                return originalSaveWorkDirectly.call(this);
-            };
-        }
-        
-        // نفس الشيء للدوال الأخرى
-        if (typeof openSaveAsModal !== 'undefined') {
-            const originalOpenSaveAsModal = openSaveAsModal;
-            window.openSaveAsModal = function() {
-                saveCurrentWindow();
-                return originalOpenSaveAsModal.call(this);
-            };
-        }
-        
-        if (typeof generateA4Sheet !== 'undefined') {
-            const originalGenerateA4Sheet = generateA4Sheet;
-            window.generateA4Sheet = function() {
-                saveCurrentWindow();
-                return originalGenerateA4Sheet.call(this);
-            };
-        }
-        // ==========================================
-
         // استدعاء عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(restrictFonts, 500);
         });
+/* === Window Management System === */
+let windows = {};
+let currentWindowId = 'win_1';
+let windowCounter = 1;
+
+function initWindows() {
+    const card = document.getElementById('card');
+    // Ensure card exists
+    if(!card) return;
+
+    const bgInput = document.getElementById('main-bg-color');
+    const startColor = bgInput ? bgInput.value : '#ffffff';
+    
+    // Save initial empty state as Window 1
+    windows['win_1'] = {
+        id: 'win_1',
+        name: 'نافذة 1',
+        html: card.innerHTML,
+        width: card.style.width,
+        height: card.style.height,
+        bgColor: startColor,
+        undoStack: (typeof undoStack !== 'undefined') ? [...undoStack] : [],
+        redoStack: (typeof redoStack !== 'undefined') ? [...redoStack] : []
+    };
+    
+    currentWindowId = 'win_1';
+    renderTabs();
+}
+
+
+function renderTabs() {
+    const container = document.getElementById('tabs-container');
+    if(!container) return;
+    
+    container.innerHTML = '';
+    
+    Object.keys(windows).forEach(id => {
+        const win = windows[id];
+        const isActive = id === currentWindowId;
+        
+        const tab = document.createElement('div');
+        tab.className = 'window-tab ' + (isActive ? 'active-tab' : '');
+        
+        // Name
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = win.name;
+        tab.appendChild(nameSpan);
+        
+        // Delete button
+        if (Object.keys(windows).length > 1) {
+           const closeBtn = document.createElement('div');
+           closeBtn.className = 'close-tab';
+           closeBtn.innerHTML = '<i class="fas fa-times text-[10px]"></i>';
+           closeBtn.addEventListener('click', (e) => {
+               e.stopPropagation();
+               if(confirm('حذف ' + win.name + '؟')) {
+                   deleteWindow(id);
+               }
+           });
+           tab.appendChild(closeBtn);
+        }
+        
+        // Switch action
+        tab.addEventListener('click', (e) => {
+            if(!e.target.closest('.close-tab')) {
+                switchWindow(id);
+            }
+        });
+        
+        container.appendChild(tab);
+    });
+}
+
+function addNewWindow() {
+    saveCurrentWindow(); // Save previous window
+    
+    windowCounter++;
+    const newId = 'win_' + Date.now();
+    
+    // Assume we want current size for new window
+    const card = document.getElementById('card');
+    
+    windows[newId] = {
+        id: newId,
+        name: 'نافذة ' + windowCounter,
+        html: '<div id="card-gradient" style="display:none;"></div>',
+        width: card.style.width,
+        height: card.style.height,
+        bgColor: '#ffffff',
+        undoStack: [],
+        redoStack: []
+    };
+    
+    // Switch variable
+    currentWindowId = newId;
+    
+    // Reset Canvas visual
+    card.innerHTML = '<div id="card-gradient" style="display:none;"></div>';
+    card.style.backgroundColor = '#ffffff';
+    if(document.getElementById('main-bg-color')) document.getElementById('main-bg-color').value = '#ffffff';
+    if(document.getElementById('bg-color-preview')) document.getElementById('bg-color-preview').style.backgroundColor = '#ffffff';
+    
+    // Reset history
+    undoStack = [];
+    redoStack = [];
+    if(typeof saveState === 'function') saveState(); 
+    
+    renderTabs();
+}
+
+function switchWindow(id) {
+    if(id === currentWindowId) return;
+    
+    saveCurrentWindow(); // Persist current state before switching
+    
+    currentWindowId = id;
+    const targetWin = windows[id];
+    
+    // Restore Canvas
+    const card = document.getElementById('card');
+    card.style.width = targetWin.width;
+    card.style.height = targetWin.height;
+    card.innerHTML = targetWin.html;
+    card.style.backgroundColor = targetWin.bgColor;
+    
+    // Restore history
+    undoStack = [...targetWin.undoStack];
+    redoStack = [...targetWin.redoStack];
+    
+    // Update inputs
+    if(document.getElementById('main-bg-color')) document.getElementById('main-bg-color').value = targetWin.bgColor;
+    if(document.getElementById('bg-color-preview')) document.getElementById('bg-color-preview').style.backgroundColor = targetWin.bgColor;
+
+    // IMPORTANT: Re-bind events to elements
+    const layers = card.querySelectorAll('.text-layer, .frame-layer, .image-layer');
+    layers.forEach(el => {
+        el.removeAttribute('data-events-bound');
+        if(typeof setupInteract === 'function') {
+            setupInteract(el);
+        }
+    });
+
+    // Handle gradient element if exists
+    const grad = document.getElementById('card-gradient');
+    if(grad) { 
+        window.hasGradient = (grad.style.display !== 'none');
+    }
+    
+    renderTabs();
+}
+
+function saveCurrentWindow() {
+    if(!windows[currentWindowId]) return;
+    const card = document.getElementById('card');
+    
+    windows[currentWindowId].html = card.innerHTML;
+    windows[currentWindowId].width = card.style.width;
+    windows[currentWindowId].height = card.style.height;
+    windows[currentWindowId].bgColor = card.style.backgroundColor;
+    windows[currentWindowId].undoStack = [...undoStack];
+    windows[currentWindowId].redoStack = [...redoStack];
+}
+
+function deleteWindow(id) {
+    // Logic: Switch to another window, then delete
+    if(currentWindowId === id) {
+        const ids = Object.keys(windows);
+        const idx = ids.indexOf(id);
+        const nextId = ids[idx - 1] || ids[idx + 1];
+        if(nextId) {
+            switchWindow(nextId);
+        }
+    }
+    
+    delete windows[id];
+    
+    // If no windows left (shouldn't happen with UI logic but safe guard)
+    if(Object.keys(windows).length === 0) {
+        addNewWindow();
+    } else {
+        renderTabs();
+    }
+}
