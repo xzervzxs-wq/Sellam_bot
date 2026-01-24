@@ -1465,8 +1465,8 @@
             const startPosX = -diagonalLength / 2;
             const startPosY = -diagonalLength / 2;
             
-            for (let x = startPosX; x < diagonalLength; x += 600) {
-                for (let y = startPosY; y < diagonalLength; y += 400) {
+            for (let x = startPosX; x < diagonalLength; x += 1000) {
+                for (let y = startPosY; y < diagonalLength; y += 800) {
                     ctx.fillText('despro.net', x, y);
                 }
             }
