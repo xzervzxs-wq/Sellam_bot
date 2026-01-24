@@ -5325,14 +5325,21 @@
             const fontSelects = document.querySelectorAll('select[id*="font"]');
             fontSelects.forEach(select => {
                 Array.from(select.options).forEach((option, index) => {
-                    // اترك أول 10 خيارات مفتوحة
-                    if (index >= ITEMS_PER_CATEGORY_FREE && option.value && option.value !== '') {
-                        option.disabled = true;
-                        if (!option.textContent.includes('PREMIUM')) {
-                            option.textContent = '[PREMIUM] - ' + option.textContent;
-                        }
-                    }
+                    // تفعيل جميع الخطوط الموجودة
+                    option.disabled = false;
                 });
+                
+                // تعطيل فقط "إضافة خط مخصص" إذا كان موجوداً
+                const customFontOption = Array.from(select.options).find(opt => 
+                    opt.textContent.includes('إضافة خط مخصص') || 
+                    opt.textContent.includes('Add Custom Font')
+                );
+                if (customFontOption) {
+                    customFontOption.disabled = true;
+                    if (!customFontOption.textContent.includes('[PREMIUM]')) {
+                        customFontOption.textContent = '[PREMIUM] - ' + customFontOption.textContent;
+                    }
+                }
             });
             // تهيئة الـ custom dropdown
             if (document.readyState === 'loading') {
