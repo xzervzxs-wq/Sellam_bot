@@ -1083,102 +1083,189 @@
     scrollbar-width: none;
 }
 
-/* Workspace Tabs Styling - Button Style with Clear Active State */
+/* Workspace Tabs Styling - SUPER VISIBLE BUTTON STYLE */
 .workspace-tab {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 16px;
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: bold;
-    color: #64748b;
+    padding: 12px 20px;
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border: 3px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #475569;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     white-space: nowrap;
-    min-width: 85px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 100px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .workspace-tab:hover {
-    background: #f8fafc;
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
     border-color: #6366f1;
-    color: #334155;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #1e293b;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(99, 102, 241, 0.2);
 }
 
 .workspace-tab.active {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border: 2px solid #4f46e5;
+    background: linear-gradient(145deg, #6366f1, #8b5cf6, #ec4899);
+    border: 3px solid #4f46e5;
     color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), 0 0 0 3px rgba(99, 102, 241, 0.1);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 
+        0 12px 24px rgba(99, 102, 241, 0.5),
+        0 8px 16px rgba(139, 92, 246, 0.3),
+        0 0 0 4px rgba(99, 102, 241, 0.2),
+        0 0 0 8px rgba(99, 102, 241, 0.1);
+    animation: glow-pulse 2s infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { box-shadow: 
+        0 12px 24px rgba(99, 102, 241, 0.5),
+        0 8px 16px rgba(139, 92, 246, 0.3),
+        0 0 0 4px rgba(99, 102, 241, 0.2),
+        0 0 0 8px rgba(99, 102, 241, 0.1); }
+    50% { box-shadow: 
+        0 16px 32px rgba(99, 102, 241, 0.7),
+        0 12px 24px rgba(139, 92, 246, 0.5),
+        0 0 0 6px rgba(99, 102, 241, 0.3),
+        0 0 0 12px rgba(99, 102, 241, 0.15); }
 }
 
 .workspace-tab .tab-name {
-    max-width: 70px;
+    max-width: 80px;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: bold;
+    font-weight: 900;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.workspace-tab.active .tab-name {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .workspace-tab .tab-close {
     position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 18px;
-    height: 18px;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    background: #ef4444;
-    border: 2px solid #ffffff;
+    background: linear-gradient(145deg, #ef4444, #dc2626);
+    border: 3px solid #ffffff;
     color: #ffffff;
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .workspace-tab .tab-close:hover {
-    background: #dc2626;
-    transform: scale(1.15);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(145deg, #dc2626, #b91c1c);
+    transform: scale(1.2);
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.6);
 }
 
 .workspace-tab.active .tab-close {
-    background: #ffffff;
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
     color: #ef4444;
     border-color: #ef4444;
 }
 
 .workspace-tab.active .tab-close:hover {
-    background: #fef2f2;
+    background: linear-gradient(145deg, #fef2f2, #fee2e2);
     color: #dc2626;
     border-color: #dc2626;
 }
 
 /* Dark mode support */
 :root.dark-mode .workspace-tab {
-    background: #1e293b;
+    background: linear-gradient(145deg, #1e293b, #334155);
     border-color: #475569;
     color: #94a3b8;
 }
 
 :root.dark-mode .workspace-tab:hover {
-    background: #334155;
+    background: linear-gradient(145deg, #334155, #475569);
     border-color: #6366f1;
     color: #e2e8f0;
 }
 
 :root.dark-mode .workspace-tab.active {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    background: linear-gradient(145deg, #6366f1, #8b5cf6, #ec4899);
     border-color: #4f46e5;
     color: #ffffff;
+}
+
+/* Hide the old double tap info */
+.info-bar {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* New Super Visible Workspace Tabs Container */
+#workspace-tabs {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706) !important;
+    border: 4px dashed #dc2626 !important;
+    border-radius: 16px !important;
+    padding: 15px !important;
+    margin: 10px 0 !important;
+    box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4) !important;
+    animation: attention-bounce 1.5s ease-in-out infinite !important;
+}
+
+@keyframes attention-bounce {
+    0%, 100% { transform: scale(1) translateY(0); }
+    25% { transform: scale(1.02) translateY(-2px); }
+    50% { transform: scale(1.05) translateY(-4px); }
+    75% { transform: scale(1.02) translateY(-2px); }
+}
+
+.tabs-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+
+.workspace-add-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px 20px !important;
+    background: linear-gradient(145deg, #22c55e, #16a34a) !important;
+    border: 3px dashed #15803d !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.4s !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4) !important;
+}
+
+.workspace-add-btn:hover {
+    background: linear-gradient(145deg, #16a34a, #15803d) !important;
+    transform: scale(1.1) translateY(-3px) !important;
+    box-shadow: 0 12px 24px rgba(34, 197, 94, 0.6) !important;
+}
+
+.workspace-add-btn:active {
+    transform: scale(0.95) !important;
 }
