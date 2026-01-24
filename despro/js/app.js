@@ -245,10 +245,8 @@
                 }
             });
 
-            // تحميل الملاحظات المحفوظة عند فتح الصفحة
-            setTimeout(() => {
-                loadDesignerNotes();
-            }, 500);
+            // تحميل الملاحظات المحفوظة عند فتح الصفحة - بدون localStorage
+            // الملاحظات تأتي فقط من فتح قالب محفوظ
         };
 
         // --- إدارة القوالب (Templates) ---
@@ -592,10 +590,7 @@
             const name = prompt('أدخل اسم القالب الجديد:');
             if (!name || name.trim() === '') return;
 
-            // جمع البيانات
-            // تأكد من حفظ أحدث قيمة للملاحظات
-            updateDesignerNotes();
-            
+            // جمع البيانات - الملاحظات تأتي مباشرة من الحقل (بدون localStorage)
             const notesValue = document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : '';
             
             const template = {
@@ -714,16 +709,8 @@
             }
         }
 
-        function updateDesignerNotes() {
-            const notes = document.getElementById('designer-notes').value;
-            localStorage.setItem('designer_notes', notes);
-        }
-
-        function loadDesignerNotes() {
-            const notes = localStorage.getItem('designer_notes') || '';
-            document.getElementById('designer-notes').value = notes;
-            updateCharCount();
-        }
+        // لا نستخدم localStorage - الملاحظات فقط مع JSON (بيانات القالب)
+        // updateCharCount() تُستدعى عند الكتابة فقط
 
         // إعادة تعيين canvas بدون حفظ
         function resetCanvasWithoutSave() {
@@ -969,9 +956,9 @@
             currentLoadedTemplateIndex = null;
 
             // حذف الملاحظات عند إنشاء عمل جديد
-            localStorage.removeItem('designer_notes');
             if(document.getElementById('designer-notes')) {
                 document.getElementById('designer-notes').value = '';
+                updateCharCount();
             }
             
             // إعادة تعيين قائمة القوالب
@@ -1006,10 +993,9 @@
                 if (template.customW) document.getElementById('custom-width').value = template.customW;
                 if (template.customH) document.getElementById('custom-height').value = template.customH;
                 
-                // استعادة الملاحظات من بيانات القالب نفسه (ليس من localStorage)
+                // استعادة الملاحظات من بيانات القالب نفسه فقط (JSON)
                 console.log('📝 تحميل الملاحظات من القالب:', template.notes); // debug
                 if (template.notes) {
-                    localStorage.setItem('designer_notes', template.notes);
                     const notesField = document.getElementById('designer-notes');
                     if(notesField) {
                         notesField.value = template.notes;
@@ -1020,7 +1006,6 @@
                     }
                 } else {
                     console.log('ℹ️ لا توجد ملاحظات محفوظة');
-                    localStorage.removeItem('designer_notes');
                     const notesField = document.getElementById('designer-notes');
                     if(notesField) {
                         notesField.value = '';
