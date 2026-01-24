@@ -130,6 +130,12 @@
             background-color: #0f172a !important;
             border-color: #334155 !important;
         }
+        
+        /* تأكيد إضافي لمربع أبعاد التصميم */
+        :root.dark-mode #dimensions-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
