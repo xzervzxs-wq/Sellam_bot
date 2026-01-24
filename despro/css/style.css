@@ -1002,108 +1002,87 @@
             color: #cbd5e1;
             font-size: 10px;
         }
-/* Window Tabs Styles - Premium Photoshop-Like Design */
-.window-tab {
-    position: relative;
+/* ===== Workspace Tabs - Chrome/Figma Style ===== */
+.workspace-tab {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    height: 36px;
-    padding: 0 20px 0 14px;
-    background: linear-gradient(135deg, #f5f6fa 0%, #e9ecf1 100%);
-    border: 1.5px solid #cbd5e1;
-    border-radius: 6px;
+    gap: 8px;
+    height: 32px;
+    padding: 0 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
-    color: #475569;
+    color: #64748b;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     user-select: none;
     white-space: nowrap;
-    min-width: 110px;
-    margin-right: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
-.window-tab:hover {
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-    color: #1e293b;
-    border-color: #94a3b8;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
-    transform: translateY(-1px);
+.workspace-tab:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #334155;
 }
 
-.window-tab.active-tab {
-    background: linear-gradient(135deg, #6366f1 0%, #5558e3 100%);
+.workspace-tab.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-color: transparent;
     color: #ffffff;
-    border-color: #4f46e5;
-    z-index: 10;
-    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
 }
 
-.window-tab.active-tab:hover {
-    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+.workspace-tab .tab-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.window-tab .close-tab {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 18px;
-    height: 18px;
+.workspace-tab .tab-close {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
-    opacity: 0.5;
-    transition: all 0.2s ease;
-    font-size: 11px;
-    color: inherit;
-    background: transparent;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #94a3b8;
+    transition: all 0.15s ease;
 }
 
-.window-tab .close-tab:hover {
-    background: rgba(0, 0, 0, 0.15);
-    opacity: 1;
+.workspace-tab .tab-close:hover {
+    background: rgba(239, 68, 68, 0.15);
     color: #ef4444;
 }
 
-.window-tab.active-tab .close-tab {
-    color: rgba(255, 255, 255, 0.7);
-    opacity: 0.7;
+.workspace-tab.active .tab-close {
+    color: rgba(255,255,255,0.7);
 }
 
-.window-tab.active-tab .close-tab:hover {
-    background: rgba(255, 255, 255, 0.25);
+.workspace-tab.active .tab-close:hover {
+    background: rgba(255,255,255,0.2);
     color: #ffffff;
-    opacity: 1;
 }
 
-/* Dark Mode Overrides for Tabs */
-:root.dark-mode .window-tab {
-    background: linear-gradient(135deg, #2d3748 0%, #1e2d3d 100%);
-    border-color: #475569;
-    color: #cbd5e1;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+/* Dark Mode */
+:root.dark-mode .workspace-tab {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
 }
 
-:root.dark-mode .window-tab:hover {
-    background: linear-gradient(135deg, #3d4a5c 0%, #2d3e4e 100%);
+:root.dark-mode .workspace-tab:hover {
+    background: #334155;
     color: #e2e8f0;
-    border-color: #64748b;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-:root.dark-mode .window-tab.active-tab {
-    background: linear-gradient(135deg, #6366f1 0%, #5558e3 100%);
+:root.dark-mode .workspace-tab.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-color: transparent;
     color: #ffffff;
-    border-color: #6366f1;
-    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-:root.dark-mode .window-tab.active-tab:hover {
-    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Hide Scrollbar */

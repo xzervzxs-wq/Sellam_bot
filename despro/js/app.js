@@ -5682,30 +5682,28 @@ function renderTabs() {
         const isActive = id === currentWindowId;
         
         const tab = document.createElement('div');
-        tab.className = 'window-tab ' + (isActive ? 'active-tab' : '');
+        tab.className = 'workspace-tab' + (isActive ? ' active' : '');
         
-        // Name
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = win.name;
-        tab.appendChild(nameSpan);
+        // Tab Content (Name + X in same row)
+        tab.innerHTML = `
+            <span class="tab-name">${win.name}</span>
+            ${Object.keys(windows).length > 1 ? '<span class="tab-close"><i class="fas fa-times"></i></span>' : ''}
+        `;
         
-        // Delete button
-        if (Object.keys(windows).length > 1) {
-           const closeBtn = document.createElement('div');
-           closeBtn.className = 'close-tab';
-           closeBtn.innerHTML = '<i class="fas fa-times text-[10px]"></i>';
-           closeBtn.addEventListener('click', (e) => {
-               e.stopPropagation();
-               if(confirm('حذف ' + win.name + '؟')) {
-                   deleteWindow(id);
-               }
-           });
-           tab.appendChild(closeBtn);
+        // Close button event
+        const closeBtn = tab.querySelector('.tab-close');
+        if(closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if(confirm('حذف ' + win.name + '؟')) {
+                    deleteWindow(id);
+                }
+            });
         }
         
         // Switch action
         tab.addEventListener('click', (e) => {
-            if(!e.target.closest('.close-tab')) {
+            if(!e.target.closest('.tab-close')) {
                 switchWindow(id);
             }
         });
