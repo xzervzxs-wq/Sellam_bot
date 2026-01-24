@@ -3383,7 +3383,6 @@
             document.getElementById('text-controls').classList.add('hidden');
             document.getElementById('frame-controls').classList.add('hidden');
             document.getElementById('frame-controls-toolbar').classList.add('hidden');
-            document.getElementById('colorable-controls-toolbar').classList.add('hidden');
             document.getElementById('gradient-toggle-row').classList.add('hidden'); // إخفاء زر التدرج مبدئياً
             
             document.getElementById('top-font-controls').classList.add('hidden');
@@ -3393,8 +3392,6 @@
 
             // التحقق من العناصر القابلة للتلوين - جميع الصور ما عدا colorable = false
             if(el.classList.contains('image-layer') && el.getAttribute('data-colorable') !== 'false') {
-                document.getElementById('colorable-controls-toolbar').classList.remove('hidden');
-                document.getElementById('colorable-controls-toolbar').classList.add('flex');
                 
                 // إظهار زر التدرج للصور أيضاً
                 document.getElementById('gradient-toggle-row').classList.remove('hidden');
@@ -3403,7 +3400,8 @@
                 // تحديث لون الـ input من لون الخلفية الحالي
                 const currentBg = el.style.backgroundColor;
                 if(currentBg && currentBg !== 'transparent') {
-                    document.getElementById('colorable-color').value = rgbToHex(currentBg);
+                    // if element exists
+                    if(document.getElementById('colorable-color')) document.getElementById('colorable-color').value = rgbToHex(currentBg);
                 }
             }
 
@@ -3685,7 +3683,7 @@
             document.getElementById('text-controls').classList.add('hidden');
             document.getElementById('frame-controls').classList.add('hidden');
             document.getElementById('frame-controls-toolbar').classList.add('hidden');
-            document.getElementById('colorable-controls-toolbar').classList.add('hidden');
+            // document.getElementById('colorable-controls-toolbar').classList.add('hidden');
             document.getElementById('gradient-toggle-row').classList.add('hidden');
             
             document.getElementById('top-font-controls').classList.add('hidden');
@@ -3745,7 +3743,7 @@
             document.getElementById('text-controls').classList.add('hidden');
             document.getElementById('frame-controls').classList.add('hidden');
             document.getElementById('frame-controls-toolbar').classList.add('hidden');
-            document.getElementById('colorable-controls-toolbar').classList.add('hidden');
+            // document.getElementById('colorable-controls-toolbar').classList.add('hidden');
             document.getElementById('gradient-toggle-row').classList.add('hidden');
             
             document.getElementById('top-font-controls').classList.add('hidden');

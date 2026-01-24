@@ -622,19 +622,6 @@
                         <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
                         <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
                     </div>
-
-                    <!-- إعدادات العناصر القابلة للتلوين (نقلت هنا) -->
-                    <div id="colorable-controls-toolbar" class="hidden flex items-center gap-2 border-r border-[#e2e8f0] pr-2 mr-2">
-                        <i class="fas fa-palette text-[#6366f1] text-xs"></i>
-                        <span class="text-[9px] font-bold text-[#475569]">لون العنصر:</span>
-                        <input type="color" id="colorable-color" value="#6366f1" oninput="updateColorableColor(this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#94a3b8]">
-                        <div class="w-px h-4 bg-[#94a3b8] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#475569]">تدرج:</span>
-                        <input type="color" id="colorable-grad-start" value="#6366f1" oninput="updateColorableGradient()" class="w-5 h-5 rounded cursor-pointer border border-[#94a3b8]" title="بداية التدرج">
-                        <input type="color" id="colorable-grad-end" value="#ec4899" oninput="updateColorableGradient()" class="w-5 h-5 rounded cursor-pointer border border-[#94a3b8]" title="نهاية التدرج">
-                        <button onclick="applyColorableGradient()" class="px-2 py-0.5 bg-[#6366f1] text-white rounded text-[9px] font-bold hover:bg-[#4f46e5] transition">تطبيق</button>
-                        <button onclick="resetColorableColor()" class="px-2 py-0.5 bg-white text-[#475569] border border-[#94a3b8] rounded text-[9px] font-bold hover:bg-[#f1f5f9] transition">إعادة</button>
-                    </div>
                 </div>
 
                 <!-- إعدادات التدرج -->
