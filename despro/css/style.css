@@ -81,6 +81,83 @@
             color: #e8e8e8;
         }
 
+        /* إصلاحات خاصة للعناصر التي ذكرها المستخدم */
+
+        /* 1. مفضلة الألوان */
+        :root.dark-mode #fav-colors-row {
+            background-color: #0f172a !important;
+            border-color: #2d3e50 !important;
+        }
+        :root.dark-mode #fav-colors-row span {
+            color: #e8e8e8 !important;
+        }
+
+        /* 2. أزرار الأدوات العلوية (الممحاة، القص، اليد، التدرج، إلخ) */
+        :root.dark-mode #btn-grad,
+        :root.dark-mode #btn-eraser,
+        :root.dark-mode #btn-lasso,
+        :root.dark-mode #btn-crop,
+        :root.dark-mode #btn-hand,
+        :root.dark-mode #btn-transparent {
+            background-color: #16213e !important;
+            color: #e8e8e8 !important;
+            border-color: #2d3e50 !important;
+        }
+        :root.dark-mode #btn-grad:hover,
+        :root.dark-mode #btn-eraser:hover,
+        :root.dark-mode #btn-lasso:hover,
+        :root.dark-mode #btn-crop:hover,
+        :root.dark-mode #btn-hand:hover,
+        :root.dark-mode #btn-transparent:hover {
+            background-color: #6366f1 !important;
+            color: white !important;
+        }
+
+        /* 3. حاوية أدوات الخلفية */
+        :root.dark-mode .flex.items-center.gap-2.px-2.py-1.bg-\[#f8fafc\] {
+            background-color: #0f172a !important;
+            border-color: #2d3e50 !important;
+        }
+        :root.dark-mode .w-px.h-5.bg-\[#e2e8f0\],
+        :root.dark-mode .w-px.h-4.bg-\[#cbd5e1\] {
+            background-color: #2d3e50 !important;
+        }
+        
+        /* 4. ليبل لون الخلفية */
+        :root.dark-mode label.text-\[#1e293b\] {
+            color: #e8e8e8 !important;
+        }
+
+        /* 5. شريط الأدوات العلوي كاملاً */
+        :root.dark-mode .flex.flex-wrap.items-center.bg-white {
+            background-color: #1a1a2e !important;
+            border-color: #2d3e50 !important;
+        }
+
+        /* 6. قسم مقاسات العمل */
+        :root.dark-mode .bg-\[#f8fafc\].p-3.rounded-xl {
+            background-color: #1a1a2e !important;
+            border-color: #2d3e50 !important;
+        }
+        :root.dark-mode #zoom-display,
+        :root.dark-mode #size-display {
+            background-color: #0f172a !important;
+            border-color: #2d3e50 !important;
+            color: #e8e8e8 !important;
+        }
+        :root.dark-mode button[onclick^="setCustomZoom"] {
+            background-color: #16213e !important;
+            border-color: #2d3e50 !important;
+            color: #e8e8e8 !important;
+        }
+
+        /* 7. لوحة التحكم الجانبية */
+        :root.dark-mode #style-panel {
+            background-color: #1a1a2e !important;
+            border-color: #2d3e50 !important;
+        }
+        
+
         /* اعكس جميع الألوان في الوضع الليلي */
         :root.dark-mode .text-white {
             color: #1a1a2e;
