@@ -1460,13 +1460,13 @@
             ctx.textBaseline = 'middle';
             ctx.rotate(-Math.PI / 4); // دوران 45 درجة
             
-            // رسم النص على كامل الصفحة
+            // رسم النص على كامل الصفحة بمسافات أكبر (بدون تداخل)
             const diagonalLength = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
             const startPosX = -diagonalLength / 2;
             const startPosY = -diagonalLength / 2;
             
-            for (let x = startPosX; x < diagonalLength; x += 300) {
-                for (let y = startPosY; y < diagonalLength; y += 200) {
+            for (let x = startPosX; x < diagonalLength; x += 600) {
+                for (let y = startPosY; y < diagonalLength; y += 400) {
                     ctx.fillText('despro.net', x, y);
                 }
             }
