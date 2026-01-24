@@ -719,7 +719,7 @@
 
             <!-- نافذة لوحة المصمم (Collapsible Designer Panel) -->
             <div id="designer-panel" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
-                <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 max-h-[70vh] overflow-y-auto" onclick="event.stopPropagation()">
                     <!-- رأس النافذة -->
                     <div class="sticky top-0 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white p-4 rounded-t-2xl flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -732,50 +732,19 @@
                     </div>
 
                     <!-- محتوى النافذة -->
-                    <div class="p-6 space-y-4">
-                        <!-- تعليمات استخدام -->
-                        <div class="bg-[#f1f5f9] p-4 rounded-lg border-l-4 border-[#6366f1]">
-                            <h3 class="font-bold text-[#1e293b] mb-2 flex items-center gap-2">
-                                <i class="fas fa-book text-[#6366f1]"></i> تعليمات التصميم
-                            </h3>
-                            <ul class="text-sm text-[#475569] space-y-2 ml-6">
-                                <li>✓ اضغط مرتين على أي عنصر لقفل/فتح تعديله</li>
-                                <li>✓ استخدم السحب لتحريك العناصر</li>
-                                <li>✓ استخدم الزوايا لتغيير الحجم</li>
-                                <li>✓ استخدم الألوان المفضلة للتطبيق السريع</li>
-                                <li>✓ حفظ العمل كقالب لاستخدامه لاحقاً</li>
-                            </ul>
-                        </div>
-
-                        <!-- إحصائيات التصميم الحالي -->
-                        <div class="bg-[#f8fafc] p-4 rounded-lg border border-[#e2e8f0]">
-                            <h3 class="font-bold text-[#1e293b] mb-3 flex items-center gap-2">
-                                <i class="fas fa-chart-pie text-[#6366f1]"></i> إحصائيات التصميم
-                            </h3>
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <span class="text-[#64748b]">عدد العناصر:</span>
-                                    <p class="font-bold text-[#1e293b] text-lg" id="element-count">0</p>
-                                </div>
-                                <div>
-                                    <span class="text-[#64748b]">مقاس المربع:</span>
-                                    <p class="font-bold text-[#1e293b] text-lg" id="canvas-size">-</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ملاحظات المصمم -->
-                        <div class="bg-[#fef3c7] p-4 rounded-lg border-l-4 border-[#f59e0b]">
-                            <h3 class="font-bold text-[#92400e] mb-3 flex items-center justify-between">
+                    <div class="p-4 space-y-3">
+                        <!-- ملاحظات المصمم (أول شي) -->
+                        <div class="bg-[#fef3c7] p-3 rounded-lg border-l-4 border-[#f59e0b]">
+                            <h3 class="font-bold text-[#92400e] mb-2 flex items-center justify-between text-sm">
                                 <span class="flex items-center gap-2">
                                     <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
                                 </span>
-                                <span class="text-xs bg-[#f59e0b] text-white px-2 py-1 rounded" id="char-count">0/280</span>
+                                <span class="text-xs bg-[#f59e0b] text-white px-2 py-0.5 rounded" id="char-count">0/280</span>
                             </h3>
                             <textarea 
                                 id="designer-notes" 
-                                class="w-full h-28 p-3 bg-white border border-[#f59e0b] rounded text-[#78350f] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#f59e0b] focus:ring-offset-2"
-                                placeholder="اكتب ملاحظاتك هنا... (مثل الأفكار، التعليقات، أو أي تعديلات مستقبلية)"
+                                class="w-full h-20 p-2 bg-white border border-[#f59e0b] rounded text-[#78350f] text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#f59e0b] focus:ring-offset-2"
+                                placeholder="اكتب ملاحظاتك هنا..."
                                 maxlength="280"
                                 onchange="updateDesignerNotes()"
                                 oninput="updateCharCount()"
@@ -783,23 +752,37 @@
                                     repeating-linear-gradient(
                                         to bottom,
                                         transparent,
-                                        transparent 24px,
-                                        #f59e0b20 24px,
-                                        #f59e0b20 25px
+                                        transparent 18px,
+                                        #f59e0b20 18px,
+                                        #f59e0b20 19px
                                     );
-                                background-size: 100% 25px;
-                                background-position: 0 10px;
-                                padding-top: 13px;"
+                                background-size: 100% 19px;
+                                background-position: 0 8px;
+                                padding-top: 10px;"
                             ></textarea>
+                        </div>
+
+                        <!-- إحصائيات التصميم الحالي (مصغرة) -->
+                        <div class="bg-[#f8fafc] p-3 rounded-lg border border-[#e2e8f0]">
+                            <h3 class="font-bold text-[#1e293b] mb-2 flex items-center gap-2 text-sm">
+                                <i class="fas fa-chart-pie text-[#6366f1]"></i> الإحصائيات
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3 text-xs">
+                                <div>
+                                    <span class="text-[#64748b]">العناصر:</span>
+                                    <p class="font-bold text-[#1e293b]" id="element-count">0</p>
+                                </div>
+                                <div>
+                                    <span class="text-[#64748b]">المقاس:</span>
+                                    <p class="font-bold text-[#1e293b]" id="canvas-size">-</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- تذييل النافذة -->
-                    <div class="bg-[#f8fafc] p-4 rounded-b-2xl border-t border-[#e2e8f0] flex gap-3">
-                        <button onclick="closeDesignerPanel()" class="flex-1 bg-[#6366f1] text-white px-4 py-2.5 rounded-lg font-bold hover:bg-[#4f46e5] transition flex items-center justify-center gap-2">
-                            <i class="fas fa-arrow-left"></i> تصغير
-                        </button>
-                        <button onclick="closeDesignerPanel()" class="flex-1 bg-white border border-[#e2e8f0] text-[#1e293b] px-4 py-2.5 rounded-lg font-bold hover:bg-[#f1f5f9] transition">
+                    <div class="bg-[#f8fafc] p-3 rounded-b-2xl border-t border-[#e2e8f0]">
+                        <button onclick="closeDesignerPanel()" class="w-full bg-[#6366f1] text-white px-4 py-2 rounded-lg font-bold hover:bg-[#4f46e5] transition text-sm">
                             إغلاق
                         </button>
                     </div>
