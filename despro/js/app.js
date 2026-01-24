@@ -5634,6 +5634,112 @@
         }
         // ==========================================
 
+        // ==========================================
+        //  نظام نوافذ العمل المتعددة (Multi-Windows)
+        // ==========================================
+        let windows = {
+            1: { content: '', undoStack: [], redoStack: [] }
+        };
+        let activeWindowId = 1;
+        let windowCounter = 1;
+
+        function saveCurrentWindow() {
+            // حفظ محتوى النافذة الحالية
+            const card = document.getElementById('card');
+            windows[activeWindowId].content = card.innerHTML;
+            windows[activeWindowId].undoStack = [...undoStack];
+            windows[activeWindowId].redoStack = [...redoStack];
+        }
+
+        function loadWindow(windowId) {
+            // تحميل محتوى النافذة المختارة
+            const card = document.getElementById('card');
+            card.innerHTML = windows[windowId].content || '<div id="card-gradient"></div>';
+            undoStack = [...(windows[windowId].undoStack || [])];
+            redoStack = [...(windows[windowId].redoStack || [])];
+            
+            // إعادة تطبيق وظائف السحب والإفلات
+            document.querySelectorAll('.draggable').forEach(el => {
+                makeDraggable(el);
+            });
+        }
+
+        function switchWindow(windowId) {
+            if (activeWindowId === windowId) return;
+            
+            // حفظ النافذة الحالية
+            saveCurrentWindow();
+            
+            // تغيير النافذة النشطة
+            activeWindowId = windowId;
+            
+            // تحديث الأزرار
+            document.querySelectorAll('.window-tab').forEach(tab => {
+                tab.classList.remove('active-tab');
+            });
+            document.getElementById('window-tab-' + windowId).classList.add('active-tab');
+            
+            // تحميل النافذة الجديدة
+            loadWindow(windowId);
+        }
+
+        function addNewWindow() {
+            // حفظ النافذة الحالية
+            saveCurrentWindow();
+            
+            windowCounter++;
+            const newWindowId = windowCounter;
+            
+            // إنشاء نافذة جديدة
+            windows[newWindowId] = { content: '<div id="card-gradient"></div>', undoStack: [], redoStack: [] };
+            
+            // إضافة زر النافذة
+            const tabsContainer = document.getElementById('windows-tabs');
+            const newTab = document.createElement('button');
+            newTab.id = 'window-tab-' + newWindowId;
+            newTab.className = 'window-tab px-3 py-1.5 rounded text-[10px] font-bold transition-all whitespace-nowrap';
+            newTab.innerHTML = `<i class="fas fa-file"></i> نافذة ${newWindowId}`;
+            newTab.onclick = () => switchWindow(newWindowId);
+            
+            // إضافة زر حذف
+            const closeBtn = document.createElement('span');
+            closeBtn.innerHTML = ' <i class="fas fa-times ml-1 text-[8px] hover:text-red-500 cursor-pointer"></i>';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                deleteWindow(newWindowId);
+            };
+            newTab.appendChild(closeBtn);
+            
+            tabsContainer.appendChild(newTab);
+            
+            // التبديل للنافذة الجديدة
+            switchWindow(newWindowId);
+        }
+
+        function deleteWindow(windowId) {
+            if (Object.keys(windows).length === 1) {
+                alert('لا يمكن حذف النافذة الأخيرة!');
+                return;
+            }
+            
+            delete windows[windowId];
+            document.getElementById('window-tab-' + windowId).remove();
+            
+            // إذا كانت النافذة المحذوفة هي النشطة، انتقل لأول نافذة
+            if (activeWindowId === windowId) {
+                const firstWindowId = parseInt(Object.keys(windows)[0]);
+                switchWindow(firstWindowId);
+            }
+        }
+
+        // حفظ تلقائي قبل التصدير
+        const originalSaveWorkDirectly = saveWorkDirectly;
+        saveWorkDirectly = function() {
+            saveCurrentWindow();
+            originalSaveWorkDirectly();
+        };
+        // ==========================================
+
         // استدعاء عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(restrictFonts, 500);

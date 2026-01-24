@@ -712,8 +712,16 @@
                 </div>
             </div>
 
-            <div class="bg-[#f1f5f9] p-2 rounded text-[10px] text-[#1e293b] border border-[#e2e8f0] flex items-center gap-2 font-bold">
-                <i class="fas fa-info-circle text-[#6366f1]"></i> <span>اضغط مرتين (Double Tap) لقفل/فتح العنصر</span>
+            <div class="bg-[#f1f5f9] p-2 rounded border border-[#e2e8f0] flex items-center gap-2">
+                <!-- نظام نوافذ العمل (Tabs) -->
+                <div id="windows-tabs" class="flex items-center gap-2 flex-1 overflow-x-auto">
+                    <button id="window-tab-1" onclick="switchWindow(1)" class="window-tab active-tab px-3 py-1.5 rounded text-[10px] font-bold bg-[#6366f1] text-white border border-[#4f46e5] transition-all whitespace-nowrap">
+                        <i class="fas fa-file"></i> نافذة 1
+                    </button>
+                </div>
+                <button onclick="addNewWindow()" class="px-2 py-1 rounded text-[10px] font-bold bg-white text-[#6366f1] border border-[#6366f1] hover:bg-[#6366f1] hover:text-white transition-all whitespace-nowrap" title="إضافة نافذة جديدة">
+                    <i class="fas fa-plus"></i> نافذة
+                </button>
             </div>
 
             <div class="preview-area" onclick="deselect(event)">
