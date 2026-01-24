@@ -5704,15 +5704,24 @@
             newTab.id = 'window-tab-' + newWindowId;
             newTab.className = 'window-tab px-3 py-1.5 rounded text-[10px] font-bold transition-all whitespace-nowrap';
             newTab.innerHTML = `<i class="fas fa-file"></i> نافذة ${newWindowId}`;
-            newTab.onclick = () => switchWindow(newWindowId);
+            
+            // ربط حدث التبديل
+            newTab.addEventListener('click', function(e) {
+                // إذا كانت النقرة على زر الحذف، لا تبدّل
+                if (e.target.classList.contains('fa-times') || e.target.closest('.delete-window-btn')) {
+                    return;
+                }
+                switchWindow(newWindowId);
+            });
             
             // إضافة زر حذف
             const closeBtn = document.createElement('span');
-            closeBtn.innerHTML = ' <i class="fas fa-times ml-1 text-[8px] hover:text-red-500 cursor-pointer"></i>';
-            closeBtn.onclick = (e) => {
+            closeBtn.className = 'delete-window-btn ml-1';
+            closeBtn.innerHTML = '<i class="fas fa-times text-[8px] hover:text-red-500 cursor-pointer"></i>';
+            closeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 deleteWindow(newWindowId);
-            };
+            });
             newTab.appendChild(closeBtn);
             
             tabsContainer.appendChild(newTab);
