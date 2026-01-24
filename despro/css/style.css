@@ -9,6 +9,75 @@
             --border-color: #cbd5e1;  /* Slate 300 */
         }
 
+        /* ثيم الوضع الليلي */
+        :root.dark-mode {
+            --paper-bg: #1a1a2e;
+            --paper-dark: #16213e;
+            --primary-color: #7c3aed;
+            --primary-hover: #6d28d9;
+            --accent-color: #f472b6;
+            --text-dark: #e8e8e8;
+            --border-color: #2d3e50;
+        }
+
+        :root.dark-mode body {
+            background-color: #0f172a;
+            color: #e8e8e8;
+            background-image: radial-gradient(#2d3e50 1px, transparent 1px);
+        }
+
+        :root.dark-mode #card-wrapper {
+            background-color: #1a1a2e;
+        }
+
+        :root.dark-mode #card {
+            background-color: #16213e;
+            color: #e8e8e8;
+        }
+
+        :root.dark-mode input,
+        :root.dark-mode textarea,
+        :root.dark-mode select {
+            background-color: #0f172a;
+            color: #e8e8e8;
+            border-color: #2d3e50;
+        }
+
+        :root.dark-mode input:focus,
+        :root.dark-mode textarea:focus,
+        :root.dark-mode select:focus {
+            border-color: #7c3aed;
+        }
+
+        :root.dark-mode .bg-white {
+            background-color: #16213e;
+        }
+
+        :root.dark-mode .border-\[#cbd5e1\] {
+            border-color: #2d3e50;
+        }
+
+        :root.dark-mode .text-\[#1e293b\] {
+            color: #e8e8e8;
+        }
+
+        :root.dark-mode .text-\[#64748b\] {
+            color: #a8b5c8;
+        }
+
+        :root.dark-mode .text-\[#94a3b8\] {
+            color: #94a3b8;
+        }
+
+        :root.dark-mode .bg-\[#f8fafc\] {
+            background-color: #0f172a;
+            border-color: #2d3e50;
+        }
+
+        :root.dark-mode .bg-\[#f1f5f9\] {
+            background-color: #1a1a2e;
+        }
+
         /* إعدادات أساسية */
         body { 
             font-family: 'Cairo', sans-serif; 
@@ -504,6 +573,69 @@
             color: #6366f1;
             opacity: 0.7;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* أيقونة تبديل الوضع الليلي والنهاري */
+        .theme-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background-color: white;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: scale(1.1) rotate(20deg);
+        }
+
+        .theme-sun,
+        .theme-moon {
+            position: absolute;
+            font-size: 18px;
+            transition: all 0.4s ease;
+        }
+
+        .theme-sun {
+            transform: rotate(0deg) scale(1);
+            opacity: 1;
+        }
+
+        .theme-moon {
+            transform: rotate(-180deg) scale(0);
+            opacity: 0;
+        }
+
+        :root.dark-mode .theme-sun {
+            transform: rotate(180deg) scale(0);
+            opacity: 0;
+        }
+
+        :root.dark-mode .theme-moon {
+            transform: rotate(0deg) scale(1);
+            opacity: 1;
+        }
+
+        :root.dark-mode .theme-toggle-btn {
+            background-color: #16213e;
+            border-color: #2d3e50;
+            color: #fbbf24;
+        }
+
+        :root.dark-mode .theme-toggle-btn:hover {
+            background-color: #7c3aed;
+            border-color: #7c3aed;
+            color: white;
         }
 
         .locked-item:hover::after {

@@ -6,6 +6,26 @@
         // ==========================================
 
         // ==========================================
+        //  نظام الوضع الليلي والنهاري (Dark Mode)
+        // ==========================================
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDarkMode = html.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        }
+
+        // تطبيق الثيم المحفوظ عند بدء الصفحة
+        initTheme();
+        // ==========================================
+
+        // ==========================================
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
