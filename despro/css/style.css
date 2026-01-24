@@ -865,7 +865,7 @@
         .theme-sun,
         .theme-moon {
             position: absolute;
-            font-size: 18px;
+            font-size: 16px;
             transition: all 0.4s ease;
         }
 
