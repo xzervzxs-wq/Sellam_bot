@@ -1058,7 +1058,7 @@
             img.loading = "eager";
             img.style.width = '100%';
             img.style.height = '100%';
-            img.style.objectFit = 'fill';
+            img.style.objectFit = 'contain';
             img.style.pointerEvents = 'none';
             
             // حفظ الأصل
@@ -2095,7 +2095,7 @@
                     img.loading = "eager";
                     img.style.width = '100%';
                     img.style.height = '100%';
-                    img.style.objectFit = 'fill';
+                    img.style.objectFit = 'contain';
                     img.style.pointerEvents = 'none';
                     img.style.imageRendering = 'high-quality';
                     
@@ -2385,7 +2385,7 @@
             newImg.src = newDataUrl;
             newImg.style.width = '100%';
             newImg.style.height = '100%';
-            newImg.style.objectFit = 'fill';
+            newImg.style.objectFit = 'contain';
             newImg.style.pointerEvents = 'none';
 
             contentWrapper.appendChild(newImg);
