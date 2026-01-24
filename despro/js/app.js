@@ -1428,6 +1428,7 @@
             
             let drawnCount = 0;
             const showCutLines = document.getElementById('show-cut-lines').checked;
+            const cutLinesOpacity = document.getElementById('cut-lines-opacity').value / 100;
             
             // رسم النسخ حسب العدد المطلوب
             outerLoop:
@@ -1440,11 +1441,14 @@
                     
                     ctx.drawImage(cachedCardImage, x, y, currentA4Layout.cardW, currentA4Layout.cardH);
                     
-                    // إطار القص الرمادي - فقط إذا كان الـ checkbox مفعل
+                    // إطار القص الرمادي - فقط إذا كان الـ checkbox مفعل مع الشفافية المتحكم بها
                     if (showCutLines) {
+                        ctx.save();
+                        ctx.globalAlpha = cutLinesOpacity;
                         ctx.strokeStyle = '#94a3b8'; 
                         ctx.lineWidth = 2;
                         ctx.strokeRect(x, y, currentA4Layout.cardW, currentA4Layout.cardH);
+                        ctx.restore();
                     }
                     
                     drawnCount++;

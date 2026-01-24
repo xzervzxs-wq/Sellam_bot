@@ -180,7 +180,7 @@
                      </div>
 
                      <!-- خيارات إضافية -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 space-y-4">
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 space-y-3">
                          <label class="flex items-center justify-between cursor-pointer group select-none">
                              <div class="flex items-center gap-2">
                                  <div class="w-8 h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
@@ -193,6 +193,15 @@
                                 <div class="w-9 h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#6366f1]"></div>
                              </div>
                          </label>
+                         
+                         <!-- Opacity Control for Cut Lines -->
+                         <div class="px-1 pt-2 pb-1">
+                             <div class="flex items-center gap-2">
+                                 <span class="text-[8px] text-slate-400 font-bold whitespace-nowrap">الشفافية:</span>
+                                 <input type="range" id="cut-lines-opacity" min="10" max="100" value="100" onchange="updateA4Count()" oninput="document.getElementById('opacity-value').innerText = this.value + '%'" class="flex-1 h-1.5 accent-[#6366f1] rounded-full" style="cursor: pointer;">
+                                 <span class="text-[8px] text-slate-400 font-bold w-5 text-right" id="opacity-value">100%</span>
+                             </div>
+                         </div>
                      </div>
 
                      <!-- ملاحظة -->
@@ -222,6 +231,10 @@
                      <button onclick="closeA4Modal()" class="mt-3 text-slate-300 hover:text-white text-xs font-bold py-2 px-4 transition text-center hover:bg-slate-700/50 rounded-lg border border-slate-600 hover:border-slate-500">
                          إغلاق النافذة
                      </button>
+                     
+                     <p class="text-center text-[9px] text-slate-500 font-light italic mt-2">
+                         Customized for PREMIUM
+                     </p>
                  </div>
             </div>
             
