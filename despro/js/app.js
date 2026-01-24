@@ -5658,10 +5658,15 @@
             undoStack = [...(windows[windowId].undoStack || [])];
             redoStack = [...(windows[windowId].redoStack || [])];
             
-            // إعادة تطبيق وظائف السحب والإفلات
-            document.querySelectorAll('.draggable').forEach(el => {
-                makeDraggable(el);
-            });
+            // إعادة تفعيل أحداث العناصر القابلة للسحب
+            setTimeout(() => {
+                document.querySelectorAll('.draggable').forEach(el => {
+                    // العناصر تحتفظ بوظائفها تلقائياً من خلال الـ attributes
+                    if (!el.hasAttribute('data-initialized')) {
+                        el.setAttribute('data-initialized', 'true');
+                    }
+                });
+            }, 100);
         }
 
         function switchWindow(windowId) {
@@ -5732,12 +5737,31 @@
             }
         }
 
-        // حفظ تلقائي قبل التصدير
-        const originalSaveWorkDirectly = saveWorkDirectly;
-        saveWorkDirectly = function() {
-            saveCurrentWindow();
-            originalSaveWorkDirectly();
-        };
+        // حفظ تلقائي قبل التصدير (تعديل آمن)
+        if (typeof saveWorkDirectly !== 'undefined') {
+            const originalSaveWorkDirectly = saveWorkDirectly;
+            window.saveWorkDirectly = function() {
+                saveCurrentWindow();
+                return originalSaveWorkDirectly.call(this);
+            };
+        }
+        
+        // نفس الشيء للدوال الأخرى
+        if (typeof openSaveAsModal !== 'undefined') {
+            const originalOpenSaveAsModal = openSaveAsModal;
+            window.openSaveAsModal = function() {
+                saveCurrentWindow();
+                return originalOpenSaveAsModal.call(this);
+            };
+        }
+        
+        if (typeof generateA4Sheet !== 'undefined') {
+            const originalGenerateA4Sheet = generateA4Sheet;
+            window.generateA4Sheet = function() {
+                saveCurrentWindow();
+                return originalGenerateA4Sheet.call(this);
+            };
+        }
         // ==========================================
 
         // استدعاء عند تحميل الصفحة
