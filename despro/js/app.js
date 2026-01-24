@@ -44,12 +44,8 @@
             const isDarkMode = html.classList.toggle('dark-mode');
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
             
-            if (isDarkMode) {
-                setTimeout(applyDarkModeColors, 50);
-            } else {
-                // العودة للألوان الأصلية - إعادة تحميل الصفحة أو استعادة الألوان الأصلية
-                location.reload();
-            }
+            // لا حاجة لإعادة التحميل - CSS يتولى كل شيء!
+            // التبديل يحصل فوراً بدون فقدان البيانات
         }
 
         // تطبيق الثيم المحفوظ عند بدء الصفحة
