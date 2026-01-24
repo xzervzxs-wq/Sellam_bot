@@ -8,17 +8,48 @@
         // ==========================================
         //  نظام الوضع الليلي والنهاري (Dark Mode)
         // ==========================================
+        const DARK_MODE_COLORS = {
+            '#ffffff': '#16213e',
+            '#f8fafc': '#0f172a',
+            '#f1f5f9': '#1a1a2e',
+            '#1e293b': '#e8e8e8',
+            '#64748b': '#a8b5c8',
+            '#94a3b8': '#a8b5c8',
+            'rgb(255, 255, 255)': 'rgb(22, 33, 62)',
+            'rgb(248, 250, 252)': 'rgb(15, 23, 42)',
+            'rgb(30, 41, 59)': 'rgb(232, 232, 232)',
+        };
+
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             if (savedTheme === 'dark') {
                 document.documentElement.classList.add('dark-mode');
+                applyDarkModeColors();
             }
+        }
+
+        function applyDarkModeColors() {
+            const elements = document.querySelectorAll('[style*="color"], [style*="background"]');
+            elements.forEach(el => {
+                let style = el.getAttribute('style') || '';
+                Object.entries(DARK_MODE_COLORS).forEach(([light, dark]) => {
+                    style = style.replace(new RegExp(light, 'gi'), dark);
+                });
+                el.setAttribute('style', style);
+            });
         }
 
         function toggleDarkMode() {
             const html = document.documentElement;
             const isDarkMode = html.classList.toggle('dark-mode');
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            
+            if (isDarkMode) {
+                setTimeout(applyDarkModeColors, 50);
+            } else {
+                // العودة للألوان الأصلية - إعادة تحميل الصفحة أو استعادة الألوان الأصلية
+                location.reload();
+            }
         }
 
         // تطبيق الثيم المحفوظ عند بدء الصفحة
