@@ -5324,18 +5324,50 @@
         function restrictFonts() {
             const fontSelects = document.querySelectorAll('select[id*="font"]');
             fontSelects.forEach(select => {
-                Array.from(select.options).forEach((option, index) => {
-                    // تفعيل جميع الخطوط الموجودة
-                    option.disabled = false;
+                let optionIndex = 0;
+                
+                // معالجة جميع الخيارات من optgroups
+                Array.from(select.querySelectorAll('optgroup')).forEach(group => {
+                    Array.from(group.querySelectorAll('option')).forEach((option) => {
+                        if (optionIndex < ITEMS_PER_CATEGORY_FREE) {
+                            // أول 10 خطوط مفتوحة
+                            option.disabled = false;
+                            option.textContent = option.textContent.replace(' [PREMIUM]', '');
+                        } else {
+                            // آخر 6 خطوط مع [PREMIUM]
+                            option.disabled = true;
+                            if (!option.textContent.includes('[PREMIUM]')) {
+                                option.textContent = option.textContent + ' [PREMIUM]';
+                            }
+                        }
+                        optionIndex++;
+                    });
                 });
                 
-                // تعطيل فقط "إضافة خط مخصص" إذا كان موجوداً
+                // معالجة الخيارات خارج optgroups
+                Array.from(select.querySelectorAll('option:not(optgroup option)')).forEach((option, idx) => {
+                    const index = optionIndex + idx;
+                    if (index < ITEMS_PER_CATEGORY_FREE) {
+                        option.disabled = false;
+                        option.textContent = option.textContent.replace(' [PREMIUM]', '');
+                    } else {
+                        option.disabled = true;
+                        if (!option.textContent.includes('[PREMIUM]')) {
+                            option.textContent = option.textContent + ' [PREMIUM]';
+                        }
+                    }
+                });
+                
+                // تعطيل "إضافة خط مخصص" دائماً
                 const customFontOption = Array.from(select.options).find(opt => 
                     opt.textContent.includes('إضافة خط مخصص') || 
                     opt.textContent.includes('Add Custom Font')
                 );
                 if (customFontOption) {
                     customFontOption.disabled = true;
+                    if (!customFontOption.textContent.includes('[PREMIUM]')) {
+                        customFontOption.textContent = '[PREMIUM] ' + customFontOption.textContent;
+                    }
                 }
             });
         }

@@ -512,11 +512,12 @@
         }
             background: rgba(99, 102, 241, 0.15);
         }
-
         /* تنسيق الخيارات المعطلة في الـ Select */
         select option:disabled {
-            color: #cbd5e1;
+            color: #9ca3af;
             background: #f1f5f9;
+            font-size: 8px;
+            font-weight: bold;
         }
 
         /* animation للبوب أب */
