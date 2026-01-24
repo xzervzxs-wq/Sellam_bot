@@ -229,9 +229,9 @@
             
             // تحميل مكتبة العناصر مباشرة مع بداية الصفحة
             loadAssetsLibraryFromGitHub();
-
-            // تهيئة نظام النوافذ
-            initWindows();
+            
+            // تهيئة نظام نوافذ العمل
+            initWorkspaces();
             
             // حفظ الحالة الأولية (فارغة) لتمكين التراجع
             saveState();
@@ -611,14 +611,19 @@
             loadTemplate(index);
         }
 
-        // دالة لفتح مشروع جديد - تفتح نافذة جديدة مباشرة
+        // دالة لفتح مشروع جديد مع سؤال حفظ القالب
         function createNewProject() {
-            // فتح نافذة عمل جديدة مباشرة
-            if(typeof addNewWindow === 'function') {
-                addNewWindow();
-            } else {
+            const card = document.getElementById('card');
+            const hasElements = card.children.length > 0;
+            
+            if (!hasElements) {
+                // إذا لم يكن هناك عناصر، أنشئ جديد مباشرة
                 resetCanvas();
+                return;
             }
+            
+            // فتح نافذة جديدة جميلة
+            document.getElementById('new-project-modal').classList.remove('hidden');
         }
 
         // إغلاق نافذة المشروع الجديد
@@ -4992,11 +4997,6 @@
             const file = input.files[0];
             const fileType = file.name.split('.').pop().toLowerCase();
 
-            // Open file in a NEW window automatically
-            if(typeof addNewWindow === 'function') {
-                addNewWindow();
-            }
-
             // 1. Project Files (Template internal format)
             if (fileType === 'template' || fileType === 'json') {
                 loadProjectFromFile(file);
@@ -5646,20 +5646,18 @@ let windows = {};
 let currentWindowId = 'win_1';
 let windowCounter = 1;
 
-// Variable to track window pending close
-let pendingCloseWindowId = null;
-
 function initWindows() {
     const card = document.getElementById('card');
+    // Ensure card exists
     if(!card) return;
 
     const bgInput = document.getElementById('main-bg-color');
     const startColor = bgInput ? bgInput.value : '#ffffff';
     
-    // Save initial state as base window (hidden from tabs)
+    // Save initial empty state as Window 1
     windows['win_1'] = {
         id: 'win_1',
-        name: 'مساحة العمل',
+        name: 'نافذة 1',
         html: card.innerHTML,
         width: card.style.width,
         height: card.style.height,
@@ -5679,42 +5677,35 @@ function renderTabs() {
     
     container.innerHTML = '';
     
-    const windowIds = Object.keys(windows);
-    
-    // Hide tabs container if only one window (base workspace)
-    const tabsWrapper = document.getElementById('windows-tabs');
-    if(tabsWrapper) {
-        tabsWrapper.style.display = windowIds.length <= 1 ? 'none' : 'flex';
-    }
-    
-    // Don't render tabs if only base window
-    if(windowIds.length <= 1) return;
-    
-    windowIds.forEach(id => {
+    Object.keys(windows).forEach(id => {
         const win = windows[id];
         const isActive = id === currentWindowId;
         
         const tab = document.createElement('div');
-        tab.className = 'workspace-tab' + (isActive ? ' active' : '');
+        tab.className = 'window-tab ' + (isActive ? 'active-tab' : '');
         
-        // Tab Content (Name + X in same row)
-        tab.innerHTML = `
-            <span class="tab-name">${win.name}</span>
-            <span class="tab-close"><i class="fas fa-times"></i></span>
-        `;
+        // Name
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = win.name;
+        tab.appendChild(nameSpan);
         
-        // Close button event - show confirmation modal
-        const closeBtn = tab.querySelector('.tab-close');
-        if(closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showCloseWindowModal(id);
-            });
+        // Delete button
+        if (Object.keys(windows).length > 1) {
+           const closeBtn = document.createElement('div');
+           closeBtn.className = 'close-tab';
+           closeBtn.innerHTML = '<i class="fas fa-times text-[10px]"></i>';
+           closeBtn.addEventListener('click', (e) => {
+               e.stopPropagation();
+               if(confirm('حذف ' + win.name + '؟')) {
+                   deleteWindow(id);
+               }
+           });
+           tab.appendChild(closeBtn);
         }
         
         // Switch action
         tab.addEventListener('click', (e) => {
-            if(!e.target.closest('.tab-close')) {
+            if(!e.target.closest('.close-tab')) {
                 switchWindow(id);
             }
         });
@@ -5723,42 +5714,18 @@ function renderTabs() {
     });
 }
 
-// Show modal before closing window
-function showCloseWindowModal(windowId) {
-    pendingCloseWindowId = windowId;
-    document.getElementById('close-window-modal').classList.remove('hidden');
-}
-
-function closeCloseWindowModal() {
-    pendingCloseWindowId = null;
-    document.getElementById('close-window-modal').classList.add('hidden');
-}
-
-function saveAndCloseWindow() {
-    if(!pendingCloseWindowId) return;
-    // Open save dialog
-    openSaveAsModal();
-    document.getElementById('save-as-callback').value = 'closeWindow';
-    closeCloseWindowModal();
-}
-
-function closeWindowWithoutSave() {
-    if(!pendingCloseWindowId) return;
-    deleteWindow(pendingCloseWindowId);
-    closeCloseWindowModal();
-}
-
 function addNewWindow() {
     saveCurrentWindow(); // Save previous window
     
     windowCounter++;
     const newId = 'win_' + Date.now();
     
+    // Assume we want current size for new window
     const card = document.getElementById('card');
     
     windows[newId] = {
         id: newId,
-        name: 'مساحة (' + windowCounter + ')',
+        name: 'نافذة ' + windowCounter,
         html: '<div id="card-gradient" style="display:none;"></div>',
         width: card.style.width,
         height: card.style.height,
@@ -5767,6 +5734,7 @@ function addNewWindow() {
         redoStack: []
     };
     
+    // Switch variable
     currentWindowId = newId;
     
     // Reset Canvas visual
@@ -5781,11 +5749,6 @@ function addNewWindow() {
     if(typeof saveState === 'function') saveState(); 
     
     renderTabs();
-}
-
-// Open file into new window
-function openFileInNewWindow() {
-    addNewWindow(); // Create new window first
 }
 
 function switchWindow(id) {
@@ -5860,4 +5823,169 @@ function deleteWindow(id) {
     } else {
         renderTabs();
     }
+}
+
+// === Workspace Management System ===
+let workspaces = {};
+let currentWorkspaceId = 'workspace_1';
+let workspaceCounter = 1;
+
+function initWorkspaces() {
+    const card = document.getElementById('card');
+    if(!card) return;
+
+    const bgColor = document.getElementById('main-bg-color')?.value || '#ffffff';
+    
+    // Initialize first workspace
+    workspaces['workspace_1'] = {
+        id: 'workspace_1',
+        name: 'العمل الأساسي',
+        html: card.innerHTML,
+        width: card.style.width,
+        height: card.style.height,
+        bgColor: bgColor,
+        undoStack: [...undoStack],
+        redoStack: [...redoStack]
+    };
+    
+    currentWorkspaceId = 'workspace_1';
+    renderWorkspaceTabs();
+}
+
+function renderWorkspaceTabs() {
+    const container = document.getElementById('tabs-container');
+    if(!container) return;
+    
+    container.innerHTML = '';
+    
+    const workspaceIds = Object.keys(workspaces);
+    
+    // Only show first workspace if it's the only one
+    if(workspaceIds.length === 1) return;
+    
+    workspaceIds.forEach(id => {
+        const ws = workspaces[id];
+        const isActive = id === currentWorkspaceId;
+        
+        const tab = document.createElement('div');
+        tab.className = `workspace-tab ${isActive ? 'active' : ''}`;
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = ws.name;
+        nameSpan.className = 'tab-name';
+        tab.appendChild(nameSpan);
+        
+        // Close button (except for first workspace)
+        if(id !== 'workspace_1') {
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '<i class="fas fa-times text-[8px]"></i>';
+            closeBtn.className = 'tab-close';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                deleteWorkspace(id);
+            };
+            tab.appendChild(closeBtn);
+        }
+        
+        tab.onclick = () => switchWorkspace(id);
+        container.appendChild(tab);
+    });
+}
+
+function addNewWorkspace() {
+    saveCurrentWorkspace();
+    
+    workspaceCounter++;
+    const newId = `workspace_${Date.now()}`;
+    
+    const card = document.getElementById('card');
+    
+    workspaces[newId] = {
+        id: newId,
+        name: `نافذة ${workspaceCounter}`,
+        html: '<div id="card-gradient" style="display:none;"></div>',
+        width: card.style.width,
+        height: card.style.height,
+        bgColor: '#ffffff',
+        undoStack: [],
+        redoStack: []
+    };
+    
+    currentWorkspaceId = newId;
+    
+    // Reset canvas
+    card.innerHTML = '<div id="card-gradient" style="display:none;"></div>';
+    card.style.backgroundColor = '#ffffff';
+    if(document.getElementById('main-bg-color')) document.getElementById('main-bg-color').value = '#ffffff';
+    if(document.getElementById('bg-color-preview')) document.getElementById('bg-color-preview').style.backgroundColor = '#ffffff';
+    
+    // Reset undo/redo
+    undoStack = [];
+    redoStack = [];
+    saveState();
+    
+    renderWorkspaceTabs();
+}
+
+function switchWorkspace(id) {
+    if(id === currentWorkspaceId) return;
+    
+    saveCurrentWorkspace();
+    
+    const ws = workspaces[id];
+    currentWorkspaceId = id;
+    
+    const card = document.getElementById('card');
+    card.style.width = ws.width;
+    card.style.height = ws.height;
+    card.innerHTML = ws.html;
+    card.style.backgroundColor = ws.bgColor;
+    
+    // Restore undo/redo
+    undoStack = [...ws.undoStack];
+    redoStack = [...ws.redoStack];
+    
+    // Update UI
+    if(document.getElementById('main-bg-color')) document.getElementById('main-bg-color').value = ws.bgColor;
+    if(document.getElementById('bg-color-preview')) document.getElementById('bg-color-preview').style.backgroundColor = ws.bgColor;
+    
+    // Re-bind events
+    const layers = card.querySelectorAll('.text-layer, .frame-layer, .image-layer');
+    layers.forEach(el => {
+        el.removeAttribute('data-events-bound');
+        if(typeof setupInteract === 'function') {
+            setupInteract(el);
+        }
+    });
+    
+    renderWorkspaceTabs();
+}
+
+function saveCurrentWorkspace() {
+    if(!workspaces[currentWorkspaceId]) return;
+    
+    const card = document.getElementById('card');
+    workspaces[currentWorkspaceId].html = card.innerHTML;
+    workspaces[currentWorkspaceId].width = card.style.width;
+    workspaces[currentWorkspaceId].height = card.style.height;
+    workspaces[currentWorkspaceId].bgColor = card.style.backgroundColor;
+    workspaces[currentWorkspaceId].undoStack = [...undoStack];
+    workspaces[currentWorkspaceId].redoStack = [...redoStack];
+}
+
+function deleteWorkspace(id) {
+    if(id === 'workspace_1') return; // Can't delete main workspace
+    
+    if(currentWorkspaceId === id) {
+        // Switch to main workspace
+        switchWorkspace('workspace_1');
+    }
+    
+    delete workspaces[id];
+    renderWorkspaceTabs();
+}
+
+// Update createNewProject to use new workspace
+function createNewProject() {
+    addNewWorkspace();
 }
