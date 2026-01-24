@@ -957,6 +957,12 @@
             
             // إعادة تعيين متغير القالب المحمل
             currentLoadedTemplateIndex = null;
+
+            // حذف الملاحظات عند إنشاء عمل جديد
+            localStorage.removeItem('designer_notes');
+            if(document.getElementById('designer-notes')) {
+                document.getElementById('designer-notes').value = '';
+            }
             
             // إعادة تعيين قائمة القوالب
             document.getElementById('template-select').value = '';
