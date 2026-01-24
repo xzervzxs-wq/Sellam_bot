@@ -977,6 +977,10 @@
             const templates = getTemplates();
             const template = templates[index];
             
+            // DEBUG: طباعة القالب كاملاً
+            console.log('🔍 القالب المحمّل:', JSON.stringify(template, null, 2));
+            console.log('📝 الملاحظات في القالب:', template ? template.notes : 'لا يوجد قالب');
+            
             if (template) {
                 const card = document.getElementById('card');
                 
