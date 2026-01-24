@@ -916,6 +916,16 @@
                     // ضبط الزوم على 50% دائماً عند فتح ملف
                     setCustomZoom(50);
                     
+                    // استعادة الملاحظات من الملف
+                    const notesField = document.getElementById('designer-notes');
+                    if (projectData.notes && notesField) {
+                        notesField.value = projectData.notes;
+                        updateCharCount();
+                    } else if (notesField) {
+                        notesField.value = '';
+                        updateCharCount();
+                    }
+                    
                     // توسيط البطاقة في منطقة العمل
                     setTimeout(() => {
                         const workspace = document.getElementById('workspace');
