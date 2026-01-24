@@ -688,6 +688,9 @@
         function updateCharCount() {
             const textarea = document.getElementById('designer-notes');
             const charCount = document.getElementById('char-count');
+            
+            if(!textarea || !charCount) return; // safety check
+            
             const maxLimit = getMaxCharLimit();
             const currentLength = textarea.value.length;
             
@@ -996,11 +999,19 @@
                 if (template.customW) document.getElementById('custom-width').value = template.customW;
                 if (template.customH) document.getElementById('custom-height').value = template.customH;
                 
-                // استعادة الملاحظات إن وجدت
+                // استعادة الملاحظات من بيانات القالب نفسه (ليس من localStorage)
                 if (template.notes) {
                     localStorage.setItem('designer_notes', template.notes);
+                    if(document.getElementById('designer-notes')) {
+                        document.getElementById('designer-notes').value = template.notes;
+                        updateCharCount();
+                    }
                 } else {
                     localStorage.removeItem('designer_notes');
+                    if(document.getElementById('designer-notes')) {
+                        document.getElementById('designer-notes').value = '';
+                        updateCharCount();
+                    }
                 }
                 
                 // تحديث المسطرة والزوم
