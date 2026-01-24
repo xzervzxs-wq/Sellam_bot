@@ -647,6 +647,29 @@
             document.getElementById('save-as-callback').value = 'newProject'; // علامة للرجوع بعد الحفظ
         }
 
+        // === دوال لوحة المصمم (Designer Panel) ===
+        function openDesignerPanel() {
+            const panel = document.getElementById('designer-panel');
+            panel.classList.remove('hidden');
+            updateDesignerStats();
+        }
+
+        function closeDesignerPanel() {
+            document.getElementById('designer-panel').classList.add('hidden');
+        }
+
+        function updateDesignerStats() {
+            const card = document.getElementById('card');
+            // حساب عدد العناصر (لا نحسب card-gradient)
+            const elementCount = card.children.length - 1;
+            document.getElementById('element-count').textContent = Math.max(0, elementCount);
+
+            // حساب مقاس المربع
+            const width = parseInt(card.style.width) / DPI_RATIO || 6;
+            const height = parseInt(card.style.height) / DPI_RATIO || 6;
+            document.getElementById('canvas-size').textContent = `${width.toFixed(1)} × ${height.toFixed(1)} سم`;
+        }
+
         // إعادة تعيين canvas بدون حفظ
         function resetCanvasWithoutSave() {
             closeNewProjectModal();
