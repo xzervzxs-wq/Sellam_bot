@@ -731,13 +731,20 @@
             // إظهار خيار الملاحظات فقط إذا كان هناك ملاحظات
             const notesField = document.getElementById('designer-notes');
             const notesOption = document.getElementById('save-notes-option');
-            const notesPreview = document.getElementById('notes-preview');
+            const premiumOption = document.getElementById('notes-option-premium');
+            const freeOption = document.getElementById('notes-option-free');
             
             if (notesField && notesOption && notesField.value.trim()) {
                 notesOption.classList.remove('hidden');
-                // عرض معاينة مختصرة للملاحظات
-                const preview = notesField.value.trim().substring(0, 20);
-                notesPreview.textContent = preview + (notesField.value.trim().length > 20 ? '...' : '');
+                
+                // إظهار الخيار المناسب حسب نوع المستخدم
+                if (userTier === 'premium') {
+                    premiumOption.classList.remove('hidden');
+                    freeOption.classList.add('hidden');
+                } else {
+                    premiumOption.classList.add('hidden');
+                    freeOption.classList.remove('hidden');
+                }
             } else if (notesOption) {
                 notesOption.classList.add('hidden');
             }

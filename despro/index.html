@@ -313,14 +313,26 @@
             
             <!-- خيار حفظ الملاحظات (يظهر فقط إذا وُجدت ملاحظات) -->
             <div id="save-notes-option" class="hidden mb-4">
-                <label class="flex items-center gap-2 cursor-pointer p-2.5 bg-[#fef3c7] border border-[#fbbf24] rounded-lg hover:bg-[#fef9c3] transition-all">
+                <!-- للمشتركين البريميوم -->
+                <label id="notes-option-premium" class="flex items-center gap-2 cursor-pointer p-2.5 bg-[#fef3c7] border border-[#fbbf24] rounded-lg hover:bg-[#fef9c3] transition-all">
                     <input type="checkbox" id="save-with-notes" class="w-4 h-4 accent-[#f59e0b] cursor-pointer" checked />
                     <span class="text-xs font-bold text-[#92400e] flex items-center gap-1">
                         <i class="fas fa-sticky-note"></i>
                         حفظ مع الملاحظات
                     </span>
-                    <span id="notes-preview" class="text-xs text-[#b45309] mr-auto truncate max-w-[120px]"></span>
                 </label>
+                <!-- للمشتركين المجانيين -->
+                <div id="notes-option-free" class="hidden flex items-center gap-2 p-2.5 bg-[#f1f5f9] border border-[#cbd5e1] rounded-lg opacity-60 cursor-not-allowed">
+                    <input type="checkbox" disabled class="w-4 h-4 accent-gray-400 cursor-not-allowed" />
+                    <span class="text-xs font-bold text-[#64748b] flex items-center gap-1">
+                        <i class="fas fa-sticky-note"></i>
+                        حفظ مع الملاحظات
+                    </span>
+                    <span class="text-xs font-bold text-[#f59e0b] mr-auto flex items-center gap-1">
+                        <i class="fas fa-crown"></i>
+                        Premium Members
+                    </span>
+                </div>
             </div>
             
             <!-- الأزرار -->
