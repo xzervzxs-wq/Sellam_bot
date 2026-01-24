@@ -1083,76 +1083,93 @@
     scrollbar-width: none;
 }
 
-/* Workspace Tabs Styling */
+/* Workspace Tabs Styling - Dashed Frame Style */
 .workspace-tab {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
+    justify-content: center;
+    padding: 8px 12px 8px 8px; /* Extra padding on right for X button */
     background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 10px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: bold;
     color: #64748b;
     cursor: pointer;
     transition: all 0.2s;
     user-select: none;
     white-space: nowrap;
+    min-width: 70px;
 }
 
 .workspace-tab:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: #f8fafc;
+    border-color: #6366f1;
     color: #334155;
 }
 
 .workspace-tab.active {
-    background: #6366f1;
-    border-color: #6366f1;
-    color: #ffffff;
-    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+    background: #ffffff;
+    border: 1px dashed #6366f1;
+    color: #6366f1;
+    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
 }
 
 .workspace-tab .tab-name {
-    max-width: 80px;
+    max-width: 60px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .workspace-tab .tab-close {
-    padding: 2px;
-    border-radius: 2px;
-    background: transparent;
-    border: none;
-    color: inherit;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    opacity: 0.6;
     transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .workspace-tab .tab-close:hover {
-    opacity: 1;
-    background: rgba(0,0,0,0.1);
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.workspace-tab.active .tab-close {
+    background: #6366f1;
+    border-color: #ffffff;
 }
 
 .workspace-tab.active .tab-close:hover {
-    background: rgba(255,255,255,0.2);
+    background: #4f46e5;
 }
 
 /* Dark mode support */
 :root.dark-mode .workspace-tab {
     background: #1e293b;
-    border-color: #334155;
+    border-color: #475569;
     color: #94a3b8;
 }
 
 :root.dark-mode .workspace-tab:hover {
     background: #334155;
+    border-color: #6366f1;
     color: #e2e8f0;
 }
 
 :root.dark-mode .workspace-tab.active {
-    background: #6366f1;
-    color: #ffffff;
+    background: #1e293b;
+    border-color: #6366f1;
+    color: #6366f1;
 }
