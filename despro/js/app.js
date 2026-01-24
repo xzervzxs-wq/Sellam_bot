@@ -568,6 +568,7 @@
                     templates[currentLoadedTemplateIndex].hVal = card.getAttribute('data-card-height');
                     templates[currentLoadedTemplateIndex].customW = document.getElementById('custom-width').value;
                     templates[currentLoadedTemplateIndex].customH = document.getElementById('custom-height').value;
+                    templates[currentLoadedTemplateIndex].notes = document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : ''; // حفظ الملاحظات
                     
                     try {
                         saveTemplates(templates);
@@ -592,6 +593,11 @@
             if (!name || name.trim() === '') return;
 
             // جمع البيانات
+            // تأكد من حفظ أحدث قيمة للملاحظات
+            updateDesignerNotes();
+            
+            const notesValue = document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : '';
+            
             const template = {
                 id: Date.now(),
                 name: name.trim(),
@@ -602,7 +608,7 @@
                 hVal: card.getAttribute('data-card-height'),
                 customW: document.getElementById('custom-width').value,
                 customH: document.getElementById('custom-height').value,
-                notes: document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : '' // حفظ الملاحظات مع التصميم
+                notes: notesValue // حفظ الملاحظات مع التصميم
             };
 
             try {
