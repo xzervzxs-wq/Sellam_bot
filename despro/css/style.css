@@ -154,6 +154,24 @@
             background-color: #0f172a !important;
             border-color: #334155 !important;
         }
+        
+        /* تأكيد إضافي للمسطرة (Ruler) */
+        :root.dark-mode .ruler {
+            background-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode .ruler-h {
+            border-bottom-color: #475569 !important;
+        }
+        :root.dark-mode .ruler-v {
+            border-right-color: #475569 !important;
+        }
+        :root.dark-mode .tick {
+            background-color: #475569 !important;
+        }
+        :root.dark-mode .tick-num {
+            color: #cbd5e1 !important;
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
