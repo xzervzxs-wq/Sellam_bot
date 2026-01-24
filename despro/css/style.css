@@ -1083,76 +1083,85 @@
     scrollbar-width: none;
 }
 
-/* Workspace Tabs Styling - Dashed Frame Style */
+/* Workspace Tabs Styling - Button Style with Clear Active State */
 .workspace-tab {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px 8px 8px; /* Extra padding on right for X button */
+    padding: 10px 16px;
     background: #ffffff;
-    border: 1px dashed #cbd5e1;
-    border-radius: 6px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: bold;
     color: #64748b;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
     user-select: none;
     white-space: nowrap;
-    min-width: 70px;
+    min-width: 85px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .workspace-tab:hover {
     background: #f8fafc;
     border-color: #6366f1;
     color: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .workspace-tab.active {
-    background: #ffffff;
-    border: 1px dashed #6366f1;
-    color: #6366f1;
-    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border: 2px solid #4f46e5;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4), 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .workspace-tab .tab-name {
-    max-width: 60px;
+    max-width: 70px;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: bold;
 }
 
 .workspace-tab .tab-close {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 14px;
-    height: 14px;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: #ef4444;
-    border: 1px solid #ffffff;
+    border: 2px solid #ffffff;
     color: #ffffff;
-    font-size: 8px;
+    font-size: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
 }
 
 .workspace-tab .tab-close:hover {
     background: #dc2626;
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
 }
 
 .workspace-tab.active .tab-close {
-    background: #6366f1;
-    border-color: #ffffff;
+    background: #ffffff;
+    color: #ef4444;
+    border-color: #ef4444;
 }
 
 .workspace-tab.active .tab-close:hover {
-    background: #4f46e5;
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #dc2626;
 }
 
 /* Dark mode support */
@@ -1169,7 +1178,7 @@
 }
 
 :root.dark-mode .workspace-tab.active {
-    background: #1e293b;
-    border-color: #6366f1;
-    color: #6366f1;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border-color: #4f46e5;
+    color: #ffffff;
 }
