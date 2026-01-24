@@ -1,0 +1,550 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+🚀 Saudi Rotation Sniper (Final Diamond Version)
+══════════════════════════════════════════════════════════════════════
+1. الاستراتيجية: Rotation (High Volume / Low Float < 50M).
+2. الشرعية: معيار الأصول (Total Assets) < 33.33%.
+3. الفلترة الذكية:
+   - ✅ استثناء شركات التعدين (Mining) فقط، وطرد المنصات (BKKT).
+   - ✅ طرد شركات الإيراد الصفري التي تعتاش على الفوائد (MEIP).
+   - ✅ طرد صناديق الريت (CMCT).
+   - ✅ طرد الأسهم الموقوفة (isActivelyTrading = False).
+4. التوقيت: أتمتة كاملة (NY Time).
+5. الذاكرة: Master Cache تراكمي.
+6. التعويض الذكي: يستمر بالبحث حتى يجد 20 سهم حلال نشط.
+══════════════════════════════════════════════════════════════════════
+"""
+
+import os
+import json
+import time
+import requests
+import re
+import sys
+from datetime import datetime, timedelta
+import pytz
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# ======================= ⚙️ إعدادات المستخدم =======================
+FMP_API_KEY = os.getenv("FMP_API_KEY", "AzN1tXfit4MUgxLSvWO73Wusjz8f2v21")
+TELEGRAM_BOT_TOKEN = "8320565935:AAFUnuZlt81XKiEZ_IxIGe6yXslF0mZk0_k"
+TELEGRAM_CHAT_ID = "237657512"
+
+# الملفات
+DAILY_WATCHLIST_FILE = "daily_watchlist.json"
+MASTER_CACHE_FILE = "shariah_stocks_master.json"
+
+# إعدادات الاستراتيجية (من zakam.py - Strongest Rotation)
+MIN_PRICE = 0.9           # نفس zakam.py (رفعناها من 0.8 إلى 0.9)
+MAX_PRICE = 12.0          # نفس zakam.py
+MIN_VOLUME = 700_000      # نفس zakam.py (700K)
+MAX_FLOAT = 50_000_000    # فلوت 50 مليون (أسهم خفيفة)
+TARGET_COUNT = 20         # 🎯 الهدف 20 سهم نظيف فقط (رابحة ونشطة)
+CHECK_POOL_SIZE = 150     # نفحص أقوى 150 سهم للوصول إلى 20 حلال
+MIN_STOCK_AGE_MONTHS = 6  # استبعاد الأسهم الجديدة
+
+# ======================= 🚫 القوائم المخصصة =======================
+HARAM_KEYWORDS = [
+    'Bank', 'Lending', 'Loan', 'Interest', 'Mortgage', 'Insurance', 'Credit',
+    'Financial', 'Asset Management', 'Brokerage', 'Capital', 'Investment',
+    'Alcohol', 'Liquor', 'Beer', 'Wine', 'Brewer', 'Distiller',
+    'Tobacco', 'Cigarette', 'Cannabis', 'Marijuana',
+    'Pork', 'Ham', 'Bacon',
+    'Casino', 'Gambling', 'Betting', 'Gaming', 'Resort',
+    'Entertainment', 'Broadcasting', 'Media', 'Music', 'Television',
+    'Gold', 'Silver', 'Precious Metals',
+    'Defense', 'Weapon',
+    'REIT', 'Real Estate Investment Trust' # ⛔️ حظر الريت
+]
+
+CRITICAL_KEYWORDS = [
+    'Casino', 'Gambling', 'Alcohol', 'Liquor', 'Beer',
+    'Wine', 'Tobacco', 'Pornography', 'Pork', 'Restaurant',
+    'Nightclub', 'Adult'
+]
+
+# ======================= 🛠️ دوال النظام =======================
+
+def log(msg):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
+
+def send_telegram(msg):
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "HTML"}
+        requests.post(url, json=payload, timeout=5)
+    except: pass
+
+def save_daily_watchlist(watchlist):
+    try:
+        with open(DAILY_WATCHLIST_FILE, 'w') as f: json.dump(watchlist, f, indent=2)
+    except: pass
+
+def clear_watchlist():
+    """حذف محتوى القائمة تماماً وتجهيزها لليوم التالي"""
+    save_daily_watchlist([])
+    log("🧹 تم تنظيف القائمة (End of Day Cleanup) استعداداً لأسهمك اليدوية غداً")
+
+# ======================= 🧠 إدارة الذاكرة (Master Cache) =======================
+
+def load_master_cache():
+    if os.path.exists(MASTER_CACHE_FILE):
+        try:
+            with open(MASTER_CACHE_FILE, 'r') as f:
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
+        except: pass
+    return {}
+
+def save_master_cache(cache_data):
+    try:
+        with open(MASTER_CACHE_FILE, 'w') as f: json.dump(cache_data, f, indent=2)
+    except: pass
+
+def get_cached_status(symbol, cache):
+    if symbol in cache:
+        entry = cache[symbol]
+        status = entry if isinstance(entry, str) else entry.get('status')
+        date_str = entry.get('date') if isinstance(entry, dict) else None
+
+        if status in ['haram', 'haram_activity', 'haram_financial']: return 'haram'
+
+        if status == 'halal':
+            # ✅ التعديل هنا: صلاحية 90 يوم (3 شهور) بدلاً من 7 أيام
+            # لأن القوائم المالية تتحدث ربع سنوياً
+            if date_str:
+                try:
+                    last_check = datetime.strptime(date_str, "%Y-%m-%d")
+                    if (datetime.now() - last_check).days < 90:
+                        return 'halal'
+                except: pass
+            else:
+                return 'halal'
+    return None
+
+def update_cache(cache, symbol, status, reason=""):
+    cache[symbol] = {"status": status, "date": datetime.now().strftime("%Y-%m-%d"), "reason": reason}
+    save_master_cache(cache)
+
+# ======================= 🔎 المحرك: جلب الأسهم النشطة من NASDAQ =======================
+
+def fetch_gainers_and_active():
+    """جلب أقوى الأسهم النشطة من NASDAQ Screener"""
+    log("🚀 جلب الأسهم النشطة من NASDAQ (Volume > 700K, Price 0.9-12$)...")
+
+    all_candidates = []
+    seen_symbols = set()
+
+    try:
+        log("   📊 جلب أسهم NASDAQ...")
+
+        # جلب من screener مرتبة حسب الحجم (نزيد الصفحات للحصول على تغطية أكبر)
+        for offset in [0, 500, 1000, 1500, 2000, 2500]:
+            url = f"https://financialmodelingprep.com/api/v3/stock-screener"
+            params = {
+                "volumeMoreThan": MIN_VOLUME,
+                "priceMoreThan": MIN_PRICE,
+                "priceLowerThan": MAX_PRICE,
+                "exchange": "NASDAQ",
+                "isEtf": "false",
+                "limit": 500,
+                "offset": offset,
+                "apikey": FMP_API_KEY
+            }
+
+            stocks = requests.get(url, params=params, timeout=15).json()
+
+            if not stocks or not isinstance(stocks, list):
+                break
+
+            log(f"   📥 جلب {len(stocks)} سهم من offset {offset}")
+
+            for stock in stocks:
+                try:
+                    symbol = stock.get('symbol', '')
+                    if symbol in seen_symbols:
+                        continue
+                    seen_symbols.add(symbol)
+
+                    price = stock.get('price', 0)
+                    volume = stock.get('volume', 0)
+                    market_cap = stock.get('marketCap', 0)
+
+                    # 🔥 فلتر أولي: استبعاد الأسهم الموقوفة من البداية
+                    is_actively_trading = stock.get('isActivelyTrading', True)
+
+                    if MIN_PRICE <= price <= MAX_PRICE and volume >= MIN_VOLUME and is_actively_trading:
+                        all_candidates.append({
+                            'symbol': symbol,
+                            'price': price,
+                            'volume': volume,
+                            'market_cap': market_cap,
+                            'change_pct': 0,  # سنحصل عليه لاحقاً إذا لزم
+                            'type': 'active'
+                        })
+                except:
+                    continue
+
+            if len(stocks) < 100:
+                break
+
+        log(f"   ✅ تم جمع {len(all_candidates)} مرشح")
+
+        # ترتيب حسب الحجم (الأكثر نشاطاً أولاً)
+        all_candidates = sorted(all_candidates, key=lambda x: x['volume'], reverse=True)
+
+        # أخذ أفضل 150 سهم للفحص الشرعي (للوصول إلى 20 حلال)
+        all_candidates = all_candidates[:CHECK_POOL_SIZE]
+
+        log(f"🎯 إجمالي المرشحين النهائيين: {len(all_candidates)} سهم (أعلى حجم تداول)")
+
+    except Exception as e:
+        log(f"   ❌ خطأ: {e}")
+
+    return all_candidates
+
+# ======================= ⚖️ الفحص الشرعي (الدقيق) =======================
+
+def check_shariah_compatible(symbol, cache):
+    # 1. فحص الكاش
+    stat = get_cached_status(symbol, cache)
+    if stat == 'halal': return True
+    if stat == 'haram': return False
+
+    try:
+        prof = requests.get(f"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={FMP_API_KEY}", timeout=5).json()
+        if not prof: return False
+
+        ind = prof[0].get('industry', ''); desc = prof[0].get('description', ''); sec = prof[0].get('sector', '')
+        comp_name = prof[0].get('companyName', ''); ipo = prof[0].get('ipoDate', '')
+
+        # 🔥 طرد الأسهم الموقوفة عن التداول (NAKD, CVT, GRUB, INFN Fix)
+        is_active = prof[0].get('isActivelyTrading', True)
+        if not is_active:
+            update_cache(cache, symbol, 'haram_activity', 'Not Actively Trading (Delisted/Halted)')
+            return False
+
+        # أ) استبعاد IPO الجديد
+        if ipo:
+            try:
+                if datetime.strptime(ipo, '%Y-%m-%d') > (datetime.now() - timedelta(days=MIN_STOCK_AGE_MONTHS * 30)):
+                    return False
+            except: pass
+
+        # ب) استثناء التعدين الحقيقي (Mining Only) - BKKT Fix
+        is_real_mining = any(k in desc.lower() or k in comp_name.lower()
+                             for k in ['mining', 'miner', 'hashrate', 'blockchain infrastructure'])
+
+        # ج) حظر القطاع المالي (يسمح فقط للمعدنين الحقيقيين)
+        if sec == 'Financial Services' and not is_real_mining:
+            update_cache(cache, symbol, 'haram_activity', 'Financial Sector')
+            return False
+
+        # د) حظر الكلمات
+        for kw in CRITICAL_KEYWORDS + HARAM_KEYWORDS:
+            # نتجاوز كلمات Capital/Financial إذا كان معدناً حقيقياً
+            if is_real_mining and kw.lower() in ['capital', 'financial']: continue
+
+            if re.search(r'\b' + re.escape(kw.lower()) + r'\b', desc.lower()) or \
+               re.search(r'\b' + re.escape(kw.lower()) + r'\b', ind.lower()):
+                update_cache(cache, symbol, 'haram_activity', f'Keyword: {kw}')
+                return False
+
+        # 3. الفحص المالي (الأصول + معالجة الإيراد الصفري)
+        bs = requests.get(f"https://financialmodelingprep.com/api/v3/balance-sheet-statement/{symbol}?period=quarter&limit=1&apikey={FMP_API_KEY}", timeout=5).json()
+        inc = requests.get(f"https://financialmodelingprep.com/api/v3/income-statement/{symbol}?period=quarter&limit=1&apikey={FMP_API_KEY}", timeout=5).json()
+
+        if not bs or not inc: return False
+
+        assets = bs[0].get('totalAssets', 0)
+        if assets == 0: return False # بيانات مضروبة
+
+        debt = bs[0].get('totalDebt', 0)
+        cash = bs[0].get('cashAndShortTermInvestments', 0)
+        intr = inc[0].get('interestIncome', 0) or 0
+        rev = inc[0].get('revenue', 0) or 0
+
+        # النسب (معيار الأصول)
+        debt_ratio = (debt / assets) * 100
+        liq_ratio = (cash / assets) * 100
+
+        # 🔥 إصلاح الإيراد الصفري (MEIP Fix)
+        if rev == 0:
+            if intr > 0: pur_ratio = 100.0 # حرام فوراً
+            else: pur_ratio = 0.0 # حلال (شركة ناشئة لم تقترض)
+        else:
+            pur_ratio = (intr / rev) * 100
+
+        # التحقق النهائي (33.33% أصول / 5% تطهير)
+        if (debt_ratio < 33.33) and (liq_ratio < 33.33) and (pur_ratio < 5.0):
+            update_cache(cache, symbol, 'halal', f"D:{debt_ratio:.1f} L:{liq_ratio:.1f} P:{pur_ratio:.1f}")
+            log(f"   ✅ {symbol} مقبول (Rot High)")
+            return True
+        else:
+            reason = f"Fail: D:{debt_ratio:.1f}% L:{liq_ratio:.1f}% P:{pur_ratio:.1f}%"
+            update_cache(cache, symbol, 'haram_financial', reason)
+            return False
+
+    except: return False
+
+# ======================= 🔄 التحديث الذكي =======================
+
+def update_process(reset=False):
+    log("🔄 بدء التحديث (Top Gainers + Most Active + Shariah Filter)...")
+
+    # قراءة القائمة القديمة للتحديث الذكي
+    old_list = []
+    if not reset and os.path.exists(DAILY_WATCHLIST_FILE):
+        try:
+            with open(DAILY_WATCHLIST_FILE, 'r') as f:
+                old_list = json.load(f)
+                log(f"📋 القائمة القديمة: {len(old_list)} سهم")
+        except: pass
+
+    if reset:
+        save_daily_watchlist([])
+        old_list = []
+
+    candidates = fetch_gainers_and_active()
+    if not candidates:
+        log("❌ لم يتم جلب أي مرشحين من السوق")
+        return
+
+    # إنشاء قاموس للبحث السريع
+    candidates_dict = {item['symbol']: item for item in candidates}
+
+    cache = load_master_cache()
+    final_list = []
+    checked = 0
+    removed_stocks = []  # 📊 الأسهم المحذوفة
+    added_stocks = []    # 📊 الأسهم المضافة
+    delisted_stocks = []
+
+    # 1️⃣ فحص القائمة القديمة (تعديل: الحفاظ على الأسهم اليدوية)
+    if old_list:
+        log(f"🔍 دمج القائمة الموجودة ({len(old_list)} سهم) مع النتائج الجديدة...")
+
+        # ننسخ كل الأسهم القديمة (اليدوية) إلى القائمة النهائية مباشرة
+        for symbol in old_list:
+            final_list.append(symbol)
+            # إذا كان السهم موجوداً أيضاً في نتائج البحث الجديدة، نحدث بياناته للعرض فقط
+            if symbol in candidates_dict:
+                log(f"   ✅ {symbol} (يدوي + نشط بالسوق)")
+            else:
+                log(f"   🛡️ {symbol} (تم الإبقاء عليه لأنه مضاف يدوياً)")
+
+    # 2️⃣ إضافة أسهم جديدة للوصول إلى الهدف
+    needed = TARGET_COUNT - len(final_list)
+    if needed > 0:
+        log(f"🔍 البحث عن {needed} سهم جديد للتعويض...")
+
+        for item in candidates:
+            if len(final_list) >= TARGET_COUNT:
+                break
+
+            checked += 1
+            symbol = item['symbol']
+
+            # تخطي الموجودين
+            if symbol in final_list:
+                continue
+
+            # تخطي الموقوفة
+            if symbol in cache and cache[symbol].get('reason') == 'Not Actively Trading (Delisted/Halted)':
+                delisted_stocks.append(symbol)
+                continue
+
+            if check_shariah_compatible(symbol, cache):
+                final_list.append(symbol)
+                added_stocks.append(symbol)
+                log(f"   ✅ {symbol} جديد - ${item['price']:.2f} | حجم: {item['volume']:,}")
+
+    if final_list:
+        save_daily_watchlist(final_list)
+        title = "🔔 <b>قائمة جديدة (Fresh)</b>" if reset else "🔄 <b>تحديث ذكي (Smart Update)</b>"
+
+        msg = f"{title}\n🚀 <b>NASDAQ Top {len(final_list)} Most Active (Halal)</b>\n"
+        msg += f"💰 السعر: {MIN_PRICE}-{MAX_PRICE}$ | الحجم: >{MIN_VOLUME:,}\n"
+
+        # 🔥 تفاصيل التحديث الذكي
+        if not reset and (removed_stocks or added_stocks):
+            msg += f"\n📊 <b>التغييرات:</b>\n"
+            if removed_stocks:
+                msg += f"❌ محذوف ({len(removed_stocks)}): {', '.join(removed_stocks)}\n"
+            if added_stocks:
+                msg += f"✅ مضاف ({len(added_stocks)}): {', '.join(added_stocks)}\n"
+
+        msg += f"\n<b>القائمة النهائية ({len(final_list)}):</b>\n" + ", ".join(final_list)
+
+        send_telegram(msg)
+        log(f"📝 تم حفظ {len(final_list)} سهم في {DAILY_WATCHLIST_FILE}")
+        if removed_stocks:
+            log(f"❌ محذوف: {', '.join(removed_stocks)}")
+        if added_stocks:
+            log(f"✅ مضاف: {', '.join(added_stocks)}")
+        log(f"✅ القائمة النهائية: {', '.join(final_list)}")
+        save_master_cache(cache)
+    else:
+        log("❌ لم ينجح أي سهم.")
+
+# ======================= ⏰ المجدول =======================
+
+# ======================= 🔥 فحص 1000 سهم وتعبئة الكاش =======================
+
+def fetch_all_stocks_from_nasdaq():
+    """جلب كل الأسهم من NASDAQ/NYSE/AMEX (مجاني - بدون API)"""
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json, text/plain, */*',
+    }
+    
+    all_stocks = []
+    
+    exchanges = [
+        ('NASDAQ', 'https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=10000&exchange=NASDAQ'),
+        ('NYSE', 'https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=10000&exchange=NYSE'),
+        ('AMEX', 'https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=10000&exchange=AMEX'),
+    ]
+    
+    for name, url in exchanges:
+        try:
+            r = requests.get(url, headers=headers, timeout=30)
+            if r.status_code == 200:
+                data = r.json()
+                rows = data.get('data', {}).get('table', {}).get('rows', [])
+                log(f"   📊 {name}: {len(rows)} سهم")
+                all_stocks.extend(rows)
+        except Exception as e:
+            log(f"   ❌ {name}: خطأ - {e}")
+    
+    return all_stocks
+
+def bulk_shariah_check():
+    """جلب أسهم < $10 من NASDAQ/NYSE وفحص الشرعية"""
+    log("🚀 بدء الفحص الشامل...")
+    
+    cache = load_master_cache()
+    log(f"📦 الكاش الحالي: {len(cache)} سهم محفوظ")
+    
+    # 1. جلب كل الأسهم من NASDAQ/NYSE/AMEX (مجاني)
+    log("📊 جلب الأسهم من NASDAQ/NYSE/AMEX...")
+    all_stocks = fetch_all_stocks_from_nasdaq()
+    log(f"✅ إجمالي: {len(all_stocks)} سهم")
+    
+    if not all_stocks:
+        log("❌ فشل جلب الأسهم")
+        return
+    
+    # 2. فلترة: سعر < $10، رمز ≤ 4 حروف
+    def get_price(s):
+        try:
+            p = s.get('lastsale', '$100').replace('$','').replace(',','')
+            return float(p) if p else 100
+        except:
+            return 100
+    
+    filtered = []
+    for stock in all_stocks:
+        symbol = stock.get('symbol', '')
+        price = get_price(stock)
+        
+        if symbol and len(symbol) <= 4 and '.' not in symbol and 0.01 < price < 10:
+            filtered.append({'symbol': symbol, 'price': price, 'name': stock.get('name', '')})
+    
+    log(f"🔍 بعد الفلترة (< $10، رمز ≤4): {len(filtered)} سهم")
+    
+    # 3. تجاوز الموجودين في الكاش
+    to_check = []
+    skipped = 0
+    
+    for stock in filtered:
+        symbol = stock['symbol']
+        if symbol in cache:
+            skipped += 1
+        else:
+            to_check.append(stock)
+    
+    log(f"⏭️ تم تجاوز {skipped} سهم (موجودين في الكاش)")
+    log(f"🔬 سيتم فحص {len(to_check)} سهم جديد...")
+    
+    if not to_check:
+        log("✅ لا توجد أسهم جديدة للفحص!")
+        send_telegram(f"✅ <b>لا توجد أسهم جديدة</b>\n📦 الكاش: {len(cache)} سهم")
+        return
+    
+    # 4. فحص الأسهم الجديدة
+    halal_count = 0
+    haram_count = 0
+    error_count = 0
+    
+    for i, stock in enumerate(to_check):
+        symbol = stock['symbol']
+        price = stock['price']
+        
+        try:
+            # فحص الشرعية
+            is_halal = check_shariah_compatible(symbol, cache)
+            
+            if is_halal:
+                halal_count += 1
+                log(f"   ✅ [{i+1}/{len(to_check)}] {symbol} - ${price:.2f} (حلال)")
+            else:
+                haram_count += 1
+                if (i+1) % 100 == 0:  # طباعة كل 100 سهم
+                    log(f"   ⏳ [{i+1}/{len(to_check)}] جاري الفحص... (حلال: {halal_count})")
+            
+            # تأخير بسيط لتجنب الحظر من FMP
+            if (i+1) % 5 == 0:
+                time.sleep(0.3)
+                
+        except Exception as e:
+            error_count += 1
+            if error_count <= 10:
+                log(f"   ❌ {symbol}: خطأ - {str(e)[:50]}")
+    
+    # 5. حفظ الكاش النهائي
+    save_master_cache(cache)
+    
+    # 6. ملخص النتائج
+    log("")
+    log("=" * 50)
+    log("📊 ملخص الفحص الشامل:")
+    log(f"   📥 إجمالي الأسهم: {len(all_stocks)}")
+    log(f"   🔍 بعد الفلترة: {len(filtered)}")
+    log(f"   ⏭️ تم تجاوزها (موجودة): {skipped}")
+    log(f"   🔬 تم فحصها: {len(to_check)}")
+    log(f"   ✅ حلال: {halal_count}")
+    log(f"   ❌ حرام: {haram_count}")
+    log(f"   ⚠️ أخطاء: {error_count}")
+    log(f"   📦 إجمالي الكاش الآن: {len(cache)} سهم")
+    log("=" * 50)
+    
+    # إرسال للتليجرام
+    msg = f"""📊 <b>انتهى الفحص الشامل</b>
+
+📥 الأسهم من NASDAQ/NYSE: {len(all_stocks)}
+🔍 بعد الفلترة (< $10): {len(filtered)}
+⏭️ تم تجاوزها: {skipped}
+🔬 تم فحصها: {len(to_check)}
+
+✅ حلال: {halal_count}
+❌ حرام: {haram_count}
+📦 إجمالي الكاش: {len(cache)} سهم"""
+    
+    send_telegram(msg)
+
+def main():
+    log("🚀 وضع الفحص الشامل (Bulk Shariah Check)...")
+    log("📊 جلب من NASDAQ/NYSE/AMEX (مجاني)")
+    
+    # تشغيل الفحص الشامل مباشرة
+    bulk_shariah_check()
+    
+    log("✅ انتهى الفحص!")
+
+if __name__ == "__main__":
+    main()

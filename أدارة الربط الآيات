@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>أداة ربط الآيات (Mapper)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #222; color: #eee; display: flex; height: 100vh; margin: 0; overflow: hidden; }
+        
+        .sidebar { width: 300px; background: #333; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #444; }
+        .main-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #fff; position: relative; overflow: auto; }
+        
+        h2 { margin-top: 0; color: #c5a059; margin-bottom: 15px; }
+        
+        select, input, button { width: 100%; padding: 10px; margin-bottom: 8px; border-radius: 5px; border: 1px solid #555; background: #444; color: white; box-sizing: border-box; }
+        button { cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { filter: brightness(1.2); }
+        
+        .btn-primary { background: #1a472a; }
+        .btn-action { background: #c5a059; color: black; }
+        .btn-danger { background: #ef4444; }
+        .nav-btn { background: #555; width: 48%; }
+        
+        .row { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 5px; }
+
+        #current-instruction { 
+            background: rgba(26, 71, 42, 0.9); padding: 15px; border-radius: 10px; 
+            margin: 15px 0; text-align: center; border: 1px solid #4ade80;
+            font-size: 18px; font-weight: bold; min-height: 100px; display: flex; flex-direction: column; justify-content: center;
+        }
+        
+        #mapped-list { flex: 1; overflow-y: auto; font-family: monospace; font-size: 12px; border-top: 1px solid #555; padding-top: 10px; }
+        .mapped-item { padding: 5px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
+        
+        svg { height: 95%; width: auto; box-shadow: 0 0 20px rgba(0,0,0,0.2); }
+        
+        /* Highlight hover effect */
+        svg g:hover, svg path:hover {
+            fill: rgba(255, 0, 0, 0.2) !important;
+            stroke: red !important;
+            stroke-width: 2px !important;
+            cursor: pointer;
+        }
+        
+        /* Already mapped elements */
+        .mapped-element {
+            fill: rgba(0, 255, 0, 0.2) !important;
+            stroke: green !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>🛠️ أداة الربط</h2>
+        
+        <!-- Controls -->
+        <div class="control-group">
+            <input type="number" id="page-num" value="7" min="1" max="604" placeholder="رقم الصفحة">
+            <button class="btn-primary" onclick="loadPage()">تحميل الصفحة</button>
+        </div>
+        
+        <div class="row">
+            <button class="nav-btn" onclick="prevPage()">السابق</button>
+            <button class="nav-btn" onclick="nextPage()">التالي</button>
+        </div>
+
+        <div class="row">
+            <button class="nav-btn btn-danger" onclick="undoLastMapping()">تراجع ↩️</button>
+            <button class="nav-btn btn-action" onclick="exportData()">نسخ JSON 📋</button>
+        </div>
+
+        <div id="current-instruction">جاري الانتظار...</div>
+        
+        <div id="mapped-list">
+            <!-- القائمة -->
+        </div>
+    </div>
+
+    <div class="main-area" id="canvas-wrapper">
+        <div style="color:black">يرجى اختيار صفحة والبدء...</div>
+    </div>
+
+    <script>
+        const SVG_BASE = 'https://cdn.jsdelivr.net/gh/salahamassi/Quran-svg-mobile@main/output/';
+        let currentPageNum = '';
+        let pageAyahs = []; 
+        let currentAyahIndex = 0; 
+        let mappings = {}; 
+        let mappedStack = []; // مصفوفة لتخزين الخطوات للتراجع المتعدد
+
+        async function loadPage(numToLoad) {
+            const numInput = document.getElementById('page-num');
+            let num = numToLoad ? String(numToLoad).padStart(3, '0') : numInput.value.padStart(3, '0');
+            numInput.value = parseInt(num); 
+            currentPageNum = num;
+            
+            const wrapper = document.getElementById('canvas-wrapper');
+            const list = document.getElementById('mapped-list');
+            
+            wrapper.innerHTML = '<div style="color:black">جاري التحميل...</div>';
+            list.innerHTML = '';
+            
+            // Reset logic
+            mappings[num] = {};
+            currentAyahIndex = 0;
+            mappedStack = [];
+
+            try {
+                // 1. Get Page Data
+                const apiRes = await fetch(`https://api.alquran.cloud/v1/page/${parseInt(num)}/quran-simple`);
+                const apiData = await apiRes.json();
+                pageAyahs = apiData.data.ayahs; 
+
+                // 2. Get SVG
+                const svgRes = await fetch(SVG_BASE + num + '.svg');
+                if (!svgRes.ok) throw new Error("الصورة غير موجودة");
+                const svgText = await svgRes.text();
+                
+                wrapper.innerHTML = svgText;
+                const svgEl = wrapper.querySelector('svg');
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+
+                // 3. Setup Interaction
+                setupInteraction(svgEl);
+                
+                // 4. Update UI
+                updateInstruction();
+
+            } catch (e) {
+                wrapper.innerHTML = `<div style="color:red">خطأ: ${e.message}</div>`;
+            }
+        }
+
+        function nextPage() {
+            let next = parseInt(document.getElementById('page-num').value) + 1;
+            if (next <= 604) loadPage(next);
+        }
+
+        function prevPage() {
+            let prev = parseInt(document.getElementById('page-num').value) - 1;
+            if (prev >= 1) loadPage(prev);
+        }
+
+        function updateInstruction() {
+            const instruction = document.getElementById('current-instruction');
+            
+            if (currentAyahIndex < pageAyahs.length) {
+                const ayah = pageAyahs[currentAyahIndex];
+                instruction.innerHTML = `
+                    <div style="font-size:14px; color:#ccc;">المطلوب:</div>
+                    <div style="color:#c5a059; font-size:24px;">آية ${ayah.numberInSurah}</div>
+                    <div style="font-size:12px; color:#aaa;">(سورة ${ayah.surah.name})</div>
+                    <div style="font-size:14px; margin-top:5px; direction:rtl; color:white;">${ayah.text.substring(0, 40)}...</div>
+                `;
+                instruction.style.borderColor = "#4ade80";
+            } else {
+                instruction.innerHTML = `✅ اكتملت الصفحة!<br>انتقل للصفحة التالية.`;
+                instruction.style.borderColor = "gold";
+            }
+        }
+
+        function setupInteraction(svg) {
+            svg.addEventListener('click', (e) => {
+                if(e.target.tagName === 'svg') return;
+                if (currentAyahIndex >= pageAyahs.length) return;
+
+                const target = e.target;
+                let targetId = target.id;
+                let targetEl = target;
+
+                // Handle group grouping
+                if (!targetId && target.parentElement.tagName === 'g') {
+                    targetId = target.parentElement.id;
+                    targetEl = target.parentElement;
+                }
+
+                if (!targetId) {
+                    alert("هذا الجزء لا يملك ID! حاول الضغط على جزء آخر.");
+                    return;
+                }
+
+                // Check if already mapped
+                if (Object.keys(mappings[currentPageNum]).includes(targetId)) {
+                    alert("هذا العنصر تم ربطه مسبقاً!");
+                    return;
+                }
+
+                // Save Mapping
+                const currentAyah = pageAyahs[currentAyahIndex];
+                mappings[currentPageNum][targetId] = {
+                    surah: currentAyah.surah.number,
+                    ayah: currentAyah.numberInSurah
+                };
+                
+                // Add to Undo Stack
+                mappedStack.push({
+                    id: targetId,
+                    index: currentAyahIndex
+                });
+
+                // Visual Feedback
+                targetEl.classList.add('mapped-element');
+                targetEl.setAttribute('data-mapped-id', targetId); 
+                targetEl.style.fill = "rgba(0, 255, 0, 0.3)";
+
+                // Add to List UI (Prepend to see latest on top)
+                const list = document.getElementById('mapped-list');
+                const listItem = document.createElement('div');
+                listItem.className = 'mapped-item';
+                listItem.id = `list-item-${targetId}`;
+                listItem.innerHTML = `
+                    <span>آية ${currentAyah.numberInSurah}</span>
+                    <span style="color:#c5a059; font-size:10px;">${targetId}</span>
+                `;
+                list.prepend(listItem);
+                
+                // Next
+                currentAyahIndex++;
+                updateInstruction();
+            });
+        }
+
+        function undoLastMapping() {
+            if (mappedStack.length > 0) {
+                // Get last action
+                const lastAction = mappedStack.pop();
+                const targetId = lastAction.id;
+
+                // Remove from data
+                delete mappings[currentPageNum][targetId];
+                
+                // Remove visual style from SVG
+                const el = document.querySelector(`[data-mapped-id="${targetId}"]`);
+                if (el) {
+                    el.classList.remove('mapped-element');
+                    el.style.fill = "";
+                    el.removeAttribute('data-mapped-id');
+                }
+
+                // Remove from list
+                const listItem = document.getElementById(`list-item-${targetId}`);
+                if (listItem) listItem.remove();
+
+                // Go back step
+                currentAyahIndex = lastAction.index;
+                updateInstruction();
+            } else {
+                alert("لا يوجد خطوات للتراجع عنها في هذه الصفحة.");
+            }
+        }
+
+        function exportData() {
+            const data = JSON.stringify(mappings, null, 2);
+            const textArea = document.createElement("textarea");
+            textArea.value = data;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert("تم نسخ البيانات! \n\nقم بلصقها في المحادثة.");
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+
+</body>
+</html>

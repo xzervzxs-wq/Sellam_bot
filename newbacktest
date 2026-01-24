@@ -1,0 +1,714 @@
+import requests
+import pandas as pd
+import io
+import time
+import sys
+import os
+import pytz
+import json
+import re
+import yfinance as yf # 👈 المصدر الآمن للفلوت
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import databento as db
+import concurrent.futures
+
+# ==============================================================================
+# 🔑 إعدادات البيئة
+# ==============================================================================
+load_dotenv()
+
+EODHD_API_KEY = os.getenv("EODHD_API_KEY")
+FMP_API_KEY = os.getenv("FMP_API_KEY")
+DATABENTO_API_KEY = os.getenv("DATABENTO_API_KEY")
+
+TELEGRAM_BOT_TOKEN = "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg"
+TELEGRAM_CHAT_ID = "237657512"
+
+# إعدادات السرعة (3 عمال = توازن وأمان)
+MAX_WORKERS = 3
+REQUEST_DELAY = 0.5
+
+FINVIZ_COOKIE = """chartsTheme=dark; notice-newsletter=show; .ASPXAUTH=C7E2E86BC876CD078E1DC69C25671D062A909C67501ECF211333FAAD7F54A40FE9B6772EF4E88ED21E26C6C99BCAE5C39C5C8D598CD73357A5FCB4B556AD83E55002A827606EFFFE1F1315C9E8A4E05BC99B517D7E533905EE95F029D8FE0B930EC18E2E5F5037693AE688694BFDFDD82DADE25BA4063B448D18DDC85EAB40FD9D717716F2FEABA2A813D932072BFF5C6F723BACD8D3E4CA5161C3B1E0FF3088C9CC8AA7E67C3A4C94EA5122A68D9ADC7F85B091D98A31BF66F654490F1F7601FA7E420E3ECAF266BF62C1A7C9733A57BC866F92; survey_dialog_cohort=0; customColors=%7B%22light%22%3A%7B%7D%2C%22dark%22%3A%7B%7D%7D; customColorsExpiration=12%2F12%2F2025%208%3A11%3A59%20PM"""
+
+FINVIZ_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Cookie": FINVIZ_COOKIE
+}
+
+SHARIAH_FILE = "shariah_stocks_master.json"
+FLOAT_CACHE_FILE = "float_cache.json"
+
+# ==============================================================================
+# 🛠️ أدوات مساعدة (تنظيف البيانات) 🧹
+# ==============================================================================
+def load_json_file(filename):
+    if os.path.exists(filename):
+        try:
+            with open(filename, 'r', encoding='utf-8') as f: return json.load(f)
+        except: return {}
+    return {}
+
+def save_json_file(filename, data):
+    try:
+        with open(filename, 'w') as f: json.dump(data, f, indent=4)
+    except: pass
+
+shariah_db = load_json_file(SHARIAH_FILE)
+float_cache = load_json_file(FLOAT_CACHE_FILE)
+
+# 🔥 دالة التنظيف (لحل مشكلة dict * float)
+def clean_float_value(val):
+    if val is None: return 0
+
+    # 1. إذا كان قاموس (Dict)، استخرج الرقم
+    if isinstance(val, dict):
+        val = val.get('value') or val.get('float') or 0
+
+    # 2. إذا كان نص (String) مثل '100M' أو '1.5B'
+    if isinstance(val, str):
+        val = val.upper().replace(',', '')
+        try:
+            if 'M' in val: return float(re.findall(r"[\d\.]+", val)[0]) * 1_000_000
+            if 'B' in val: return float(re.findall(r"[\d\.]+", val)[0]) * 1_000_000_000
+            if 'K' in val: return float(re.findall(r"[\d\.]+", val)[0]) * 1_000
+            return float(val)
+        except: return 0
+
+    # 3. إذا كان رقم
+    if isinstance(val, (int, float)):
+        return val
+
+    return 0
+
+def fmt_shares(n):
+    if not isinstance(n, (int, float)): return "N/A"
+    if n >= 1_000_000: return f"{n/1_000_000:.1f}M".replace(".0M", "M")
+    if n >= 1_000: return f"{n/1_000:.1f}K"
+    return str(int(n))
+
+def send_telegram(message):
+    if not TELEGRAM_BOT_TOKEN: return
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
+        requests.post(url, json=payload, timeout=5)
+    except: pass
+
+def get_shariah_label(symbol):
+    data = shariah_db.get(symbol)
+    if data and data.get('status') == 'halal': return "✅ حلال"
+    return "🚫 غير متوفر"
+
+def evaluate_liquidity(volume, float_val):
+    if float_val == 0: return "غير محدد", 0
+    rotation_pct = (volume / float_val) * 100
+    if rotation_pct >= 5.0: return "🔥🔥 انفجار (عالي جداً)", rotation_pct
+    elif rotation_pct >= 2.0: return "🔥 نار (ممتاز)", rotation_pct
+    elif rotation_pct >= 0.5: return "✅ جيد (نشط)", rotation_pct
+    else: return "💤 ضعيف (خطر)", rotation_pct
+
+# =========================================
+# 🛠️ دالة تنظيف الفلوت (جديدة)
+# =========================================
+def clean_float_value(val):
+    """تستخرج الرقم الحقيقي من الفلوت سواء كان نصاً أو قاموساً"""
+    if val is None: return 0
+
+    # 1. إذا كان قاموس (Dict) مثل {'value': 123}
+    if isinstance(val, dict):
+        val = val.get('value') or val.get('float') or 0
+
+    # 2. إذا كان نص (String) مثل '100M' أو '1.5B'
+    if isinstance(val, str):
+        val = val.upper().replace(',', '')
+        try:
+            # استخدام Regex لاستخراج الرقم والوحدة
+            import re
+            if 'M' in val: return float(re.findall(r"[\d\.]+", val)[0]) * 1_000_000
+            if 'B' in val: return float(re.findall(r"[\d\.]+", val)[0]) * 1_000_000_000
+            if 'K' in val: return float(re.findall(r"[\d\.]+", val)[0]) * 1_000
+            return float(val)
+        except: return 0
+
+    # 3. إذا كان رقم جاهز
+    if isinstance(val, (int, float)):
+        return val
+
+    return 0
+
+# ==============================================================================
+# 💎 مصادر البيانات (Safe Sources)
+# ==============================================================================
+
+# 1. جلب الفلوت من Yahoo (آمن ومجاني) + تنظيف الكاش
+def get_float_shares_safe(symbol):
+    global float_cache
+
+    # محاولة القراءة من الكاش أولاً وتنظيف القيمة
+    if symbol in float_cache:
+        val = clean_float_value(float_cache[symbol]) # 👈 هنا التعديل
+        if val > 0: return val
+
+    # الجلب من ياهو فايننس
+    try:
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+        val = info.get('floatShares')
+        if not val: val = info.get('sharesOutstanding')
+
+        if val:
+            # نخزن القيمة الخام كما هي، والتنظيف يتم عند القراءة
+            float_cache[symbol] = val
+            save_json_file(FLOAT_CACHE_FILE, float_cache)
+            return clean_float_value(val) # نرجع قيمة نظيفة
+    except: pass
+
+    return 0
+
+# 2. جلب الشموع من Databento (للبيانات الحية)
+def get_databento_data(symbol, target_time):
+    """جلب شموع 5 دقائق من Databento - من 9:30 إلى 10:00 لليوم"""
+    try:
+        time.sleep(REQUEST_DELAY)
+
+        if not DATABENTO_API_KEY:
+            return pd.DataFrame(), "No Databento API Key"
+
+        client = db.Historical(DATABENTO_API_KEY)
+
+        # جلب البيانات من 9:30 إلى 10:00 لليوم المحدد
+        ny_tz = pytz.timezone('America/New_York')
+        start_time = target_time.replace(hour=9, minute=30, second=0, microsecond=0)
+        end_time = target_time.replace(hour=10, minute=0, second=0, microsecond=0)
+
+        data = client.timeseries.get_range(
+            dataset="XNAS.ITCH",  # Nasdaq dataset
+            symbols=[symbol],
+            schema="ohlcv-5m",  # شموع 5 دقائق مباشرة
+            start=start_time.isoformat(),
+            end=end_time.isoformat(),
+        )
+
+        if data.df.empty:
+            return pd.DataFrame(), "No Data from Databento"
+
+        df = data.df.copy()
+
+        if df.index.tz is None:
+            df.index = df.index.tz_localize('UTC')
+        df.index = df.index.tz_convert('America/New_York')
+
+        df.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+
+        # إزالة NaN
+        df = df.dropna()
+
+        if df.empty:
+            return pd.DataFrame(), "No data in time range"
+
+        return df, "OK"
+    except Exception as e:
+        return pd.DataFrame(), f"Databento Error: {str(e)}"
+
+# 4. جلب الشموع من Yahoo Finance (لايف - اليوم)
+def get_yfinance_live_data(symbol, target_time):
+    """جلب شموع 5 دقائق من Yahoo Finance - من 9:30 إلى 10:00 لليوم"""
+    try:
+        time.sleep(REQUEST_DELAY)
+
+        # جلب بيانات اليوم فقط
+        start_date = target_time.date()
+        end_date = (target_time + timedelta(days=1)).date()
+
+        df = yf.download(symbol, start=start_date, end=end_date, interval='5m', prepost=False, progress=False, auto_adjust=False)
+
+        if df.empty:
+            return pd.DataFrame(), "No Data from Yahoo"
+
+        # إذا كانت الأعمدة متعددة المستويات، نبسطها
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+
+        # تحويل التوقيت لنيويورك
+        if df.index.tz is None:
+            df.index = df.index.tz_localize('America/New_York', ambiguous='infer', nonexistent='shift_forward')
+        else:
+            df.index = df.index.tz_convert('America/New_York')
+
+        # فلتر الشموع من 9:30 إلى 10:00 فقط
+        mask = (df.index.time >= datetime.strptime('09:30', '%H:%M').time()) & \
+               (df.index.time <= datetime.strptime('10:00', '%H:%M').time())
+        df = df[mask]
+
+        # إعادة تسمية الأعمدة
+        df.rename(columns={'Open': 'Open', 'High': 'High', 'Low': 'Low', 'Close': 'Close', 'Volume': 'Volume'}, inplace=True)
+
+        # إزالة NaN
+        df = df.dropna()
+
+        if df.empty:
+            return pd.DataFrame(), "No data in time range"
+
+        return df, "OK"
+
+    except Exception as e:
+        return pd.DataFrame(), f"Yahoo Error: {str(e)}"
+def get_eodhd_data(symbol, target_time):
+    """جلب شموع 5 دقائق من EODHD - من 9:30 إلى 10:00 فقط"""
+    try:
+        time.sleep(REQUEST_DELAY)
+
+        # تحديد التوقيت بالـ timestamps
+        ny_tz = pytz.timezone('America/New_York')
+        start_time = target_time.replace(hour=9, minute=30, second=0, microsecond=0)
+        end_time = target_time.replace(hour=10, minute=0, second=0, microsecond=0)
+
+        from_ts = int(start_time.timestamp())
+        to_ts = int(end_time.timestamp())
+
+        # استخدام intraday endpoint من EODHD
+        url = f"https://eodhd.com/api/intraday/{symbol}.US"
+        params = {
+            'api_token': EODHD_API_KEY,
+            'interval': '5m',
+            'from': from_ts,
+            'to': to_ts,
+            'fmt': 'json'
+        }
+
+        r = requests.get(url, params=params, timeout=15)
+        if r.status_code != 200:
+            return pd.DataFrame(), f"EODHD API Error: {r.status_code}"
+
+        data = r.json()
+        if not data or not isinstance(data, list):
+            return pd.DataFrame(), "No Data from EODHD"
+
+        df = pd.DataFrame(data)
+
+        # تحويل التاريخ
+        if 'datetime' in df.columns:
+            df['datetime'] = pd.to_datetime(df['datetime'])
+        elif 'timestamp' in df.columns:
+            df['datetime'] = pd.to_datetime(df['timestamp'], unit='s')
+        else:
+            return pd.DataFrame(), "No datetime column"
+
+        df = df.set_index('datetime').sort_index()
+
+        # تحويل إلى توقيت نيويورك
+        if df.index.tz is None:
+            df.index = df.index.tz_localize('UTC')
+        df.index = df.index.tz_convert('America/New_York')
+
+        # إعادة تسمية الأعمدة
+        df.rename(columns={
+            'open': 'Open',
+            'high': 'High',
+            'low': 'Low',
+            'close': 'Close',
+            'volume': 'Volume'
+        }, inplace=True)
+
+        if df.empty:
+            return pd.DataFrame(), "No data in time range"
+
+        return df, "OK"
+
+    except Exception as e:
+        return pd.DataFrame(), f"EODHD Error: {str(e)}"
+def get_fmp_intraday_data(symbol, target_time):
+    """جلب شموع 5 دقائق من FMP API - من 9:30 إلى 10:00 لليوم"""
+    try:
+        time.sleep(REQUEST_DELAY)
+
+        # تحديد التاريخ المطلوب
+        date_str = target_time.strftime('%Y-%m-%d')
+
+        # استخدام الـ URL الصحيح من FMP Documentation
+        url = "https://financialmodelingprep.com/stable/historical-chart/5min"
+        params = {
+            'symbol': symbol,
+            'apikey': FMP_API_KEY,
+            'from': date_str,
+            'to': date_str
+        }
+
+        r = requests.get(url, params=params, timeout=15)
+
+        if r.status_code != 200:
+            return pd.DataFrame(), f"FMP API Error: {r.status_code}"
+
+        data = r.json()
+        if not data or not isinstance(data, list):
+            return pd.DataFrame(), "No Data from FMP"
+
+        df = pd.DataFrame(data)
+
+        # تحويل التاريخ
+        if 'date' in df.columns:
+            df['datetime'] = pd.to_datetime(df['date'])
+        elif 'timestamp' in df.columns:
+            df['datetime'] = pd.to_datetime(df['timestamp'])
+        else:
+            return pd.DataFrame(), "No datetime column"
+
+        df = df.set_index('datetime').sort_index()
+
+        # تحويل إلى توقيت نيويورك
+        if df.index.tz is None:
+            df.index = df.index.tz_localize('UTC')
+        df.index = df.index.tz_convert('America/New_York')
+
+        # فلتر الشموع من 9:30 إلى 10:00 فقط
+        mask = (df.index.time >= datetime.strptime('09:30', '%H:%M').time()) & \
+               (df.index.time <= datetime.strptime('10:00', '%H:%M').time())
+        df = df[mask]
+
+        # إعادة تسمية الأعمدة
+        df.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+
+        # إزالة NaN
+        df = df.dropna()
+
+        if df.empty:
+            return pd.DataFrame(), "No data in time range"
+
+        return df, "OK"
+
+    except Exception as e:
+        return pd.DataFrame(), f"FMP Error: {str(e)}"
+    # 🔥 التعديل هنا: زدنا الأيام من 3 إلى 10 عشان نضمن وجود 200 شمعة
+    start_timestamp = int((target_time - timedelta(days=10)).timestamp())
+
+    url = f"https://eodhd.com/api/intraday/{symbol}.US?api_token={EODHD_API_KEY}&interval=5m&fmt=json&from={start_timestamp}"
+    try:
+        time.sleep(REQUEST_DELAY)
+        r = requests.get(url, timeout=10)
+        if r.status_code != 200: return pd.DataFrame(), f"API Error: {r.status_code}"
+        data = r.json()
+        if not data or not isinstance(data, list): return pd.DataFrame(), "No Data/Bad JSON"
+
+        df = pd.DataFrame(data)
+        if 'timestamp' in df.columns: df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
+        elif 'datetime' in df.columns: df['date'] = pd.to_datetime(df['datetime'], utc=True)
+
+        df = df.set_index('date').sort_index()
+        df.index = df.index.tz_convert('America/New_York')
+        df.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+        return df, "OK"
+    except Exception as e: return pd.DataFrame(), f"Exception: {str(e)}"
+
+# ==============================================================================
+# 🧠 منطق السلم (مع إصلاح الخطأ الحسابي)
+# ==============================================================================
+# ==============================================================================
+# 🧠 منطق السلم الذكي (Scoring Engine: Golden vs Flexible)
+# ==============================================================================
+def check_ladder_pattern_final(df_window, float_val):
+    # نحتاج 3 شموع على الأقل
+    if len(df_window) < 3: return False, 0, 0, "بيانات غير كافية"
+
+    # تحويل الصفوف إلى dictionaries بدلاً من Series لتجنب مشاكل المقارنة
+    candles = [row.to_dict() if hasattr(row, 'to_dict') else dict(row) for _, row in df_window.iterrows()]
+    c1, c2 = candles[0], candles[1]
+
+    # ---------------------------------------------------------
+    # 📊 دوال مساعدة للحسابات
+    # ---------------------------------------------------------
+    def get_candle_metrics(row):
+        o, c = row['Open'], row['Close']
+        h, l = row['High'], row['Low']
+        if pd.isna(o) or pd.isna(c) or pd.isna(h) or pd.isna(l):
+            return 0, 0, False, 0, 0, 0, 0
+        body = abs(c - o)
+        body_pct = (body / o * 100) if o > 0 else 0
+        total_range = h - l
+        upper_wick = h - max(o, c)
+        wick_ratio = (upper_wick / total_range) if total_range > 0 else 0
+        is_green = c > o
+        return body_pct, wick_ratio, is_green, l, o, c, h
+
+    b1, w1, g1, l1, o1, c1_close, h1 = get_candle_metrics(c1)
+    b2, w2, g2, l2, o2, c2_close, h2 = get_candle_metrics(c2)
+
+    # =========================================================
+    # 💯 نظام النقاط (The Scoring System)
+    # Start Score: 100 -> Deduct based on ugliness
+    # =========================================================
+    score = 100
+    tag = ""
+
+    # 1. فلتر البداية (Hard Rules - لا نقاش فيها)
+    if not (g1 and g2): return False, 0, 0, "بداية حمراء"
+    if (b1 + b2) < 0.8: return False, 0, 0, "زخم ميت (<0.8%)"
+    if w1 > 0.50: return False, 0, 0, f"ذيل طويل جداً ({w1:.2f})"
+
+    # 2. خصم النقاط بناءً على "المثالية"
+
+    # أ) خصم الذيول (Penalize Wicks)
+    # الناجحين (SIDU/MVIS) ذيولهم 0.0. NBIS ذيله طويل.
+    # كل 0.1 زيادة في الذيل تخصم 5 نقاط
+    max_wick = max(w1, w2)
+    if max_wick > 0.15:
+        penalty = int((max_wick - 0.15) * 40) # معادلة الخصم
+        score -= penalty
+        # tag += f"| ذيل -{penalty}"
+
+    # ب) خصم الزخم الضعيف (Penalize Weak Body)
+    # NBY كان مجموعه 9%. إذا المجموع أقل من 1.5% نخصم
+    total_body = b1 + b2
+    if total_body < 1.5:
+        score -= 10
+    elif total_body > 4.0:
+        score += 5 # بونص للانفجار القوي
+
+    # ---------------------------------------------------------
+    # 🛡️ تتبع المسار (Path Tracking)
+    # ---------------------------------------------------------
+    start_price = o1
+    try:
+        current_price = float(candles[-1]['Close'])
+        morning_high = float(df_window['High'].max())
+    except (ValueError, TypeError):
+        return False, 0, 0, "بيانات غير صالحة"
+
+    if current_price <= start_price: return False, 0, 0, "فشل الصعود"
+
+    for i in range(1, len(candles)):
+        curr_row = candles[i]
+        prev_row = candles[i-1]
+
+        # تحويل القيم إلى float لتجنب مشكلة Series
+        try:
+            curr_l = float(curr_row['Low'])
+            prev_l = float(prev_row['Low'])
+            curr_o = float(curr_row['Open'])
+            curr_c = float(curr_row['Close'])
+            prev_o = float(prev_row['Open'])
+        except (ValueError, TypeError):
+            continue
+
+        # ج) فحص كسر القاع (The RIVN Filter)
+        if curr_l < prev_l:
+            drop_pct = abs(curr_l - prev_l) / prev_l * 100
+
+            # ⛔ Hard Rule: كسر عنيف
+            if drop_pct > 0.35: return False, 0, 0, "كسر قاع عنيف"
+
+            # ⚠️ Soft Penalty: كسر بسيط (تذبذب)
+            # RIVN كسر القاع بنسبة بسيطة، لذلك هو ناجح لكن ليس 100/100
+            score -= 15
+            # tag += "| كسر قاع"
+
+        # د) الشموع الحمراء
+        if curr_c < curr_o:
+            if curr_c < prev_o: return False, 0, 0, "ابتلاع سلبي"
+            score -= 5 # الشمعة الحمراء تقلل الجمالية قليلاً
+
+    # ---------------------------------------------------------
+    # 🏷️ التصنيف النهائي
+    # ---------------------------------------------------------
+    score = max(0, min(100, score)) # حصر النتيجة بين 0 و 100
+
+    if score >= 90:
+        final_tag = "💎 ذهبي (Golden)" # مثل NBY, SIDU
+    elif score >= 75:
+        final_tag = "✅ قوي/مرن (Strong)" # مثل RIVN, NBIS
+    else:
+        final_tag = "⚠️ مقبول (Weak)" # مثل CCL بذيول
+
+    return True, score, morning_high, final_tag
+
+# ==============================================================================
+# ⚡ المعالج الفردي
+# ==============================================================================
+def process_stock(ticker, target_time):
+    try:
+        # تجربة FMP Premium أولاً (البيانات الأفضل)
+        df, status = get_fmp_intraday_data(ticker, target_time)
+
+        # إذا فشل FMP، جرب Databento
+        if df.empty:
+            df, status = get_databento_data(ticker, target_time)
+
+        # إذا فشل الاثنين، استخدم Yahoo Finance كآخر خيار
+        if df.empty:
+            df, status = get_yfinance_live_data(ticker, target_time)
+        if df.empty: return None, f"{ticker}: {status}"
+
+        day_data = df[df.index.date == target_time.date()]
+        if day_data.empty: return None, f"{ticker}: No Today Data"
+
+        cutoff_mask = day_data.index <= target_time
+        setup = day_data[cutoff_mask]
+
+        if len(setup) < 3: return None, f"{ticker}: Not Enough Candles (<3)"
+
+        # 🚀 جلب الفلوت الآمن
+        float_val = get_float_shares_safe(ticker)
+
+        is_valid, score, morning_high, reason = check_ladder_pattern_final(setup, float_val)
+
+        if is_valid:
+            pattern_tag = reason  # الآن reason هو التصنيف مثل "💎 ذهبي (Golden)"
+            if "ثقيل" in pattern_tag: return None, f"{ticker}: Heavy"
+
+            total_vol = setup['Volume'].sum()
+            liq_status, liq_pct = evaluate_liquidity(total_vol, float_val)
+            if liq_pct < 0.2: return None, f"{ticker}: Dead Liq ({liq_pct:.2f}%)"
+
+            current_price = setup['Close'].iloc[-1]
+
+            # SMA 200
+            full_history_until_now = df[df.index <= target_time]
+            sma_msg = ""
+            if len(full_history_until_now) >= 200:
+                sma200 = full_history_until_now['Close'].rolling(window=200).mean().iloc[-1]
+                diff_pct = ((current_price - sma200) / sma200) * 100
+                if abs(diff_pct) <= 5.0:
+                    pos = "فوق" if current_price > sma200 else "تحت"
+                    sma_msg = f"\n🔥 **تنبيه:** السعر يلامس SMA200 ({pos} المتوسط: ${sma200:.2f})"
+
+            if current_price >= morning_high * 0.99:
+                action_text = "🚀 **دخول مباشر** (اختراق)"
+            else:
+                buy_stop = morning_high + 0.01
+                if current_price < 1.0: buy_stop = morning_high + 0.0001
+                action_text = f"✋ **أمر معلق (Buy Stop): ${buy_stop:.4f}**"
+
+            shariah_status = get_shariah_label(ticker)
+            flag = "🇺🇸"
+
+            # تحديد الايموجي بناء على القوة
+            score_emoji = "⭐️⭐️⭐️⭐️⭐️" if score >= 90 else ("⭐️⭐️⭐️" if score >= 75 else "⭐️")
+
+            msg = (
+                f"🪜 **سلم صاعد ({pattern_tag})**\n"
+                f"🔋 **القوة:** {score}% {score_emoji}\n\n"
+                f"🏆 السهم: *{ticker}* {flag}\n"
+                f"💵 السعر (10:00): *${current_price:.4f}*\n"
+                f"🎯 القمة: *${morning_high:.4f}*\n"
+                f"💧 السيولة: {liq_status} *({liq_pct:.1f}%)*\n"
+                f"🪶 الفلوت: *{fmt_shares(float_val)}*\n"
+                f"⚖️ الحكم: *{shariah_status}*"
+                f"{sma_msg}\n"
+                f"---------------------------\n"
+                f"{action_text}"
+            )
+            return msg, "OK"
+        else:
+            return None, f"{ticker}: {reason}"
+    except Exception as e:
+        return None, f"{ticker}: Error {str(e)}"
+
+# ==============================================================================
+# 🚀 Main Loop
+# ==============================================================================
+def get_finviz_elite_list():
+    print("📡 سحب الأسهم ($0.02 - $11 + Float < 15M) من Finviz Elite...")
+    url = (
+        "https://elite.finviz.com/export.ashx?v=111"
+        "&f=sh_price_u11,sh_float_u15,sh_curvol_o50,ta_change_u"
+        "&o=-volume"
+    )
+    try:
+        response = requests.get(url, headers=FINVIZ_HEADERS, timeout=15)
+        if response.status_code == 200:
+            csv_data = io.StringIO(response.text)
+            df = pd.read_csv(csv_data)
+            if 'Ticker' in df.columns and 'Price' in df.columns:
+                # فلتر الأسهم من 0.02$ إلى 11$
+                df = df[(df['Price'] >= 0.02) & (df['Price'] <= 11.0)]
+                top_300 = df['Ticker'].head(300).tolist()
+                print(f"✅ تم تحميل {len(top_300)} سهم (السعر: $0.02 - $11).")
+                return top_300
+    except: pass
+    return []
+
+def get_trading_day_target(current_time_ny):
+    """الحصول على وقت 10:00 صباحاً لليوم الحالي أو آخر يوم تداول"""
+    cutoff_hour, cutoff_minute = 10, 0
+
+    check_date = current_time_ny
+
+    # إذا كان اليوم سبت أو أحد، نرجع للجمعة
+    while check_date.weekday() > 4:  # 5=سبت, 6=أحد
+        check_date -= timedelta(days=1)
+
+    target_time = check_date.replace(hour=cutoff_hour, minute=cutoff_minute, second=0, microsecond=0)
+
+    # إذا لسا ما وصلنا للعاشرة صباحاً اليوم، نرجع لأمس
+    if check_date.date() == current_time_ny.date() and current_time_ny < target_time:
+        check_date -= timedelta(days=1)
+        while check_date.weekday() > 4:
+            check_date -= timedelta(days=1)
+        target_time = check_date.replace(hour=cutoff_hour, minute=cutoff_minute, second=0, microsecond=0)
+
+    print(f"📅 تحليل شموع {check_date.strftime('%Y-%m-%d %A')} من 9:30 إلى 10:00 صباحاً...")
+
+    return target_time
+
+def main():
+    print("="*50)
+    print("🛡️ HYBRID BOT (Type-Safe Mode)")
+    print("="*50)
+
+    ny_tz = pytz.timezone('America/New_York')
+    target_time = get_trading_day_target(datetime.now(ny_tz))
+    print(f"📅 وقت التحليل: {target_time.strftime('%Y-%m-%d %H:%M')}")
+
+    market_list = get_finviz_elite_list()
+    if not market_list:
+        print("❌ لم يتم جلب أي أسهم.")
+        return
+
+    print(f"🚀 بدء الفحص (3 Workers)...")
+
+    matches = 0
+    successful_stocks = []  # لحفظ الأسهم الناجحة
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        future_to_stock = {executor.submit(process_stock, ticker, target_time): ticker for ticker in market_list}
+
+        for i, future in enumerate(concurrent.futures.as_completed(future_to_stock), 1):
+            stock = future_to_stock[future]
+            try:
+                msg, status = future.result()
+                if msg:
+                    send_telegram(msg)
+                    print(f"✅ {stock}: مقبول")
+                    matches += 1
+                    # استخراج نسبة القوة من الرسالة
+                    import re
+                    score_match = re.search(r'القوة:\*\* (\d+)%', msg)
+                    if score_match:
+                        score = int(score_match.group(1))
+                        successful_stocks.append((stock, score))
+                else:
+                    # طباعة السبب لتطمئن
+                    print(f"⚠️ {status}")
+
+            except Exception as exc: pass
+
+    print(f"\n🏁 النتائج النهائية: {matches}")
+
+    # إرسال الملخص على تليجرام
+    if successful_stocks:
+        # ترتيب الأسهم حسب القوة (من الأعلى للأقل)
+        successful_stocks.sort(key=lambda x: x[1], reverse=True)
+
+        summary = "📊 *ملخص الأسهم اليوم*\n"
+        summary += f"📅 التاريخ: {target_time.strftime('%Y-%m-%d')}\n"
+        summary += f"✅ عدد الأسهم: {matches}\n\n"
+
+        for stock, score in successful_stocks:
+            stars = "⭐️⭐️⭐️⭐️⭐️" if score >= 90 else ("⭐️⭐️⭐️" if score >= 75 else "⭐️")
+            summary += f"• *{stock}*: {score}% {stars}\n"
+
+        send_telegram(summary)
+        print(f"\n✅ تم إرسال الملخص على تليجرام")
+
+if __name__ == "__main__":
+    main()

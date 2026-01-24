@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معلّم الآيات التفاعلي - المصحف</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d6a4f 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #quran-canvas {
+            cursor: crosshair;
+            display: block;
+            margin: auto;
+            border: 3px solid #c5a059;
+            border-radius: 10px;
+            background: white;
+        }
+        #nav-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .page-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #1a472a;
+        }
+        .click-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff5722;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            animation: pulse 0.3s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .ayah-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid #c5a059;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .ayah-item.selected {
+            background: #fff3cd;
+            border-left-color: #ff5722;
+        }
+        .badge {
+            display: inline-block;
+            background: #c5a059;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="h-screen flex flex-col">
+        <!-- Header -->
+        <div class="bg-white/90 backdrop-blur p-4 shadow-lg">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-quran text-3xl text-[#1a472a]"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold text-[#1a472a]">معلّم الآيات</h1>
+                        <p class="text-sm text-gray-600">اضغط على الآيات لتحديد إحداثياتها</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <span class="badge">الصفحة: <span id="current-page">1</span>/604</span>
+                    <span class="badge">الآيات: <span id="ayah-count">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Canvas Area -->
+            <div class="flex-1 flex flex-col items-center justify-center overflow-auto bg-gray-900 p-4">
+                <div class="page-info mb-3" id="page-info">
+                    جاري التحميل...
+                </div>
+                <div class="relative" id="canvas-container" style="width: 100%; max-width: 600px;">
+                    <canvas id="quran-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="w-80 bg-white/95 backdrop-blur flex flex-col shadow-lg">
+                <!-- Page & Input -->
+                <div class="p-4 border-b">
+                    <label class="block text-sm font-bold text-[#1a472a] mb-2">رقم الصفحة</label>
+                    <input type="number" id="page-input" min="1" max="604" value="1" class="w-full p-2 border-2 border-[#c5a059] rounded-lg font-bold text-center">
+                </div>
+
+                <!-- Ayahs List -->
+                <div class="flex-1 overflow-y-auto p-4 border-b">
+                    <h3 class="font-bold text-[#1a472a] mb-3 text-sm">
+                        <i class="fas fa-list text-[#c5a059]"></i> الآيات المحددة
+                    </h3>
+                    <div id="ayahs-list" class="space-y-2">
+                        <p class="text-xs text-gray-500 text-center">لم يتم تحديد آيات بعد</p>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="p-4 space-y-3 border-b">
+                    <button id="undo-btn" class="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600 disabled:opacity-50" disabled>
+                        <i class="fas fa-undo"></i> تراجع
+                    </button>
+                    <button id="clear-page-btn" class="w-full bg-red-500 text-white py-2 rounded-lg font-bold hover:bg-red-600">
+                        <i class="fas fa-trash"></i> مسح الصفحة
+                    </button>
+                    <button id="export-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700">
+                        <i class="fas fa-download"></i> تحميل البيانات
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="p-4 bg-[#fdfbf7]">
+                    <h3 class="font-bold text-[#1a472a] text-sm mb-3">📊 الإحصائيات</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span>إجمالي الآيات:</span>
+                            <span id="stat-total" class="font-bold text-[#c5a059]">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>الصفحات المعالجة:</span>
+                            <span id="stat-pages" class="font-bold text-[#c5a059]">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Navigation Buttons -->
+    <div id="nav-buttons">
+        <button id="prev-btn" class="bg-[#1a472a] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#0f2a1a] shadow-lg">
+            <i class="fas fa-arrow-right"></i> السابقة
+        </button>
+        <button id="next-btn" class="bg-[#1a472a] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#0f2a1a] shadow-lg">
+            التالية <i class="fas fa-arrow-left"></i>
+        </button>
+    </div>
+
+    <script>
+        const REPO_URL = 'https://raw.githubusercontent.com/salahamassi/Quran-svg-mobile/main/output';
+        
+        let currentPage = 1;
+        let allAyahs = {}; // {page: [ayahs]}
+        let currentPageAyahs = [];
+        let canvas = null;
+        let ctx = null;
+        let currentImage = null;
+
+        // Initialize
+        async function init() {
+            canvas = document.getElementById('quran-canvas');
+            ctx = canvas.getContext('2d');
+            
+            setupEventListeners();
+            await loadPage(1);
+        }
+
+        function setupEventListeners() {
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                if (currentPage > 1) loadPage(currentPage - 1);
+            });
+
+            document.getElementById('next-btn').addEventListener('click', () => {
+                if (currentPage < 604) loadPage(currentPage + 1);
+            });
+
+            document.getElementById('page-input').addEventListener('change', (e) => {
+                const page = parseInt(e.target.value);
+                if (page >= 1 && page <= 604) loadPage(page);
+            });
+
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                addAyah(x, y);
+            });
+
+            document.getElementById('undo-btn').addEventListener('click', undoLast);
+            document.getElementById('clear-page-btn').addEventListener('click', clearPage);
+            document.getElementById('export-btn').addEventListener('click', exportData);
+        }
+
+        async function loadPage(pageNum) {
+            currentPage = pageNum;
+            document.getElementById('current-page').textContent = pageNum;
+            document.getElementById('page-input').value = pageNum;
+            document.getElementById('page-info').textContent = `جاري تحميل الصفحة ${pageNum}...`;
+
+            try {
+                const paddedNum = String(pageNum).padStart(3, '0');
+                const url = `${REPO_URL}/${paddedNum}.svg`;
+
+                const response = await fetch(url);
+                const svgText = await response.text();
+
+                // Convert SVG to image
+                const blob = new Blob([svgText], { type: 'image/svg+xml' });
+                const objectUrl = URL.createObjectURL(blob);
+
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    currentImage = img;
+
+                    document.getElementById('page-info').innerHTML = `
+                        <span class="font-bold text-[#1a472a]">الصفحة ${pageNum}</span>
+                        <span class="text-sm text-gray-600 block">اضغط على الآيات لتحديد إحداثياتها</span>
+                    `;
+
+                    URL.revokeObjectURL(objectUrl);
+                };
+                img.src = objectUrl;
+
+                // Load existing ayahs for this page
+                currentPageAyahs = allAyahs[pageNum] || [];
+                redrawPage();
+
+            } catch (error) {
+                document.getElementById('page-info').textContent = `❌ خطأ في التحميل: ${error.message}`;
+            }
+        }
+
+        function redrawPage() {
+            if (!currentImage) return;
+
+            ctx.drawImage(currentImage, 0, 0);
+
+            // Draw existing markers
+            currentPageAyahs.forEach((ayah, index) => {
+                ctx.strokeStyle = '#c5a059';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(ayah.x, ayah.y, ayah.width, ayah.height);
+
+                // Draw number
+                ctx.fillStyle = '#c5a059';
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(index + 1, ayah.x + 5, ayah.y - 5);
+            });
+
+            updateAyahsList();
+        }
+
+        function addAyah(x, y) {
+            if (!currentPageAyahs) currentPageAyahs = [];
+
+            // صغير جداً - قد الآية بس
+            const size = 15;
+            const ayah = {
+                x: Math.max(0, x - size / 2),
+                y: Math.max(0, y - size / 2),
+                width: size,
+                height: size
+            };
+
+            currentPageAyahs.push(ayah);
+            if (!allAyahs[currentPage]) allAyahs[currentPage] = [];
+            allAyahs[currentPage] = currentPageAyahs;
+
+            redrawPage();
+            updateStats();
+
+            // Show pulse animation
+            const marker = document.createElement('div');
+            marker.className = 'click-marker';
+            marker.style.left = x + 'px';
+            marker.style.top = y + 'px';
+            document.getElementById('canvas-container').appendChild(marker);
+            setTimeout(() => marker.remove(), 300);
+        }
+
+        function undoLast() {
+            if (currentPageAyahs.length > 0) {
+                currentPageAyahs.pop();
+                allAyahs[currentPage] = currentPageAyahs;
+                redrawPage();
+                updateStats();
+            }
+        }
+
+        function clearPage() {
+            if (confirm('هل تريد مسح جميع الآيات في هذه الصفحة؟')) {
+                currentPageAyahs = [];
+                allAyahs[currentPage] = [];
+                redrawPage();
+                updateStats();
+            }
+        }
+
+        function updateAyahsList() {
+            const list = document.getElementById('ayahs-list');
+            document.getElementById('ayah-count').textContent = currentPageAyahs.length;
+
+            if (currentPageAyahs.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500 text-center">لم يتم تحديد آيات بعد</p>';
+                return;
+            }
+
+            list.innerHTML = currentPageAyahs.map((ayah, idx) => `
+                <div class="ayah-item">
+                    <div class="font-bold text-[#c5a059]">آية ${idx + 1}</div>
+                    <div class="text-xs text-gray-600 mt-1">
+                        الموقع: (${Math.round(ayah.x)}, ${Math.round(ayah.y)})
+                    </div>
+                    <div class="text-xs text-gray-600">
+                        الحجم: ${Math.round(ayah.width)}×${Math.round(ayah.height)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            let totalAyahs = 0;
+            let processedPages = 0;
+
+            for (let page in allAyahs) {
+                if (allAyahs[page].length > 0) {
+                    totalAyahs += allAyahs[page].length;
+                    processedPages++;
+                }
+            }
+
+            document.getElementById('stat-total').textContent = totalAyahs;
+            document.getElementById('stat-pages').textContent = processedPages;
+        }
+
+        function exportData() {
+            // Build complete JSON
+            const data = {
+                timestamp: new Date().toISOString(),
+                total_pages: 604,
+                processed_pages: Object.keys(allAyahs).filter(p => allAyahs[p].length > 0).length,
+                total_ayahs: Object.values(allAyahs).reduce((sum, arr) => sum + arr.length, 0),
+                pages: {}
+            };
+
+            // Add page data
+            for (let page in allAyahs) {
+                if (allAyahs[page].length > 0) {
+                    data.pages[page] = allAyahs[page].map((ayah, idx) => ({
+                        ayah_number: idx + 1,
+                        x: Math.round(ayah.x),
+                        y: Math.round(ayah.y),
+                        width: Math.round(ayah.width),
+                        height: Math.round(ayah.height)
+                    }));
+                }
+            }
+
+            // Download JSON
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quran_ayahs_coordinates_${new Date().getTime()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>

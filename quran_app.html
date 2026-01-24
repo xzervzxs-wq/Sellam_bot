@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>المصحف الرقمي</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1a472a;
+            --secondary: #c5a059;
+            --bg-light: #ffffff;
+            --bg-dark: #000000;
+            --panel-light: rgba(255, 255, 255, 0.9);
+            --panel-dark: rgba(30, 30, 30, 0.9);
+        }
+
+        * {
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            box-sizing: border-box;
+            outline: none;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            background-color: var(--bg-light);
+            height: 100vh;
+            /* دعم الشاشات الحديثة */
+            height: 100dvh; 
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+        }
+
+        /* --- Loader --- */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-light);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            transition: opacity 0.5s;
+        }
+        body.dark-mode #loader { background: var(--bg-dark); }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(197, 160, 89, 0.3);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Mushaf Viewer --- */
+        .content-area {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* الحاوية التي سيتم حقن كود SVG بداخلها */
+        #quran-view {
+            width: 100%;
+            /* استخدام dvh يضمن الامتلاء الحقيقي للشاشة */
+            height: 100vh;
+            height: 100dvh; 
+            display: flex;
+            align-items: stretch; 
+            justify-content: stretch;
+            overflow: hidden; /* لمنع ظهور أشرطة تمرير بسبب التمطيط */
+        }
+
+        /* تنسيق كود SVG المحقون */
+        #quran-view svg {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover; 
+            display: block;
+            flex: 1;
+        }
+
+        body.dark-mode #quran-view {
+            filter: invert(0.9) hue-rotate(180deg) brightness(1.1);
+        }
+
+        /* --- Navigation Zones --- */
+        .nav-zone {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 35%;
+            z-index: 10;
+        }
+        .nav-left { left: 0; }
+        .nav-right { right: 0; }
+
+        /* --- Bottom Controls --- */
+        .tab-nav {
+            position: fixed;
+            bottom: 30px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 50px;
+            background: var(--panel-light);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .tab-nav.idle {
+            opacity: 0.2;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        body.dark-mode .tab-nav {
+            background: var(--panel-dark);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 20px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab-btn.active-bookmark { color: var(--secondary); }
+        
+        /* --- Page Badge --- */
+        .page-badge {
+            position: absolute; 
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cairo'; 
+            font-size: 12px; 
+            color: #666;
+            background: rgba(255,255,255,0.7); 
+            padding: 4px 14px; 
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+        body.dark-mode .page-badge {
+            color: #aaa;
+            background: rgba(0,0,0,0.6);
+        }
+        .page-badge.idle { opacity: 0; }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 2000;
+        }
+        .toast.show { opacity: 1; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div style="font-family: 'Cairo'; font-size: 12px;">جاري التحميل</div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast" class="toast">تم</div>
+
+    <!-- Main Viewer -->
+    <div class="content-area">
+        <!-- الحاوية التي سنحقن فيها الكود -->
+        <div id="quran-view"></div>
+
+        <!-- مناطق اللمس -->
+        <div class="nav-zone nav-right" onclick="prevPage()"></div>
+        <div class="nav-zone nav-left" onclick="nextPage()"></div>
+
+        <!-- رقم الصفحة -->
+        <div id="page-indicator" class="page-badge">1</div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="tab-nav" id="bottom-nav">
+        <button class="tab-btn" onclick="toggleDarkMode()">
+            <i class="fas fa-moon" id="dark-mode-icon"></i>
+        </button>
+        <button class="tab-btn" onclick="toggleBookmark()" id="bookmark-btn">
+            <i class="fas fa-bookmark"></i>
+        </button>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const SVG_BASE_URL = 'https://raw.githubusercontent.com/batoulapps/quran-svg/main/svg/';
+        const TOTAL_PAGES = 604;
+        
+        // --- STATE ---
+        let currentPage = parseInt(localStorage.getItem('lastPage')) || 1;
+        let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+        let idleTimeout;
+
+        // --- INIT ---
+        window.onload = () => {
+            applyTheme();
+            loadPage(currentPage);
+            
+            // تفعيل نظام الإخفاء التلقائي
+            resetIdleTimer();
+            document.addEventListener('click', resetIdleTimer);
+            document.addEventListener('touchstart', resetIdleTimer);
+        };
+
+        // --- CORE FUNCTIONS (INLINE FETCHING) ---
+        async function loadPage(num) {
+            if (num < 1) num = 1;
+            if (num > TOTAL_PAGES) num = TOTAL_PAGES;
+            currentPage = num;
+            localStorage.setItem('lastPage', currentPage);
+
+            const paddedNum = String(currentPage).padStart(3, '0');
+            const url = `${SVG_BASE_URL}${paddedNum}.svg`;
+            const container = document.getElementById('quran-view');
+
+            try {
+                // جلب النص المصدري للملف
+                const response = await fetch(url);
+                let svgText = await response.text();
+
+                // 1. إجبار المتصفح على تجاهل النسب الأصلية (Stretch)
+                if (svgText.includes('<svg')) {
+                    // استبدال وتنظيف كود SVG لضمان الامتلاء
+                    svgText = svgText.replace(/<svg([^>]*)>/, (match, attrs) => {
+                        // إزالة أي قيود سابقة
+                        let newAttrs = attrs.replace(/width="[^"]*"/g, '')
+                                            .replace(/height="[^"]*"/g, '')
+                                            .replace(/preserveAspectRatio="[^"]*"/g, '');
+                        
+                        // إضافة التوجيهات - حفظ النسبة مع ملء الشاشة
+                        return `<svg${newAttrs} width="100%" height="100%" preserveAspectRatio="xMidYMid slice">`;
+                    });
+                }
+
+                container.innerHTML = svgText;
+                
+                // إخفاء اللودر عند النجاح
+                const loader = document.getElementById('loader');
+                if(loader.style.display !== 'none') {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }
+                
+                updateUI();
+
+            } catch (error) {
+                console.error("Failed to load SVG", error);
+                container.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:fill;">`;
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < TOTAL_PAGES) loadPage(currentPage + 1);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) loadPage(currentPage - 1);
+        }
+
+        function updateUI() {
+            document.getElementById('page-indicator').innerText = currentPage;
+            
+            const btn = document.getElementById('bookmark-btn');
+            if (bookmarks.includes(currentPage)) {
+                btn.classList.add('active-bookmark');
+                btn.innerHTML = '<i class="fas fa-bookmark"></i>';
+            } else {
+                btn.classList.remove('active-bookmark');
+                btn.innerHTML = '<i class="far fa-bookmark"></i>';
+            }
+        }
+
+        // --- INTERACTION ---
+        function resetIdleTimer() {
+            const nav = document.getElementById('bottom-nav');
+            const badge = document.getElementById('page-indicator');
+            
+            nav.classList.remove('idle');
+            badge.classList.remove('idle');
+            
+            clearTimeout(idleTimeout);
+            idleTimeout = setTimeout(() => {
+                nav.classList.add('idle');
+                badge.classList.add('idle');
+            }, 2500);
+        }
+
+        // --- BOOKMARKS ---
+        function toggleBookmark() {
+            const index = bookmarks.indexOf(currentPage);
+            if (index === -1) {
+                bookmarks.push(currentPage);
+                showToast('تم الحفظ');
+            } else {
+                bookmarks.splice(index, 1);
+                showToast('تم الإزالة');
+            }
+            bookmarks.sort((a,b) => a-b);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            updateUI();
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1500);
+        }
+
+        // --- THEME ---
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('darkMode', isDarkMode);
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const icon = document.getElementById('dark-mode-icon');
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                icon.className = 'fas fa-sun';
+            } else {
+                document.body.classList.remove('dark-mode');
+                icon.className = 'fas fa-moon';
+            }
+        }
+    </script>
+</body>
+</html>

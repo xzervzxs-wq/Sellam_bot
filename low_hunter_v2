@@ -1,0 +1,186 @@
+import requests
+import sys
+import os
+from datetime import datetime
+from dotenv import load_dotenv
+import yfinance as yf
+import time
+
+# ==============================================================================
+# 🔑 إعدادات البيئة
+# ==============================================================================
+load_dotenv()
+
+TELEGRAM_BOT_TOKEN = "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg"
+TELEGRAM_CHAT_ID = "237657512"
+
+# ==============================================================================
+# 🎯 الإعدادات
+# ==============================================================================
+MAX_FLOAT = 10_000_000         # فلوت أقل من 10 مليون
+MAX_DISTANCE_FROM_LOW = 15     # أقصى مسافة من القاع: 15%
+MIN_VOLUME = 50_000            # حد أدنى للفوليوم
+
+# قائمة أسهم Low Float معروفة + أسهم نشطة
+LOW_FLOAT_STOCKS = [
+    # Penny stocks معروفة
+    'CLOV', 'SOFI', 'PLTR', 'NIO', 'LCID', 'RIVN', 'FSR', 'GOEV',
+    'TLRY', 'ACB', 'SNDL', 'CGC', 'HEXO', 'GRWG',
+    'BB', 'NOK', 'WISH', 'CENN', 'FFIE', 'NKLA',
+    'PLUG', 'FCEL', 'BE', 'BLDP', 'HYLN',
+    'SPCE', 'RKLB', 'ASTR', 'RDW', 'ASTS',
+    'DNA', 'IONQ', 'RGTI', 'QUBT',
+    'LAZR', 'LIDR', 'MVIS', 'VLDR',
+    'WKHS', 'RIDE', 'ARVL', 'PSNY',
+    'OPEN', 'RDFN', 'COMP', 'EXPI',
+    'CRSP', 'EDIT', 'NTLA', 'BEAM',
+    'AI', 'BIGC', 'SNOW', 'PATH',
+    # أسهم منخفضة السعر
+    'AMC', 'GME', 'BBBY', 'EXPR', 'KOSS',
+    'NAKD', 'CTRM', 'ZOM', 'IDEX', 'GEVO',
+    'OCGN', 'BNGO', 'SENS', 'CLVS', 'TRVN',
+    'MARA', 'RIOT', 'HUT', 'BITF', 'HIVE',
+    'DPST', 'FAZ', 'LABU', 'LABD', 'NUGT',
+    'JNUG', 'DUST', 'DRIP', 'GUSH',
+    # أسهم تحت $10
+    'F', 'SNAP', 'PINS', 'HOOD', 'COIN',
+    'DKNG', 'PENN', 'SKLZ', 'PTRA',
+    'TELL', 'RIG', 'SWN', 'AR', 'RRC',
+    'AAL', 'UAL', 'DAL', 'SAVE', 'JBLU',
+    # بعض المزيد
+    'XELA', 'PROG', 'ATER', 'BBIG', 'SPRT',
+    'IRNT', 'TMC', 'SDC', 'BODY', 'TALK'
+]
+
+def log(msg):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
+    sys.stdout.flush()
+
+def send_telegram(message):
+    if not TELEGRAM_BOT_TOKEN: return
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
+        resp = requests.post(url, json=payload, timeout=10)
+        if not resp.json().get('ok'):
+            log(f"❌ خطأ تليجرام: {resp.json()}")
+    except Exception as e:
+        log(f"❌ خطأ إرسال: {e}")
+
+def format_float(num):
+    """تنسيق الفلوت بشكل مقروء"""
+    if not num: return "N/A"
+    if num >= 1_000_000_000:
+        return f"{num/1_000_000_000:.2f}B"
+    if num >= 1_000_000:
+        return f"{num/1_000_000:.2f}M"
+    elif num >= 1_000:
+        return f"{num/1_000:.0f}K"
+    return str(int(num))
+
+def run_support_hunter_strategy():
+    log("🔵 جاري فحص الأسهم عبر Yahoo Finance...")
+    log(f"   📊 عدد الأسهم للفحص: {len(LOW_FLOAT_STOCKS)}")
+    
+    final_matches = []
+    checked = 0
+    
+    for symbol in LOW_FLOAT_STOCKS:
+        checked += 1
+        try:
+            ticker = yf.Ticker(symbol)
+            info = ticker.info
+            
+            # تجاهل ETFs
+            quote_type = info.get('quoteType', '')
+            if quote_type in ['ETF', 'MUTUALFUND', 'INDEX']:
+                continue
+            
+            price = info.get('currentPrice') or info.get('regularMarketPrice') or info.get('previousClose', 0)
+            year_low = info.get('fiftyTwoWeekLow', 0)
+            volume = info.get('volume', 0) or info.get('regularMarketVolume', 0)
+            float_shares = info.get('floatShares', 0)
+            
+            if not price or not year_low or price <= 0:
+                continue
+            
+            # حساب المسافة من القاع
+            distance = ((price - year_low) / year_low) * 100
+            
+            # فلترة
+            if distance <= MAX_DISTANCE_FROM_LOW:
+                # فقط إذا الفلوت أقل من الحد أو غير معروف
+                if float_shares == 0 or float_shares <= MAX_FLOAT:
+                    final_matches.append({
+                        'symbol': symbol,
+                        'price': price,
+                        'year_low': year_low,
+                        'float': float_shares,
+                        'distance': distance,
+                        'volume': volume,
+                        'change': info.get('regularMarketChangePercent', 0)
+                    })
+                    log(f"   🎯 {symbol} | ${price:.2f} | Dist: {distance:.1f}% | Float: {format_float(float_shares)}")
+            
+            # تقدم كل 20 سهم
+            if checked % 20 == 0:
+                log(f"   ⏳ تم فحص {checked}/{len(LOW_FLOAT_STOCKS)} سهم...")
+                
+        except Exception as e:
+            continue
+    
+    # ترتيب حسب القرب من القاع
+    final_matches.sort(key=lambda x: x['distance'])
+    
+    if final_matches:
+        log(f"✅ تم اعتماد {len(final_matches)} سهم قريب من القاع.")
+        
+        # فلترة الفوليوم
+        high_vol = [s for s in final_matches if s['volume'] >= MIN_VOLUME]
+        
+        if high_vol:
+            msg = "🔥💎 *صياد القيعان* 💎🔥\n"
+            msg += "━━━━━━━━━━━━━\n"
+            msg += f"📅 {datetime.now().strftime('%H:%M')} | 🎯 Near Low\n"
+            msg += "━━━━━━━━━━━━━\n\n"
+            
+            for s in high_vol[:10]:
+                icon = "🔥" if s['distance'] < 5 else "✅"
+                chg_icon = "📈" if s['change'] >= 0 else "📉"
+                msg += f"{icon} *{s['symbol']}* | ${s['price']:.2f}\n"
+                msg += f"📉 قاع: ${s['year_low']:.2f} | 📏 {s['distance']:.1f}%\n"
+                msg += f"🪶 {format_float(s['float'])} | 📊 Vol: {format_float(s['volume'])}\n"
+                msg += f"{chg_icon} Change: {s['change']:.1f}%\n"
+                msg += "─────────────\n"
+            
+            msg += f"\n✅ المجموع: {len(high_vol)} سهم"
+            send_telegram(msg)
+            log("📬 تم الإرسال للتليجرام.")
+        else:
+            log("⚠️ الأسهم موجودة لكن الفوليوم ضعيف جداً.")
+            
+        # طباعة التقرير في الكونسول
+        print("\n" + "="*70)
+        print(f"🎯 النتائج النهائية ({len(final_matches)} سهم):")
+        print("="*70)
+        print(f"{'Symbol':<8} | {'Price':<8} | {'Low':<8} | {'Dist%':<6} | {'Float':<10} | {'Volume':<10}")
+        print("-"*70)
+        for s in final_matches[:20]:
+            print(f"  {s['symbol']:<6} | ${s['price']:<6.2f} | ${s['year_low']:<6.2f} | {s['distance']:<5.1f}% | {format_float(s['float']):<9} | {format_float(s['volume'])}")
+        print("="*70)
+
+    else:
+        log("🐢 لم يتم العثور على أسهم قريبة من القاع.")
+
+# ==============================================================================
+# التشغيل
+# ==============================================================================
+def main():
+    print("="*50)
+    print("🤖 LOW FLOAT HUNTER v2 (Yahoo Finance)")
+    print("="*50)
+    run_support_hunter_strategy()
+    print("✅ Done.")
+
+if __name__ == "__main__":
+    main()

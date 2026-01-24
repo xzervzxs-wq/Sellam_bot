@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a472a">
+    <title>أداة توسيم المصحف | Quran Annotator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #c5a059; --green: #1a472a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; background: #fdfbf7; overflow-x: hidden; }
+        
+        #canvas-container {
+            position: relative;
+            display: inline-block;
+            border: 3px solid var(--green);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            max-width: 100%;
+            margin-top: 20px;
+        }
+
+        canvas { display: block; cursor: crosshair; }
+
+        .annotation-box {
+            position: absolute;
+            border: 2px solid var(--gold);
+            background: rgba(197, 160, 89, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--green);
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .annotation-box:hover {
+            background: rgba(197, 160, 89, 0.3);
+            border-width: 3px;
+        }
+
+        .annotation-box.selected {
+            border: 3px solid #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .verse-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .verse-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            cursor: pointer;
+            border-left: 3px solid var(--gold);
+            transition: all 0.2s;
+        }
+
+        .verse-item:hover {
+            background: #f0fdf4;
+            transform: translateX(-5px);
+        }
+
+        .verse-item.selected {
+            background: var(--gold);
+            color: white;
+        }
+
+        .btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn:hover { background: #143620; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,71,42,0.3); }
+
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-group input, .input-group select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .stats {
+            background: rgba(197, 160, 89, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-right: 4px solid var(--gold);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: right;
+        }
+
+        .json-output {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-[#1a472a] mb-2">🕋 أداة توسيم المصحف</h1>
+            <p class="text-gray-600">حدد الآيات على صورة المصحف وأنشئ خريطة إحداثيات</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Panel - Controls -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-bold text-[#1a472a] mb-4">🔧 التحكم</h2>
+
+                    <!-- Image Upload -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2">1️⃣ حمل صورة المصحف</label>
+                        <input type="file" id="imageInput" accept="image/*" class="w-full p-2 border rounded-lg">
+                        <small class="text-gray-500">اختر صورة صفحة من المصحف</small>
+                    </div>
+
+                    <!-- Verse Input -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2">2️⃣ أدخل بيانات الآية</label>
+                        <div class="input-group">
+                            <input type="number" id="surahNum" placeholder="رقم السورة" min="1" max="114">
+                            <input type="number" id="ayahFrom" placeholder="من الآية" min="1">
+                            <input type="number" id="ayahTo" placeholder="إلى الآية" min="1">
+                        </div>
+                        <small class="text-gray-500">ثم ارسم على الصورة</small>
+                    </div>
+
+                    <!-- Drawing Mode -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2">3️⃣ أداة الرسم</label>
+                        <button onclick="startDrawing()" class="btn w-full">
+                            <i class="fas fa-pen"></i> ابدأ الرسم
+                        </button>
+                        <button onclick="cancelDrawing()" class="btn btn-danger w-full">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats">
+                        <div class="text-sm font-bold text-[#1a472a] mb-2">📊 الإحصائيات</div>
+                        <div class="text-xs">
+                            <p>عدد الآيات المحددة: <span id="annotationCount" class="font-bold">0</span></p>
+                            <p>حجم الصورة: <span id="imageSize" class="font-bold">-</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mt-6">
+                        <button onclick="exportAnnotations()" class="btn btn-success w-full mb-2">
+                            <i class="fas fa-download"></i> حفظ البيانات
+                        </button>
+                        <button onclick="showJSON()" class="btn w-full mb-2">
+                            <i class="fas fa-code"></i> عرض JSON
+                        </button>
+                        <button onclick="clearAll()" class="btn btn-danger w-full">
+                            <i class="fas fa-trash"></i> مسح الكل
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Canvas -->
+            <div class="lg:col-span-2">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-bold text-[#1a472a] mb-4">📖 الصورة</h2>
+                    
+                    <div id="canvas-container" style="display: none;">
+                        <canvas id="canvas"></canvas>
+                    </div>
+
+                    <div id="noImagePlaceholder" class="text-center py-20 text-gray-400">
+                        <i class="fas fa-image text-6xl mb-4"></i>
+                        <p>اختر صورة من المصحف أولاً</p>
+                    </div>
+
+                    <!-- Annotations List -->
+                    <div id="annotationsDiv" style="display: none; margin-top: 20px;">
+                        <h3 class="font-bold text-[#1a472a] mb-2">📝 الآيات المحددة:</h3>
+                        <div class="verse-list" id="annotationsList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON Modal -->
+    <div id="jsonModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">📋 بيانات الآيات (JSON)</h2>
+                <button onclick="closeJSON()" class="text-2xl cursor-pointer">✕</button>
+            </div>
+            <div id="jsonContent" class="json-output"></div>
+            <button onclick="copyJSON()" class="btn btn-success mt-4 w-full">
+                <i class="fas fa-copy"></i> نسخ إلى الحافظة
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let image = null;
+        let isDrawing = false;
+        let startX, startY;
+        let annotations = [];
+        let selectedAnnotation = null;
+
+        // Load Image
+        document.getElementById('imageInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                image = new Image();
+                image.onload = () => {
+                    // تحديد حجم Canvas
+                    const maxWidth = 800;
+                    const scale = image.width > maxWidth ? maxWidth / image.width : 1;
+                    canvas.width = image.width * scale;
+                    canvas.height = image.height * scale;
+
+                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    redrawAnnotations();
+
+                    document.getElementById('canvas-container').style.display = 'inline-block';
+                    document.getElementById('noImagePlaceholder').style.display = 'none';
+                    document.getElementById('imageSize').textContent = `${image.width}x${image.height}`;
+                };
+                image.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Drawing Mode
+        function startDrawing() {
+            if (!image) return alert('حمل صورة أولاً!');
+            if (!document.getElementById('surahNum').value) return alert('أدخل رقم السورة!');
+            isDrawing = true;
+            canvas.style.cursor = 'crosshair';
+        }
+
+        function cancelDrawing() {
+            isDrawing = false;
+            canvas.style.cursor = 'default';
+        }
+
+        // Canvas Drawing
+        canvas.addEventListener('mousedown', (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing || !startX) return;
+            const rect = canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+
+            redrawAnnotations();
+            ctx.strokeStyle = '#c5a059';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, startY, currentX - startX, currentY - startY);
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (!isDrawing || !startX) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const endX = e.clientX - rect.left;
+            const endY = e.clientY - rect.top;
+
+            const x = Math.min(startX, endX);
+            const y = Math.min(startY, endY);
+            const width = Math.abs(endX - startX);
+            const height = Math.abs(endY - startY);
+
+            if (width > 10 && height > 10) {
+                addAnnotation(x, y, width, height);
+            }
+
+            startX = null;
+            startY = null;
+        });
+
+        // Add Annotation
+        function addAnnotation(x, y, width, height) {
+            const surah = parseInt(document.getElementById('surahNum').value);
+            const ayahFrom = parseInt(document.getElementById('ayahFrom').value);
+            const ayahTo = parseInt(document.getElementById('ayahTo').value) || ayahFrom;
+
+            if (!surah || !ayahFrom) {
+                alert('أدخل رقم السورة والآية!');
+                return;
+            }
+
+            const annotation = {
+                id: Date.now(),
+                surah: surah,
+                ayahFrom: ayahFrom,
+                ayahTo: ayahTo,
+                x: Math.round(x),
+                y: Math.round(y),
+                width: Math.round(width),
+                height: Math.round(height)
+            };
+
+            annotations.push(annotation);
+            redrawAnnotations();
+            updateAnnotationsList();
+            document.getElementById('annotationCount').textContent = annotations.length;
+
+            // Clear inputs
+            document.getElementById('ayahFrom').value = '';
+            document.getElementById('ayahTo').value = '';
+        }
+
+        // Redraw Annotations
+        function redrawAnnotations() {
+            if (!image) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            annotations.forEach((ann, idx) => {
+                ctx.fillStyle = ann.id === selectedAnnotation ? 'rgba(239, 68, 68, 0.3)' : 'rgba(197, 160, 89, 0.2)';
+                ctx.strokeStyle = ann.id === selectedAnnotation ? '#ef4444' : '#c5a059';
+                ctx.lineWidth = ann.id === selectedAnnotation ? 3 : 2;
+                ctx.fillRect(ann.x, ann.y, ann.width, ann.height);
+                ctx.strokeRect(ann.x, ann.y, ann.width, ann.height);
+
+                // رقم الآية
+                ctx.fillStyle = '#1a472a';
+                ctx.font = 'bold 14px Cairo';
+                ctx.fillText(`${ann.surah}:${ann.ayahFrom}`, ann.x + 5, ann.y + 20);
+            });
+        }
+
+        // Update Annotations List
+        function updateAnnotationsList() {
+            const list = document.getElementById('annotationsList');
+            list.innerHTML = annotations.map((ann, idx) => `
+                <div class="verse-item ${ann.id === selectedAnnotation ? 'selected' : ''}" onclick="selectAnnotation(${ann.id})">
+                    <span class="font-bold">سورة ${ann.surah}: ${ann.ayahFrom}</span>
+                    <span class="text-xs text-gray-500">موضع: (${ann.x}, ${ann.y}) حجم: ${ann.width}x${ann.height}</span>
+                    <button onclick="deleteAnnotation(${ann.id})" class="text-xs text-red-500 float-left">حذف</button>
+                </div>
+            `).join('');
+            
+            if (annotations.length > 0) {
+                document.getElementById('annotationsDiv').style.display = 'block';
+            }
+        }
+
+        // Select Annotation
+        function selectAnnotation(id) {
+            selectedAnnotation = selectedAnnotation === id ? null : id;
+            redrawAnnotations();
+            updateAnnotationsList();
+        }
+
+        // Delete Annotation
+        function deleteAnnotation(id) {
+            annotations = annotations.filter(a => a.id !== id);
+            redrawAnnotations();
+            updateAnnotationsList();
+            document.getElementById('annotationCount').textContent = annotations.length;
+        }
+
+        // Export JSON
+        function exportAnnotations() {
+            if (annotations.length === 0) {
+                alert('لا توجد آيات محددة!');
+                return;
+            }
+
+            const data = {
+                timestamp: new Date().toISOString(),
+                imageSize: { width: image.width, height: image.height },
+                annotations: annotations
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quran_annotations_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('✅ تم حفظ البيانات!');
+        }
+
+        // Show JSON
+        function showJSON() {
+            if (annotations.length === 0) {
+                alert('لا توجد آيات محددة!');
+                return;
+            }
+
+            const data = {
+                timestamp: new Date().toISOString(),
+                imageSize: { width: image.width, height: image.height },
+                annotations: annotations
+            };
+
+            document.getElementById('jsonContent').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('jsonModal').classList.add('active');
+        }
+
+        function closeJSON() {
+            document.getElementById('jsonModal').classList.remove('active');
+        }
+
+        function copyJSON() {
+            const text = document.getElementById('jsonContent').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ تم النسخ!');
+            });
+        }
+
+        // Clear All
+        function clearAll() {
+            if (confirm('هل أنت متأكد؟')) {
+                annotations = [];
+                selectedAnnotation = null;
+                document.getElementById('imageInput').value = '';
+                document.getElementById('canvas-container').style.display = 'none';
+                document.getElementById('noImagePlaceholder').style.display = 'block';
+                document.getElementById('annotationsDiv').style.display = 'none';
+                document.getElementById('annotationCount').textContent = '0';
+                document.getElementById('imageSize').textContent = '-';
+            }
+        }
+    </script>
+
+</body>
+</html>
