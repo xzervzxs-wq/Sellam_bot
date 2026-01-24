@@ -194,6 +194,17 @@
             background-color: #db2777 !important;
             box-shadow: 0 0 15px rgba(236, 72, 153, 0.5) !important;
         }
+        
+        /* تحسين أيقونات الأدوات (صورة، جديد، إطار، شكل) في الوضع الليلي */
+        :root.dark-mode .text-\[#6366f1\],
+        :root.dark-mode i.text-\[#6366f1\] {
+            color: #60a5fa !important; /* أزرق فاتح Sky 400 */
+        }
+        
+        :root.dark-mode .group:hover .text-\[#6366f1\],
+        :root.dark-mode .group:hover i.text-\[#6366f1\] {
+            color: #3b82f6 !important; /* أزرق أفتح عند hover */
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
