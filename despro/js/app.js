@@ -611,19 +611,14 @@
             loadTemplate(index);
         }
 
-        // دالة لفتح مشروع جديد مع سؤال حفظ القالب
+        // دالة لفتح مشروع جديد - تفتح نافذة جديدة مباشرة
         function createNewProject() {
-            const card = document.getElementById('card');
-            const hasElements = card.children.length > 0;
-            
-            if (!hasElements) {
-                // إذا لم يكن هناك عناصر، أنشئ جديد مباشرة
+            // فتح نافذة عمل جديدة مباشرة
+            if(typeof addNewWindow === 'function') {
+                addNewWindow();
+            } else {
                 resetCanvas();
-                return;
             }
-            
-            // فتح نافذة جديدة جميلة
-            document.getElementById('new-project-modal').classList.remove('hidden');
         }
 
         // إغلاق نافذة المشروع الجديد
