@@ -602,12 +602,13 @@
                 hVal: card.getAttribute('data-card-height'),
                 customW: document.getElementById('custom-width').value,
                 customH: document.getElementById('custom-height').value,
-                notes: document.getElementById('designer-notes').value // حفظ الملاحظات مع التصميم
+                notes: document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : '' // حفظ الملاحظات مع التصميم
             };
 
             try {
                 templates.push(template);
                 saveTemplates(templates, false); // حفظ كقالب خاص بالمستخدم
+                console.log('✅ تم حفظ القالب مع الملاحظات:', template.notes); // debug
                 alert(`✅ تم حفظ القالب "${name.trim()}" بنجاح!`);
             } catch(e) {
                 console.error(e);
@@ -1000,16 +1001,23 @@
                 if (template.customH) document.getElementById('custom-height').value = template.customH;
                 
                 // استعادة الملاحظات من بيانات القالب نفسه (ليس من localStorage)
+                console.log('📝 تحميل الملاحظات من القالب:', template.notes); // debug
                 if (template.notes) {
                     localStorage.setItem('designer_notes', template.notes);
-                    if(document.getElementById('designer-notes')) {
-                        document.getElementById('designer-notes').value = template.notes;
+                    const notesField = document.getElementById('designer-notes');
+                    if(notesField) {
+                        notesField.value = template.notes;
+                        console.log('✅ تم تعيين الملاحظات بنجاح');
                         updateCharCount();
+                    } else {
+                        console.warn('⚠️ لم يتم العثور على حقل الملاحظات');
                     }
                 } else {
+                    console.log('ℹ️ لا توجد ملاحظات محفوظة');
                     localStorage.removeItem('designer_notes');
-                    if(document.getElementById('designer-notes')) {
-                        document.getElementById('designer-notes').value = '';
+                    const notesField = document.getElementById('designer-notes');
+                    if(notesField) {
+                        notesField.value = '';
                         updateCharCount();
                     }
                 }
