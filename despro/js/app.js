@@ -1451,6 +1451,28 @@
                 }
             }
             
+            // إضافة العلامة المائية (Watermark)
+            ctx.save();
+            ctx.globalAlpha = 0.08; // شفافية 8% فقط
+            ctx.fillStyle = '#000000'; // لون أسود خفيف جداً
+            ctx.font = 'bold 180px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.rotate(-Math.PI / 4); // دوران 45 درجة
+            
+            // رسم النص على كامل الصفحة
+            const diagonalLength = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+            const startPosX = -diagonalLength / 2;
+            const startPosY = -diagonalLength / 2;
+            
+            for (let x = startPosX; x < diagonalLength; x += 300) {
+                for (let y = startPosY; y < diagonalLength; y += 200) {
+                    ctx.fillText('despro.net', x, y);
+                }
+            }
+            
+            ctx.restore();
+            
             const saveImg = document.getElementById('save-img');
             // إذا كان التصميم شفاف، استخدم PNG. وإلا استخدم JPEG بجودة 85% لتقليل الحجم
             const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.85);
