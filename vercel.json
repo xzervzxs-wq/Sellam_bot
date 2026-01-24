@@ -1,19 +1,4 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "despro/**/*",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/despro/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/despro/index.html"
-    }
-  ]
+  "outputDirectory": "."
 }
