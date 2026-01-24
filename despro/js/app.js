@@ -381,8 +381,9 @@
                 const div = document.createElement('div');
                 div.className = 'asset-item bg-[#f1f5f9] rounded-lg p-2 cursor-pointer hover:bg-[#e2e8f0] transition-all relative group';
                 
-                // تحديد ما إذا كان العنصر مقفول
-                const isLocked = index >= 4 && userTier === 'free';
+                // تحديد ما إذا كان العنصر مقفول (استخدام freeCount من البيانات، افتراضي 4)
+                const freeCount = category.freeCount !== undefined ? category.freeCount : 4;
+                const isLocked = index >= freeCount && userTier === 'free';
                 
                 if (isLocked) {
                     div.classList.add('locked-item');
