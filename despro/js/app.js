@@ -232,6 +232,18 @@
             
             // حفظ الحالة الأولية (فارغة) لتمكين التراجع
             saveState();
+            
+            // إضافة حماية عند تحديث الصفحة أو إغلاقها
+            window.addEventListener('beforeunload', (e) => {
+                const card = document.getElementById('card');
+                const hasElements = card && card.children.length > 1; // > 1 لأن card-gradient يحسب كعنصر
+                
+                if (hasElements) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                    return '';
+                }
+            });
         };
 
         // --- إدارة القوالب (Templates) ---
