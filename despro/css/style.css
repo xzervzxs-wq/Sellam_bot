@@ -172,6 +172,28 @@
         :root.dark-mode .tick-num {
             color: #cbd5e1 !important;
         }
+        
+        /* تحسين وضوح أزرار التصدير في الوضع الليلي */
+        :root.dark-mode button[onclick="saveWorkDirectly()"],
+        :root.dark-mode button[onclick="openSaveAsModal()"] {
+            background-color: #6366f1 !important;
+            color: white !important;
+            border: 1px solid #4f46e5 !important;
+        }
+        :root.dark-mode button[onclick="saveWorkDirectly()"]:hover,
+        :root.dark-mode button[onclick="openSaveAsModal()"]:hover {
+            background-color: #4f46e5 !important;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5) !important;
+        }
+        :root.dark-mode button[onclick="generateA4Sheet()"] {
+            background-color: #ec4899 !important;
+            color: white !important;
+            border: 1px solid #db2777 !important;
+        }
+        :root.dark-mode button[onclick="generateA4Sheet()"]:hover {
+            background-color: #db2777 !important;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.5) !important;
+        }
 
         /* 4. ليبل لون الخلفية والنصوص */
         :root.dark-mode label,
