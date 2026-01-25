@@ -1085,3 +1085,13 @@
     scrollbar-width: none;
 }
 
+
+        /* إصلاح شريط الملاحظات في الوضع الليلي */
+        :root.dark-mode #info-bar-placeholder {
+            background-color: #1a1a2e !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        :root.dark-mode #info-bar-placeholder svg {
+            stroke: #f1f5f9 !important;
+        }

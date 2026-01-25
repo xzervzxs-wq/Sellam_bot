@@ -392,7 +392,7 @@
                 </div>
                 <!-- زر تبديل الوضع الليلي والنهاري -->
                 <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn" title="تبديل الوضع الليلي">
-                    <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-moon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
+                    <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-moon" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
                     <i class="fas fa-moon theme-moon"></i>
                 </button>
             </div>
@@ -506,15 +506,15 @@
             <div id="assets-library-container" class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
                 <div class="flex justify-between items-center cursor-pointer" onclick="toggleAssetsLibrary()">
                     <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
-                        <i class="fas fa-shapes text-[#6366f1]"></i> مكتبة العناصر
+                        <i class="fas fa-shapes text-[#6366f1]"></i> مكتبة العناصر <span class="text-[#cbd5e1] mx-1">|</span> <span class="text-xs font-bold text-[#1e293b] flex items-center gap-1">مكتبة متجددة</span>
                     </label>
-                    <i id="assets-library-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200"></i>
+                    <i id="assets-library-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200" style="transform: rotate(-90deg);"></i>
                 </div>
                 
-                <div id="assets-library-content" class="hidden mt-3 flex-col gap-2">
+                <div id="assets-library-content" class="mt-3 flex flex-col gap-2">
                     <!-- القائمة المنسدلة للتصنيفات -->
                     <div class="w-full">
-                        <select id="assets-category-select" class="w-full p-2 text-[11px] font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]" onchange="loadAssetsCategory()">
+                        <select id="assets-category-select" class="w-full p-2 text-xs font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]" onchange="loadAssetsCategory()">
                             <option value="">📂 اختر تصنيفاً...</option>
                         </select>
                     </div>
@@ -882,12 +882,32 @@
                 <i class="fas fa-fill-drip text-[8px]"></i> تدرج
             </button>
             <div class="w-px h-4 bg-[#e2e8f0]"></div>
-            <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">لون النص:</span>
-            <input type="color" id="top-text-color" value="#1e293b" onchange="applyTextColor(this.value)" oninput="applyTextColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#cbd5e1] bg-transparent" title="لون النص">
+            
+            <!-- Partial Color Hint Tooltip Wrapper -->
+            <div class="relative group flex items-center gap-1">
+                <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">لون النص:</span>
+                <input type="color" id="top-text-color" value="#1e293b" onchange="applyTextColor(this.value)" oninput="applyTextColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#cbd5e1] bg-transparent" title="لون النص (حدد جزء لتلوينه)">
+                <!-- Tooltip -->
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-[8px] px-2 py-1 rounded pointer-events-none whitespace-nowrap z-50">ظلل نصاً لتلوينه منفرداً</span>
+            </div>
+
             <div class="w-px h-4 bg-[#e2e8f0]"></div>
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
             <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
             <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
+        </div>
+
+        <!-- NEW: صف المحاذاة (توسيط، يمين، يسار) -->
+        <div id="text-alignment-row" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-center bg-gray-50/50 border border-gray-100 mx-1">
+             <button onclick="updateStyle('textAlign', 'right')" class="p-1.5 hover:bg-indigo-100 hover:text-indigo-600 rounded text-slate-500 transition" title="محاذاة لليمين">
+                <i class="fas fa-align-right text-xs"></i>
+             </button>
+             <button onclick="updateStyle('textAlign', 'center')" class="p-1.5 hover:bg-indigo-100 hover:text-indigo-600 rounded text-slate-500 transition" title="توسيط">
+                <i class="fas fa-align-center text-xs"></i>
+             </button>
+             <button onclick="updateStyle('textAlign', 'left')" class="p-1.5 hover:bg-indigo-100 hover:text-indigo-600 rounded text-slate-500 transition" title="محاذاة لليسار">
+                <i class="fas fa-align-left text-xs"></i>
+             </button>
         </div>
 
         <!-- الصف الثاني: نوع الخط + قائمة الخطوط + نجمة المفضلة + B -->
@@ -1003,7 +1023,7 @@
                 <div>
                     <div class="flex items-center gap-2 mb-2">
                         <i class="fas fa-link text-xs text-pink-300"></i>
-                        <h4 class="font-bold text-xs text-pink-300 uppercase tracking-wide">روابط سريعة</h4>
+                        <h4 class="font-bold text-xs text-white uppercase tracking-wide">روابط سريعة</h4>
                     </div>
                     <div class="flex items-center gap-0">
                         <a href="subscriptions.html" class="text-sm font-semibold text-[#fbbf24] hover:text-[#f59e0b] transition flex items-center gap-2 px-3 py-1 no-underline">
@@ -1042,11 +1062,11 @@
             
             <!-- Bottom -->
             <div class="border-t border-white border-opacity-30 mt-3 pt-3 text-center text-xs text-white text-opacity-85">
-                <p>© جميع الحقوق محفوظة © despro.net 2026 • حيث الإبداع لا حدود له ✨</p>
+                <p>© جميع الحقوق محفوظة © despro.net 2026</p>
             </div>
         </div>
     </footer>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=1769352972"></script>
 </body>
 </html>
