@@ -6,6 +6,53 @@
         // ==========================================
 
         // ==========================================
+        //  نظام الوضع الليلي والنهاري (Dark Mode)
+        // ==========================================
+        const DARK_MODE_COLORS = {
+            '#ffffff': '#16213e',
+            '#f8fafc': '#0f172a',
+            '#f1f5f9': '#1a1a2e',
+            '#1e293b': '#e8e8e8',
+            '#64748b': '#a8b5c8',
+            '#94a3b8': '#a8b5c8',
+            'rgb(255, 255, 255)': 'rgb(22, 33, 62)',
+            'rgb(248, 250, 252)': 'rgb(15, 23, 42)',
+            'rgb(30, 41, 59)': 'rgb(232, 232, 232)',
+        };
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+                applyDarkModeColors();
+            }
+        }
+
+        function applyDarkModeColors() {
+            const elements = document.querySelectorAll('[style*="color"], [style*="background"]');
+            elements.forEach(el => {
+                let style = el.getAttribute('style') || '';
+                Object.entries(DARK_MODE_COLORS).forEach(([light, dark]) => {
+                    style = style.replace(new RegExp(light, 'gi'), dark);
+                });
+                el.setAttribute('style', style);
+            });
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDarkMode = html.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            
+            // لا حاجة لإعادة التحميل - CSS يتولى كل شيء!
+            // التبديل يحصل فوراً بدون فقدان البيانات
+        }
+
+        // تطبيق الثيم المحفوظ عند بدء الصفحة
+        initTheme();
+        // ==========================================
+
+        // ==========================================
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
@@ -185,6 +232,21 @@
             
             // حفظ الحالة الأولية (فارغة) لتمكين التراجع
             saveState();
+            
+            // إضافة حماية عند تحديث الصفحة أو إغلاقها
+            window.addEventListener('beforeunload', (e) => {
+                const card = document.getElementById('card');
+                const hasElements = card && card.children.length > 1; // > 1 لأن card-gradient يحسب كعنصر
+                
+                if (hasElements) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                    return '';
+                }
+            });
+
+            // تحميل الملاحظات المحفوظة عند فتح الصفحة - بدون localStorage
+            // الملاحظات تأتي فقط من فتح قالب محفوظ
         };
 
         // --- إدارة القوالب (Templates) ---
@@ -322,16 +384,25 @@
                     select.appendChild(option);
                 });
                 
-                grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
+                // اختيار أول تصنيف تلقائياً
+                select.value = 0;
+                loadAssetsCategory();
+                
                 console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
                 return;
             }
             
             // عرض رسالة تحميل
-            grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin ml-2"></i>جاري تحميل المكتبة...</p>';
+            grid.innerHTML = `
+                <div class="col-span-3 py-6 px-4">
+                    <div class="h-1 w-full bg-[#f1f5f9] rounded-full overflow-hidden relative">
+                        <div class="absolute h-full bg-gradient-to-r from-[#6366f1] via-[#a855f7] to-[#6366f1] w-1/3 rounded-full" style="animation: loadingSlide 1.5s infinite ease-in-out;"></div>
+                    </div>
+                    <style>@keyframes loadingSlide { 0% { left: -40%; } 100% { left: 110%; } }</style>
+                </div>`;
             
-            // تحميل ملف JSON عبر fetch
-            fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/Official.json?t=' + Date.now())
+            // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
+            fetch('./Official.json?t=' + Date.now())
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('فشل تحميل الملف');
@@ -350,7 +421,14 @@
                         select.appendChild(option);
                     });
                     
-                    grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
+                    // اختيار أول تصنيف تلقائياً
+                    if (officialAssetsLibrary.length > 0) {
+                        select.value = 0;
+                        loadAssetsCategory();
+                    } else {
+                        grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ المكتبة فارغة حالياً</p>';
+                    }
+                    
                     console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
                 })
                 .catch(error => {
@@ -386,8 +464,17 @@
                 const isLocked = index >= freeCount && userTier === 'free';
                 
                 if (isLocked) {
-                    div.classList.add('locked-item');
-                    div.style.opacity = '0.7';
+                    // div.classList.add('locked-item'); // تم تعطيل الكلاس القديم لإزالة علامة القفل القديمة
+                    div.style.position = 'relative';
+                    div.style.opacity = '0.9'; // جعل العنصر واضحاً ومغرياً
+                    
+                    // إضافة أيقونة القفل الجديدة
+                    const lockIcon = document.createElement('div');
+                    lockIcon.className = 'absolute top-1 right-1 bg-white/90 backdrop-blur-sm rounded-full p-1 shadow-sm z-10 flex items-center justify-center';
+                    lockIcon.style.width = '20px';
+                    lockIcon.style.height = '20px';
+                    lockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>`;
+                    div.appendChild(lockIcon);
                 }
                 
                 const img = document.createElement('img');
@@ -401,7 +488,7 @@
                     // إذا كان مقفول، عرض modal الاشتراك بدل إضافة العنصر
                     div.onclick = (e) => {
                         e.stopPropagation();
-                        showPremiumModal('عناصر إضافية');
+                        showPremiumModal('عناصر إضافية', item.src);
                     };
                 } else {
                     // إذا كان مفتوح، أضفه للـ canvas
@@ -504,6 +591,7 @@
                     templates[currentLoadedTemplateIndex].hVal = card.getAttribute('data-card-height');
                     templates[currentLoadedTemplateIndex].customW = document.getElementById('custom-width').value;
                     templates[currentLoadedTemplateIndex].customH = document.getElementById('custom-height').value;
+                    templates[currentLoadedTemplateIndex].notes = document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : ''; // حفظ الملاحظات
                     
                     try {
                         saveTemplates(templates);
@@ -527,7 +615,9 @@
             const name = prompt('أدخل اسم القالب الجديد:');
             if (!name || name.trim() === '') return;
 
-            // جمع البيانات
+            // جمع البيانات - الملاحظات تأتي مباشرة من الحقل (بدون localStorage)
+            const notesValue = document.getElementById('designer-notes') ? document.getElementById('designer-notes').value : '';
+            
             const template = {
                 id: Date.now(),
                 name: name.trim(),
@@ -537,12 +627,14 @@
                 wVal: card.getAttribute('data-card-width'),
                 hVal: card.getAttribute('data-card-height'),
                 customW: document.getElementById('custom-width').value,
-                customH: document.getElementById('custom-height').value
+                customH: document.getElementById('custom-height').value,
+                notes: notesValue // حفظ الملاحظات مع التصميم
             };
 
             try {
                 templates.push(template);
                 saveTemplates(templates, false); // حفظ كقالب خاص بالمستخدم
+                console.log('✅ تم حفظ القالب مع الملاحظات:', template.notes); // debug
                 alert(`✅ تم حفظ القالب "${name.trim()}" بنجاح!`);
             } catch(e) {
                 console.error(e);
@@ -588,6 +680,139 @@
             document.getElementById('save-as-callback').value = 'newProject'; // علامة للرجوع بعد الحفظ
         }
 
+        // === دوال لوحة المصمم (Designer Panel) ===
+        function openDesignerPanel() {
+            const panel = document.getElementById('designer-panel');
+            panel.classList.remove('hidden');
+            updateDesignerStats();
+        }
+
+        function closeDesignerPanel() {
+            document.getElementById('designer-panel').classList.add('hidden');
+        }
+
+        function updateDesignerStats() {
+            const card = document.getElementById('card');
+            // حساب عدد العناصر (لا نحسب card-gradient)
+            const elementCount = Math.max(0, card.children.length - 1);
+            document.getElementById('element-count').textContent = elementCount;
+
+            // حساب مقاس المربع
+            const width = parseInt(card.style.width) / DPI_RATIO || 6;
+            const height = parseInt(card.style.height) / DPI_RATIO || 6;
+            document.getElementById('canvas-size').textContent = `${width.toFixed(1)} × ${height.toFixed(1)} سم`;
+
+            // === استخراج الألوان المستخدمة (Used Colors) ===
+            const usedColors = new Set();
+            
+            // قائمة الكلمات المحجوزة في Gradients لتجاهلها
+            const ignoredWords = new Set(['linear', 'radial', 'gradient', 'to', 'right', 'left', 'top', 'bottom', 'deg', 'circle', 'at', 'center', 'transparent', 'none', 'url', 'repeat', 'no-repeat', 'scroll']);
+
+            // دالة مساعدة لتنظيف وإضافة اللون
+            const collectColor = (c) => {
+                if (!c) return;
+                const color = c.toString().trim().toLowerCase();
+                if (ignoredWords.has(color) || color === 'rgba(0, 0, 0, 0)' || color === 'inherit' || color === 'none') return;
+                try {
+                    // التحقق من أن اللون صالح بوضعه في عنصر مؤقت (طريقة آمنة)
+                    const s = new Option().style;
+                    s.color = color;
+                    if (s.color !== '') usedColors.add(color);
+                } catch (e) {}
+            };
+
+            // دالة لاستخراج الألوان من التدرجات أو النصوص المعقدة
+            const extractColorsFromString = (str) => {
+                if (!str || str === 'none') return;
+                // Regex for Hex, RGB, HSL, and Names (basic)
+                const regex = /#[0-9a-fA-F]{3,8}|rgba?\([\d\s,.]+\)|hsla?\([\d\s,%.]+\)|[a-z]{3,}/gi;
+                const matches = str.match(regex);
+                if (matches) {
+                    matches.forEach(m => collectColor(m));
+                }
+            };
+
+            // الدوران على العناصر
+            Array.from(card.children).forEach(child => {
+                if (child.id === 'card-gradient') return; // تجاهل التدرج الخلفي
+
+                // 1. فحص أنماط العنصر الأساسي
+                if (child.style.color) collectColor(child.style.color);
+                if (child.style.backgroundColor) collectColor(child.style.backgroundColor);
+                if (child.style.borderColor) collectColor(child.style.borderColor);
+                
+                // فحص التدرجات (Gradients)
+                if (child.style.backgroundImage && child.style.backgroundImage.includes('gradient')) {
+                     extractColorsFromString(child.style.backgroundImage);
+                }
+
+                // 2. فحص النصوص
+                const textElements = child.querySelectorAll('*'); 
+                textElements.forEach(el => {
+                     if (el.style.color) collectColor(el.style.color);
+                     if (el.style.backgroundColor) collectColor(el.style.backgroundColor);
+                });
+
+                // 3. فحص SVG
+                const svgElements = child.tagName === 'svg' ? [child] : child.querySelectorAll('svg, path, circle, rect');
+                svgElements.forEach(el => {
+                    collectColor(el.getAttribute('fill') || el.style.fill);
+                    collectColor(el.getAttribute('stroke') || el.style.stroke);
+                });
+            });
+
+            // تعبئة لوحة الألوان
+            const paletteDiv = document.getElementById('used-colors-palette');
+            if (paletteDiv) {
+                paletteDiv.innerHTML = '';
+                if (usedColors.size === 0) {
+                    paletteDiv.innerHTML = '<span class="text-[10px] text-gray-400 italic">لا توجد عناصر ملونة</span>';
+                } else {
+                    Array.from(usedColors).slice(0, 18).forEach(color => {
+                        const dot = document.createElement('div');
+                        dot.className = 'w-4 h-4 rounded-full border border-gray-200 cursor-help transition hover:scale-110';
+                        dot.style.backgroundColor = color;
+                        dot.title = color; // ظهر كود اللون عند التمرير
+                        paletteDiv.appendChild(dot);
+                    });
+                }
+            }
+
+            // تحديث حد الأحرف والملاحظات
+            updateCharCount();
+            loadDesignerNotes();
+        }
+
+        // === دوال ملاحظات المصمم ===
+        function getMaxCharLimit() {
+            return userTier === 'premium' ? 1000 : 280;
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('designer-notes');
+            const charCount = document.getElementById('char-count');
+            
+            if(!textarea || !charCount) return; // safety check
+            
+            const maxLimit = getMaxCharLimit();
+            const currentLength = textarea.value.length;
+            
+            charCount.textContent = `${currentLength}/${maxLimit}`;
+            textarea.maxLength = maxLimit;
+            
+            // تحديث الألوان بناءً على الامتلاء
+            if (currentLength > maxLimit * 0.8) {
+                charCount.classList.remove('bg-[#f59e0b]');
+                charCount.classList.add('bg-red-500');
+            } else {
+                charCount.classList.remove('bg-red-500');
+                charCount.classList.add('bg-[#f59e0b]');
+            }
+        }
+
+        // لا نستخدم localStorage - الملاحظات فقط مع JSON (بيانات القالب)
+        // updateCharCount() تُستدعى عند الكتابة فقط
+
         // إعادة تعيين canvas بدون حفظ
         function resetCanvasWithoutSave() {
             closeNewProjectModal();
@@ -603,6 +828,27 @@
             const randomNum = Math.floor(Math.random() * 1000000);
             const defaultName = `template_${randomNum}`; 
             document.getElementById('save-as-name').value = defaultName;
+            
+            // إظهار خيار الملاحظات فقط إذا كان هناك ملاحظات
+            const notesField = document.getElementById('designer-notes');
+            const notesOption = document.getElementById('save-notes-option');
+            const premiumOption = document.getElementById('notes-option-premium');
+            const freeOption = document.getElementById('notes-option-free');
+            
+            if (notesField && notesOption && notesField.value.trim()) {
+                notesOption.classList.remove('hidden');
+                
+                // إظهار الخيار المناسب حسب نوع المستخدم
+                if (userTier === 'premium') {
+                    premiumOption.classList.remove('hidden');
+                    freeOption.classList.add('hidden');
+                } else {
+                    premiumOption.classList.add('hidden');
+                    freeOption.classList.remove('hidden');
+                }
+            } else if (notesOption) {
+                notesOption.classList.add('hidden');
+            }
         }
 
         function closeSaveAsModal() {
@@ -664,6 +910,13 @@
                     timestamp: new Date().toLocaleString('ar-SA'),
                     version: "2.0" 
                 };
+                
+                // حفظ الملاحظات إذا اختار المستخدم ذلك
+                const saveWithNotes = document.getElementById('save-with-notes');
+                const notesField = document.getElementById('designer-notes');
+                if (saveWithNotes && saveWithNotes.checked && notesField && notesField.value.trim()) {
+                    projectData.notes = notesField.value.trim();
+                }
                 
                 // 1. التنزيل المباشر كملف JSON (.dalal) للمستخدم
                 const dataStr = JSON.stringify(projectData, null, 2);
@@ -771,6 +1024,16 @@
                     // ضبط الزوم على 50% دائماً عند فتح ملف
                     setCustomZoom(50);
                     
+                    // استعادة الملاحظات من الملف
+                    const notesField = document.getElementById('designer-notes');
+                    if (projectData.notes && notesField) {
+                        notesField.value = projectData.notes;
+                        updateCharCount();
+                    } else if (notesField) {
+                        notesField.value = '';
+                        updateCharCount();
+                    }
+                    
                     // توسيط البطاقة في منطقة العمل
                     setTimeout(() => {
                         const workspace = document.getElementById('workspace');
@@ -830,6 +1093,12 @@
             
             // إعادة تعيين متغير القالب المحمل
             currentLoadedTemplateIndex = null;
+
+            // حذف الملاحظات عند إنشاء عمل جديد
+            if(document.getElementById('designer-notes')) {
+                document.getElementById('designer-notes').value = '';
+                updateCharCount();
+            }
             
             // إعادة تعيين قائمة القوالب
             document.getElementById('template-select').value = '';
@@ -862,6 +1131,16 @@
                 // استعادة قيم الحقول
                 if (template.customW) document.getElementById('custom-width').value = template.customW;
                 if (template.customH) document.getElementById('custom-height').value = template.customH;
+                
+                // استعادة الملاحظات من بيانات القالب نفسه فقط (JSON)
+                const notesField = document.getElementById('designer-notes');
+                if (template.notes && notesField) {
+                    notesField.value = template.notes;
+                    updateCharCount();
+                } else if (notesField) {
+                    notesField.value = '';
+                    updateCharCount();
+                }
                 
                 // تحديث المسطرة والزوم
                 const w = parseFloat(template.wVal);
@@ -999,7 +1278,7 @@
             img.loading = "eager";
             img.style.width = '100%';
             img.style.height = '100%';
-            img.style.objectFit = 'fill';
+            img.style.objectFit = 'contain';
             img.style.pointerEvents = 'none';
             
             // حفظ الأصل
@@ -2020,35 +2299,52 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const wrapper = createWrapper('image-layer');
-                    const contentWrapper = wrapper.querySelector('.content-wrapper');
-                    wrapper.style.width = '60%';
-                    wrapper.style.height = '60%';
-                    contentWrapper.style.width = '100%';
-                    contentWrapper.style.height = '100%';
-                    contentWrapper.style.overflow = 'hidden';
-                    contentWrapper.style.borderRadius = '8px';
-                    contentWrapper.style.display = 'flex';
-                    
-                    const img = document.createElement('img');
-                    img.crossOrigin = "anonymous"; // إضافة CrossOrigin
-                    img.src = e.target.result;
-                    img.loading = "eager";
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'fill';
-                    img.style.pointerEvents = 'none';
-                    img.style.imageRendering = 'high-quality';
-                    
-                    wrapper.setAttribute('data-original-image', e.target.result);
-                    // الصور المرفوعة قابلة للتلوين افتراضياً
-                    wrapper.setAttribute('data-colorable', 'true');
-                    
-                    contentWrapper.appendChild(img);
-                    document.getElementById('card').appendChild(wrapper);
-                    selectEl(wrapper);
-                    setupInteract(wrapper, 'box');
-                    saveState();
+                    const tempImg = new Image();
+                    tempImg.src = e.target.result;
+                    tempImg.onload = function() {
+                        const wrapper = createWrapper('image-layer');
+                        const contentWrapper = wrapper.querySelector('.content-wrapper');
+                        
+                        // حساب الأبعاد المناسبة بناءً على نسبة العرض للارتفاع
+                        const card = document.getElementById('card');
+                        const cardRect = card.getBoundingClientRect();
+                        const cardWidth = cardRect.width || card.offsetWidth;
+                        
+                        // جعل العرض الافتراضي 50% من عرض الكارد (بدلاً من 60% ثابتة)
+                        const targetWidth = cardWidth * 0.5;
+                        const aspectRatio = tempImg.width / tempImg.height;
+                        const targetHeight = targetWidth / aspectRatio;
+                        
+                        wrapper.style.width = targetWidth + 'px';
+                        wrapper.style.height = targetHeight + 'px';
+                        
+                        contentWrapper.style.width = '100%';
+                        contentWrapper.style.height = '100%';
+                        contentWrapper.style.overflow = 'hidden';
+                        contentWrapper.style.borderRadius = '8px';
+                        contentWrapper.style.display = 'flex';
+                        
+                        const img = document.createElement('img');
+                        img.crossOrigin = "anonymous";
+                        img.src = e.target.result;
+                        img.loading = "eager";
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        // استخدام fill للسماح بالتشويه اليدوي إذا رغب المستخدم
+                        // وبما أننا ضبطنا أبعاد الـ wrapper لتطابق الصورة، فلن تظهر مشوهة مبدئياً
+                        img.style.objectFit = 'fill'; 
+                        img.style.pointerEvents = 'none';
+                        img.style.imageRendering = 'high-quality';
+                        
+                        wrapper.setAttribute('data-original-image', e.target.result);
+                        wrapper.setAttribute('data-colorable', 'true');
+                        
+                        contentWrapper.appendChild(img);
+                        document.getElementById('card').appendChild(wrapper);
+                        selectEl(wrapper);
+                        setupInteract(wrapper, 'box');
+                        saveState();
+                    };
                 };
                 reader.readAsDataURL(input.files[0]);
                 input.value = '';
@@ -2326,7 +2622,7 @@
             newImg.src = newDataUrl;
             newImg.style.width = '100%';
             newImg.style.height = '100%';
-            newImg.style.objectFit = 'fill';
+            newImg.style.objectFit = 'contain';
             newImg.style.pointerEvents = 'none';
 
             contentWrapper.appendChild(newImg);
@@ -3383,7 +3679,8 @@
             document.getElementById('text-controls').classList.add('hidden');
             document.getElementById('frame-controls').classList.add('hidden');
             document.getElementById('frame-controls-toolbar').classList.add('hidden');
-            document.getElementById('gradient-toggle-row').classList.add('hidden'); // إخفاء زر التدرج مبدئياً
+            document.getElementById('gradient-toggle-row').classList.add('hidden'); if(document.getElementById('text-alignment-row')) document.getElementById('text-alignment-row').classList.add('hidden'); // إخفاء زر التدرج مبدئياً
+            if(document.getElementById('text-alignment-row')) document.getElementById('text-alignment-row').classList.add('hidden');
             
             document.getElementById('top-font-controls').classList.add('hidden');
             
@@ -3411,6 +3708,10 @@
                 document.getElementById('top-font-controls').classList.add('flex');
                 document.getElementById('gradient-toggle-row').classList.remove('hidden'); // إظهار زر التدرج للنصوص
                 document.getElementById('gradient-toggle-row').classList.add('flex'); // إضافة flex للعرض الصحيح
+                if(document.getElementById('text-alignment-row')) {
+                    document.getElementById('text-alignment-row').classList.remove('hidden');
+                    document.getElementById('text-alignment-row').classList.add('flex');
+                }
                 
                 // تحديث حالة واجهة التدرج بناءً على هذا النص بالتحديد
                 updateGradientUIState(el);
@@ -3620,9 +3921,13 @@
                         // إنشاء Session ID عشوائي
                         const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
                         
-                        sessionStorage.setItem('studioName', userData.name);
-                        sessionStorage.setItem('expiryDate', userData.expiryDate);
-                        sessionStorage.setItem('sessionId', sessionId);
+                        // حفظ الجلسة في localStorage لتدوم بعد التحديث
+                        const sessionObj = {
+                             name: userData.name,
+                             expiryDate: userData.expiryDate,
+                             sessionId: sessionId
+                        };
+                        localStorage.setItem('despro_session', JSON.stringify(sessionObj));
                         
                         // تعديل الـ tier إلى premium
                         setPremiumUser();
@@ -3684,7 +3989,7 @@
             document.getElementById('frame-controls').classList.add('hidden');
             document.getElementById('frame-controls-toolbar').classList.add('hidden');
             // document.getElementById('colorable-controls-toolbar').classList.add('hidden');
-            document.getElementById('gradient-toggle-row').classList.add('hidden');
+            document.getElementById('gradient-toggle-row').classList.add('hidden'); if(document.getElementById('text-alignment-row')) document.getElementById('text-alignment-row').classList.add('hidden');
             
             document.getElementById('top-font-controls').classList.add('hidden');
             document.getElementById('top-font-controls').classList.remove('flex');
@@ -3744,7 +4049,7 @@
             document.getElementById('frame-controls').classList.add('hidden');
             document.getElementById('frame-controls-toolbar').classList.add('hidden');
             // document.getElementById('colorable-controls-toolbar').classList.add('hidden');
-            document.getElementById('gradient-toggle-row').classList.add('hidden');
+            document.getElementById('gradient-toggle-row').classList.add('hidden'); if(document.getElementById('text-alignment-row')) document.getElementById('text-alignment-row').classList.add('hidden');
             
             document.getElementById('top-font-controls').classList.add('hidden');
             document.getElementById('top-font-controls').classList.remove('flex');
@@ -3864,6 +4169,18 @@
         function applyTextColor(color) {
             if (!activeEl || !activeEl.classList.contains('text-layer')) return;
             
+            // --- دعم التلوين الجزئي (Partial Selection) ---
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                const range = selection.getRangeAt(0);
+                if (activeEl.contains(range.commonAncestorContainer)) {
+                    // تطبيق اللون على الجزء المحدد فقط
+                    document.execCommand('styleWithCSS', false, true);
+                    document.execCommand('foreColor', false, color);
+                    return; 
+                }
+            }
+            
             const textDiv = activeEl.querySelector('.user-text');
             if (textDiv) {
                 // إزالة التدرج إذا كان موجوداً
@@ -3973,8 +4290,56 @@
         function updateStyle(prop, val) {
             if(!activeEl) return;
             
+            // --- تعديل: دعم التلوين الجزئي عند استخدام لوحة الألوان الرئيسية ---
+            if (prop === 'color' && activeEl.classList.contains('text-layer')) {
+                const selection = window.getSelection();
+                // Check if selection exists, is not empty, and intersects with activeEl
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    if (activeEl.contains(range.commonAncestorContainer) || activeEl.contains(range.startContainer)) {
+                        document.execCommand('styleWithCSS', false, true);
+                        document.execCommand('foreColor', false, val);
+                        
+                        // Sync inputs but DON'T update the whole element style
+                        const topTextColor = document.getElementById('top-text-color');
+                        if (topTextColor) topTextColor.value = val;
+                        const quickColor = document.getElementById('quick-color');
+                        if (quickColor) quickColor.value = val;
+                        
+                        saveState();
+                        return; // Stop execution here for partial coloring
+                    }
+                }
+            }
+            // -----------------------------------------------------------------
+
+            // تطبيق التغيير على العنصر الأساسي (الغلاف)
             activeEl.style[prop] = val;
+
+            // إذا كنا نغير اللون ولم يكن هناك تحديد جزئي (أعلاه)، فهذا يعني أن المستخدم يريد تلوين النص بالكامل
+            if (prop === 'color' && activeEl.classList.contains('text-layer')) {
+                const textDiv = activeEl.querySelector('.user-text');
+                if (textDiv) {
+                    textDiv.style.color = val; // Force child to take color
+                    // إزالة التلوين الداخلي السابق لتوحيد اللون
+                    const spans = textDiv.querySelectorAll('span, font, b, i, u');
+                    spans.forEach(span => {
+                         // Reset inline color to inherit parent
+                         if(span.style.color) span.style.color = '';
+                         // If it's a font tag with color attr
+                         if(span.tagName === 'FONT') span.removeAttribute('color');
+                    });
+                }
+            }
             
+            // إذا كنا نغير المحاذاة، نتأكد من تطبيقها على النص المقروء أيضاً إذا وجد
+            if (prop === 'textAlign') {
+                const userText = activeEl.querySelector('.user-text');
+                if (userText) {
+                    userText.style.textAlign = val; // Force consistency
+                }
+            }
+
             if(prop === 'fontSize') {
                 const numVal = parseInt(val);
                 document.getElementById('font-size').value = numVal;
@@ -5465,90 +5830,148 @@
             }
         }
         
-        // نافذة البريميوم المشفوعة
-        function showPremiumModal(featureName) {
+        // نافذة البريميوم المشفوعة (محسنة ولطيفة)
+        function showPremiumModal(featureName, imageSrc = null) {
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed;
                 inset: 0;
-                background: rgba(15, 23, 42, 0.5);
+                background: rgba(15, 23, 42, 0.6);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 10000;
-                backdrop-filter: blur(4px);
+                backdrop-filter: blur(8px);
+                transition: all 0.3s;
             `;
             
+            // خلفية الصورة الضبابية إذا وجدت
+            let backgroundStyle = '';
+            if (imageSrc) {
+                backgroundStyle = `
+                    position: relative;
+                    overflow: hidden;
+                `;
+            }
+
             modal.innerHTML = `
                 <div style="
-                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-                    border-radius: 20px;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 24px;
                     padding: 30px;
-                    max-width: 400px;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    width: 320px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
                     text-align: center;
-                    border: 2px solid #6366f1;
-                    animation: slideIn 0.3s ease-out;
+                    border: 1px solid rgba(255,255,255,0.5);
+                    animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    ${backgroundStyle}
                 ">
-                    <div style="font-size: 40px; margin-bottom: 15px;">🔒</div>
-                    <h2 style="color: #1e293b; font-size: 20px; margin-bottom: 10px; font-weight: bold;">
-                        ميزة بريميوم
-                    </h2>
-                    <p style="color: #64748b; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
-                        "${featureName}" متاحة فقط لأعضاء البريميوم
-                    </p>
+                    ${imageSrc ? `
+                        <div style="
+                            position: absolute;
+                            inset: 0;
+                            background-image: url('${imageSrc}');
+                            background-size: cover;
+                            background-position: center;
+                            filter: blur(20px);
+                            opacity: 0.15;
+                            z-index: 0;
+                            transform: scale(1.2);
+                        "></div>
+                    ` : ''}
                     
-                    <div style="background: #f0f4ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: right;">
-                        <div style="color: #6366f1; font-weight: bold; margin-bottom: 8px;">✨ مع البريميوم تحصل على:</div>
-                        <div style="color: #475569; font-size: 12px; text-align: right;">
-                            • خطوط وأشكال وإطارات غير محدودة<br>
-                            • تصدير بدون علامة مائية<br>
-                            • حفظ التصاميم<br>
-                            • جودة فائقة
+                    <div style="position: relative; z-index: 1;">
+                        ${imageSrc ? `
+                        <div style="
+                            width: 140px; 
+                            height: 140px; 
+                            background: white; 
+                            border-radius: 20px; 
+                            margin: 0 auto 20px auto; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center;
+                            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15);
+                            border: 4px solid white;
+                            overflow: hidden;
+                            position: relative;
+                        ">
+                            <div style="
+                                position: absolute;
+                                top: 8px;
+                                right: 8px;
+                                background: #f472b6;
+                                color: white;
+                                font-size: 10px;
+                                font-weight: bold;
+                                padding: 2px 6px;
+                                border-radius: 6px;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            ">PREMIUM</div>
+                            <img src="${imageSrc}" style="max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
                         </div>
+                        ` : `
+                        <div style="
+                            width: 60px; 
+                            height: 60px; 
+                            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); 
+                            border-radius: 50%; 
+                            margin: 0 auto 15px auto; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center;
+                            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
+                        ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
+                        </div>
+                        `}
+                        
+                        <h2 style="color: #1e293b; font-size: 18px; margin-bottom: 8px; font-weight: 800;">
+                            عنصر مميز ✨
+                        </h2>
+                        
+                        <p style="color: #64748b; font-size: 12px; margin-bottom: 20px; line-height: 1.6; font-weight: 600;">
+                            هذا العنصر متاح فقط للمشتركين.<br>امتلك هذا العنصر وآلاف العناصر الأخرى الآن!
+                        </p>
+                        
+                        <button onclick="window.location.href = 'subscriptions.html'" style="
+                            width: 100%;
+                            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+                            color: white;
+                            border: none;
+                            padding: 12px;
+                            border-radius: 14px;
+                            font-weight: bold;
+                            font-size: 13px;
+                            cursor: pointer;
+                            margin-bottom: 10px;
+                            transition: all 0.3s;
+                            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                        " onmouseover="this.style.transform='translateY(-2px) shadow-lg'" onmouseout="this.style.transform='translateY(0)'">
+                            ترقية للباقة الكاملة 💎
+                        </button>
+                        
+                        <button onclick="this.parentElement.parentElement.parentElement.remove();" style="
+                            width: 100%;
+                            background: transparent;
+                            color: #94a3b8;
+                            border: none;
+                            padding: 8px;
+                            border-radius: 10px;
+                            font-weight: bold;
+                            font-size: 11px;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                        " onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#94a3b8'">
+                            ليس الآن
+                        </button>
                     </div>
-                    
-                    <button onclick="this.parentElement.parentElement.remove(); openPremiumLogin();" style="
-                        width: 100%;
-                        background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
-                        color: white;
-                        border: none;
-                        padding: 12px;
-                        border-radius: 10px;
-                        font-weight: bold;
-                        font-size: 14px;
-                        cursor: pointer;
-                        margin-bottom: 10px;
-                        transition: all 0.3s;
-                    " onmouseover="this.style.boxShadow='0 10px 25px rgba(99, 102, 241, 0.4)'" onmouseout="this.style.boxShadow='none'">
-                        ترقية لـ البريميوم الآن
-                    </button>
-                    
-                    <button onclick="this.parentElement.parentElement.remove();" style="
-                        width: 100%;
-                        background: #e2e8f0;
-                        color: #475569;
-                        border: none;
-                        padding: 10px;
-                        border-radius: 10px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                    " onmouseover="this.style.background='#cbd5e1'" onmouseout="this.style.background='#e2e8f0'">
-                        إغلاق
-                    </button>
                 </div>
                 
                 <style>
                     @keyframes slideIn {
-                        from {
-                            transform: scale(0.9) translateY(-20px);
-                            opacity: 0;
-                        }
-                        to {
-                            transform: scale(1) translateY(0);
-                            opacity: 1;
-                        }
+                        from { transform: scale(0.95) translateY(10px); opacity: 0; }
+                        to { transform: scale(1) translateY(0); opacity: 1; }
                     }
                 </style>
             `;
@@ -5591,3 +6014,84 @@
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(restrictFonts, 500);
         });
+
+// ========== إدارة الجلسة (Session Management) ==========
+
+function checkSession() {
+    const sessionStr = localStorage.getItem('despro_session');
+    if (sessionStr) {
+        try {
+            const session = JSON.parse(sessionStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // التحقق من تاريخ التاريخ
+            let expiryDate = null;
+            const dateStr = session.expiryDate.trim();
+            if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                const [day, month, year] = dateStr.split('-');
+                expiryDate = new Date(`${year}-${month}-${day}`);
+            } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                expiryDate = new Date(dateStr);
+            } else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                expiryDate = new Date(dateStr);
+            }
+            expiryDate.setHours(0, 0, 0, 0);
+
+            if (expiryDate >= today) {
+                // الجلسة صالحة
+                userTier = 'premium';
+                document.documentElement.setAttribute('data-tier', 'premium');
+                updateStudioName(session.name);
+                updateFooterForUser(session.name);
+                
+                // إخفاء زر الدخول إن وجد
+                const loginOverlay = document.getElementById('login-overlay');
+                if(loginOverlay) loginOverlay.style.display = 'none';
+            } else {
+                // الجلسة منتهية
+                logoutUser();
+            }
+        } catch (e) {
+            console.error('Session error', e);
+            logoutUser();
+        }
+    }
+}
+
+function updateFooterForUser(name) {
+    // استخدام الحاوية الجديدة المخصصة
+    const authContainer = document.getElementById('auth-container');
+    
+    if (authContainer) {
+        authContainer.innerHTML = `
+            <div class="flex items-center gap-2 bg-indigo-900/50 px-3 py-1.5 rounded-full border border-indigo-400/30 shadow-inner backdrop-blur-sm">
+                <span class="text-xs font-bold text-[#fbbf24] flex items-center gap-1.5 select-none">
+                    <i class="fas fa-user-check text-xs"></i>
+                    ${name}
+                </span>
+                <div class="w-px h-3 bg-white/20"></div>
+                <button onclick="logoutUser()" class="text-xs font-bold text-red-300 hover:text-red-100 transition flex items-center gap-1" title="تسجيل الخروج">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        `;
+    } else {
+        // Fallback for older HTML structure (if cache persists)
+        const buttons = document.querySelectorAll('button');
+        // ... (legacy logic omitted for cleaner file, assuming HTML is updated)
+    }
+    
+    // تحديث العنوان الرئيسي أيضاً للتأكيد
+    const studioTitle = document.getElementById('studio-name-display');
+    if(studioTitle) {
+        studioTitle.innerHTML = `استوديو ${name} 🎨`;
+    }
+}
+
+function logoutUser() {
+    localStorage.removeItem('despro_session');
+    window.location.reload();
+}
+document.addEventListener('DOMContentLoaded', checkSession);
+document.addEventListener('DOMContentLoaded', loadAssetsLibraryFromGitHub);
