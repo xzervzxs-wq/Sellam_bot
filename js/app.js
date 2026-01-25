@@ -3921,9 +3921,13 @@
                         // إنشاء Session ID عشوائي
                         const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
                         
-                        sessionStorage.setItem('studioName', userData.name);
-                        sessionStorage.setItem('expiryDate', userData.expiryDate);
-                        sessionStorage.setItem('sessionId', sessionId);
+                        // حفظ الجلسة في localStorage لتدوم بعد التحديث
+                        const sessionObj = {
+                             name: userData.name,
+                             expiryDate: userData.expiryDate,
+                             sessionId: sessionId
+                        };
+                        localStorage.setItem('despro_session', JSON.stringify(sessionObj));
                         
                         // تعديل الـ tier إلى premium
                         setPremiumUser();
