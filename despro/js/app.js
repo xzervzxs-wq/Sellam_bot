@@ -368,6 +368,7 @@
         function loadAssetsLibraryFromGitHub() {
             const grid = document.getElementById('assets-grid');
             const select = document.getElementById('assets-category-select');
+            const loadingBar = document.getElementById('assets-loading-bar');
             
             if (!grid || !select) {
                 console.error('عناصر المكتبة غير موجودة');
@@ -386,12 +387,16 @@
                 });
                 
                 grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
+                if (loadingBar) loadingBar.classList.add('hidden');
                 console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
                 return;
             }
             
-            // عرض رسالة تحميل
-            grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin ml-2"></i>جاري تحميل المكتبة...</p>';
+            // عرض شريط التحميل
+            if (loadingBar) {
+                loadingBar.classList.remove('hidden');
+            }
+            grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">جاري التحميل...</p>';
             
             // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
             fetch('./Official.json?t=' + Date.now())
@@ -414,11 +419,13 @@
                     });
                     
                     grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
+                    if (loadingBar) loadingBar.classList.add('hidden');
                     console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
                 })
                 .catch(error => {
                     console.error('خطأ في تحميل المكتبة:', error);
                     grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
+                    if (loadingBar) loadingBar.classList.add('hidden');
                 });
         }
 
@@ -5996,4 +6003,18 @@ function logoutUser() {
     localStorage.removeItem('userTier');
     window.location.reload();
 }
-document.addEventListener('DOMContentLoaded', checkSession);
+
+// فتح مكتبة العناصر افتراضياً عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    checkSession();
+    // فتح مكتبة العناصر مباشرة
+    const assetsContent = document.getElementById('assets-library-content');
+    const arrow = document.getElementById('assets-library-arrow');
+    if (assetsContent && assetsContent.classList.contains('hidden')) {
+        assetsContent.classList.remove('hidden');
+        assetsContent.classList.add('flex');
+        if (arrow) arrow.style.transform = 'rotate(-90deg)';
+        // تحميل المكتبة
+        loadAssetsLibraryFromGitHub();
+    }
+});
