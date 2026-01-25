@@ -4286,6 +4286,29 @@
         function updateStyle(prop, val) {
             if(!activeEl) return;
             
+            // --- تعديل: دعم التلوين الجزئي عند استخدام لوحة الألوان الرئيسية ---
+            if (prop === 'color' && activeEl.classList.contains('text-layer')) {
+                const selection = window.getSelection();
+                // Check if selection exists, is not empty, and intersects with activeEl
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    if (activeEl.contains(range.commonAncestorContainer) || activeEl.contains(range.startContainer)) {
+                        document.execCommand('styleWithCSS', false, true);
+                        document.execCommand('foreColor', false, val);
+                        
+                        // Sync inputs but DON'T update the whole element style
+                        const topTextColor = document.getElementById('top-text-color');
+                        if (topTextColor) topTextColor.value = val;
+                        const quickColor = document.getElementById('quick-color');
+                        if (quickColor) quickColor.value = val;
+                        
+                        saveState();
+                        return; // Stop execution here for partial coloring
+                    }
+                }
+            }
+            // -----------------------------------------------------------------
+
             activeEl.style[prop] = val;
             
             // إذا كنا نغير المحاذاة، نتأكد من تطبيقها على النص المقروء أيضاً إذا وجد
