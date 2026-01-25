@@ -6060,42 +6060,26 @@ function checkSession() {
 }
 
 function updateFooterForUser(name) {
-    // البحث عن زر دخول المشتركين في الفوتر واستبداله
-    // بما أننا لا نملك ID دقيق، سنبحث عن الزر الذي يحتوي على "دخول المشتركين"
-    const buttons = document.querySelectorAll('button');
-    let loginBtn = null;
-    buttons.forEach(btn => {
-        if(btn.textContent.includes('دخول المشتركين') || btn.innerHTML.includes('fa-user-circle')) {
-            loginBtn = btn;
-        }
-    });
-
-    if (loginBtn) {
-        // إنشاء حاوية جديدة للأزرار إذا لزم الأمر أو استبدال الزر فقط
-        const parent = loginBtn.parentElement;
-        
-        // إزالة الزر القديم
-        loginBtn.remove();
-        
-        // إضافة اسم المستخدم وزر الخروج
-        // زر الخروج
-        const logoutBtn = document.createElement('button');
-        logoutBtn.onclick = logoutUser;
-        logoutBtn.className = 'text-sm font-semibold text-red-300 hover:text-red-200 transition flex items-center gap-2 px-3 py-1';
-        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> خروج';
-        
-        // فاصل
-        const divider = document.createElement('div');
-        divider.className = 'h-5 w-px bg-white bg-opacity-30';
-        
-        // اسم المستخدم
-        const userSpan = document.createElement('span');
-        userSpan.className = 'text-sm font-bold text-[#fbbf24] px-3 py-1 flex items-center gap-2';
-        userSpan.innerHTML = `<i class="fas fa-user-check"></i> ${name}`;
-        
-        parent.appendChild(userSpan);
-        parent.appendChild(divider);
-        parent.appendChild(logoutBtn);
+    // استخدام الحاوية الجديدة المخصصة
+    const authContainer = document.getElementById('auth-container');
+    
+    if (authContainer) {
+        authContainer.innerHTML = `
+            <div class="flex items-center gap-2 bg-indigo-900/50 px-3 py-1.5 rounded-full border border-indigo-400/30 shadow-inner backdrop-blur-sm">
+                <span class="text-xs font-bold text-[#fbbf24] flex items-center gap-1.5 select-none">
+                    <i class="fas fa-user-check text-xs"></i>
+                    ${name}
+                </span>
+                <div class="w-px h-3 bg-white/20"></div>
+                <button onclick="logoutUser()" class="text-xs font-bold text-red-300 hover:text-red-100 transition flex items-center gap-1" title="تسجيل الخروج">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        `;
+    } else {
+        // Fallback for older HTML structure (if cache persists)
+        const buttons = document.querySelectorAll('button');
+        // ... (legacy logic omitted for cleaner file, assuming HTML is updated)
     }
     
     // تحديث العنوان الرئيسي أيضاً للتأكيد

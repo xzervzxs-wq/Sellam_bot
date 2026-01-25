@@ -1028,20 +1028,25 @@
                         <h4 class="font-bold text-xs text-white uppercase tracking-wide">روابط سريعة</h4>
                     </div>
                     <div class="flex items-center gap-0">
-                        <a href="subscriptions.html" class="text-sm font-semibold text-[#fbbf24] hover:text-[#f59e0b] transition flex items-center gap-2 px-3 py-1 no-underline">
+                        <a href="subscriptions.html" class="text-xs font-bold text-[#fbbf24] hover:text-[#f59e0b] transition flex items-center gap-1.5 px-2 py-1 bg-white/10 rounded-lg hover:bg-white/20 border border-white/10">
                             <i class="fas fa-crown text-[#fbbf24]"></i>
-                            PREMIUM
+                            اشتراك
                         </a>
-                        <div class="h-5 w-px bg-white bg-opacity-30"></div>
-                        <button onclick="toggleLoginOverlay()" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1">
+                        
+                        <a href="https://wa.me/966531333714" target="_blank" class="text-xs font-bold text-white hover:text-gray-200 transition flex items-center gap-1.5 px-2 py-1">
                             <i class="fas fa-headset text-pink-300"></i>
-                            الدعم الفني
-                        </button>
-                        <div class="h-5 w-px bg-white bg-opacity-30"></div>
-                        <button onclick="toggleLoginOverlay()" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1">
-                            <i class="fas fa-user-circle text-pink-300"></i>
-                            دخول المشتركين
-                        </button>
+                            دعم
+                        </a>
+                        
+                        <div class="h-4 w-px bg-white/20 mx-1"></div>
+                        
+                        <!-- Login Button Container -->
+                        <div id="auth-container">
+                            <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="text-xs font-bold text-white hover:text-white transition flex items-center gap-1.5 px-3 py-1 bg-[#6366f1] hover:bg-[#4f46e5] rounded-full shadow-lg border border-[#818cf8] animate-pulse-slow">
+                                <i class="fas fa-user-circle"></i>
+                                تسجيل دخول
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1069,6 +1074,6 @@
         </div>
     </footer>
 
-    <script src="js/app.js?v=1769353200"></script>
+    <script src="js/app.js?v=1769353250"></script>
 </body>
 </html>
