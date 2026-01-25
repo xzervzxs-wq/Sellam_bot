@@ -1,1605 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز الألعاب الإسلامي</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background: #fdfbf7;
-            overflow-x: hidden;
-            touch-action: manipulation;
-        }
-
-        /* --- Shared Styles --- */
-        .btn-hover { transition: all 0.2s; }
-        .btn-hover:active { transform: scale(0.95); }
-
-        /* --- Crossword Styles --- */
-        .letter-box {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .letter-box.filled { background-color: #ffffff; border-color: #1a472a; transform: translateY(-2px); }
-        .letter-box.correct { background-color: #d4af9d; border-color: #b4975a; color: #1a472a; animation: bounce 0.5s; }
-        .letter-box.wrong { background-color: #d4a5a5; border-color: #8b7355; animation: shake 0.5s; }
-
-        /* --- Hexagon Game Styles --- */
-        .hex-wrapper {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            border: 4px solid #efe9d9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        .hex-row {
-            display: flex;
-            justify-content: center;
-            margin-bottom: -10px;
-        }
-        
-        .hex-row:nth-child(even) {
-            margin-right: 55px; 
-        }
-
-        .hex-cell {
-            width: 55px;
-            height: 60px;
-            margin: 3px;
-            background-color: #f0ebe0; 
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 1.4rem;
-            color: #b4975a;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            z-index: 10;
-            border: 2px solid transparent; 
-        }
-        
-        .hex-cell:hover:not(.locked) {
-            background-color: #b4975a;
-            color: white;
-            transform: scale(1.1);
-            z-index: 20;
-        }
-
-        .hex-cell.team1 { background-color: #1a472a; color: white; } 
-        .hex-cell.team2 { background-color: #d84545; color: white; } 
-        .hex-cell.locked { cursor: default; }
-
-        /* --- Connect 4 Styles --- */
-        .c4-board {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            background-color: #b4975a; /* Wooden/Gold frame color */
-            padding: 10px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 4px solid #8b7355;
-        }
-        .c4-col {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            cursor: pointer;
-            padding: 5px 0;
-            border-radius: 10px;
-            transition: background-color 0.2s;
-        }
-        .c4-col:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-        .c4-cell {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #f0ebe0; /* Empty slot */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.4s cubic-bezier(1,-0.01,.39,1.44); /* Bounce effect */
-        }
-        .c4-cell.p1 { background-color: #1a472a; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3); } /* Green */
-        .c4-cell.p2 { background-color: #d84545; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3); } /* Red */
-        
-        @media (min-width: 640px) {
-            .c4-cell { width: 55px; height: 55px; }
-            .c4-board { gap: 12px; padding: 15px; }
-            .c4-col { gap: 12px; }
-        }
-
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .animate-pop { animation: bounce 0.4s ease-out; }
-        .animate-sway { animation: sway 3s ease-in-out infinite; }
-        @keyframes sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-center text-gray-800 p-2">
-
-    <!-- Audio System -->
-    <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-
-            if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(500, now);
-                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } else if (type === 'wrong') {
-                osc.type = 'triangle'; 
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.exponentialRampToValueAtTime(50, now + 0.4);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                gainNode.gain.setValueAtTime(0.05, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            } else if (type === 'win') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
-                osc.frequency.linearRampToValueAtTime(400, now + 0.2);
-                osc.frequency.linearRampToValueAtTime(800, now + 0.4);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
-                osc.start(now);
-                osc.stop(now + 0.6);
-            } else if (type === 'warning') {
-                // صوت تنبيه للوقت المتبقي
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                gainNode.gain.setValueAtTime(0.08, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
-                osc.start(now);
-                osc.stop(now + 0.15);
-            }
-        }
-    </script>
-
-    <!-- App Container -->
-    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden min-h-[700px] relative border border-[#efe9d9]">
-        
-        <!-- Header -->
-        <div class="h-2 bg-gradient-to-r from-[#b4975a] to-[#1a472a] w-full"></div>
-
-        <!-- === SCREEN 0: MAIN MENU === -->
-        <div id="screen-menu" class="p-6 flex flex-col items-center justify-center h-full min-h-[650px] animate-fade-in text-center space-y-8">
-            <div class="space-y-2">
-                <span class="text-7xl animate-sway inline-block">🕌</span>
-                <h1 class="text-5xl font-black text-[#1a472a] tracking-tight">واحة الألعاب</h1>
-                <p class="text-[#b4975a] text-xl font-medium">مسابقات ثقافية وإسلامية</p>
-            </div>
-
-            <div class="w-full max-w-md bg-[#f0ebe0] p-6 rounded-2xl border border-[#efe9d9]">
-                <h3 class="text-sm font-bold text-[#1a472a] mb-3 text-right">أسماء الفرق:</h3>
-                <div class="flex flex-col gap-3">
-                    <input type="text" id="g-team1" placeholder="الفريق الأول (الأخضر)" class="w-full px-4 py-3 rounded-xl border border-[#efe9d9] text-right focus:ring-2 focus:ring-[#b4975a] outline-none bg-white">
-                    <input type="text" id="g-team2" placeholder="الفريق الثاني (الأحمر)" class="w-full px-4 py-3 rounded-xl border border-[#efe9d9] text-right focus:ring-2 focus:ring-[#b4975a] outline-none bg-white">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 w-full max-w-lg">
-                <button onclick="launchGame('crossword')" class="group bg-white border-2 border-[#efe9d9] hover:border-[#b4975a] rounded-2xl p-4 transition-all hover:shadow-lg btn-hover flex flex-col items-center justify-center h-32 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 opacity-50"></div>
-                    <span class="text-4xl mb-2 relative z-10">📝</span>
-                    <span class="font-bold text-[#1a472a] text-sm relative z-10">الكلمات المتقاطعة</span>
-                    <span class="text-[10px] text-[#b4975a] mt-1 relative z-10 font-bold">أسئلة إسلامية ثقافية</span>
-                </button>
-
-                <button onclick="launchGame('hexagon')" class="group bg-white border-2 border-[#efe9d9] hover:border-[#b4975a] rounded-2xl p-4 transition-all hover:shadow-lg btn-hover flex flex-col items-center justify-center h-32 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-purple-50 to-pink-50 opacity-50"></div>
-                    <span class="text-4xl mb-2 relative z-10">⬡</span>
-                    <span class="font-bold text-[#1a472a] text-sm relative z-10">مسابقة الحروف</span>
-                    <span class="text-[10px] text-[#b4975a] mt-1 relative z-10 font-bold">لعبة سرعة وذاكرة</span>
-                </button>
-
-                <button onclick="launchGame('connect4')" class="col-span-2 group bg-white border-2 border-[#efe9d9] hover:border-[#b4975a] rounded-2xl p-4 transition-all hover:shadow-lg btn-hover flex flex-col items-center justify-center h-32 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-green-50 to-red-50 opacity-50"></div>
-                    <span class="text-4xl mb-2 relative z-10">🔴⚪🟢</span>
-                    <span class="font-bold text-[#1a472a] text-sm relative z-10">أربعة تربح</span>
-                    <span class="text-[10px] text-[#b4975a] mt-1 relative z-10 font-bold">لعبة ذكاء واستراتيجية</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- === SCREEN 1: CROSSWORD GAME === -->
-        <div id="screen-crossword" class="hidden flex flex-col h-full relative min-h-[650px]">
-            <div class="flex justify-between items-center bg-[#f0ebe0] p-3 border-b border-[#efe9d9]">
-                <button onclick="goHome()" class="text-xs bg-white border border-[#efe9d9] px-3 py-1 rounded-full hover:bg-[#fdfbf7] font-bold text-[#b4975a]">🏠 خروج</button>
-                <div class="font-bold text-[#1a472a]">الكلمات المتقاطعة</div>
-                <div class="text-xs font-bold bg-white px-3 py-1 rounded-full border border-[#efe9d9] text-[#b4975a]">مرحلة <span id="cw-stage">1</span></div>
-            </div>
-            
-            <div class="flex justify-between p-2 bg-white border-b border-[#efe9d9]">
-                <div id="cw-t1-box" class="flex-1 text-center p-2 rounded-lg border-2 border-[#b4975a] bg-[#f0ebe0] transition-all">
-                    <div id="cw-t1-name" class="font-bold text-sm text-[#1a472a]"></div>
-                    <div id="cw-t1-score" class="text-2xl font-black text-[#b4975a]">0</div>
-                    <div id="cw-t1-hearts" class="text-xs tracking-widest mt-1">❤️❤️❤️❤️❤️</div>
-                </div>
-                <div class="px-3 flex flex-col justify-center items-center">
-                    <div id="cw-timer" class="w-20 h-20 rounded-full bg-[#1a472a] text-white flex items-center justify-center font-black text-4xl shadow-lg">60</div>
-                </div>
-                <div id="cw-t2-box" class="flex-1 text-center p-2 rounded-lg border-2 border-transparent opacity-50 transition-all">
-                    <div id="cw-t2-name" class="font-bold text-sm text-[#1a472a]"></div>
-                    <div id="cw-t2-score" class="text-2xl font-black text-[#b4975a]">0</div>
-                    <div id="cw-t2-hearts" class="text-xs tracking-widest mt-1">❤️❤️❤️❤️❤️</div>
-                </div>
-            </div>
-
-            <div class="flex-1 overflow-y-auto p-4 flex flex-col items-center">
-                <div id="cw-turn-msg" class="mb-4 px-6 py-2 bg-[#d4af9d] text-[#1a472a] rounded-full text-sm font-bold animate-pulse shadow-sm"></div>
-                
-                <div class="bg-[#f0ebe0] w-full p-4 rounded-xl border border-[#efe9d9] mb-6 text-center">
-                     <h2 id="cw-question" class="text-xl md:text-2xl font-bold text-[#1a472a] leading-relaxed">...</h2>
-                </div>
-                
-                <div id="cw-grid" class="flex flex-wrap gap-2 justify-center mb-6" dir="rtl"></div>
-                <div id="cw-feedback" class="h-6 mb-2 text-center font-bold text-sm"></div>
-
-                <div class="mt-auto w-full max-w-md space-y-3">
-                    <button onclick="cwUseHint()" id="cw-hint-btn" class="w-full py-3 bg-[#f0ebe0] text-[#b4975a] border border-[#efe9d9] rounded-xl font-bold text-sm hover:bg-[#efe9d9] transition flex items-center justify-center gap-2">
-                        <span>💡</span> <span>استخدام مساعدة (كشف حرف)</span>
-                    </button>
-                    <div id="cw-keyboard" class="grid grid-cols-7 gap-1.5"></div>
-                    <button onclick="cwBackspace()" class="w-full py-3 bg-[#d4a5a5] text-[#1a472a] border border-[#efe9d9] rounded-xl font-bold hover:bg-[#c49494] flex justify-center gap-2 transition">
-                        <span>مسح</span> ⌫
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- === SCREEN 2: HEXAGON GAME === -->
-        <div id="screen-hexagon" class="hidden flex flex-col h-full relative min-h-[650px]">
-            <div class="flex justify-between items-center bg-gray-50 p-3 border-b">
-                <button onclick="goHome()" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-gray-100 font-bold text-gray-600">🏠 خروج</button>
-                <div class="font-bold text-gray-700">مسابقة الحروف</div>
-                <div class="text-xs text-gray-500 font-bold bg-white px-2 py-1 rounded border">الفائز من 3 جولات</div>
-            </div>
-
-            <div class="flex justify-between p-3 bg-white">
-                <div id="hex-t1-box" class="p-2 rounded-md bg-green-50 border border-green-300 text-center transition-all shadow-sm max-w-xs">
-                    <div class="text-[8px] font-bold text-green-700 mb-1 flex items-center justify-center gap-0.5 opacity-70">
-                        <span>اليمين</span> ↔️ <span>اليسار</span>
-                    </div>
-                    <div id="hex-t1-name" class="font-bold text-green-900 text-sm mb-1"></div>
-                    <div id="hex-t1-wins" class="flex justify-center gap-1 text-lg">
-                        <span class="text-gray-300">★</span><span class="text-gray-300">★</span><span class="text-gray-300">★</span>
-                    </div>
-                </div>
-                
-                <div id="hex-t2-box" class="p-2 rounded-md bg-red-50 border border-red-300 text-center opacity-50 transition-all shadow-sm max-w-xs">
-                    <div class="text-[8px] font-bold text-red-700 mb-1 flex items-center justify-center gap-0.5 opacity-70">
-                         <span>الأعلى</span> ↕️ <span>الأسفل</span>
-                    </div>
-                    <div id="hex-t2-name" class="font-bold text-red-900 text-sm mb-1"></div>
-                    <div id="hex-t2-wins" class="flex justify-center gap-1 text-lg">
-                        <span class="text-gray-300">★</span><span class="text-gray-300">★</span><span class="text-gray-300">★</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="hex-status" class="text-center text-sm font-bold py-2 bg-gray-100 text-gray-600 border-y border-gray-200">
-                اختر حرفاً للبدء
-            </div>
-
-            <div class="flex-1 flex items-center justify-center p-4 bg-gray-50 overflow-y-auto">
-                <div class="hex-wrapper shadow-lg">
-                    <div class="absolute -top-6 text-red-400 font-bold text-xs tracking-widest">▼ الفريق الأحمر ▼</div>
-                    <div class="absolute -bottom-6 text-red-400 font-bold text-xs tracking-widest">▲ الفريق الأحمر ▲</div>
-                    <div class="absolute -right-8 top-1/2 -translate-y-1/2 text-green-500 font-bold text-xs tracking-widest [writing-mode:vertical-rl] rotate-180">◄ الفريق الأخضر</div>
-                    <div class="absolute -left-8 top-1/2 -translate-y-1/2 text-green-500 font-bold text-xs tracking-widest [writing-mode:vertical-rl] rotate-180">الفريق الأخضر ►</div>
-                    <div id="hex-board"></div>
-                </div>
-
-                <div id="hex-modal" class="hidden absolute inset-0 bg-white/95 z-50 flex flex-col items-center justify-center p-6 animate-fade-in backdrop-blur-sm">
-                    <button onclick="closeHexModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕ إلغاء</button>
-                    <div id="hex-modal-timer" class="w-20 h-20 rounded-full bg-[#1a472a] text-white flex items-center justify-center font-black text-4xl shadow-lg mb-4 transition-colors duration-300">60</div>
-                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-4xl mb-6 font-black text-gray-600 border-4 border-gray-200 shadow-inner" id="hex-q-char">أ</div>
-                    <div class="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl border border-gray-100 text-center">
-                        <h3 id="hex-question-text" class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">...</h3>
-                        <div class="space-y-4">
-                            <input type="text" id="hex-input" placeholder="اكتب الإجابة هنا..." class="w-full text-center text-xl p-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition" autocomplete="off">
-                            <button onclick="checkHexAnswer()" class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition">تحقق من الإجابة ✅</button>
-                        </div>
-                        <div id="hex-feedback" class="h-6 mt-3 text-sm font-bold"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- === SCREEN 3: CONNECT 4 GAME (NEW) === -->
-        <div id="screen-connect4" class="hidden flex flex-col h-full relative min-h-[650px]">
-            <div class="flex justify-between items-center bg-gray-50 p-3 border-b">
-                <button onclick="goHome()" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-gray-100 font-bold text-gray-600">🏠 خروج</button>
-                <div class="font-bold text-gray-700">أربعة تربح</div>
-                <div class="text-xs text-gray-500 font-bold bg-white px-2 py-1 rounded border">كون 4 بصف واحد</div>
-            </div>
-
-            <!-- Teams Status -->
-            <div class="flex justify-between p-3 bg-white">
-                <div id="c4-t1-box" class="p-2 px-4 rounded-md bg-green-50 border border-green-300 text-center transition-all shadow-sm">
-                    <div class="text-[8px] font-bold text-green-700 mb-1 opacity-70">الفريق الأول</div>
-                    <div id="c4-t1-name" class="font-bold text-green-900 text-sm mb-1"></div>
-                    <div class="w-4 h-4 rounded-full bg-[#1a472a] mx-auto border border-gray-300 shadow-inner"></div>
-                </div>
-                
-                <div id="c4-status" class="flex-1 flex items-center justify-center font-bold text-sm text-gray-600 px-2 text-center">
-                    اختر عموداً لإنزال القرص
-                </div>
-
-                <div id="c4-t2-box" class="p-2 px-4 rounded-md bg-red-50 border border-red-300 text-center opacity-50 transition-all shadow-sm">
-                    <div class="text-[8px] font-bold text-red-700 mb-1 opacity-70">الفريق الثاني</div>
-                    <div id="c4-t2-name" class="font-bold text-red-900 text-sm mb-1"></div>
-                    <div class="w-4 h-4 rounded-full bg-[#d84545] mx-auto border border-gray-300 shadow-inner"></div>
-                </div>
-            </div>
-
-            <div class="flex-1 flex items-center justify-center p-4 bg-gray-100 overflow-y-auto">
-                <div class="c4-board" id="c4-board">
-                    <!-- Board Generated by JS -->
-                </div>
-
-                <!-- Connect 4 Question Modal -->
-                <div id="c4-modal" class="hidden absolute inset-0 bg-white/95 z-50 flex flex-col items-center justify-center p-6 animate-fade-in backdrop-blur-sm">
-                    <button onclick="closeC4Modal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕ إلغاء</button>
-                    
-                    <div id="c4-modal-timer" class="w-20 h-20 rounded-full bg-[#1a472a] text-white flex items-center justify-center font-black text-4xl shadow-lg mb-4 transition-colors duration-300">60</div>
-
-                    <div class="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl border border-gray-100 text-center">
-                        <span class="text-xs font-bold text-gray-400 tracking-widest mb-2 block">سؤال التحدي</span>
-                        <h3 id="c4-question-text" class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">...</h3>
-                        
-                        <div class="space-y-4">
-                            <input type="text" id="c4-input" placeholder="اكتب الإجابة هنا..." class="w-full text-center text-xl p-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition" autocomplete="off">
-                            <button onclick="checkC4Answer()" class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition">
-                                تحقق من الإجابة ✅
-                            </button>
-                        </div>
-                        <div id="c4-feedback" class="h-6 mt-3 text-sm font-bold"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- === WIN SCREEN === -->
-        <div id="screen-win" class="hidden absolute inset-0 bg-white z-[60] flex flex-col items-center justify-center p-8 text-center animate-pop">
-            <div class="text-8xl mb-6 animate-bounce">🏆</div>
-            <h2 class="text-4xl font-black text-gray-800 mb-2">الفائز بالبطولة</h2>
-            <h3 id="winner-name" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600 mb-8 py-2"></h3>
-            <button onclick="goHome()" class="bg-gray-800 text-white px-10 py-4 rounded-xl font-bold hover:bg-gray-700 shadow-xl transition transform hover:scale-105">القائمة الرئيسية</button>
-        </div>
-
-        <!-- === ROUND WIN MODAL === -->
-        <div id="round-win-modal" class="hidden absolute inset-0 bg-black/50 z-[55] flex flex-col items-center justify-center p-8 text-center backdrop-blur-sm animate-fade-in">
-            <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full">
-                <div class="text-6xl mb-4">🌟</div>
-                <h2 class="text-2xl font-black text-gray-800 mb-2">انتهت الجولة!</h2>
-                <p class="text-gray-600 mb-6">الفائز بهذه الجولة: <span id="round-winner-name" class="font-bold text-green-600"></span></p>
-                <button onclick="startNextHexRound()" class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg">بدء الجولة التالية</button>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- LOGIC -->
-    <script>
-        // --- GLOBAL STATE ---
-        const gState = {
-            team1: "الفريق الأخضر",
-            team2: "الفريق الأحمر",
-            currentGame: null 
-        };
-
-        // --- MASSIVE QUESTION BANK (Existing for Games 1 & 2) ---
-        const questionBank = [
-             { q: "أول مؤذن في الإسلام؟", a: "بلال", char: "ب" },
-            { q: "سورة تعدل ثلث القرآن؟", a: "الاخلاص", char: "ا" },
-            { q: "اسم ناقة النبي ﷺ؟", a: "القصواء", char: "ا" },
-            { q: "خازن النار في القرآن؟", a: "مالك", char: "م" },
-            { q: "لقب عثمان بن عفان؟", a: "ذوالنورين", char: "ذ" },
-            { q: "غزوة كسرت فيها رباعية النبي؟", a: "احد", char: "ا" },
-            { q: "كليم الله هو النبي؟", a: "موسى", char: "م" },
-            { q: "زوجة النبي وهي بنت الصديق؟", a: "عائشة", char: "ع" },
-            { q: "أول سفير في الإسلام؟", a: "مصعب", char: "م" },
-            { q: "عدد أجزاء القرآن؟", a: "ثلاثون", char: "ث" },
-            { q: "نبي ابتلعه الحوت؟", a: "يونس", char: "ي" },
-            { q: "أول الخلفاء الراشدين؟", a: "ابوبكر", char: "ا" },
-            { q: "مدينة يطلق عليها طيبة؟", a: "المدينة", char: "ا" },
-            { q: "عدد الصلوات المفروضة؟", a: "خمس", char: "خ" },
-            { q: "الشهر الذي نزل فيه القرآن؟", a: "رمضان", char: "ر" },
-            { q: "من بنى الكعبة مع ابنه؟", a: "ابراهيم", char: "ا" },
-            { q: "اسم زوجة فرعون المؤمنة؟", a: "اسيا", char: "ا" },
-            { q: "السورة التي تسمى قلب القرآن؟", a: "يس", char: "ي" },
-            { q: "في أي عام كانت حجة الوداع؟", a: "عاشر", char: "ع" },
-            { q: "من هو سيف الله المسلول؟", a: "خالد", char: "خ" },
-            { q: "من هو أمين هذه الأمة؟", a: "ابوعبيدة", char: "ا" },
-            { q: "اسم غار الوحي؟", a: "حراء", char: "ح" },
-            { q: "اسم غار الهجرة؟", a: "ثور", char: "ث" },
-            { q: "أطول سورة في القرآن؟", a: "البقرة", char: "ا" },
-            { q: "أقصر سورة في القرآن؟", a: "الكوثر", char: "ا" },
-            { q: "مرضعة الرسول ﷺ؟", a: "حليمة", char: "ح" },
-            { q: "عم الرسول الملقب بأسد الله؟", a: "حمزة", char: "ح" },
-            { q: "من هو الفاروق؟", a: "عمر", char: "ع" },
-            { q: "أول من أسلم من الرجال؟", a: "ابوبكر", char: "ا" },
-            { q: "أول من أسلم من الصبيان؟", a: "علي", char: "ع" },
-            { q: "أول من أسلم من النساء؟", a: "خديجة", char: "خ" },
-            { q: "خازن الجنة؟", a: "رضوان", char: "ر" },
-            { q: "الصحابي الذي اهتز لموته عرش الرحمن؟", a: "سعد", char: "س" },
-            { q: "في أي يوم خلق آدم؟", a: "الجمعة", char: "ا" },
-            { q: "سورة خالية من البسملة؟", a: "التوبة", char: "ا" },
-            { q: "السورة التي بها بسملتين؟", a: "النمل", char: "ا" },
-            { q: "الصحابي الملقب بترجمان القرآن؟", a: "ابن عباس", char: "ا" },
-            { q: "النبي الذي لان له الحديد؟", a: "داود", char: "د" },
-            { q: "النبي الذي سخرت له الرياح؟", a: "سليمان", char: "س" },
-            { q: "النبي الذي يفر من زوجته يوم القيامة؟", a: "لوط", char: "ل" },
-            { q: "زوجة الرسول الملقبة بأم المساكين؟", a: "زينب", char: "ز" },
-            { q: "القبلة الأولى للمسلمين؟", a: "القدس", char: "ا" },
-            { q: "مؤذن الرسول في السماء؟", a: "جبريل", char: "ج" },
-            { q: "شاعر الرسول؟", a: "حسان", char: "ح" },
-            { q: "حيوان يلقب بملك الغابة؟", a: "الاسد", char: "ا" },
-            { q: "أسرع حيوان بري؟", a: "الفهد", char: "ا" },
-            { q: "عاصمة السعودية؟", a: "الرياض", char: "ا" },
-            { q: "الشيء الذي كلما زاد نقص؟", a: "العمر", char: "ا" },
-            { q: "المعدن السائل؟", a: "الزئبق", char: "ا" },
-            { q: "عاصمة فلسطين؟", a: "القدس", char: "ا" },
-            { q: "أكبر قارات العالم؟", a: "اسيا", char: "ا" },
-            { q: "غاز يتنفسه الإنسان؟", a: "الاكسجين", char: "ا" },
-            { q: "مكتشف الجاذبية؟", a: "نيوتن", char: "ن" },
-            { q: "أطول نهر في العالم؟", a: "النيل", char: "ا" },
-            { q: "الكوكب الأحمر؟", a: "المريخ", char: "ا" },
-            { q: "صوت الحصان؟", a: "صهيل", char: "ص" },
-            { q: "عكس تفاؤل؟", a: "تشاؤم", char: "ت" },
-            { q: "وحدة قياس الصوت؟", a: "ديسيبل", char: "د" },
-            { q: "أكبر محيط في العالم؟", a: "الهادي", char: "ا" },
-            { q: "أصغر قارة في العالم؟", a: "استراليا", char: "ا" },
-            { q: "دولة المليون شهيد؟", a: "الجزائر", char: "ا" },
-            { q: "عاصمة مصر؟", a: "القاهرة", char: "ا" },
-            { q: "عاصمة العراق؟", a: "بغداد", char: "ب" },
-            { q: "عاصمة الاردن؟", a: "عمان", char: "ع" },
-            { q: "عاصمة سوريا؟", a: "دمشق", char: "د" },
-            { q: "عاصمة لبنان؟", a: "بيروت", char: "ب" },
-            { q: "عملة الكويت؟", a: "دينار", char: "د" },
-            { q: "عملة السعودية؟", a: "ريال", char: "ر" },
-            { q: "عملة الامارات؟", a: "درهم", char: "د" },
-            { q: "أكبر دولة مساحة؟", a: "روسيا", char: "ر" },
-            { q: "أكبر حيوان في العالم؟", a: "الحوت", char: "ا" },
-            { q: "طائر لا يطير؟", a: "النعامة", char: "ا" },
-            { q: "حيوان له خرطوم؟", a: "الفيل", char: "ا" },
-            { q: "حيوان يسمى سفينة الصحراء؟", a: "الجمل", char: "ا" },
-            { q: "كم عدد ألوان قوس قزح؟", a: "سبعة", char: "س" },
-            { q: "شيء له أسنان ولا يعض؟", a: "المشط", char: "ا" },
-            { q: "بيت النمل؟", a: "قرية", char: "ق" },
-            { q: "بيت النحل؟", a: "خلية", char: "خ" },
-            { q: "صوت الأسد؟", a: "زئير", char: "ز" },
-            { q: "صوت الذئب؟", a: "عواء", char: "ع" },
-            { q: "صوت الحمام؟", a: "هديل", char: "ه" },
-            { q: "عاصمة ايطاليا؟", a: "روما", char: "ر" },
-            { q: "عاصمة فرنسا؟", a: "باريس", char: "ب" },
-            { q: "عاصمة بريطانيا؟", a: "لندن", char: "ل" },
-            { q: "عاصمة المانيا؟", a: "برلين", char: "ب" },
-            { q: "عاصمة اسبانيا؟", a: "مدريد", char: "م" },
-            { q: "عاصمة اليابان؟", a: "طوكيو", char: "ط" },
-            { q: "مكتشف المصباح الكهربائي؟", a: "اديسون", char: "ا" },
-            { q: "مكتشف الهاتف؟", a: "بيل", char: "ب" },
-            { q: "مكتشف البنسلين؟", a: "فلمنج", char: "ف" },
-            { q: "الذهب الأسود هو؟", a: "النفط", char: "ا" },
-            { q: "الذهب الأبيض هو؟", a: "القطن", char: "ا" },
-            { q: "مدينة الضباب؟", a: "لندن", char: "ل" },
-            { q: "بلد الأهرامات؟", a: "مصر", char: "م" },
-            { q: "أطول مبنى في العالم؟", a: "خليفة", char: "خ" },
-            { q: "أسرع طائر في العالم؟", a: "الشاهين", char: "ا" },
-            { q: "حيوان ينام وإحدى عينيه مفتوحة؟", a: "الدلفين", char: "ا" },
-            { q: "كم قلب للأخطبوط؟", a: "ثلاثة", char: "ث" },
-            { q: "حيوان يتنفس من مؤخرته؟", a: "السلحفاة", char: "ا" },
-            { q: "كم عدد أرجل العنكبوت؟", a: "ثمانية", char: "ث" },
-            { q: "الغاز المستخدم في اطفاء الحرائق؟", a: "الكربون", char: "ا" },
-            { q: "العنصر الكيميائي للماء؟", a: "هيدروجين", char: "ه" },
-            { q: "الكوكب الأقرب للشمس؟", a: "عطارد", char: "ع" },
-            { q: "الكوكب الأبعد عن الشمس؟", a: "نبتون", char: "ن" },
-            { q: "أكبر كواكب المجموعة الشمسية؟", a: "المشتري", char: "ا" },
-            { q: "أصغر كواكب المجموعة الشمسية؟", a: "عطارد", char: "ع" },
-            { q: "كم يوما في السنة الكبيسة؟", a: "ستةوستين", char: "س" },
-            { q: "ما هو الداء؟", a: "المرض", char: "ا" },
-            { q: "ما هو الدواء؟", a: "العلاج", char: "ا" },
-            { q: "عكس كلمة ليل؟", a: "نهار", char: "ن" },
-            { q: "عكس كلمة ابيض؟", a: "اسود", char: "ا" },
-            { q: "عكس كلمة طويل؟", a: "قصير", char: "ق" },
-            { q: "عكس كلمة سمين؟", a: "نحيف", char: "ن" },
-            { q: "عكس كلمة قوي؟", a: "ضعيف", char: "ض" },
-            { q: "عكس كلمة سريع؟", a: "بطيء", char: "ب" },
-            { q: "مرادف كلمة سعيد؟", a: "فرحان", char: "ف" },
-            { q: "مرادف كلمة حزين؟", a: "كئيب", char: "ك" },
-            { q: "جمع كلمة كتاب؟", a: "كتب", char: "ك" },
-            { q: "جمع كلمة قلم؟", a: "اقلام", char: "ا" },
-            { q: "جمع كلمة مدرسة؟", a: "مدارس", char: "م" },
-            { q: "مفرد كلمة طلاب؟", a: "طالب", char: "ط" },
-            { q: "مفرد كلمة علوم؟", a: "علم", char: "ع" },
-            { q: "مفرد كلمة مساجد؟", a: "مسجد", char: "م" },
-            { q: "أين يقع برج ايفل؟", a: "باريس", char: "ب" },
-            { q: "أين تقع الكعبة؟", a: "مكة", char: "م" },
-            { q: "أين يقع المسجد النبوي؟", a: "المدينة", char: "ا" },
-            { q: "أين يقع المسجد الأقصى؟", a: "فلسطين", char: "ف" },
-            { q: "أين يقع تمثال الحرية؟", a: "امريكا", char: "ا" },
-            { q: "أين يقع تاج محل؟", a: "الهند", char: "ا" },
-            { q: "أين يقع سور الصين؟", a: "الصين", char: "ا" },
-            { q: "أين تقع الاهرامات؟", a: "مصر", char: "م" },
-            { q: "أين تقع البتراء؟", a: "الاردن", char: "ا" },
-            { q: "أين تقع مدائن صالح؟", a: "السعودية", char: "ا" },
-            { q: "اسم العملة في قطر؟", a: "ريال", char: "ر" },
-            { q: "اسم العملة في البحرين؟", a: "دينار", char: "د" },
-            { q: "اسم العملة في عمان؟", a: "ريال", char: "ر" },
-            { q: "اسم العملة في مصر؟", a: "جنيه", char: "ج" },
-            { q: "اسم العملة في اوروبا؟", a: "يورو", char: "ي" },
-            { q: "اسم العملة في امريكا؟", a: "دولار", char: "د" },
-            { q: "أسرع المخلوقات البحرية؟", a: "التونة", char: "ا" },
-            { q: "أضخم حيوان لا فقاري؟", a: "الحبار", char: "ا" },
-            { q: "حيوان يتغير لونه؟", a: "الحرباء", char: "ا" },
-            { q: "حيوان يصوم رمضان؟", a: "الافعى", char: "ا" },
-            { q: "حيوان يضحك كالإنـسان؟", a: "الضبع", char: "ا" },
-            { q: "حيوان ليس له صوت؟", a: "الزرافة", char: "ا" },
-            { q: "طائر يلد ولا يبيض؟", a: "الخفاش", char: "ا" },
-            { q: "كم عدد العيون للنحلة؟", a: "خمس", char: "خ" },
-            { q: "كم عدد أجنحة النحلة؟", a: "اربعة", char: "ا" },
-            { q: "كم عدد أرجل النملة؟", a: "ستة", char: "س" },
-            { q: "كم عدد أرجل العنكبوت؟", a: "ثمانية", char: "ث" },
-            { q: "ما هو الذهب الازرق؟", a: "الماء", char: "ا" },
-            { q: "ما هو الذهب الاخضر؟", a: "القمح", char: "ا" },
-            { q: "ما هو الذهب الابيض؟", a: "القطن", char: "ا" },
-            { q: "ما هو الذهب الاسود؟", a: "النفط", char: "ا" },
-            { q: "دولة تقع في قارتين؟", a: "تركيا", char: "ت" },
-            { q: "اكبر جزيرة في العالم؟", a: "جرينلاند", char: "ج" },
-            { q: "اكبر بحر مغلق؟", a: "قزوين", char: "ق" },
-            { q: "اعلى جبل في العالم؟", a: "ايفرست", char: "ا" },
-            { q: "اخفض نقطة على الارض؟", a: "الميت", char: "ا" },
-            { q: "اطول جسر بحري؟", a: "فهد", char: "ف" },
-            { q: "اكبر دولة عربية؟", a: "الجزائر", char: "ا" },
-            { q: "اصغر دولة عربية؟", a: "البحرين", char: "ا" },
-            { q: "اكثر الدول سكانا؟", a: "الصين", char: "ا" },
-            { q: "اقل القارات سكانا؟", a: "انتركتيكا", char: "ا" },
-            { q: "اول من صعد للقمر؟", a: "ارمسترونغ", char: "ا" },
-            { q: "اول من اخترع الطائرة؟", a: "رايت", char: "ر" },
-            { q: "مكتشف الدورة الدموية؟", a: "النفيس", char: "ا" },
-            { q: "مؤسس علم الجبر؟", a: "الخوارزمي", char: "ا" },
-            { q: "مؤسس علم الاجتماع؟", a: "خلدون", char: "خ" },
-            { q: "مؤلف كتاب البخلاء؟", a: "الجاحظ", char: "ا" },
-            { q: "شاعر النيل؟", a: "حافظ", char: "ح" },
-            { q: "امير الشعراء؟", a: "شوقي", char: "ش" },
-            { q: "عميد الادب العربي؟", a: "طه", char: "ط" },
-            { q: "كوكب الصبح؟", a: "الزهرة", char: "ا" },
-            { q: "نجم القطب؟", a: "الشمالي", char: "ا" },
-            { q: "عدد اسنان الانسان البالغ؟", a: "اثنان وثلاثون", char: "ا" },
-            { q: "عدد عظام الانسان؟", a: "مئتان وستة", char: "م" },
-            { q: "العضو المسؤول عن التذوق؟", a: "اللسان", char: "ا" },
-            { q: "العضو المسؤول عن الشم؟", a: "الانف", char: "ا" },
-            { q: "العضو المسؤول عن السمع؟", a: "الاذن", char: "ا" },
-            { q: "العضو المسؤول عن البصر؟", a: "العين", char: "ا" },
-            { q: "اكبر عضو في الجسم؟", a: "الجلد", char: "ا" },
-            { q: "اقوى عضلة في الجسم؟", a: "اللسان", char: "ا" }, 
-            { q: "اين يقع القلب؟", a: "اليسار", char: "ا" },
-            { q: "سائل الحياة؟", a: "الدم", char: "ا" },
-            { q: "ماذا يغطي جسم الطيور؟", a: "الريش", char: "ا" },
-            { q: "ماذا يغطي جسم الاسماك؟", a: "القشور", char: "ا" },
-            { q: "ماذا يغطي جسم الدب؟", a: "الفرو", char: "ا" },
-            { q: "ماذا يغطي جسم الخروف؟", a: "الصوف", char: "ا" },
-            { q: "ابو البشر؟", a: "ادم", char: "ا" },
-            { q: "ابو الانبياء؟", a: "ابراهيم", char: "ا" },
-            { q: "خاتم الانبياء؟", a: "محمد", char: "م" },
-            { q: "كليم الله؟", a: "موسى", char: "م" },
-            { q: "روح الله؟", a: "عيسى", char: "ع" },
-            { q: "خليل الله؟", a: "ابراهيم", char: "ا" },
-            { q: "الذبيح؟", a: "اسماعيل", char: "ا" },
-            { q: "النبي الصابر؟", a: "ايوب", char: "ا" },
-            { q: "النبي الجميل؟", a: "يوسف", char: "ي" },
-            { q: "النبي النجار؟", a: "زكريا", char: "ز" },
-            { q: "النبي الخياط؟", a: "ادريس", char: "ا" },
-            { q: "النبي الحداد؟", a: "داود", char: "د" },
-            { q: "اول من بنى السجون؟", a: "علي", char: "ع" },
-            { q: "اول من ركب الخيل؟", a: "اسماعيل", char: "ا" },
-            { q: "اول من كتب بالقلم؟", a: "ادريس", char: "ا" },
-            { q: "اول من قال اما بعد؟", a: "داود", char: "د" },
-            { q: "سيد الشهداء؟", a: "حمزة", char: "ح" },
-            { q: "امين الوحي؟", a: "جبريل", char: "ج" },
-            { q: "ملك الموت؟", a: "عزرائيل", char: "ع" },
-            { q: "حارس الجنة؟", a: "رضوان", char: "ر" },
-            { q: "حارس النار؟", a: "مالك", char: "م" },
-            { q: "منفخ الصور؟", a: "اسرافيل", char: "ا" },
-            { q: "الملاك الموكل بالقطر؟", a: "ميكائيل", char: "م" },
-            { q: "اول معركة في الاسلام؟", a: "بدر", char: "ب" },
-            { q: "آخر غزوة للرسول؟", a: "تبوك", char: "ت" },
-            { q: "فاتح القدس؟", a: "صلاح", char: "ص" },
-            { q: "فاتح الاندلس؟", a: "طارق", char: "ط" },
-            { q: "فاتح القسطنطينية؟", a: "محمد", char: "م" },
-            { q: "فاتح مصر؟", a: "عمرو", char: "ع" },
-            { q: "قائد الفرس في القادسية؟", a: "رستم", char: "ر" },
-            { q: "كم عدد الخلفاء الراشدين؟", a: "اربعة", char: "ا" },
-            { q: "عاصمة الخلافة الاموية؟", a: "دمشق", char: "د" },
-            { q: "عاصمة الخلافة العباسية؟", a: "بغداد", char: "ب" },
-            { q: "عاصمة الدولة العثمانية؟", a: "اسلامبول", char: "ا" },
-            { q: "مخترع الديناميت؟", a: "نوبل", char: "ن" },
-            { q: "مخترع الراديو؟", a: "ماركوني", char: "م" },
-            { q: "مخترع التلفزيون؟", a: "بيرد", char: "ب" },
-            { q: "مكتشف امريكا؟", a: "كولومبس", char: "ك" },
-            { q: "مكتشف طريق الهند؟", a: "جامـا", char: "ج" },
-            { q: "اول رائد فضاء عربي؟", a: "سلطان", char: "س" }
-        ];
-
-        // --- NEW Question Bank for Connect 4 (Ages 8-16) ---
-        // بنك أسئلة جديد للعبة "أربعة تربح" - مناسب للأعمار ٨-١٦
-        const c4QuestionBank = [
-            { q: "كم عدد ركعات صلاة الفجر؟", a: "ركعتان" },
-            { q: "كم عدد ركعات صلاة المغرب؟", a: "ثلاث" },
-            { q: "كم عدد ركعات صلاة الظهر؟", a: "اربع" },
-            { q: "كم عدد أركان الإسلام؟", a: "خمسة" },
-            { q: "كم عدد أركان الإيمان؟", a: "ستة" },
-            { q: "من هو خاتم الأنبياء؟", a: "محمد" },
-            { q: "ما هو الكتاب الذي نزل على محمد ﷺ؟", a: "القران" },
-            { q: "في أي شهر يصوم المسلمون؟", a: "رمضان" },
-            { q: "ما هي القبلة التي يتجه إليها المسلمون؟", a: "الكعبة" },
-            { q: "أين ولد النبي محمد ﷺ؟", a: "مكة" },
-            { q: "إلى أين هاجر النبي محمد ﷺ؟", a: "المدينة" },
-            { q: "من هو أول البشر؟", a: "ادم" },
-            { q: "ما هو اسم والد النبي محمد ﷺ؟", a: "عبدالله" },
-            { q: "ما هو اسم والدة النبي محمد ﷺ؟", a: "امنة" },
-            { q: "من هو الصحابي الملقب بالصديق؟", a: "ابوبكر" },
-            { q: "ما هي الصلاة التي ليس فيها ركوع ولا سجود؟", a: "الجنازة" },
-            { q: "ما هو الحيوان الذي ارتبط بقصة أصحاب الكهف؟", a: "الكلب" },
-            { q: "ما هي السورة التي لا تبدأ ببسم الله؟", a: "التوبة" },
-            { q: "من هو النبي الذي بنى السفينة؟", a: "نوح" },
-            { q: "من هو النبي الذي ألقي في النار ولم يحترق؟", a: "ابراهيم" },
-            { q: "من هو النبي الذي كلمة الله تكليماً؟", a: "موسى" },
-            { q: "من هو النبي الذي ولد بدون أب؟", a: "عيسى" },
-            { q: "ما هو اسم خازن الجنة؟", a: "رضوان" },
-            { q: "ما هو اسم خازن النار؟", a: "مالك" },
-            { q: "كم عدد الخلفاء الراشدين؟", a: "اربعة" },
-            { q: "من هو مؤذن الرسول؟", a: "بلال" },
-            { q: "ما هي عاصمة المملكة العربية السعودية؟", a: "الرياض" },
-            { q: "ما هي العملة المستخدمة في السعودية؟", a: "ريال" },
-            { q: "أكبر قارة في العالم؟", a: "اسيا" },
-            { q: "أصغر قارة في العالم؟", a: "استراليا" },
-            { q: "ما هو أسرع حيوان بري؟", a: "الفهد" },
-            { q: "ما هو ملك الغابة؟", a: "الاسد" },
-            { q: "ما هو الطائر الذي لا يطير وله رقبة طويلة؟", a: "النعامة" },
-            { q: "شيء تشتريه بمالك ولا تدخله دارك؟", a: "السيارة" }, // لغز سهل: السيارة (مجازي) أو نصحح لـ (الكفن؟ لا صعب).. نغيره
-            { q: "شيء كلما أخذت منه كبر؟", a: "الحفرة" },
-            { q: "شيء له أسنان ولا يعض؟", a: "المشط" },
-            { q: "أخت خالتك وليست خالتك، من تكون؟", a: "امي" },
-            { q: "ما هو الشيء الذي يكتب ولا يقرأ؟", a: "القلم" },
-            { q: "ما هو البيت الذي ليس فيه أبواب ولا نوافذ؟", a: "الشعر" },
-            { q: "من هو النبي الذي ابتلعه الحوت؟", a: "يونس" },
-            { q: "ما هي السورة التي تعدل ثلث القرآن؟", a: "الاخلاص" },
-            { q: "ما هي أعظم آية في القرآن؟", a: "الكرسي" },
-            { q: "في أي يوم خلق الله آدم؟", a: "الجمعة" },
-            { q: "ما هو اسم جد النبي محمد ﷺ؟", a: "عبدالمطلب" },
-            { q: "من هي زوجة النبي الأولى؟", a: "خديجة" },
-            { q: "من هي ابنة النبي زوجة علي بن أبي طالب؟", a: "فاطمة" },
-            { q: "ما هو اسم عم النبي الذي كفله؟", a: "ابوطالب" },
-            { q: "ما هو الركن الثاني من أركان الإسلام؟", a: "الصلاة" },
-            { q: "ما هو الركن الثالث من أركان الإسلام؟", a: "الزكاة" },
-            { q: "ما هو الركن الرابع من أركان الإسلام؟", a: "الصوم" },
-            { q: "ما هو الركن الخامس من أركان الإسلام؟", a: "الحج" },
-            { q: "ما هي الصلاة الوسطى؟", a: "العصر" },
-            { q: "ما هي أول معركة في الإسلام؟", a: "بدر" },
-            { q: "من هو سيف الله المسلول؟", a: "خالد" },
-            { q: "من هو الفاروق؟", a: "عمر" },
-            { q: "من هو ذو النورين؟", a: "عثمان" },
-            { q: "من هو أسد الله؟", a: "حمزة" },
-            { q: "كم سنة استمر نزول القرآن؟", a: "ثلاثةوعشرون" },
-            { q: "ما هو الشهر الذي نزل فيه القرآن؟", a: "رمضان" },
-            { q: "ما هي الليلة التي هي خير من ألف شهر؟", a: "القدر" },
-            { q: "ما هو اسم الجبل الذي عليه غار حراء؟", a: "النور" },
-            { q: "ما هو اسم الغار الذي اختبأ فيه الرسول وأبو بكر؟", a: "ثور" },
-            { q: "من هو النبي الذي صبر على المرض؟", a: "ايوب" },
-            { q: "من هو النبي الذي كان ملكاً؟", a: "سليمان" },
-            { q: "من هو النبي الذي لان له الحديد؟", a: "داود" },
-            { q: "من هو النبي الذي رفعه الله إليه؟", a: "عيسى" },
-            { q: "أول من آمن من الرجال؟", a: "ابوبكر" },
-            { q: "أول من آمن من النساء؟", a: "خديجة" },
-            { q: "أول من آمن من الصبيان؟", a: "علي" },
-            { q: "ما هو الطائر الذي تكلم مع سليمان؟", a: "الهدهد" },
-            { q: "ما هي الحشرة التي تكلمت في القرآن؟", a: "النملة" },
-            { q: "ما هو الحيوان الذي خلقه الله من ناقة؟", a: "الجمل" }, // سؤال للتعديل: الناقة هي أنثى الجمل
-            { q: "ما هو أكبر حيوان في البحر؟", a: "الحوت" },
-            { q: "ما هو الذهب الأسود؟", a: "النفط" },
-            { q: "ما هي عاصمة مصر؟", a: "القاهرة" },
-            { q: "ما هي عاصمة الأردن؟", a: "عمان" },
-            { q: "ما هي عاصمة الكويت؟", a: "الكويت" },
-            { q: "ما هي عاصمة البحرين؟", a: "المنامة" },
-            { q: "ما هي عاصمة قطر؟", a: "الدوحة" },
-            { q: "ما هي عاصمة الإمارات؟", a: "ابوظبي" },
-            { q: "دولة خليجية تتكون من جزر؟", a: "البحرين" },
-            { q: "من هو مخترع المصباح؟", a: "اديسون" },
-            { q: "من هو مكتشف الجاذبية؟", a: "نيوتن" },
-            { q: "ما هو السائل الذي لا لون له ولا طعم ولا رائحة؟", a: "الماء" },
-            { q: "كم عدد أيام الأسبوع؟", a: "سبعة" },
-            { q: "كم عدد ساعات اليوم؟", a: "اربع وعشرون" },
-            { q: "ما هو عكس أبيض؟", a: "اسود" },
-            { q: "ما هو عكس طويل؟", a: "قصير" },
-            { q: "ما هو عكس سمين؟", a: "نحيف" },
-            { q: "ما هو مرادف كلمة (يمشي)؟", a: "يسير" },
-            { q: "ما هو جمع كلمة (ولد)؟", a: "اولاد" },
-            { q: "ما هو مفرد كلمة (مدارس)؟", a: "مدرسة" },
-            { q: "ما هو صوت القطة؟", a: "مواء" },
-            { q: "ما هو صوت الكلب؟", a: "نباح" },
-            { q: "ما هو صوت العصفور؟", a: "تغريد" },
-            { q: "في أي فصل تتساقط أوراق الشجر؟", a: "الخريف" },
-            { q: "في أي فصل نذهب للبحر؟", a: "الصيف" },
-            { q: "في أي فصل ينزل المطر؟", a: "الشتاء" },
-            { q: "في أي فصل تتفتح الزهور؟", a: "الربيع" },
-            { q: "ما هو اسم والدة اسماعيل عليه السلام؟", a: "هاجر" },
-            { q: "ما هو اسم والدة اسحاق عليه السلام؟", a: "سارة" },
-            { q: "أين يوجد المسجد الأقصى؟", a: "فلسطين" },
-            { q: "أين يوجد المسجد الحرام؟", a: "مكة" },
-            { q: "أين يوجد المسجد النبوي؟", a: "المدينة" },
-            { q: "ما هو أول مسجد بني في الإسلام؟", a: "قباء" },
-            { q: "كم سنة صام الرسول رمضان؟", a: "تسع" },
-            { q: "من هو عم الرسول الذي رفض الإسلام؟", a: "ابولهب" },
-            { q: "ما هي السورة التي تسمى عروس القرآن؟", a: "الرحمن" },
-            { q: "ما هي السورة التي تسمى قلب القرآن؟", a: "يس" },
-            { q: "ما هي أقصر سورة في القرآن؟", a: "الكوثر" },
-            { q: "ما هي أطول سورة في القرآن؟", a: "البقرة" },
-            { q: "ما هي السورة التي ليس فيها حرف الميم؟", a: "الكوثر" },
-            { q: "ما هو الشيء الذي خلقه الله واستعظمه (كيد..)؟", a: "النساء" },
-            { q: "ما هو الشيء الذي خلقه الله وأنكره (صوت..)؟", a: "الحمير" },
-            { q: "من هو النبي الذي لقب بـ كليم الله؟", a: "موسى" },
-            { q: "من هو النبي الذي لقب بـ خليل الله؟", a: "ابراهيم" },
-            { q: "من هو النبي الذي لقب بـ روح الله؟", a: "عيسى" },
-            { q: "من هو النبي الذي لقب بـ ذو النون؟", a: "يونس" },
-            { q: "كم عدد أبواب الجنة؟", a: "ثمانية" },
-            { q: "كم عدد أبواب النار؟", a: "سبعة" },
-            { q: "ما هو اسم خازن النار؟", a: "مالك" },
-            { q: "ما هو اسم خازن الجنة؟", a: "رضوان" },
-            { q: "ما هو الركن الأول من أركان الإسلام؟", a: "الشهادتان" },
-            { q: "نبي خلقه الله من طين؟", a: "ادم" },
-            { q: "نبي خلقه الله من نار؟", a: "ابليس" }, // تصحيح: ابليس ليس نبي
-            { q: "مخلوقات خلقت من نور؟", a: "الملائكة" },
-            { q: "مخلوقات خلقت من نار؟", a: "الجن" },
-            { q: "من هو الملك الموكل بالوحي؟", a: "جبريل" },
-            { q: "من هو الملك الموكل بالنفخ في الصور؟", a: "اسرافيل" },
-            { q: "من هو الملك الموكل بقبض الأرواح؟", a: "عزرائيل" }, // أو ملك الموت
-            { q: "من هو الملك الموكل بالمطر؟", a: "ميكائيل" },
-            { q: "ما هي الصلاة التي تصلى لطلب المطر؟", a: "الاستسقاء" },
-            { q: "ما هي الصلاة التي تصلى عند كسوف الشمس؟", a: "الكسوف" },
-            { q: "ما هي الصلاة التي تصلى عند خسوف القمر؟", a: "الخسوف" },
-            { q: "ما هو الذكر الذي يقال عند النوم؟", a: "الاذكار" },
-            { q: "بأي يد نأكل؟", a: "اليمين" },
-            { q: "بأي رجل ندخل المسجد؟", a: "اليمين" },
-            { q: "بأي رجل نخرج من المسجد؟", a: "اليسار" },
-            { q: "بأي رجل ندخل الحمام؟", a: "اليسار" },
-            { q: "بأي رجل نخرج من الحمام؟", a: "اليمين" },
-            { q: "ماذا نقول عند العطس؟", a: "الحمدلله" },
-            { q: "ماذا يرد العاطس إذا شمت؟", a: "يهديكم" },
-            { q: "ما هو الشهر الذي يأتي بعد رمضان؟", a: "شوال" },
-            { q: "ما هو الشهر الذي فيه الحج؟", a: "ذوالحجة" },
-            { q: "ما هو العيد الذي يأتي بعد رمضان؟", a: "الفطر" },
-            { q: "ما هو العيد الذي يأتي في الحج؟", a: "الاضحى" },
-            { q: "كم عدد تكبيرات صلاة الجنازة؟", a: "اربع" },
-            { q: "هل في صلاة الجنازة ركوع؟", a: "لا" },
-            { q: "هل في صلاة الجنازة سجود؟", a: "لا" },
-            { q: "من هو النبي الذي كانت معجزته العصا؟", a: "موسى" },
-            { q: "من هو النبي الذي كانت معجزته الناقة؟", a: "صالح" },
-            { q: "من هو النبي الذي كانت معجزته احياء الموتى؟", a: "عيسى" },
-            { q: "من هو النبي الذي انشق له القمر؟", a: "محمد" },
-            { q: "ما هو اسم ناقة صالح؟", a: "الناقة" },
-            { q: "في أي مدينة يقع المسجد الإبراهيمي؟", a: "الخليل" },
-            { q: "ما هي السورة التي ذكرت فيها البسملة مرتين؟", a: "النمل" },
-            { q: "ما هي السورة التي تسمى الفاضحة؟", a: "التوبة" },
-            { q: "ما هي الشجرة الملعونة في القرآن؟", a: "الزقوم" },
-            { q: "ما هي الفاكهة التي ذكرت في القرآن (والتين..)؟", a: "التين" },
-            { q: "ما هو الحيوان الذي ذكر مع أصحاب الكهف؟", a: "الكلب" },
-            { q: "كم لبث أصحاب الكهف في كهفهم؟", a: "ثلاثمائة" },
-            { q: "من هو النبي الذي أمره الله ببناء الكعبة؟", a: "ابراهيم" },
-            { q: "من ساعد إبراهيم في بناء الكعبة؟", a: "اسماعيل" },
-            { q: "ما هو اسم أم موسى؟", a: "يوكابد" }, // قد يكون صعب، نبدله
-            { q: "من كفل مريم عليها السلام؟", a: "زكريا" },
-            { q: "ما هو اسم والدة عيسى عليه السلام؟", a: "مريم" },
-            { q: "كم عدد أولي العزم من الرسل؟", a: "خمسة" },
-            { q: "من هو النبي الذي أرسل إلى قوم عاد؟", a: "هود" },
-            { q: "من هو النبي الذي أرسل إلى قوم ثمود؟", a: "صالح" },
-            { q: "من هو النبي الذي أرسل إلى مدين؟", a: "شعيب" },
-            { q: "أطول آية في القرآن هي آية؟", a: "الدين" },
-            { q: "ما هي السورة التي تحوي آية الكرسي؟", a: "البقرة" },
-            { q: "ما هي الحشرة التي تصنع العسل؟", a: "النحلة" },
-            { q: "ما هو الحيوان الذي يعطينا الحليب؟", a: "البقرة" },
-            { q: "ما هو الحيوان الذي يحرث الأرض؟", a: "الثور" },
-            { q: "ما هو الحيوان الذي يسمى الماكر؟", a: "الثعلب" },
-            { q: "ما هو الحيوان الذي يغطي جسمه الشوك؟", a: "القنفذ" }
-        ];
-
-        // --- HELPER: Intelligent Normalization & Matching ---
-        function normalizeText(text) {
-            if(!text) return "";
-            return text.trim()
-                .replace(/[أإآ]/g, 'ا')
-                .replace(/ة$/g, 'ه')
-                .replace(/ى$/g, 'ي')
-                .replace(/[\u064B-\u065F]/g, '') // remove tashkeel
-                .replace(/\s+/g, ' ');
-        }
-
-        // Levenshtein Distance for typos
-        function getEditDistance(a, b) {
-            if(a.length === 0) return b.length; 
-            if(b.length === 0) return a.length; 
-            var matrix = [];
-            for(var i = 0; i <= b.length; i++) matrix[i] = [i];
-            for(var j = 0; j <= a.length; j++) matrix[0][j] = j;
-            for(var i = 1; i <= b.length; i++){
-                for(var j = 1; j <= a.length; j++){
-                    if(b.charAt(i-1) == a.charAt(j-1)) matrix[i][j] = matrix[i-1][j-1];
-                    else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1));
-                }
-            }
-            return matrix[b.length][a.length];
-        }
-
-        function isSmartMatch(userInput, targetAnswer) {
-            const u = normalizeText(userInput);
-            const t = normalizeText(targetAnswer);
-            
-            if (u === "") return false;
-            if (u === t) return true;
-            
-            const userWords = u.split(" ");
-            if (userWords.includes(t)) return true;
-            
-            if (t.includes(u) && u.length > 2) return true;
-            if (u.includes(t) && t.length > 2) return true;
-
-            const dist = getEditDistance(u, t);
-            const allowedErrors = t.length > 5 ? 2 : 1;
-            if (dist <= allowedErrors) return true;
-            
-            return false;
-        }
-
-        function showScreen(id) {
-            ['screen-menu', 'screen-crossword', 'screen-hexagon', 'screen-connect4', 'screen-win', 'round-win-modal'].forEach(s => {
-                document.getElementById(s).classList.add('hidden');
-            });
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function launchGame(type) {
-            playSound('click');
-            const t1 = document.getElementById('g-team1').value.trim() || "الفريق الأخضر";
-            const t2 = document.getElementById('g-team2').value.trim() || "الفريق الأحمر";
-            gState.team1 = t1;
-            gState.team2 = t2;
-            gState.currentGame = type;
-
-            if (type === 'crossword') initCrossword();
-            else if (type === 'hexagon') initHexagon();
-            else initConnect4();
-        }
-
-        function goHome() {
-            playSound('click');
-            showScreen('screen-menu');
-            clearInterval(cwState.timerInterval);
-            clearInterval(hexState.timerInterval);
-            clearInterval(c4State.timerInterval);
-        }
-
-        function showWin(winnerName) {
-            playSound('win');
-            document.getElementById('winner-name').innerText = winnerName;
-            showScreen('screen-win');
-        }
-
-        // --- CROSSWORD LOGIC (Unchanged) ---
-        let cwState = {
-            stage: 1, score1: 0, score2: 0, hints1: 5, hints2: 5, turn: 1,
-            questions: [], currentQ: null, userAns: [], timer: 60, timerInterval: null
-        };
-
-        function initCrossword() {
-            cwState = {
-                stage: 1, score1: 0, score2: 0, hints1: 5, hints2: 5, turn: 1,
-                questions: shuffleArray([...questionBank]).slice(0, 10),
-                currentQ: null, userAns: [], timer: 60, timerInterval: null
-            };
-            document.getElementById('cw-t1-name').innerText = gState.team1;
-            document.getElementById('cw-t2-name').innerText = gState.team2;
-            updateCwUI();
-            showScreen('screen-crossword');
-            loadCwStage();
-        }
-
-        function loadCwStage() {
-            if (cwState.stage > 10) {
-                let winner = cwState.score1 > cwState.score2 ? gState.team1 : gState.team2;
-                if (cwState.score1 === cwState.score2) winner = "تعادل!";
-                showWin(winner);
-                return;
-            }
-            clearInterval(cwState.timerInterval);
-            cwState.timer = 60;
-            cwState.userAns = [];
-            cwState.currentQ = cwState.questions[cwState.stage - 1];
-            document.getElementById('cw-stage').innerText = cwState.stage;
-            document.getElementById('cw-question').innerText = cwState.currentQ.q;
-            document.getElementById('cw-feedback').innerText = "";
-            renderCwGrid();
-            renderCwKeyboard();
-            updateCwTurnUI();
-            startCwTimer();
-        }
-
-        function startCwTimer() {
-            document.getElementById('cw-timer').innerText = cwState.timer;
-            cwState.timerInterval = setInterval(() => {
-                cwState.timer--;
-                const timerEl = document.getElementById('cw-timer');
-                timerEl.innerText = cwState.timer;
-                
-                if(cwState.timer <= 10 && cwState.timer > 0) {
-                    timerEl.classList.add('bg-red-600', 'animate-pulse');
-                    timerEl.classList.remove('bg-[#1a472a]');
-                    if(cwState.timer === 10 || cwState.timer === 5 || cwState.timer === 1) {
-                        playSound('warning');
-                    }
-                } else if(cwState.timer > 10) {
-                    timerEl.classList.remove('bg-red-600', 'animate-pulse');
-                    timerEl.classList.add('bg-[#1a472a]');
-                }
-                
-                if(cwState.timer <= 0) {
-                    clearInterval(cwState.timerInterval);
-                    cwSwitchTurn(true);
-                }
-            }, 1000);
-        }
-
-        function renderCwGrid() {
-            const grid = document.getElementById('cw-grid');
-            grid.innerHTML = '';
-            const ans = cwState.currentQ.a;
-            for(let i=0; i<ans.length; i++) {
-                const box = document.createElement('div');
-                box.className = "letter-box w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-xl font-bold bg-white text-gray-400";
-                if(cwState.userAns[i]) {
-                    box.innerText = cwState.userAns[i];
-                    box.classList.add('filled', 'text-gray-900');
-                }
-                grid.appendChild(box);
-            }
-        }
-
-        function renderCwKeyboard() {
-            const kb = document.getElementById('cw-keyboard');
-            kb.innerHTML = '';
-            let pool = cwState.currentQ.a.split('');
-            const extras = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي";
-            while (pool.length < 14) pool.push(extras[Math.floor(Math.random() * extras.length)]);
-            pool = shuffleArray(pool);
-            pool.forEach(char => {
-                const btn = document.createElement('button');
-                btn.innerText = char;
-                btn.className = "h-12 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-green-50 font-bold text-lg btn-hover text-gray-700";
-                btn.onclick = () => cwInput(char);
-                kb.appendChild(btn);
-            });
-        }
-
-        function cwInput(char) {
-            if(cwState.userAns.length < cwState.currentQ.a.length) {
-                playSound('click');
-                cwState.userAns.push(char);
-                renderCwGrid();
-                if(cwState.userAns.length === cwState.currentQ.a.length) checkCwAnswer();
-            }
-        }
-
-        function cwBackspace() {
-            if(cwState.userAns.length > 0) {
-                playSound('click');
-                cwState.userAns.pop();
-                renderCwGrid();
-                document.getElementById('cw-feedback').innerText = "";
-            }
-        }
-
-        function checkCwAnswer() {
-            const input = normalizeText(cwState.userAns.join(''));
-            const target = normalizeText(cwState.currentQ.a);
-
-            if(input === target) {
-                clearInterval(cwState.timerInterval);
-                playSound('correct');
-                document.querySelectorAll('.letter-box').forEach(b => b.classList.add('correct'));
-                document.getElementById('cw-feedback').innerText = "أحسنت! إجابة صحيحة";
-                document.getElementById('cw-feedback').className = "text-green-600 font-bold h-6 mb-2";
-                if(cwState.turn === 1) cwState.score1 += 10; else cwState.score2 += 10;
-                updateCwUI();
-                setTimeout(() => {
-                    cwState.stage++;
-                    cwState.turn = cwState.stage % 2 !== 0 ? 1 : 2; 
-                    loadCwStage();
-                }, 1500);
-            } else {
-                playSound('wrong');
-                document.querySelectorAll('.letter-box').forEach(b => b.classList.add('wrong'));
-                document.getElementById('cw-feedback').innerText = "خطأ! انتقال الدور...";
-                document.getElementById('cw-feedback').className = "text-red-600 font-bold h-6 mb-2";
-                setTimeout(() => cwSwitchTurn(false), 1500);
-            }
-        }
-
-        function cwSwitchTurn(timeout) {
-            clearInterval(cwState.timerInterval);
-            if(timeout) playSound('wrong');
-            cwState.turn = cwState.turn === 1 ? 2 : 1;
-            cwState.userAns = [];
-            cwState.timer = 60;
-            updateCwTurnUI();
-            renderCwGrid();
-            startCwTimer();
-            document.getElementById('cw-feedback').innerText = "";
-        }
-
-        function updateCwUI() {
-            document.getElementById('cw-t1-score').innerText = cwState.score1;
-            document.getElementById('cw-t2-score').innerText = cwState.score2;
-            document.getElementById('cw-t1-hearts').innerText = "❤️".repeat(cwState.hints1) + "🖤".repeat(5 - cwState.hints1);
-            document.getElementById('cw-t2-hearts').innerText = "❤️".repeat(cwState.hints2) + "🖤".repeat(5 - cwState.hints2);
-        }
-
-        function updateCwTurnUI() {
-            const t1Box = document.getElementById('cw-t1-box');
-            const t2Box = document.getElementById('cw-t2-box');
-            const msg = document.getElementById('cw-turn-msg');
-            const name = cwState.turn === 1 ? gState.team1 : gState.team2;
-            msg.innerText = `دور: ${name}`;
-            if(cwState.turn === 1) {
-                t1Box.classList.remove('opacity-50', 'border-transparent');
-                t1Box.classList.add('border-green-500', 'bg-green-50', 'scale-105', 'shadow-md');
-                t2Box.classList.add('opacity-50', 'border-transparent');
-                t2Box.classList.remove('border-blue-500', 'bg-blue-50', 'scale-105', 'shadow-md');
-            } else {
-                t2Box.classList.remove('opacity-50', 'border-transparent');
-                t2Box.classList.add('border-blue-500', 'bg-blue-50', 'scale-105', 'shadow-md');
-                t1Box.classList.add('opacity-50', 'border-transparent');
-                t1Box.classList.remove('border-green-500', 'bg-green-50', 'scale-105', 'shadow-md');
-            }
-        }
-
-        function cwUseHint() {
-            const teamHints = cwState.turn === 1 ? cwState.hints1 : cwState.hints2;
-            if(teamHints > 0) {
-                playSound('click');
-                const ans = cwState.currentQ.a;
-                let idx = -1;
-                for(let i=0; i<ans.length; i++) {
-                    if(cwState.userAns[i] !== ans[i]) { idx = i; break; }
-                }
-                if(idx !== -1) {
-                    let newAns = [];
-                    for(let i=0; i<idx; i++) newAns.push(ans[i]);
-                    newAns.push(ans[idx]);
-                    cwState.userAns = newAns;
-                    renderCwGrid();
-                    if(cwState.turn === 1) cwState.hints1--; else cwState.hints2--;
-                    updateCwUI();
-                    
-                    const currentStr = normalizeText(cwState.userAns.join(''));
-                    const targetStr = normalizeText(ans);
-                    if(currentStr === targetStr) checkCwAnswer();
-                }
-            } else {
-                playSound('wrong');
-                alert("انتهت المساعدات!");
-            }
-        }
-
-        // --- HEXAGON LOGIC ---
-        let hexState = {
-            grid: [], 
-            turn: 1, 
-            selectedCell: -1,
-            targetAnswer: "",
-            rounds1: 0,
-            rounds2: 0,
-            currentRound: 1,
-            timer: 60,
-            timerInterval: null
-        };
-        
-        function initHexagon() {
-            hexState.turn = 1;
-            hexState.rounds1 = 0;
-            hexState.rounds2 = 0;
-            hexState.currentRound = 1;
-            hexState.timer = 60;
-            
-            document.getElementById('hex-t1-name').innerText = gState.team1;
-            document.getElementById('hex-t2-name').innerText = gState.team2;
-            
-            updateHexRoundUI();
-            resetHexBoard();
-            showScreen('screen-hexagon');
-        }
-
-        function resetHexBoard() {
-            try {
-                clearInterval(hexState.timerInterval);
-                hexState.grid = [];
-                hexState.selectedCell = -1;
-                hexState.turn = (hexState.currentRound % 2 === 0) ? 2 : 1; 
-                hexState.timer = 60;
-                
-                const chars = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي";
-                for(let i=0; i<25; i++) {
-                    hexState.grid.push({
-                        id: i,
-                        char: chars[Math.floor(Math.random() * chars.length)],
-                        owner: 0 
-                    });
-                }
-                renderHexBoard();
-                updateHexTurnUI();
-            } catch(e) {
-                console.error('Error in resetHexBoard:', e);
-            }
-        }
-
-        function renderHexBoard() {
-            const board = document.getElementById('hex-board');
-            board.innerHTML = '';
-            
-            for(let r=0; r<5; r++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'hex-row';
-                for(let c=0; c<5; c++) {
-                    const idx = r*5 + c;
-                    const cellData = hexState.grid[idx];
-                    const cell = document.createElement('div');
-                    cell.className = `hex-cell ${cellData.owner === 1 ? 'team1' : cellData.owner === 2 ? 'team2' : ''}`;
-                    if(cellData.owner !== 0) cell.classList.add('locked');
-                    cell.innerText = cellData.char;
-                    cell.onclick = () => hexCellClick(idx);
-                    rowDiv.appendChild(cell);
-                }
-                board.appendChild(rowDiv);
-            }
-        }
-
-        function hexCellClick(idx) {
-            const cell = hexState.grid[idx];
-            if(cell.owner !== 0) return; 
-            
-            hexState.selectedCell = idx;
-            playSound('click');
-            
-            const possibleQs = questionBank.filter(q => q.char === cell.char);
-            let qObj;
-            if(possibleQs.length > 0) {
-                qObj = possibleQs[Math.floor(Math.random() * possibleQs.length)];
-            } else {
-                qObj = questionBank[Math.floor(Math.random() * questionBank.length)];
-            }
-            
-            hexState.targetAnswer = qObj.a;
-            
-            document.getElementById('hex-q-char').innerText = cell.char;
-            document.getElementById('hex-question-text').innerText = qObj.q;
-            document.getElementById('hex-input').value = "";
-            document.getElementById('hex-feedback').innerText = "";
-            document.getElementById('hex-feedback').className = "h-6 mt-3 text-sm font-bold";
-            
-            document.getElementById('hex-modal').classList.remove('hidden');
-            document.getElementById('hex-input').focus();
-            
-            hexState.timer = 60;
-            startHexTimer();
-        }
-
-        function closeHexModal() {
-            document.getElementById('hex-modal').classList.add('hidden');
-            clearInterval(hexState.timerInterval);
-        }
-
-        function checkHexAnswer() {
-            const userIn = document.getElementById('hex-input').value;
-            const target = hexState.targetAnswer;
-            
-            if(isSmartMatch(userIn, target)) {
-                clearInterval(hexState.timerInterval);
-                playSound('correct');
-                document.getElementById('hex-feedback').innerText = "إجابة صحيحة! ✅";
-                document.getElementById('hex-feedback').className = "h-6 mt-3 text-sm font-bold text-green-600";
-                
-                setTimeout(() => {
-                    closeHexModal();
-                    hexState.grid[hexState.selectedCell].owner = hexState.turn;
-                    renderHexBoard();
-                    
-                    if(checkHexWin(hexState.turn)) {
-                        handleRoundWin(hexState.turn);
-                    } else {
-                        switchHexTurn();
-                    }
-                }, 1000);
-                
-            } else {
-                clearInterval(hexState.timerInterval);
-                playSound('wrong');
-                document.getElementById('hex-feedback').innerText = "إجابة خاطئة ❌";
-                document.getElementById('hex-feedback').className = "h-6 mt-3 text-sm font-bold text-red-600";
-                
-                setTimeout(() => {
-                    closeHexModal();
-                    switchHexTurn();
-                }, 2000);
-            }
-        }
-
-        function handleRoundWin(team) {
-            playSound('correct');
-            if (team === 1) hexState.rounds1++;
-            else hexState.rounds2++;
-            
-            updateHexRoundUI();
-            
-            if (hexState.rounds1 >= 3 || hexState.rounds2 >= 3) {
-                const winner = hexState.rounds1 > hexState.rounds2 ? gState.team1 : gState.team2;
-                setTimeout(() => showWin(winner), 500);
-            } else {
-                const winnerName = team === 1 ? gState.team1 : gState.team2;
-                document.getElementById('round-winner-name').innerText = winnerName;
-                document.getElementById('round-win-modal').classList.remove('hidden');
-            }
-        }
-
-        function startNextHexRound() {
-            document.getElementById('round-win-modal').classList.add('hidden');
-            hexState.currentRound++;
-            resetHexBoard();
-        }
-
-        function updateHexRoundUI() {
-            const getStars = (count) => {
-                let s = "";
-                for(let i=0; i<3; i++) {
-                    s += i < count ? "<span class='text-yellow-400'>★</span>" : "<span class='text-gray-200'>★</span>";
-                }
-                return s;
-            };
-            document.getElementById('hex-t1-wins').innerHTML = getStars(hexState.rounds1);
-            document.getElementById('hex-t2-wins').innerHTML = getStars(hexState.rounds2);
-        }
-
-        function switchHexTurn() {
-            hexState.turn = hexState.turn === 1 ? 2 : 1;
-            updateHexTurnUI();
-        }
-
-        function updateHexTurnUI() {
-            const t1 = document.getElementById('hex-t1-box');
-            const t2 = document.getElementById('hex-t2-box');
-            const stat = document.getElementById('hex-status');
-            const name = hexState.turn === 1 ? gState.team1 : gState.team2;
-            
-            stat.innerText = `دور ${name} لاختيار حرف`;
-            stat.className = hexState.turn === 1 
-                ? "text-center text-sm font-bold py-2 bg-green-100 text-green-800 border-y border-green-200"
-                : "text-center text-sm font-bold py-2 bg-red-100 text-red-800 border-y border-red-200";
-
-            if(hexState.turn === 1) {
-                t1.classList.remove('opacity-50', 'border-transparent');
-                t1.classList.add('border-green-400', 'bg-green-50', 'scale-105', 'shadow-md');
-                t2.classList.add('opacity-50', 'border-transparent');
-                t2.classList.remove('border-red-400', 'bg-red-50', 'scale-105', 'shadow-md');
-            } else {
-                t2.classList.remove('opacity-50', 'border-transparent');
-                t2.classList.add('border-red-400', 'bg-red-50', 'scale-105', 'shadow-md');
-                t1.classList.add('opacity-50', 'border-transparent');
-                t1.classList.remove('border-green-400', 'bg-green-50', 'scale-105', 'shadow-md');
-            }
-        }
-
-        function checkHexWin(player) {
-            const visited = new Set();
-            const queue = [];
-            for(let i=0; i<25; i++) {
-                if(hexState.grid[i].owner === player) {
-                    let r = Math.floor(i/5);
-                    let c = i%5;
-                    if(player === 1 && c === 0) queue.push(i); 
-                    if(player === 2 && r === 0) queue.push(i); 
-                }
-            }
-            while(queue.length > 0) {
-                const curr = queue.shift();
-                if(visited.has(curr)) continue;
-                visited.add(curr);
-                const r = Math.floor(curr/5);
-                const c = curr%5;
-                if(player === 1 && c === 4) return true; 
-                if(player === 2 && r === 4) return true; 
-                const neighbors = [curr-5, curr+5, curr-1, curr+1, curr-6, curr-4, curr+4, curr+6];
-                for(let n of neighbors) {
-                    if(n >= 0 && n < 25 && hexState.grid[n].owner === player && !visited.has(n)) {
-                        const nr = Math.floor(n/5);
-                        const nc = n%5;
-                        if(Math.abs(nr-r) <= 1 && Math.abs(nc-c) <= 1) { 
-                             queue.push(n);
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        function startHexTimer() {
-            const timerEl = document.getElementById('hex-modal-timer');
-            timerEl.innerText = hexState.timer;
-            timerEl.classList.remove('bg-red-600', 'animate-pulse');
-            timerEl.classList.add('bg-[#1a472a]');
-
-            hexState.timerInterval = setInterval(() => {
-                hexState.timer--;
-                timerEl.innerText = hexState.timer;
-                
-                if(hexState.timer <= 10 && hexState.timer > 0) {
-                    timerEl.classList.add('bg-red-600', 'animate-pulse');
-                    timerEl.classList.remove('bg-[#1a472a]');
-                    if(hexState.timer === 10 || hexState.timer === 5 || hexState.timer === 1) {
-                        playSound('warning');
-                    }
-                }
-                
-                if(hexState.timer <= 0) {
-                    clearInterval(hexState.timerInterval);
-                    playSound('wrong');
-                    closeHexModal();
-                    switchHexTurn();
-                }
-            }, 1000);
-        }
-
-        // --- CONNECT 4 LOGIC (New Game) ---
-        let c4State = {
-            rows: 6,
-            cols: 7,
-            board: [], // 0 = empty, 1 = p1, 2 = p2
-            turn: 1, // 1 or 2
-            selectedCol: -1,
-            targetAnswer: "",
-            timer: 60,
-            timerInterval: null
-        };
-
-        function initConnect4() {
-            c4State.turn = 1;
-            c4State.board = Array(c4State.rows).fill().map(() => Array(c4State.cols).fill(0));
-            document.getElementById('c4-t1-name').innerText = gState.team1;
-            document.getElementById('c4-t2-name').innerText = gState.team2;
-            renderC4Board();
-            updateC4TurnUI();
-            showScreen('screen-connect4');
-        }
-
-        function renderC4Board() {
-            const boardEl = document.getElementById('c4-board');
-            boardEl.innerHTML = '';
-            
-            for (let c = 0; c < c4State.cols; c++) {
-                const colEl = document.createElement('div');
-                colEl.className = 'c4-col';
-                colEl.onclick = () => handleC4ColClick(c);
-                
-                for (let r = 0; r < c4State.rows; r++) {
-                    const cellEl = document.createElement('div');
-                    const val = c4State.board[r][c];
-                    cellEl.className = `c4-cell ${val === 1 ? 'p1' : val === 2 ? 'p2' : ''}`;
-                    colEl.appendChild(cellEl);
-                }
-                boardEl.appendChild(colEl);
-            }
-        }
-
-        function handleC4ColClick(colIdx) {
-            // Check if column is full
-            if (c4State.board[0][colIdx] !== 0) {
-                playSound('wrong');
-                return; // Column full
-            }
-
-            playSound('click');
-            c4State.selectedCol = colIdx;
-
-            // Pick random question from New Bank
-            const qObj = c4QuestionBank[Math.floor(Math.random() * c4QuestionBank.length)];
-            c4State.targetAnswer = qObj.a;
-
-            // Show Modal
-            document.getElementById('c4-question-text').innerText = qObj.q;
-            document.getElementById('c4-input').value = "";
-            document.getElementById('c4-feedback').innerText = "";
-            document.getElementById('c4-feedback').className = "h-6 mt-3 text-sm font-bold";
-            document.getElementById('c4-modal').classList.remove('hidden');
-            document.getElementById('c4-input').focus();
-
-            // Start Timer
-            c4State.timer = 60;
-            startC4Timer();
-        }
-
-        function startC4Timer() {
-            const timerEl = document.getElementById('c4-modal-timer');
-            timerEl.innerText = c4State.timer;
-            timerEl.classList.remove('bg-red-600', 'animate-pulse');
-            timerEl.classList.add('bg-[#1a472a]');
-
-            c4State.timerInterval = setInterval(() => {
-                c4State.timer--;
-                timerEl.innerText = c4State.timer;
-                
-                if(c4State.timer <= 10 && c4State.timer > 0) {
-                    timerEl.classList.add('bg-red-600', 'animate-pulse');
-                    timerEl.classList.remove('bg-[#1a472a]');
-                    if(c4State.timer === 10 || c4State.timer === 5 || c4State.timer === 1) {
-                        playSound('warning');
-                    }
-                }
-                
-                if(c4State.timer <= 0) {
-                    clearInterval(c4State.timerInterval);
-                    playSound('wrong');
-                    closeC4Modal();
-                    switchC4Turn(); // Timeout = lose turn
-                }
-            }, 1000);
-        }
-
-        function closeC4Modal() {
-            document.getElementById('c4-modal').classList.add('hidden');
-            clearInterval(c4State.timerInterval);
-        }
-
-        function checkC4Answer() {
-            const userIn = document.getElementById('c4-input').value;
-            const target = c4State.targetAnswer;
-
-            if (isSmartMatch(userIn, target)) {
-                // Correct
-                clearInterval(c4State.timerInterval);
-                playSound('correct');
-                document.getElementById('c4-feedback').innerText = "إجابة صحيحة! ✅";
-                document.getElementById('c4-feedback').className = "h-6 mt-3 text-sm font-bold text-green-600";
-
-                setTimeout(() => {
-                    closeC4Modal();
-                    dropC4Piece(c4State.selectedCol);
-                }, 1000);
-
-            } else {
-                // Wrong
-                clearInterval(c4State.timerInterval);
-                playSound('wrong');
-                document.getElementById('c4-feedback').innerText = "إجابة خاطئة ❌";
-                document.getElementById('c4-feedback').className = "h-6 mt-3 text-sm font-bold text-red-600";
-
-                setTimeout(() => {
-                    closeC4Modal();
-                    switchC4Turn(); // Wrong answer = lose turn
-                }, 1500);
-            }
-        }
-
-        function dropC4Piece(colIdx) {
-            // Find lowest empty row
-            for (let r = c4State.rows - 1; r >= 0; r--) {
-                if (c4State.board[r][colIdx] === 0) {
-                    c4State.board[r][colIdx] = c4State.turn;
-                    renderC4Board();
-                    
-                    if (checkC4Win(r, colIdx)) {
-                        setTimeout(() => showWin(c4State.turn === 1 ? gState.team1 : gState.team2), 500);
-                    } else {
-                        switchC4Turn();
-                    }
-                    return;
-                }
-            }
-        }
-
-        function switchC4Turn() {
-            c4State.turn = c4State.turn === 1 ? 2 : 1;
-            updateC4TurnUI();
-        }
-
-        function updateC4TurnUI() {
-            const t1 = document.getElementById('c4-t1-box');
-            const t2 = document.getElementById('c4-t2-box');
-            const status = document.getElementById('c4-status');
-            const name = c4State.turn === 1 ? gState.team1 : gState.team2;
-
-            status.innerText = `دور ${name}`;
-            
-            if (c4State.turn === 1) {
-                t1.classList.remove('opacity-50');
-                t1.classList.add('scale-105', 'shadow-md', 'bg-green-100');
-                t2.classList.add('opacity-50');
-                t2.classList.remove('scale-105', 'shadow-md', 'bg-red-100');
-                t2.classList.add('bg-red-50');
-            } else {
-                t2.classList.remove('opacity-50');
-                t2.classList.add('scale-105', 'shadow-md', 'bg-red-100');
-                t1.classList.add('opacity-50');
-                t1.classList.remove('scale-105', 'shadow-md', 'bg-green-100');
-                t1.classList.add('bg-green-50');
-            }
-        }
-
-        function checkC4Win(row, col) {
-            const player = c4State.board[row][col];
-            const directions = [
-                [0, 1],  // Horizontal
-                [1, 0],  // Vertical
-                [1, 1],  // Diagonal /
-                [1, -1]  // Diagonal \
-            ];
-
-            for (let [dr, dc] of directions) {
-                let count = 1;
-                // Check positive direction
-                for (let i = 1; i < 4; i++) {
-                    const r = row + dr * i;
-                    const c = col + dc * i;
-                    if (r < 0 || r >= c4State.rows || c < 0 || c >= c4State.cols || c4State.board[r][c] !== player) break;
-                    count++;
-                }
-                // Check negative direction
-                for (let i = 1; i < 4; i++) {
-                    const r = row - dr * i;
-                    const c = col - dc * i;
-                    if (r < 0 || r >= c4State.rows || c < 0 || c >= c4State.cols || c4State.board[r][c] !== player) break;
-                    count++;
-                }
-                if (count >= 4) return true;
-            }
-            return false;
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-    </script>
-    
-    <footer style="text-align: center; padding: 20px; margin-top: 20px; font-size: 12px; font-weight: 300; color: #1a472a; letter-spacing: 0.5px;">
-        برمجة وتصميم Abo azzam
-    </footer>
-</body>
-</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>أداة ربط وتحليل الآيات (المطور)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #222; color: #eee; display: flex; height: 100vh; margin: 0; overflow: hidden; }
+        
+        .sidebar { width: 350px; background: #333; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #444; overflow-y: auto; }
+        .main-area { flex: 1; display: flex; justify-content: center; align-items: flex-start; background: #fff; position: relative; overflow: auto; padding: 0; }
+        
+        h2 { margin-top: 0; color: #c5a059; margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 10px; }
+        h3 { font-size: 14px; color: #aaa; margin: 10px 0 5px 0; }
+        
+        select, input, button { width: 100%; padding: 10px; margin-bottom: 8px; border-radius: 5px; border: 1px solid #555; background: #444; color: white; box-sizing: border-box; }
+        button { cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { filter: brightness(1.2); }
+        
+        .btn-primary { background: #1a472a; }
+        .btn-action { background: #c5a059; color: black; }
+        .btn-danger { background: #ef4444; }
+        .btn-blue { background: #3b82f6; }
+        .nav-btn { background: #555; width: 48%; }
+        
+        .row { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 5px; }
+
+        #current-instruction { 
+            background: rgba(26, 71, 42, 0.9); padding: 15px; border-radius: 10px; 
+            margin: 15px 0; text-align: center; border: 1px solid #4ade80;
+            font-size: 18px; font-weight: bold; min-height: 80px; display: flex; flex-direction: column; justify-content: center;
+        }
+        
+        #mapped-list, #analysis-results { flex: 1; overflow-y: auto; font-family: monospace; font-size: 12px; border-top: 1px solid #555; padding-top: 10px; }
+        .mapped-item { padding: 5px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Analysis Styles */
+        .result-row { padding: 8px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
+        .status-pass { color: #4ade80; font-weight: bold; }
+        .status-fail { color: #ef4444; font-weight: bold; }
+        .progress-bar { height: 4px; background: #555; width: 100%; margin-bottom: 10px; border-radius: 2px; overflow: hidden; display: none; }
+        .progress-fill { height: 100%; background: #c5a059; width: 0%; transition: width 0.3s; }
+
+        svg { height: 80%; width: auto; box-shadow: 0 0 20px rgba(0,0,0,0.2); margin: 0; }
+        
+        /* Highlight hover effect */
+        svg g:hover, svg path:hover {
+            fill: rgba(255, 0, 0, 0.2) !important;
+            stroke: red !important;
+            stroke-width: 2px !important;
+            cursor: pointer;
+        }
+        
+        /* Already mapped elements */
+        .mapped-element {
+            fill: rgba(0, 255, 0, 0.2) !important;
+            stroke: green !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>🛠️ المحلل الذكي & المخطط</h2>
+        
+        <!-- Tabs -->
+        <div class="row" style="margin-bottom: 15px;">
+            <button class="nav-btn" onclick="switchTab('manual')" id="tab-manual" style="background:#1a472a">يدوي</button>
+            <button class="nav-btn" onclick="switchTab('auto')" id="tab-auto" style="background:#444">تحليل آلي</button>
+        </div>
+
+        <!-- Manual Mode -->
+        <div id="panel-manual">
+            <div class="control-group">
+                <input type="number" id="page-num" value="7" min="1" max="604" placeholder="رقم الصفحة">
+                <button class="btn-primary" onclick="loadPage()">تحميل الصفحة</button>
+            </div>
+            
+            <div class="row">
+                <button class="nav-btn" onclick="prevPage()">السابق</button>
+                <button class="nav-btn" onclick="nextPage()">التالي</button>
+            </div>
+
+            <div id="current-instruction">جاري الانتظار...</div>
+            
+            <div class="row">
+                <button class="nav-btn btn-danger" onclick="undoLastMapping()">تراجع ↩️</button>
+                <button class="nav-btn btn-action" onclick="exportData()">نسخ JSON الحالي</button>
+            </div>
+            
+            <div id="mapped-list"></div>
+        </div>
+
+        <!-- Auto Analysis Mode -->
+        <div id="panel-auto" style="display:none;">
+            <h3>فحص وتوليد JSON آلياً</h3>
+            <div class="row">
+                <input type="number" id="start-page" value="1" min="1" max="604" placeholder="من">
+                <input type="number" id="end-page" value="10" min="1" max="604" placeholder="إلى">
+            </div>
+            <button class="btn-blue" onclick="startAnalysis()">ابدأ الفحص والتوليد 🚀</button>
+            
+            <div class="progress-bar" id="analysis-progress"><div class="progress-fill" id="progress-fill"></div></div>
+            
+            <div style="margin: 10px 0; font-size: 12px; color: #aaa;">
+                الناجحة: <span id="count-pass" style="color:#4ade80">0</span> | 
+                الفاشلة: <span id="count-fail" style="color:#ef4444">0</span>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:10px;">
+                <button class="btn-action" onclick="copyAutoSuccessJSON()">📋 نسخ JSON الصفحات الناجحة</button>
+                <button class="btn-danger" onclick="copyFailedPages()">⚠️ نسخ أرقام الصفحات الفاشلة</button>
+            </div>
+
+            <div id="analysis-results">
+                <div style="text-align:center; padding:20px; color:#777;">اضغط "ابدأ الفحص" لاختبار الصفحات وتوليد الكود</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-area" id="canvas-wrapper">
+        <div style="color:black">يرجى اختيار صفحة والبدء...</div>
+    </div>
+
+    <script>
+        const SVG_BASE = 'https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/quran-svg-pages/';
+        let currentPageNum = '';
+        let pageAyahs = []; 
+        let currentAyahIndex = 0; 
+        let mappings = {}; 
+        let mappedStack = [];
+        
+        // Auto Analysis Vars
+        let failedPages = [];
+        let autoGeneratedMappings = {}; // This will hold the JSON for successful pages
+
+        // --- TABS ---
+        function switchTab(tab) {
+            document.getElementById('panel-manual').style.display = tab === 'manual' ? 'block' : 'none';
+            document.getElementById('panel-auto').style.display = tab === 'auto' ? 'block' : 'none';
+            document.getElementById('tab-manual').style.background = tab === 'manual' ? '#1a472a' : '#444';
+            document.getElementById('tab-auto').style.background = tab === 'auto' ? '#3b82f6' : '#444';
+        }
+
+        // --- MANUAL MODE ---
+        async function loadPage(numToLoad) {
+            const numInput = document.getElementById('page-num');
+            let num = numToLoad ? String(numToLoad).padStart(3, '0') : numInput.value.padStart(3, '0');
+            numInput.value = parseInt(num); 
+            currentPageNum = num;
+            
+            const wrapper = document.getElementById('canvas-wrapper');
+            const instruction = document.getElementById('current-instruction');
+            const list = document.getElementById('mapped-list');
+            
+            wrapper.innerHTML = '<div style="color:black">جاري التحميل...</div>';
+            list.innerHTML = '';
+            
+            mappings[num] = {};
+            currentAyahIndex = 0;
+            mappedStack = [];
+
+            try {
+                const apiRes = await fetch(`https://api.alquran.cloud/v1/page/${parseInt(num)}/quran-simple`);
+                const apiData = await apiRes.json();
+                pageAyahs = apiData.data.ayahs; 
+
+                const svgRes = await fetch(SVG_BASE + num + '.svg');
+                if (!svgRes.ok) throw new Error("الصورة غير موجودة");
+                const svgText = await svgRes.text();
+                
+                wrapper.innerHTML = svgText;
+                const svgEl = wrapper.querySelector('svg');
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+
+                setupInteraction(svgEl);
+                updateInstruction();
+
+            } catch (e) {
+                wrapper.innerHTML = `<div style="color:red">خطأ: ${e.message}</div>`;
+            }
+        }
+
+        function nextPage() {
+            let next = parseInt(document.getElementById('page-num').value) + 1;
+            if (next <= 604) loadPage(next);
+        }
+
+        function prevPage() {
+            let prev = parseInt(document.getElementById('page-num').value) - 1;
+            if (prev >= 1) loadPage(prev);
+        }
+
+        function updateInstruction() {
+            const instruction = document.getElementById('current-instruction');
+            
+            if (currentAyahIndex < pageAyahs.length) {
+                const ayah = pageAyahs[currentAyahIndex];
+                instruction.innerHTML = `
+                    <div style="font-size:14px; color:#ccc;">اضغط على موقع الآية:</div>
+                    <div style="color:#c5a059; font-size:24px;">الآية ${ayah.numberInSurah}</div>
+                    <div style="font-size:12px; color:#aaa;">سورة ${ayah.surah.name}</div>
+                    <div style="font-size:10px; color:#888; margin-top:5px;">التقدم: ${currentAyahIndex}/${pageAyahs.length}</div>
+                `;
+                instruction.style.borderColor = "#4ade80";
+            } else {
+                instruction.innerHTML = `✅ اكتملت الصفحة!\n\n${Object.keys(mappings[currentPageNum]).length} آية تم تحديدها`;
+                instruction.style.borderColor = "gold";
+            }
+        }
+
+        function setupInteraction(svg) {
+            svg.addEventListener('click', (e) => {
+                if(e.target.tagName === 'svg') return;
+
+                const target = e.target;
+                let targetId = target.id;
+                let targetEl = target;
+
+                if (!targetId && target.parentElement && target.parentElement.id) {
+                    targetId = target.parentElement.id;
+                    targetEl = target.parentElement;
+                }
+
+                if (!targetId) {
+                    alert("اضغط مباشرة على عنصر SVG (path/g)");
+                    return;
+                }
+
+                selectAyahFromId(targetId, targetEl);
+            });
+        }
+
+        function selectAyahFromId(targetId, targetEl) {
+            if (currentAyahIndex >= pageAyahs.length) {
+                alert("لقد اكتملت الصفحة!");
+                return;
+            }
+
+            const ayah = pageAyahs[currentAyahIndex];
+            
+            mappings[currentPageNum][targetId] = {
+                surah: ayah.surah.number,
+                ayah: ayah.numberInSurah
+            };
+
+            mappedStack.push({ id: targetId, index: currentAyahIndex });
+            
+            if (targetEl) {
+                targetEl.classList.add('mapped-element');
+                targetEl.setAttribute('data-mapped-id', targetId);
+            }
+
+            const list = document.getElementById('mapped-list');
+            const listItem = document.createElement('div');
+            listItem.className = 'mapped-item';
+            listItem.id = `list-item-${targetId}`;
+            listItem.innerHTML = `<span style="color:#4ade80; font-weight:bold;">✓ آية ${ayah.numberInSurah}</span><span style="color:#c5a059; font-size:10px;">${targetId}</span>`;
+            list.prepend(listItem);
+
+            currentAyahIndex++;
+            updateInstruction();
+        }
+
+        function undoLastMapping() {
+            if (mappedStack.length > 0) {
+                const lastAction = mappedStack.pop();
+                const targetId = lastAction.id;
+                delete mappings[currentPageNum][targetId];
+                
+                const el = document.querySelector(`[data-mapped-id="${targetId}"]`);
+                if (el) {
+                    el.classList.remove('mapped-element');
+                    el.style.fill = "";
+                    el.removeAttribute('data-mapped-id');
+                }
+
+                const listItem = document.getElementById(`list-item-${targetId}`);
+                if (listItem) listItem.remove();
+
+                currentAyahIndex = lastAction.index;
+                updateInstruction();
+            }
+        }
+
+        // --- AUTO ANALYSIS MODE (الخوارزمية + التوليد) ---
+        async function startAnalysis() {
+            const start = parseInt(document.getElementById('start-page').value);
+            const end = parseInt(document.getElementById('end-page').value);
+            const resultsDiv = document.getElementById('analysis-results');
+            const progress = document.getElementById('analysis-progress');
+            const fill = document.getElementById('progress-fill');
+            const wrapper = document.getElementById('canvas-wrapper');
+            
+            resultsDiv.innerHTML = '';
+            failedPages = [];
+            autoGeneratedMappings = {}; // Reset storage
+            let passCount = 0;
+            let failCount = 0;
+            
+            progress.style.display = 'block';
+            
+            for (let i = start; i <= end; i++) {
+                const pageNum = String(i).padStart(3, '0');
+                
+                // Update Progress
+                const percent = ((i - start) / (end - start + 1)) * 100;
+                fill.style.width = percent + '%';
+                
+                try {
+                    // 1. Get Verse Count
+                    const apiRes = await fetch(`https://api.alquran.cloud/v1/page/${i}/quran-simple`);
+                    const apiData = await apiRes.json();
+                    const verseCount = apiData.data.ayahs.length;
+                    
+                    // 2. Get SVG Text
+                    const svgRes = await fetch(SVG_BASE + pageNum + '.svg');
+                    const svgText = await svgRes.text();
+                    
+                    // 3. Check Algorithm - Try multiple starting points
+                    let matches = 0;
+                    let pathBaseNum = 22; // Default
+                    let maxMatches = 0;
+                    
+                    // Try different starting patterns: 16, 18, 20, 22, 24, 26, 28, 30
+                    const startingPoints = [16, 18, 20, 22, 24, 26, 28, 30];
+                    
+                    for (let startPoint of startingPoints) {
+                        let currentMatches = 0;
+                        for (let v = 0; v < verseCount; v++) {
+                            const expectedId = `path${startPoint + (v * 4)}`;
+                            if (svgText.includes(`id="${expectedId}"`)) {
+                                currentMatches++;
+                            }
+                        }
+                        
+                        if (currentMatches > maxMatches) {
+                            maxMatches = currentMatches;
+                            pathBaseNum = startPoint;
+                        }
+                    }
+                    
+                    matches = maxMatches;
+                    
+                    // 4. Result
+                    const isSuccess = (matches === verseCount);
+                    
+                    if (isSuccess) {
+                        passCount++;
+                        // Generate and Store Data Automatically
+                        autoGeneratedMappings[pageNum] = {};
+                        apiData.data.ayahs.forEach((ayah, index) => {
+                            const pathId = `path${pathBaseNum + (index * 4)}`;
+                            autoGeneratedMappings[pageNum][pathId] = {
+                                surah: ayah.surah.number,
+                                ayah: ayah.numberInSurah
+                            };
+                        });
+                    } else {
+                        failCount++;
+                        failedPages.push(i);
+                    }
+                    
+                    const row = document.createElement('div');
+                    row.className = 'result-row';
+                    row.innerHTML = `
+                        <span>صفحة ${i}</span>
+                        <span class="${isSuccess ? 'status-pass' : 'status-fail'}">${isSuccess ? 'ناجحة ✅' : 'شاذة ❌'}</span>
+                    `;
+                    resultsDiv.prepend(row);
+                    
+                    // Visualize
+                    wrapper.innerHTML = svgText;
+                    
+                } catch (e) {
+                    console.error(e);
+                }
+                
+                document.getElementById('count-pass').innerText = passCount;
+                document.getElementById('count-fail').innerText = failCount;
+                
+                await new Promise(r => setTimeout(r, 5));
+            }
+            
+            progress.style.display = 'none';
+            alert(`انتهى الفحص!\n\nتم توليد بيانات لـ ${passCount} صفحة ناجحة.\nيمكنك نسخها الآن.`);
+        }
+
+        function copyAutoSuccessJSON() {
+            if (Object.keys(autoGeneratedMappings).length === 0) {
+                alert("لا توجد بيانات ناجحة بعد. قم بتشغيل الفحص أولاً.");
+                return;
+            }
+            copyToClipboard(JSON.stringify(autoGeneratedMappings, null, 2), "تم نسخ JSON الصفحات الناجحة!");
+        }
+
+        function copyFailedPages() {
+            if (failedPages.length === 0) {
+                alert("لا توجد صفحات فاشلة حتى الآن.");
+                return;
+            }
+            copyToClipboard(failedPages.join(', '), "تم نسخ أرقام الصفحات الفاشلة (للعمل اليدوي)");
+        }
+
+        function exportData() {
+            // Exports manual mappings from current session
+            copyToClipboard(JSON.stringify(mappings, null, 2), "تم نسخ JSON اليدوي!");
+        }
+
+        function copyToClipboard(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert(successMsg);
+            } catch (err) {
+                alert("فشل النسخ. انظر للكونسول.");
+                console.log(text);
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+
+</body>
+</html>

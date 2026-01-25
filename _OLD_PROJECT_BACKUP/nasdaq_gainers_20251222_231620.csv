@@ -1,0 +1,51 @@
+symbol,companyName,marketCap,sector,industry,beta,price,lastAnnualDividend,volume,exchange,exchangeShortName,country,isEtf,isFund,isActivelyTrading
+APE,"AMC Entertainment Holdings, Inc.",2259035391,Communication Services,Entertainment,1.93488,1.42,0.0,134390172,New York Stock Exchange,NYSE,US,False,False,False
+HBI,Hanesbrands Inc.,2289099956,Consumer Cyclical,Apparel - Manufacturers,1.716,6.47,0.0,104189457,New York Stock Exchange,NYSE,US,False,False,True
+PLUG,Plug Power Inc.,2181523915,Industrials,Electrical Equipment & Parts,1.749,2.11,0.0,79530706,NASDAQ Capital Market,NASDAQ,US,False,False,True
+BBAI,"BigBear.ai Holdings, Inc.",2369544113,Technology,Information Technology Services,3.197,6.39,0.0,77872723,New York Stock Exchange,NYSE,US,False,False,True
+ONDS,Ondas Holdings Inc.,3414836927,Technology,Communication Equipment,2.361,9.27,0.0,68405930,NASDAQ Capital Market,NASDAQ,US,False,False,True
+OPEN,Opendoor Technologies Inc.,4673142126,Real Estate,Real Estate - Services,3.594,6.42,0.0,67801253,NASDAQ Global Select,NASDAQ,US,False,False,True
+CS,Credit Suisse Group AG,3496163992,Financial Services,Banks - Diversified,1.191489,0.8858,0.05,63950993,New York Stock Exchange,NYSE,CH,False,False,False
+DISH,DISH Network Corporation,3083430398,Communication Services,Telecommunications Services,1.661,5.77,0.0,50815955,NASDAQ Global Select,NASDAQ,US,False,False,False
+AUY,Yamana Gold Inc.,5628852403,Basic Materials,Gold,1.269098,5.85,0.19,42248515,New York Stock Exchange,NYSE,CA,False,False,False
+ABEV,Ambev S.A.,35994046158,Consumer Defensive,Beverages - Alcoholic,0.25,2.3,0.31,40082183,New York Stock Exchange,NYSE,BR,False,False,True
+SWN,Southwestern Energy Company,7842187572,Energy,Oil & Gas Exploration & Production,1.117,7.11,0.0,39859353,New York Stock Exchange,NYSE,US,False,False,False
+SNAP,Snap Inc.,13397198564,Communication Services,Internet Content & Information,0.849,7.94,0.0,32829110,New York Stock Exchange,NYSE,US,False,False,True
+GRAB,Grab Holdings Limited,20538700000,Technology,Software - Application,0.894,5.18,0.0,31803678,NASDAQ Global Select,NASDAQ,SG,False,False,True
+DNN,Denison Mines Corp.,2485494799,Energy,Uranium,1.926,2.77,0.0,30799342,New York Stock Exchange Arca,AMEX,CA,False,False,True
+BBD,Banco Bradesco S.A.,34617906290,Financial Services,Banks - Regional,0.24,3.27,0.12172,30640942,New York Stock Exchange,NYSE,BR,False,False,True
+ACHR,Archer Aviation Inc.,5470999892,Industrials,Aerospace & Defense,3.101,8.4,0.0,29086958,New York Stock Exchange,NYSE,US,False,False,True
+BTG,B2Gold Corp.,6333597370,Basic Materials,Gold,0.958,4.8,0.08,27007706,New York Stock Exchange Arca,AMEX,CA,False,False,True
+VRN,Veren Inc.,3677020314,Energy,Oil & Gas Exploration & Production,1.34,6.01,0.32,26426717,New York Stock Exchange,NYSE,CA,False,False,False
+NOK,Nokia Oyj,35321833680,Technology,Communication Equipment,0.468,6.54,0.16,25803180,New York Stock Exchange,NYSE,FI,False,False,True
+YRI.TO,Yamana Gold Inc.,7591734267,Basic Materials,Gold,1.28684,7.89,0.55,23617782,Toronto Stock Exchange,TSX,CA,False,False,False
+ALTM,Arcadium Lithium plc,6288862587,Basic Materials,Chemicals - Specialty,1.494,5.84,0.0,22394351,New York Stock Exchange,NYSE,IE,False,False,False
+NIO,NIO Inc.,12142936770,Consumer Cyclical,Auto - Manufacturers,1.042,5.0,0.0,21821884,New York Stock Exchange,NYSE,CN,False,False,True
+RIG,Transocean Ltd.,3621995680,Energy,Oil & Gas Drilling,1.398,4.01,0.0,20554676,New York Stock Exchange,NYSE,CH,False,False,True
+AUR,"Aurora Innovation, Inc.",8171335823,Technology,Information Technology Services,2.47,4.22,0.0,20019330,NASDAQ Global Select,NASDAQ,US,False,False,True
+DNB,"Dun & Bradstreet Holdings, Inc.",4082629277,Financial Services,Financial - Data & Stock Exchanges,1.123,9.15,0.15,17826710,New York Stock Exchange,NYSE,US,False,False,False
+CDEV,Permian Resources Corporation,4181414109,Energy,Oil & Gas Exploration & Production,4.917852,7.62,0.0,17581515,NASDAQ Capital Market,NASDAQ,US,False,False,False
+NGD,New Gold Inc.,7267939183,Basic Materials,Gold,1.555,9.18,0.0,16938723,New York Stock Exchange Arca,AMEX,CA,False,False,True
+ITUB,Itaú Unibanco Holding S.A.,76332809382,Financial Services,Banks - Regional,0.132,7.11,0.52885,16324801,New York Stock Exchange,NYSE,BR,False,False,True
+AMCR,Amcor plc,19205554709,Consumer Cyclical,Packaging & Containers,0.681,8.32,0.5125,15829090,New York Stock Exchange,NYSE,CH,False,False,True
+CCCS,CCC Intelligent Solutions Holdings Inc.,5629031450,Technology,Software - Infrastructure,0.721,8.75,0.0,14497951,NASDAQ,NASDAQ,US,False,False,False
+EXK,Endeavour Silver Corp.,2903214494,Basic Materials,Other Precious Metals,2.172,9.89,0.0,14332949,New York Stock Exchange,NYSE,CA,False,False,True
+IBRX,"ImmunityBio, Inc.",2233723250,Healthcare,Biotechnology,-0.057,2.27,0.0,14018789,NASDAQ Global Select,NASDAQ,US,False,False,True
+BTO.TO,B2Gold Corp.,8708696383,Basic Materials,Gold,0.958,6.6,0.11186,13587644,Toronto Stock Exchange,TSX,CA,False,False,True
+BB,BlackBerry Limited,2344572697,Technology,Software - Infrastructure,0.944,3.95,0.0,12908430,New York Stock Exchange,NYSE,CA,False,False,True
+CVT,Cvent Holding Corp.,4188610852,Technology,Software - Application,1.115353,8.52,0.0,12222804,NASDAQ Global Market,NASDAQ,US,False,False,False
+LUMN,"Lumen Technologies, Inc.",7969251860,Communication Services,Telecommunications Services,1.436,7.77,0.0,12141161,New York Stock Exchange,NYSE,US,False,False,True
+BULL,Webull Corporation Class A Ordinary Shares,4385878963,Technology,Software - Application,-0.144,8.74,0.0,11903202,NASDAQ Global Select,NASDAQ,US,False,False,True
+VG,"Venture Global, Inc.",16184534638,Energy,Oil & Gas Midstream,5.9189916,6.61,0.07,11421159,New York Stock Exchange,NYSE,US,False,False,True
+CNH,CNH Industrial N.V.,11770209459,Industrials,Agricultural - Machinery,1.395,9.42,0.25,10030053,New York Stock Exchange,NYSE,GB,False,False,True
+BTE,Baytex Energy Corp.,2397149059,Energy,Oil & Gas Exploration & Production,1.03,3.12,0.07,8731137,New York Stock Exchange,NYSE,CA,False,False,True
+GGB,Gerdau S.A.,7466631993,Basic Materials,Steel,0.907,3.69,0.10907,7970608,New York Stock Exchange,NYSE,BR,False,False,True
+NXE,NexGen Energy Ltd.,5989233864,Energy,Uranium,1.877,9.15,0.0,7810769,New York Stock Exchange,NYSE,CA,False,False,True
+COTY,Coty Inc.,2738397441,Consumer Defensive,Household & Personal Products,0.942,3.14,0.0,7709091,New York Stock Exchange,NYSE,US,False,False,True
+PTEN,"Patterson-UTI Energy, Inc.",2273637680,Energy,Oil & Gas Drilling,0.766,5.89,0.32,7490770,NASDAQ Global Select,NASDAQ,US,False,False,True
+TMC,TMC the metals company Inc.,3184450282,Basic Materials,Industrial Materials,1.825,7.71,0.0,7414609,NASDAQ Global Select,NASDAQ,CA,False,False,True
+VRN.TO,Veren Inc.,5592007599,Energy,Oil & Gas Exploration & Production,1.34,9.14,0.46,7102799,Toronto Stock Exchange,TSX,CA,False,False,False
+WIT,Wipro Limited,31611380529,Technology,Information Technology Services,0.58,3.02,0.12593,6870702,New York Stock Exchange,NYSE,IN,False,False,True
+AQN,Algonquin Power & Utilities Corp.,4746291900,Utilities,Renewable Utilities,0.789,6.18,0.2599,6446262,New York Stock Exchange,NYSE,CA,False,False,True
+CCC,CCC Intelligent Solutions Holdings Inc.,5185142113,Technology,Software - Infrastructure,0.672,8.06,0.0,6427711,NASDAQ,NASDAQ,US,False,False,True
+WU,The Western Union Company,2962314515,Financial Services,Financial - Credit Services,0.536,9.32,1.175,6257002,New York Stock Exchange,NYSE,US,False,False,True

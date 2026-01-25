@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المصحف التفاعلي - Interactive Quran</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #eee;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #2a2a2a;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #c5a059;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: #c5a059;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #c5a059;
+            padding-bottom: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #aaa;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555;
+            background: #333;
+            color: white;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #1a472a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a6a3a;
+        }
+
+        .btn-nav {
+            background: #444;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-nav:hover {
+            background: #555;
+        }
+
+        .nav-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .nav-row .btn-nav {
+            margin: 0;
+        }
+
+        .page-info {
+            background: rgba(197, 160, 89, 0.1);
+            border: 1px solid #c5a059;
+            border-radius: 5px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .page-info p {
+            margin: 5px 0;
+        }
+
+        .page-num { color: #c5a059; font-weight: bold; }
+        .surah-name { color: #4ade80; }
+        .ayah-count { color: #aaa; }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: white;
+            overflow: auto;
+            position: relative;
+        }
+
+        svg {
+            height: auto;
+            max-width: 100%;
+            cursor: pointer;
+        }
+
+        .highlighted {
+            filter: brightness(0.8);
+        }
+
+        /* Popup Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            direction: rtl;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+            border: 2px solid #c5a059;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #c5a059;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #c5a059;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .modal-subtitle {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .verse-text {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #fff;
+            border-right: 4px solid #c5a059;
+        }
+
+        .tafsir-box {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #444;
+        }
+
+        .tafsir-box h3 {
+            color: #4ade80;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .tafsir-box p {
+            color: #ddd;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            min-width: 120px;
+        }
+
+        .btn-tafsir {
+            background: #1a472a;
+            color: white;
+        }
+
+        .btn-tafsir:hover {
+            background: #2a6a3a;
+        }
+
+        .btn-listen {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-listen:hover {
+            background: #2563eb;
+        }
+
+        .btn-close {
+            background: #555;
+            color: white;
+        }
+
+        .btn-close:hover {
+            background: #666;
+        }
+
+        .loading {
+            text-align: center;
+            color: #aaa;
+            padding: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #444;
+            border-top: 3px solid #c5a059;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ef4444;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .canvas-container { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>🌙 المصحف التفاعلي</h2>
+
+        <div class="control-group">
+            <label>رقم الصفحة</label>
+            <input type="number" id="pageNum" min="1" max="604" value="1">
+        </div>
+
+        <div class="nav-row">
+            <button class="btn btn-nav" onclick="prevPage()">← السابق</button>
+            <button class="btn btn-nav" onclick="nextPage()">التالي →</button>
+        </div>
+
+        <button class="btn btn-primary" onclick="loadPage()">📖 تحميل الصفحة</button>
+
+        <div class="page-info" id="pageInfo" style="display: none;">
+            <p><span class="page-num">الصفحة:</span> <span id="pageNumDisplay"></span></p>
+            <p><span class="surah-name" id="surahName"></span></p>
+            <p><span class="ayah-count" id="ayahCount"></span></p>
+        </div>
+
+        <div id="errorMsg"></div>
+    </div>
+
+    <div class="canvas-container" id="canvas"></div>
+
+    <!-- Modal Popup -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">آية <span id="modalAyahNum"></span></div>
+                <div class="modal-subtitle">من سورة <span id="modalSurahName"></span></div>
+            </div>
+
+            <div class="modal-body">
+                <div class="verse-text" id="verseText"></div>
+
+                <div class="tafsir-box">
+                    <h3>📚 معلومات الآية</h3>
+                    <p id="verseInfo"></p>
+                </div>
+
+                <div id="tafsirContent" style="display: none;">
+                    <div class="tafsir-box">
+                        <h3>📖 التفسير</h3>
+                        <p id="tafsirText"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-buttons button btn-tafsir" onclick="fetchTafsir()">📚 اقرأ التفسير</button>
+                <button class="modal-buttons button btn-listen" onclick="playAudio()">🎧 استمع</button>
+                <button class="modal-buttons button btn-close" onclick="closeModal()">✕ إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SVG_BASE = 'https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/quran-svg-pages/';
+        let ayatMap = {};
+        let currentPage = 1;
+        let currentVerse = null;
+        let currentSurah = null;
+
+        // Load ayat_map from GitHub
+        async function loadAyatMap() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/ayat_map');
+                ayatMap = await response.json();
+                console.log('✅ Loaded ayat_map:', Object.keys(ayatMap).length, 'pages');
+            } catch (e) {
+                showError('خطأ في تحميل ملف الإحداثيات');
+                console.error(e);
+            }
+        }
+
+        async function loadPage() {
+            const pageNum = parseInt(document.getElementById('pageNum').value);
+            if (pageNum < 1 || pageNum > 604) return;
+
+            currentPage = pageNum;
+            const pageStr = String(pageNum).padStart(3, '0');
+
+            try {
+                // Fetch SVG
+                const svgRes = await fetch(SVG_BASE + pageStr + '.svg');
+                const svgText = await svgRes.text();
+                document.getElementById('canvas').innerHTML = svgText;
+
+                const svgEl = document.querySelector('svg');
+                setupInteraction(svgEl);
+
+                // Fetch verse info from API
+                const apiRes = await fetch(`https://api.alquran.cloud/v1/page/${pageNum}/quran-simple`);
+                const apiData = await apiRes.json();
+                const verses = apiData.data.ayahs;
+
+                // Update page info
+                const firstVerse = verses[0];
+                document.getElementById('pageNumDisplay').textContent = pageNum;
+                document.getElementById('surahName').textContent = firstVerse.surah.name;
+                document.getElementById('ayahCount').textContent = `عدد الآيات: ${verses.length}`;
+                document.getElementById('pageInfo').style.display = 'block';
+
+            } catch (e) {
+                showError('خطأ في تحميل الصفحة');
+                console.error(e);
+            }
+        }
+
+        function setupInteraction(svgEl) {
+            const pathElements = svgEl.querySelectorAll('path, g');
+
+            pathElements.forEach(element => {
+                element.style.cursor = 'pointer';
+                element.addEventListener('click', handlePathClick);
+                element.addEventListener('mouseenter', (e) => {
+                    e.target.style.opacity = '0.7';
+                });
+                element.addEventListener('mouseleave', (e) => {
+                    e.target.style.opacity = '1';
+                });
+            });
+        }
+
+        function handlePathClick(event) {
+            const element = event.target;
+            let pathId = element.id;
+
+            if (!pathId && element.parentElement) {
+                pathId = element.parentElement.id;
+            }
+
+            if (!pathId) return;
+
+            const pageStr = String(currentPage).padStart(3, '0');
+            
+            if (!ayatMap[pageStr]) {
+                showError('البيانات غير متوفرة لهذه الصفحة');
+                return;
+            }
+
+            const verseData = ayatMap[pageStr][pathId];
+            if (!verseData) return;
+
+            currentVerse = verseData.ayah;
+            currentSurah = verseData.surah;
+
+            displayVerse();
+        }
+
+        async function displayVerse() {
+            const pageStr = String(currentPage).padStart(3, '0');
+            const verseData = ayatMap[pageStr];
+
+            if (!verseData) {
+                showError('البيانات غير متوفرة لهذه الصفحة');
+                return;
+            }
+
+            // Highlight all paths of current verse
+            highlightVerse(verseData);
+
+            // Fetch verse text from API
+            try {
+                const apiRes = await fetch(`https://api.alquran.cloud/v1/surah/${currentSurah}`);
+                const surahData = await apiRes.json();
+                const verse = surahData.data.ayahs.find(a => a.numberInSurah === currentVerse);
+
+                if (verse) {
+                    document.getElementById('modalAyahNum').textContent = currentVerse;
+                    document.getElementById('modalSurahName').textContent = surahData.data.name;
+                    document.getElementById('verseText').textContent = verse.text;
+                    document.getElementById('verseInfo').textContent = `السورة: ${surahData.data.name} | الآية: ${currentVerse} | الرقم الكلي: ${verse.number}`;
+                    document.getElementById('tafsirContent').style.display = 'none';
+
+                    showModal();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function highlightVerse(verseData) {
+            const svgEl = document.querySelector('svg');
+            if (!svgEl) return;
+
+            // Remove previous highlights
+            svgEl.querySelectorAll('path, g').forEach(el => {
+                el.style.fill = '';
+                el.style.opacity = '1';
+                el.classList.remove('highlighted');
+            });
+
+            // Highlight ALL paths of current verse from ayatMap
+            const pageStr = String(currentPage).padStart(3, '0');
+            const pageAyat = ayatMap[pageStr];
+
+            if (pageAyat) {
+                for (const [pathId, data] of Object.entries(pageAyat)) {
+                    // إذا كانت نفس السورة والآية، ظلل الـ path
+                    if (data.ayah === currentVerse && data.surah === currentSurah) {
+                        const element = svgEl.getElementById(pathId);
+                        if (element) {
+                            element.style.fill = 'rgba(197, 160, 89, 0.5)';
+                            element.style.opacity = '1';
+                            element.classList.add('highlighted');
+                        }
+                    }
+                }
+            }
+        }
+
+        async function fetchTafsir() {
+            const tafsirBox = document.getElementById('tafsirContent');
+            const tafsirText = document.getElementById('tafsirText');
+
+            tafsirText.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            tafsirBox.style.display = 'block';
+
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/ayah/${currentSurah}:${currentVerse}/en.asad`);
+                const data = await res.json();
+                
+                if (data.data && data.data.text) {
+                    tafsirText.textContent = data.data.text;
+                } else {
+                    tafsirText.textContent = 'التفسير غير متوفر';
+                }
+            } catch (e) {
+                tafsirText.textContent = 'حدث خطأ في تحميل التفسير';
+                console.error(e);
+            }
+        }
+
+        function playAudio() {
+            try {
+                const ayahNumber = currentSurah + ':' + currentVerse;
+                const audioUrl = `https://cdn.alquran.cloud/media/audio/Abdullah-Basfar/${ayahNumber}`;
+                
+                const audio = new Audio(audioUrl);
+                audio.play();
+            } catch (e) {
+                alert('خطأ في تشغيل الصوت');
+                console.error(e);
+            }
+        }
+
+        function showModal() {
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            
+            // Remove highlights
+            const svgEl = document.querySelector('svg');
+            if (svgEl) {
+                svgEl.querySelectorAll('path, g').forEach(el => {
+                    el.style.opacity = '1';
+                    el.classList.remove('highlighted');
+                });
+            }
+        }
+
+        function nextPage() {
+            let page = parseInt(document.getElementById('pageNum').value);
+            if (page < 604) {
+                document.getElementById('pageNum').value = page + 1;
+                loadPage();
+            }
+        }
+
+        function prevPage() {
+            let page = parseInt(document.getElementById('pageNum').value);
+            if (page > 1) {
+                document.getElementById('pageNum').value = page - 1;
+                loadPage();
+            }
+        }
+
+        function showError(msg) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.innerHTML = `<div class="error">${msg}</div>`;
+            setTimeout(() => errorDiv.innerHTML = '', 5000);
+        }
+
+        // Initialize
+        loadAyatMap();
+        loadPage();
+    </script>
+
+</body>
+</html>

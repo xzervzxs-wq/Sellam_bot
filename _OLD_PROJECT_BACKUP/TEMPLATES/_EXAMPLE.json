@@ -1,0 +1,18 @@
+{
+  "category": "مثال متقدم",
+  "icon": "💡",
+  "items": [
+    {
+      "name": "قلب بسيط (SVG)",
+      "svg": "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M50,90 C20,70 10,50 10,35 C10,20 20,10 30,10 C40,10 50,25 50,25 C50,25 60,10 70,10 C80,10 90,20 90,35 C90,50 80,70 50,90 Z' fill='#ff1493'/></svg>"
+    },
+    {
+      "name": "عنصر من الإنترنت (URL)",
+      "url": "https://via.placeholder.com/100x100?text=Element"
+    },
+    {
+      "name": "صورة Base64",
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+    }
+  ]
+}

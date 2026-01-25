@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أستوديو دلال | Dalal Studio</title>
+    
+    <!-- مكتبات التنسيق والخطوط -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <!-- إضافة مكتبة jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- مكتبة الأيقونات -->
+    <link id="fa-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    
+    <!-- تحميل الخطوط العربية (مكتبة موسعة - 20 خط) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Baloo+Bhaijaan+2:wght@400;700&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=Droid+Sans:wght@400;700&family=El+Messiri:wght@400;700&family=Gulzar&family=Harmattan:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Katibeh&family=Kufam:wght@400;700&family=Lalezar&family=Lateef:wght@400;700&family=Lemonada:wght@400;700&family=Mada:wght@400;700&family=Mirza:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Serif+Arabic:wght@400;700&family=Rakkas&family=Reem+Kufi:wght@400;700&family=Sakkal+Madina:wght@400;700&family=Scheherazade+New:wght@400;700&family=Tajawal:wght@400;700&family=Vazirmatn:wght@400;700&family=Zain:wght@400;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+
+    <style>
+        /* إعدادات الألوان العصرية (ثيم دلال) */
+        :root {
+            --paper-bg: #f8fafc;      /* Slate 50 */
+            --paper-dark: #e2e8f0;    /* Slate 200 */
+            --primary-color: #6366f1; /* Indigo 500 */
+            --primary-hover: #4f46e5; /* Indigo 600 */
+            --accent-color: #ec4899;  /* Pink 500 */
+            --text-dark: #1e293b;     /* Slate 800 */
+            --border-color: #cbd5e1;  /* Slate 300 */
+        }
+
+        /* إعدادات أساسية */
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: var(--paper-bg); 
+            color: var(--text-dark); 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+            overscroll-behavior: none;
+            background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* شاشة التحميل */
+        #startup-overlay { 
+            position: fixed; inset: 0; 
+            background: #1e1b4b; 
+            z-index: 99999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            transition: opacity 0.3s; 
+        }
+        #startup-overlay .spinner {
+            width: 50px; height: 50px; 
+            border: 5px solid #312e81; 
+            border-top-color: var(--primary-color); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite;
+        }
+        #startup-overlay .loading-text {
+            color: white; 
+            font-weight: bold; 
+            font-family: 'Cairo', sans-serif;
+            margin-top: 10px;
+        }
+
+        /* شاشة التصدير */
+        #export-overlay { 
+            position: fixed; inset: 0; 
+            background: rgba(30, 27, 75, 0.95); 
+            z-index: 100000; 
+            display: none; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            transition: opacity 0.3s; 
+        }
+        #export-overlay .spinner { 
+            width: 50px; height: 50px; 
+            border: 5px solid rgba(255,255,255,0.1); 
+            border-top-color: var(--accent-color); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* منطقة العمل */
+        .preview-area {
+            background-color: white;
+            border-radius: 20px; min-height: 400px; display: flex; justify-content: center; align-items: flex-start;
+            overflow: auto; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 50px; position: relative; /* increased padding for rulers */
+        }
+
+        /* حاوي البطاقة والمسطرة */
+        #card-wrapper {
+            position: relative;
+            margin: 0 auto 40px auto;
+            transform-origin: center top;
+            transform: scale(var(--card-zoom, 1));
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        /* البطاقة الرئيسية */
+        #card {
+            background-color: white; 
+            position: relative; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+            overflow: hidden; 
+            /* هامش وتحويل تم نقلهما للغلاف للحفاظ على المسطرة */
+            margin: 0;
+            transform: none;
+            direction: rtl;
+            width: 100%; height: 100%;
+            flex-shrink: 0; 
+        }
+
+        /* تنسيق المساطر */
+        .ruler {
+            position: absolute;
+            background-color: #f1f5f9;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 50;
+            font-family: sans-serif;
+            font-size: 8px;
+            color: #64748b;
+        }
+        .ruler-h {
+            top: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .ruler-v {
+            top: 0;
+            left: -20px;
+            bottom: 0;
+            width: 20px;
+            border-right: 1px solid #cbd5e1;
+        }
+        .tick {
+            position: absolute;
+            background-color: #cbd5e1;
+        }
+        .tick-num {
+            position: absolute;
+            font-size: 10px; /* تم التكبير */
+            font-weight: 900; /* خط أعرض */
+            color: #475569;
+        }
+        /* Vertical Numbers */
+        .ruler-v .tick-num {
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+
+        /* التدرج اللوني */
+        #card-gradient {
+            position: absolute; 
+            bottom: 0; left: 0; right: 0; 
+            height: 50%; 
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            z-index: 10; 
+            pointer-events: none; 
+            display: none;
+        }
+
+        /* العناصر القابلة للسحب */
+        .draggable-el { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            cursor: grab; touch-action: none; 
+            border: 1px solid transparent;
+        }
+        .draggable-el:active { cursor: grabbing; }
+        
+        /* حالة القفل */
+        .draggable-el.is-locked { cursor: default; }
+
+        /* طبقات الصور والنصوص والإطارات */
+        .image-layer { z-index: 5; }
+        .image-layer.bg-image { width: 100% !important; height: 100% !important; top: 0 !important; left: 0 !important; transform: none !important; }
+        .image-layer img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        
+        .frame-layer { z-index: 20; width: 80%; height: 80%; background: transparent; border-style: solid; border-width: 2px; border-color: #334155; pointer-events: auto; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s; }
+        
+        /* النصوص */
+        .text-layer { z-index: 30; width: auto; min-width: 100px; text-align: center; padding: 5px; }
+        .user-text { 
+            line-height: 1.6; display: block; white-space: pre-wrap; outline: none; 
+            background: transparent; border: none; text-align: center; width: 100%; 
+            resize: none; overflow: visible; 
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            cursor: text;
+            touch-action: auto !important; 
+            pointer-events: auto;
+        }
+        
+        /* أدوات التحكم (المقابض) */
+        .draggable-el.selected { border: 1px dashed var(--primary-color); z-index: 100; }
+        .draggable-el.selected.is-locked { border-color: #ef4444; border-style: dotted; }
+        
+        .handle { position: absolute; background: white; border: 2px solid var(--primary-color); width: 18px; height: 18px; border-radius: 50%; z-index: 101; display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .draggable-el.selected .handle { display: block; }
+        
+        /* اتجاهات المقابض */
+        .resize-nw { top: -9px; left: -9px; cursor: nw-resize; }
+        .resize-ne { top: -9px; right: -9px; cursor: ne-resize; }
+        .resize-sw { bottom: -9px; left: -9px; cursor: sw-resize; }
+        .resize-se { bottom: -9px; right: -9px; cursor: se-resize; }
+        .resize-n { top: -9px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+        .resize-e { top: 50%; right: -9px; transform: translateY(-50%); cursor: e-resize; }
+        .resize-s { bottom: -9px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+        
+        .control-btn { position: absolute; width: 28px; height: 28px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 102; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .delete-btn { top: -40px; left: -14px; background: #ef4444; }
+        .move-handle { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 50px; height: 32px; background: var(--primary-color); border-radius: 6px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        .draggable-el.selected .control-btn, .draggable-el.selected .move-handle { display: flex; }
+        .draggable-el.is-locked .control-btn, .draggable-el.is-locked .handle, .draggable-el.is-locked .move-handle { display: none !important; }
+
+        /* مودال الحفظ */
+        #save-modal { display: none; position: fixed; inset: 0; background: rgba(30, 27, 75, 0.95); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; overflow-y: auto; }
+        #save-img { max-width: 100%; max-height: 50vh; border: none; border-radius: 0; box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 20px; }
+        
+        /* النافذة العائمة للأصول (Assets) */
+        #asset-window {
+            position: fixed;
+            top: 20%; left: 20%;
+            width: 250px;
+            max-height: 400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #cbd5e1;
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #asset-header {
+            background: #1e293b;
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+        #asset-content {
+            padding: 10px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .asset-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+        .asset-item:hover {
+            border-color: #6366f1;
+            transform: scale(1.05);
+        }
+        .asset-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .asset-item-text {
+            font-size: 10px;
+            color: #1e293b;
+            text-align: center;
+            padding: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* تحميل الخطوط المخفي */
+        #hidden-font-loader { opacity: 0; pointer-events: none; position: absolute; top: -9999px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--paper-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+        
+        /* تنسيق أدوات التحكم المرنة */
+        .controls-row {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-color);
+            display: none; 
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            order: 99; 
+        }
+        .controls-row.active { display: flex; }
+        
+        /* تنسيق الحقول */
+        input[type="number"], input[type="text"], textarea, select {
+            transition: all 0.2s;
+        }
+        input[type="number"]:focus, input[type="text"]:focus, textarea:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen" onclick="deselect(event)">
+
+    <!-- تحميل الخطوط -->
+    <div id="hidden-font-loader">
+        <span style="font-family: 'Amiri', serif;">أ</span>
+        <!-- ... (باقي الخطوط) ... -->
+        <span style="font-family: 'Tajawal', sans-serif;">أ</span>
+    </div>
+
+    <!-- شاشة التنبيه -->
+    <div id="startup-overlay">
+        <div class="spinner mb-4"></div>
+        <div class="loading-text">جاري تجهيز أستوديو دلال...</div>
+    </div>
+    
+    <!-- نافذة الأصول العائمة -->
+    <div id="asset-window">
+        <div id="asset-header">
+            <span>🎨 عناصر القالب</span>
+            <button onclick="document.getElementById('asset-window').style.display='none'" class="text-white hover:text-red-400"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="asset-content">
+            <!-- سيتم تعبئة العناصر هنا -->
+        </div>
+    </div>
+
+    <!-- شاشة التصدير -->
+    <div id="export-overlay"><div class="spinner mb-4"></div><div class="text-white font-bold text-xl">جاري إنشاء الصورة...</div></div>
+    
+    <div id="save-modal">
+        <div class="text-white font-bold mb-4 text-center text-xl">✨ معاينة طباعة A4</div>
+        
+        <!-- قسم التحكم بعدد النسخ -->
+        <div id="a4-settings" class="flex items-center gap-3 mb-4 bg-white/10 p-3 rounded-xl border border-white/20">
+            <label class="text-white text-sm font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
+            <input type="text" inputmode="numeric" id="a4-count" class="w-20 p-2 rounded-lg text-center text-lg font-bold text-[#1e293b] outline-none border-2 border-transparent focus:border-[#ec4899] transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
+            <span class="text-slate-300 text-xs font-bold" id="a4-max-text"></span>
+        </div>
+
+        <div class="flex flex-col items-center w-full max-w-2xl">
+            <img id="save-img" alt="تصميم دلال">
+            <div class="flex flex-wrap gap-3 justify-center w-full mt-4">
+                <button onclick="downloadImage()" class="bg-[#6366f1] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#4f46e5] transition flex items-center gap-2 shadow-lg">
+                    <i class="fas fa-image"></i> حفظ كصورة (PNG)
+                </button>
+                <button onclick="downloadPDF()" class="bg-[#ef4444] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#dc2626] transition flex items-center gap-2 shadow-lg">
+                    <i class="fas fa-file-pdf"></i> حفظ كملف (PDF)
+                </button>
+                <button onclick="sendToTelegramPDF(this)" class="bg-[#0088cc] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#0077b5] transition flex items-center gap-2 shadow-lg">
+                    <i class="fab fa-telegram-plane"></i> إرسال لتليجرام
+                </button>
+                <!-- تم إخفاء الزر القديم -->
+                <button id="btn-modal-a4" onclick="generateA4Sheet()" class="bg-[#ec4899] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#db2777] transition flex items-center gap-2 shadow-lg hidden">
+                    <i class="fas fa-print"></i> حفظ كصفحة طباعة (A4)
+                </button>
+                <!-- أيقونة طباعة صغيرة مستقلة -->
+                <button onclick="printDesignDirect()" class="bg-[#6366f1] text-white p-3 rounded-lg hover:bg-[#4f46e5] transition shadow-lg" title="طباعة">
+                    <i class="fas fa-print text-xl"></i>
+                </button>
+                <button onclick="document.getElementById('save-modal').style.display='none'" class="bg-white text-[#1e293b] px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition flex items-center gap-2">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+            <p class="text-slate-400 text-xs mt-4 text-center max-w-md leading-relaxed">
+                يتم ترتيب التصاميم تلقائياً. يمكنك تغيير عدد النسخ أعلاه وسيتم تحديث المعاينة فوراً.
+            </p>
+        </div>
+    </div>
+
+    <!-- واجهة التطبيق -->
+    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
+        
+        <!-- اللوحة الجانبية -->
+        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-3 border-b border-[#e2e8f0] pb-3">
+                <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3"><i class="fas fa-palette text-lg"></i></div>
+                <div>
+                    <h1 class="font-bold text-[#1e293b] text-xl">أستوديو دلال</h1>
+                    <p class="text-[12px] text-[#6366f1] font-bold">Pro ✨ نسخة احترافية</p>
+                </div>
+            </div>
+
+            <!-- إضافة النصوص -->
+            <div class="space-y-2 bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <label class="text-xs font-bold text-[#1e293b]">إضافة نصوص</label>
+                <div class="flex flex-col gap-2">
+                    <textarea id="user-text-input" rows="2" placeholder="اكتب النص هنا..." class="w-full p-2 bg-white border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-[#1e293b] resize-none"></textarea>
+                    <button onclick="addUserText()" class="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] flex items-center justify-center border border-[#6366f1] text-sm font-bold shadow-sm w-full">
+                        <i class="fas fa-plus ml-2"></i> إضافة النص
+                    </button>
+                </div>
+            </div>
+
+            <!-- أدوات الإضافة -->
+            <div class="grid grid-cols-3 gap-2">
+                <label class="col-span-2 bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition group">
+                    <i class="far fa-image text-lg text-[#6366f1] group-hover:scale-110 transition-transform"></i> خلفية
+                    <input type="file" onchange="addImageLayer(this)" class="hidden" accept="image/*">
+                </label>
+                <label class="bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition group">
+                    <i class="fas fa-image text-lg text-[#6366f1] group-hover:scale-110 transition-transform"></i> صورة
+                    <input type="file" onchange="addRegularImage(this)" class="hidden" accept="image/*">
+                </label>
+                <button onclick="addFrame()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="far fa-square text-[#6366f1] group-hover:scale-110 transition-transform"></i> إطار</button>
+                <button onclick="addShape()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-square-full text-[#6366f1] group-hover:scale-110 transition-transform"></i> شكل</button>
+                <div class="bg-transparent"></div> 
+            </div>
+
+            <!-- مقاسات العمل (يدوي فقط - 10x10 افتراضي) -->
+            <div class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <label class="text-xs font-bold text-[#1e293b] mb-2 block flex items-center gap-2">
+                    <i class="fas fa-ruler-combined text-[#6366f1]"></i> أبعاد التصميم (سم)
+                </label>
+                
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <label class="text-[9px] text-[#64748b] font-bold block mb-1">العرض (Width)</label>
+                        <input type="text" inputmode="decimal" id="custom-width" value="10" class="w-full px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-[#64748b] font-bold block mb-1">الارتفاع (Height)</label>
+                        <input type="text" inputmode="decimal" id="custom-height" value="10" class="w-full px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
+                    </div>
+                </div>
+                
+                <div class="mt-2 text-center">
+                    <span id="size-display" class="text-[10px] font-bold text-[#64748b] bg-white px-2 py-1 rounded border border-[#e2e8f0]">1181 × 1181 px</span>
+                </div>
+                
+                <!-- التحكم بـ Zoom -->
+                <div class="mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-[9px] text-[#0c4a6e] font-bold">🔍 مستوى الزوم</label>
+                        <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">100%</span>
+                    </div>
+                    <input type="range" id="zoom-slider" min="25" max="200" value="100" class="w-full cursor-pointer" oninput="setCustomZoom(this.value)">
+                    <div class="flex gap-1 mt-2">
+                        <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">50%</button>
+                        <button onclick="setCustomZoom(75)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">75%</button>
+                        <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">100%</button>
+                        <button onclick="setCustomZoom(150)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">150%</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم القوالب الجديد (تم نقله هنا وجعله قابلاً للطي) -->
+            <div class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleTemplates()">
+                    <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-save text-[#6366f1]"></i> القوالب المحفوظة
+                    </label>
+                    <i id="templates-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200"></i>
+                </div>
+                
+                <div id="templates-content" class="hidden mt-3 flex-col gap-2">
+                    <!-- القائمة المنسدلة -->
+                    <div class="w-full">
+                        <select id="template-select" class="w-full p-2 text-[11px] font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]">
+                            <option value="">📂 اختر قالباً...</option>
+                        </select>
+                    </div>
+
+                    <!-- أزرار التحكم -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- صف 1: فتح و عناصر -->
+                        <button onclick="loadSelectedTemplate()" class="bg-[#3b82f6] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#2563eb] shadow-sm transition flex items-center justify-center gap-1">
+                            <i class="fas fa-folder-open"></i> فتح العمل
+                        </button>
+                        <button onclick="openTemplateAsAssets()" class="bg-[#6366f1] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#4f46e5] shadow-sm transition flex items-center justify-center gap-1">
+                            <i class="fas fa-box-open"></i> العناصر
+                        </button>
+                        
+                        <!-- صف 2: حفظ وحذف -->
+                        <button onclick="saveCurrentAsTemplate()" class="bg-[#10b981] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#059669] shadow-sm transition flex items-center justify-center gap-1">
+                            <i class="fas fa-plus"></i> حفظ جديد
+                        </button>
+                        <button onclick="deleteSelectedTemplate()" class="bg-red-100 text-red-600 px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-red-200 shadow-sm border border-red-200 transition flex items-center justify-center gap-1">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                        
+                        <!-- صف 3: استيراد وتحميل -->
+                        <button onclick="importTemplates()" class="bg-[#f59e0b] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#d97706] shadow-sm transition flex items-center justify-center gap-1">
+                            <i class="fas fa-upload"></i> استيراد
+                        </button>
+                        <button onclick="exportTemplates()" class="bg-[#8b5cf6] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#7c3aed] shadow-sm transition flex items-center justify-center gap-1">
+                            <i class="fas fa-download"></i> تحميل
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة العمل -->
+        <div class="lg:col-span-8 flex flex-col gap-1">
+            
+            <!-- شريط الأدوات العلوي -->
+            <div class="flex flex-wrap items-center bg-white p-2 rounded-xl border border-[#cbd5e1] shadow-sm justify-between gap-y-2" onclick="event.stopPropagation()">
+                
+                <!-- مجموعة الأدوات الأساسية -->
+                <div class="flex items-center gap-1 md:gap-2">
+                    <button onclick="undoAction()" class="p-1.5 md:p-2 text-[#64748b] hover:text-[#6366f1]"><i class="fas fa-undo"></i></button>
+                    <button onclick="redoAction()" class="p-1.5 md:p-2 text-[#64748b] hover:text-[#6366f1]"><i class="fas fa-redo"></i></button>
+                    <div class="w-px h-5 bg-[#e2e8f0] mx-1"></div>
+                    <button onclick="toggleBg()" id="btn-bg" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition border border-[#e2e8f0]">شفافية</button>
+                </div>
+
+                <!-- مجموعة أدوات التعديل -->
+                <div class="flex items-center gap-1 md:gap-2">
+                     <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
+                        <i class="fas fa-adjust"></i> التدرج
+                    </button>
+                    <!-- تعديل زر الممحاة حسب الطلب لإظهار النص دائماً -->
+                    <button onclick="toggleEraserMode()" id="btn-eraser" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
+                        <i class="fas fa-eraser"></i> <span class="ml-1 text-[9px] font-black">الممحاة</span>
+                    </button>
+                </div>
+                
+                <!-- لوحات التحكم -->
+                
+                <!-- إعدادات التدرج -->
+                <div id="grad-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0]">
+                    <span class="text-[9px] font-bold text-[#1e293b]">اللون:</span>
+                    <button id="grad-black-btn" onclick="setGradientColor('black')" class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-slate-900 text-white hover:bg-slate-700 transition ring-2 ring-[#6366f1]">أسود</button>
+                    <button id="grad-white-btn" onclick="setGradientColor('white')" class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-white text-slate-900 border border-slate-300 hover:bg-slate-50 transition">أبيض</button>
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <input type="range" min="0" max="1" step="0.1" value="0.8" oninput="setGradientOpacity(this.value)" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="الشفافية">
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <span class="text-[9px] font-bold text-[#1e293b]">التمدد:</span>
+                    <input type="range" min="10" max="100" value="50" oninput="setGradientHeight(this.value)" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="ارتفاع التدرج">
+                </div>
+
+                <!-- إعدادات النص (20 خط متنوع) -->
+                <div id="top-font-controls" class="controls-row bg-[#f8fafc] px-2 py-1 rounded border border-[#e2e8f0] flex items-center gap-2">
+                    <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">حجم:</span>
+                    <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-20 h-1.5 accent-[#6366f1]" title="حجم الخط">
+                    <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-16 px-2 py-1 border border-[#cbd5e1] rounded text-[11px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <select id="top-font-family" onchange="updateStyle('fontFamily', this.value)" class="bg-white border border-[#cbd5e1] rounded text-[9px] py-0.5 px-1 font-bold outline-none focus:border-[#6366f1] text-[#1e293b]">
+                        <!-- الخطوط الأساسية -->
+                        <option value="'Cairo', sans-serif">كايرو (Cairo) - مودرن</option>
+                        <option value="'Tajawal', sans-serif">تجوال (Tajawal) - المهندس ⭐</option>
+                        <option value="'Almarai', sans-serif">المراعي (Almarai) - رسمي</option>
+                        <option value="'Zain', sans-serif">زين (Zain) - عصري</option>
+                        <option value="'Mada', sans-serif">مدى (Mada) - ناعم</option>
+                        <!-- الخطوط الحديثة الجديدة -->
+                        <option value="'Noto Sans Arabic', sans-serif">نوتو سانس (Noto Sans) - عصري حديث</option>
+                        <option value="'Noto Serif Arabic', serif">نوتو سيريف (Noto Serif) - سيريف عصري</option>
+                        <option value="'Harmattan', sans-serif">هرمتان (Harmattan) - جميل ناعم</option>
+                        <option value="'Sakkal Madina', sans-serif">سكال (Sakkal Madina) - أنيق رسمي</option>
+                        <option value="'Mirza', sans-serif">ميرزا (Mirza) - فني حديث</option>
+                        <option value="'Katibeh', serif">كاتبة (Katibeh) - يدوي مزخرف</option>
+                        <option value="'Droid Sans', sans-serif">درويد (Droid Sans) - تقني نظيف</option>
+                        <!-- الخطوط الكلاسيكية -->
+                        <option value="'IBM Plex Sans Arabic', sans-serif">بلكس (IBM Plex) - تقني</option>
+                        <option value="'Vazirmatn', sans-serif">وزير (Vazirmatn) - نظيف</option>
+                        <option value="'Amiri', serif">أميري (Amiri) - نسخ</option>
+                        <option value="'Aref Ruqaa', serif">عارف (Aref Ruqaa) - رقعة</option>
+                        <option value="'Reem Kufi', sans-serif">ريم (Reem Kufi) - كوفي</option>
+                        <option value="'Kufam', sans-serif">كوفم (Kufam) - كوفي مطور</option>
+                        <option value="'El Messiri', sans-serif">المسيري (El Messiri) - مميز</option>
+                        <option value="'Lalezar', cursive">لاليزار (Lalezar) - عريض</option>
+                        <option value="'Changa', sans-serif">شانجا (Changa) - قوي</option>
+                        <option value="'Baloo Bhaijaan 2', cursive">بالو (Baloo) - طفولي</option>
+                        <option value="'Lemonada', cursive">ليمونادة (Lemonada) - عفوي</option>
+                        <option value="'Lateef', serif">لطيف (Lateef) - كلاسيكي</option>
+                        <option value="'Scheherazade New', serif">شهرزاد (Scheherazade) - تراثي</option>
+                        <option value="'Rakkas', serif">رقاص (Rakkas) - فني</option>
+                        <option value="'Gulzar', serif">جلزار (Gulzar) - نستعليق</option>
+                    </select>
+                    <!-- زر البولد -->
+                    <button id="btn-bold" onclick="toggleBold()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition ml-1" title="خط عريض">
+                        B
+                    </button>
+                </div>
+
+                <!-- الخصائص السريعة -->
+                <div id="quick-props" class="controls-row justify-center">
+                     <span class="text-[9px] text-[#1e293b] font-bold" id="color-label">لون النص:</span>
+                     <input type="color" id="quick-color" oninput="updateStyle('color', this.value)" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                </div>
+
+                <!-- إعدادات الإطار -->
+                <div id="frame-controls-toolbar" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0]">
+                    <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
+                    <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                    <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <span class="text-[9px] font-bold text-[#1e293b]">لون الشكل:</span>
+                    <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                </div>
+
+                <!-- إعدادات الممحاة -->
+                <div id="eraser-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0]">
+                    <div class="flex items-center gap-1 pl-2">
+                        <label class="flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" id="eraser-protect-bg" checked class="w-3 h-3 accent-[#6366f1]">
+                            <span class="text-[9px] font-bold text-[#1e293b]">حماية الخلفية</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center gap-1">
+                         <span class="text-[9px] font-bold text-[#1e293b]">حجم:</span>
+                         <input type="range" min="5" max="100" value="30" id="eraser-size" class="w-12 h-1 accent-[#6366f1] cursor-pointer">
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <span class="text-[9px] font-bold text-[#1e293b]">نعومة:</span>
+                        <input type="range" min="0" max="50" value="0" id="eraser-softness" class="w-12 h-1 accent-[#6366f1] cursor-pointer">
+                    </div>
+                    
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <!-- تعديل زر الممحاة السحرية لإظهار النص -->
+                    <button id="btn-magic" onclick="toggleMagicMode()" class="px-2 py-0.5 rounded text-[9px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1" title="ممحاة سحرية">
+                        <i class="fas fa-magic"></i> <span class="ml-1 text-[9px] font-black">الممحاة السحرية</span>
+                    </button>
+                    
+                    <div id="magic-tolerance-control" class="hidden items-center gap-1">
+                         <span class="text-[9px] font-bold text-[#6366f1]">دقة:</span>
+                         <input type="range" min="1" max="100" value="30" id="magic-tolerance" class="w-10 h-1 accent-[#6366f1] cursor-pointer">
+                    </div>
+
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <button onclick="exitEraserMode()" class="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-300 text-slate-700 hover:bg-slate-400 transition">إنهاء</button>
+                </div>
+            </div>
+
+            <div class="bg-[#f0ebe0] p-2 rounded text-[10px] text-[#1e293b] border border-[#e2e8f0] flex items-center gap-2 font-bold">
+                <i class="fas fa-info-circle text-[#6366f1]"></i> <span>اضغط مرتين (Double Tap) لقفل/فتح العنصر</span>
+            </div>
+
+            <div class="preview-area" onclick="deselect(event)">
+                <div id="card-wrapper">
+                    <div id="ruler-h" class="ruler ruler-h"></div>
+                    <div id="ruler-v" class="ruler ruler-v"></div>
+                    <div id="card" onclick="event.stopPropagation()">
+                        <div id="card-gradient"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="style-panel" class="bg-white p-4 rounded-2xl shadow-lg border border-[#cbd5e1] transition-all" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4 border-b border-[#e2e8f0] pb-2">
+                    <span class="text-xs font-black text-[#6366f1] uppercase tracking-wider" id="panel-title">الخصائص</span>
+                    <!-- زران مباشران للحفظ -->
+                    <div class="flex gap-2">
+                        <button onclick="saveWorkDirectly()" class="bg-[#1e293b] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#0f172a] flex items-center gap-1 shadow-md">
+                            <i class="fas fa-image"></i> حفظ العمل
+                        </button>
+                        <button onclick="generateA4Sheet()" class="bg-[#ec4899] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#db2777] flex items-center gap-1 shadow-md">
+                            <i class="fas fa-print"></i> طباعة A4
+                        </button>
+                    </div>
+                </div>
+
+                <div id="no-selection-msg" class="text-center py-4 text-[#64748b] text-xs font-bold opacity-70">
+                    حدد عنصراً للتعديل عليه
+                </div>
+
+                <div id="text-controls" class="hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] text-[#1e293b] font-bold block mb-1">نوع الخط</label>
+                            <select id="font-family" onchange="updateStyle('fontFamily', this.value)" class="w-full p-2 bg-[#f8fafc] rounded-lg text-xs font-bold border border-[#cbd5e1] outline-none text-[#1e293b] focus:border-[#6366f1]">
+                                <!-- الخطوط الأساسية -->
+                                <option value="'Cairo', sans-serif">كايرو (Cairo) - مودرن</option>
+                                <option value="'Tajawal', sans-serif">تجوال (Tajawal) - المهندس 🔷</option>
+                                <option value="'Almarai', sans-serif">المراعي (Almarai) - رسمي</option>
+                                <option value="'Zain', sans-serif">زين (Zain) - عصري</option>
+                                <option value="'Mada', sans-serif">مدى (Mada) - ناعم</option>
+                                <!-- الخطوط الحديثة الجديدة -->
+                                <option value="'Noto Sans Arabic', sans-serif">نوتو سانس (Noto Sans) - عصري حديث</option>
+                                <option value="'Noto Serif Arabic', serif">نوتو سيريف (Noto Serif) - سيريف عصري</option>
+                                <option value="'Harmattan', sans-serif">هرمتان (Harmattan) - جميل ناعم</option>
+                                <option value="'Sakkal Madina', sans-serif">سكال (Sakkal Madina) - أنيق رسمي</option>
+                                <option value="'Mirza', sans-serif">ميرزا (Mirza) - فني حديث</option>
+                                <option value="'Katibeh', serif">كاتبة (Katibeh) - يدوي مزخرف</option>
+                                <option value="'Droid Sans', sans-serif">درويد (Droid Sans) - تقني نظيف</option>
+                                <!-- الخطوط التقنية -->
+                                <option value="'IBM Plex Sans Arabic', sans-serif">بلكس (IBM Plex) - تقني</option>
+                                <option value="'Vazirmatn', sans-serif">وزير (Vazirmatn) - نظيف</option>
+                                <!-- الخطوط الكلاسيكية -->
+                                <option value="'Amiri', serif">أميري (Amiri) - نسخ</option>
+                                <option value="'Aref Ruqaa', serif">عارف (Aref Ruqaa) - رقعة</option>
+                                <option value="'Reem Kufi', sans-serif">ريم (Reem Kufi) - كوفي</option>
+                                <option value="'Kufam', sans-serif">كوفم (Kufam) - كوفي مطور</option>
+                                <option value="'El Messiri', sans-serif">المسيري (El Messiri) - مميز</option>
+                                <option value="'Lalezar', cursive">لاليزار (Lalezar) - عريض</option>
+                                <option value="'Changa', sans-serif">شانجا (Changa) - قوي</option>
+                                <option value="'Baloo Bhaijaan 2', cursive">بالو (Baloo) - طفولي</option>
+                                <option value="'Lemonada', cursive">ليمونادة (Lemonada) - عفوي</option>
+                                <option value="'Lateef', serif">لطيف (Lateef) - كلاسيكي</option>
+                                <option value="'Scheherazade New', serif">شهرزاد (Scheherazade) - تراثي</option>
+                                <option value="'Rakkas', serif">رقاص (Rakkas) - فني</option>
+                                <option value="'Gulzar', serif">جلزار (Gulzar) - نستعليق</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-[#1e293b] font-bold block mb-1">حجم الخط</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="range" id="font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value;" class="flex-1 h-2 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
+                                <input type="text" inputmode="numeric" id="font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value;" class="w-20 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-[13px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
+                                <span class="text-[9px] text-[#64748b] font-bold whitespace-nowrap">بكسل</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="frame-controls" class="hidden space-y-4">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- لا يوجد فوتر -->
+
+    <script>
+        // ==========================================
+        //  إعدادات تليجرام (قم بوضع بياناتك هنا)
+        // ==========================================
+        const TG_BOT_TOKEN = "8496103721:AAEwYa65lXMrH5RjnzTXdg-EkPNt5sB7uOM"; // استبدل هذا بالتوكن الخاص بك
+        const TG_CHAT_ID = "237657512";     // استبدل هذا بالشات ايدي الخاص بك
+        // ==========================================
+
+        const DPI_RATIO = 118.11;
+        let activeEl = null;
+        let undoStack = [];
+        let redoStack = [];
+        let isTransparent = false;
+        let hasGradient = false;
+        let eraserMode = false;
+        let magicMode = false; 
+        let eraserCanvas = null; 
+        let eraserSize = 30;
+        let eraserSoftness = 0; 
+        let magicTolerance = 30; 
+        let isSnappingEnabled = false;
+        let currentZoom = 100; // متغير التحكم بـ zoom
+        
+        // متغيرات للتحكم في معاينة A4
+        let currentCardData = null;
+        let currentA4Layout = null;
+        let cachedCardImage = null;
+        
+        // متغير لتتبع القالب المحمل الحالي
+        let currentLoadedTemplateIndex = null;
+
+        // دالة تحويل الأرقام العربية إلى إنجليزية
+        function arabicToEnglish(arabicNum) {
+            const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            let result = String(arabicNum);
+            for (let i = 0; i < 10; i++) {
+                result = result.replace(new RegExp(arabicDigits[i], 'g'), englishDigits[i]);
+            }
+            return result;
+        }
+
+        window.onload = async () => {
+            await document.fonts.ready;
+            setTimeout(() => {
+                document.getElementById('startup-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
+            }, 800);
+            
+            // تعيين المقاس الافتراضي 10 سم * 10 سم
+            const defaultSize = Math.round(10 * DPI_RATIO);
+            setCardSize(defaultSize, defaultSize);
+            
+            // إعادة تعيين متغير القالب المحمل (عمل جديد)
+            currentLoadedTemplateIndex = null;
+            
+            updateTemplateList(); // تحميل القوالب
+            initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
+        };
+
+        // --- إدارة القوالب (Templates) ---
+        const MAX_TEMPLATES = 10;
+
+        function getTemplates() {
+            try {
+                return JSON.parse(localStorage.getItem('dalal_templates') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveTemplates(templates) {
+            localStorage.setItem('dalal_templates', JSON.stringify(templates));
+            updateTemplateList();
+        }
+
+        function updateTemplateList() {
+            const templates = getTemplates();
+            const select = document.getElementById('template-select');
+            
+            // إبقاء الخيار الأول فقط
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            templates.forEach((t, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                // تنسيق التاريخ
+                const date = new Date(t.id).toLocaleDateString('ar-SA');
+                option.text = `${t.name} (${date})`;
+                select.add(option);
+            });
+        }
+
+        function toggleTemplates() {
+            const content = document.getElementById('templates-content');
+            const arrow = document.getElementById('templates-arrow');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                content.classList.add('flex');
+                arrow.style.transform = 'rotate(-90deg)';
+            } else {
+                content.classList.add('hidden');
+                content.classList.remove('flex');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function saveCurrentAsTemplate() {
+            const templates = getTemplates();
+            const card = document.getElementById('card');
+            
+            // إلغاء التحديد قبل الحفظ ليكون القالب نظيفاً
+            deselect();
+            
+            // تنظيف HTML من خصائص الأحداث المرتبطة
+            let cleanedHTML = card.innerHTML;
+            // إزالة data-events-bound و data-element-id لتجنب مشاكل إعادة ربط الأحداث
+            cleanedHTML = cleanedHTML.replace(/\s*data-events-bound="[^"]*"/g, '');
+            cleanedHTML = cleanedHTML.replace(/\s*data-element-id="[^"]*"/g, '');
+            
+            // إذا كان هناك قالب محمل حالياً، نسأل هل تريد تحديثه
+            if (currentLoadedTemplateIndex !== null && currentLoadedTemplateIndex >= 0) {
+                if (confirm('🔄 تم تحميل قالب موجود.\n\nهل تريد تحديث هذا القالب بالتعديلات الحالية؟\n\n✅ نعم = تحديث القالب الموجود\n❌ لا = حفظ كقالب جديد')) {
+                    // تحديث القالب الموجود
+                    templates[currentLoadedTemplateIndex].html = cleanedHTML;
+                    templates[currentLoadedTemplateIndex].width = card.style.width;
+                    templates[currentLoadedTemplateIndex].height = card.style.height;
+                    templates[currentLoadedTemplateIndex].wVal = card.getAttribute('data-card-width');
+                    templates[currentLoadedTemplateIndex].hVal = card.getAttribute('data-card-height');
+                    templates[currentLoadedTemplateIndex].customW = document.getElementById('custom-width').value;
+                    templates[currentLoadedTemplateIndex].customH = document.getElementById('custom-height').value;
+                    
+                    try {
+                        saveTemplates(templates);
+                        alert(`✅ تم تحديث القالب "${templates[currentLoadedTemplateIndex].name}" بنجاح!`);
+                        return;
+                    } catch(e) {
+                        console.error(e);
+                        alert('❌ عذراً، حدث خطأ في تحديث القالب.');
+                        return;
+                    }
+                }
+                // إذا اختار "لا"، سيستمر في حفظ قالب جديد
+            }
+            
+            // حفظ كقالب جديد
+            if (templates.length >= MAX_TEMPLATES) {
+                alert('⚠️ عذراً، وصلت للحد الأقصى (10 قوالب). يرجى حذف قالب قديم أولاً.');
+                return;
+            }
+            
+            const name = prompt('أدخل اسم القالب الجديد:');
+            if (!name || name.trim() === '') return;
+
+            // جمع البيانات
+            const template = {
+                id: Date.now(),
+                name: name.trim(),
+                html: cleanedHTML,
+                width: card.style.width,
+                height: card.style.height,
+                wVal: card.getAttribute('data-card-width'),
+                hVal: card.getAttribute('data-card-height'),
+                customW: document.getElementById('custom-width').value,
+                customH: document.getElementById('custom-height').value
+            };
+
+            try {
+                templates.push(template);
+                saveTemplates(templates);
+                alert('✅ تم حفظ القالب الجديد بنجاح!');
+            } catch(e) {
+                console.error(e);
+                alert('❌ عذراً، مساحة التخزين ممتلئة. حاول استخدام صور أقل دقة أو حذف قوالب قديمة.');
+            }
+        }
+
+        // دالة جديدة للتأكد من الاختيار قبل التحميل
+        function loadSelectedTemplate() {
+            const select = document.getElementById('template-select');
+            const index = select.value;
+            if (index === "") {
+                alert('يرجى اختيار قالب من القائمة أولاً.');
+                return;
+            }
+            loadTemplate(index);
+        }
+
+        function loadTemplate(index) {
+            if (index === "") return;
+            
+            if(!confirm('هل أنت متأكد من فتح القالب؟ سيتم استبدال العمل الحالي.')) {
+                return;
+            }
+
+            const templates = getTemplates();
+            const template = templates[index];
+            
+            if (template) {
+                const card = document.getElementById('card');
+                
+                // استعادة الأبعاد
+                card.style.width = template.width;
+                card.style.height = template.height;
+                card.setAttribute('data-card-width', template.wVal);
+                card.setAttribute('data-card-height', template.hVal);
+                
+                // استعادة المحتوى
+                card.innerHTML = template.html;
+                
+                // استعادة قيم الحقول
+                if (template.customW) document.getElementById('custom-width').value = template.customW;
+                if (template.customH) document.getElementById('custom-height').value = template.customH;
+                
+                // تحديث المسطرة والزوم
+                const w = parseFloat(template.wVal);
+                const h = parseFloat(template.hVal);
+                setCardSize(w, h); // هذا سيعيد رسم المسطرة
+                
+                // إعادة تفعيل الأحداث للعناصر
+                rebindEvents();
+                
+                // تسجيل القالب المحمل حالياً
+                currentLoadedTemplateIndex = index;
+                
+                // إعادة تصفير التحديد
+                document.getElementById('template-select').value = "";
+                undoStack = []; // تصفير التراجع لبداية جديدة
+                redoStack = [];
+            }
+        }
+
+        function deleteSelectedTemplate() {
+            const select = document.getElementById('template-select');
+            const index = select.value;
+            
+            if (index === "") {
+                alert('يرجى اختيار قالب من القائمة أولاً لحذفه.');
+                return;
+            }
+            
+            if(confirm('هل أنت متأكد من حذف هذا القالب؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                const templates = getTemplates();
+                templates.splice(index, 1);
+                saveTemplates(templates);
+                alert('تم حذف القالب.');
+                select.value = "";
+            }
+        }
+
+        // --- ميزة استخراج الأصول (فتح كعناصر) ---
+        function openTemplateAsAssets() {
+            const select = document.getElementById('template-select');
+            const index = select.value;
+            
+            if (index === "") {
+                alert('يرجى اختيار قالب من القائمة أولاً لفتحه كعناصر.');
+                return;
+            }
+
+            const templates = getTemplates();
+            const template = templates[index];
+            if (!template) return;
+
+            // تحليل محتوى القالب لاستخراج الصور والنصوص
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(template.html, 'text/html');
+            
+            const images = [];
+            doc.querySelectorAll('.image-layer img').forEach(img => {
+                images.push(img.src);
+            });
+
+            const texts = [];
+            doc.querySelectorAll('.text-layer .user-text').forEach(txt => {
+                if(txt.innerText.trim()) texts.push(txt.innerText);
+            });
+
+            if (images.length === 0 && texts.length === 0) {
+                alert('هذا القالب لا يحتوي على صور أو نصوص قابلة للاستخراج.');
+                return;
+            }
+
+            // تعبئة النافذة العائمة
+            const contentDiv = document.getElementById('asset-content');
+            contentDiv.innerHTML = '';
+
+            // إضافة الصور
+            images.forEach(src => {
+                const item = document.createElement('div');
+                item.className = 'asset-item';
+                item.innerHTML = `<img src="${src}" alt="asset">`;
+                item.onclick = () => addAssetImage(src);
+                contentDiv.appendChild(item);
+            });
+
+            // إضافة النصوص
+            texts.forEach(txt => {
+                const item = document.createElement('div');
+                item.className = 'asset-item';
+                item.innerHTML = `<div class="asset-item-text">${txt.substring(0, 20)}${txt.length>20?'...':''}</div>`;
+                item.onclick = () => { addTextToCanvas(txt, false); saveState(); };
+                contentDiv.appendChild(item);
+            });
+
+            // إظهار النافذة
+            document.getElementById('asset-window').style.display = 'flex';
+        }
+
+        // دالة مساعدة لإضافة صورة من رابط مباشر (للأصول)
+        function addAssetImage(src) {
+            const wrapper = createWrapper('image-layer');
+            const contentWrapper = wrapper.querySelector('.content-wrapper');
+            wrapper.style.width = '60%';
+            wrapper.style.height = '60%';
+            contentWrapper.style.width = '100%';
+            contentWrapper.style.height = '100%';
+            contentWrapper.style.overflow = 'hidden';
+            contentWrapper.style.borderRadius = '8px';
+            contentWrapper.style.display = 'flex';
+            
+            const img = document.createElement('img');
+            img.crossOrigin = "anonymous";
+            img.src = src;
+            img.loading = "eager";
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'fill';
+            img.style.pointerEvents = 'none';
+            
+            // حفظ الأصل
+            wrapper.setAttribute('data-original-image', src);
+            
+            contentWrapper.appendChild(img);
+            document.getElementById('card').appendChild(wrapper);
+            selectEl(wrapper);
+            setupInteract(wrapper, 'box');
+            saveState();
+        }
+
+        // دالة لتحريك نافذة الأصول
+        function initAssetWindowDrag() {
+            const el = document.getElementById('asset-window');
+            const header = document.getElementById('asset-header');
+            
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = el.offsetLeft;
+                initialTop = el.offsetTop;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                el.style.left = `${initialLeft + dx}px`;
+                el.style.top = `${initialTop + dy}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            // Touch support for dragging window
+            header.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                initialLeft = el.offsetLeft;
+                initialTop = el.offsetTop;
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const dx = e.touches[0].clientX - startX;
+                const dy = e.touches[0].clientY - startY;
+                el.style.left = `${initialLeft + dx}px`;
+                el.style.top = `${initialTop + dy}px`;
+            });
+
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        // --- وظائف الحفظ الجديدة المباشرة ---
+
+        async function saveWorkDirectly() {
+             const overlay = document.getElementById('export-overlay');
+             const loadingText = overlay.querySelector('.text-white');
+             if(loadingText) loadingText.innerText = "جاري حفظ العمل...";
+             overlay.style.display = 'flex';
+
+             try {
+                deselect();
+                const card = document.getElementById('card');
+                await new Promise(r => setTimeout(r, 200));
+
+                // الحفظ بالحجم الفعلي بدقة 300 DPI
+                const pixelRatio = 4; // للحفاظ على جودة عالية
+                const actualWidth = parseInt(card.getAttribute('data-card-width')) || card.offsetWidth;
+                const actualHeight = parseInt(card.getAttribute('data-card-height')) || card.offsetHeight;
+                
+                const dataUrl = await htmlToImage.toPng(card, {
+                    pixelRatio: pixelRatio, 
+                    cacheBust: true,
+                    width: actualWidth,
+                    height: actualHeight,
+                    style: { 
+                        transform: 'none', 
+                        boxShadow: 'none', 
+                        margin: '0',
+                        border: 'none'
+                    }
+                });
+
+                const link = document.createElement('a');
+                link.download = `design-${Date.now()}.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+             } catch (err) {
+                 console.error(err);
+                 alert("حدث خطأ أثناء الحفظ");
+             } finally {
+                 overlay.style.display = 'none';
+             }
+        }
+
+        async function generateA4Sheet() {
+            const loadingText = document.querySelector('#export-overlay .text-white');
+            if(loadingText) loadingText.innerText = "جاري تحضير صفحة A4...";
+            const overlay = document.getElementById('export-overlay');
+            overlay.style.display = 'flex';
+
+            deselect();
+            const card = document.getElementById('card');
+            
+            // انتظار ذكي لتحميل جميع الصور بدقة
+            await waitForImagesLoad(card);
+            
+            // تأخير صغير للتأكد النهائي من الرسم
+            await new Promise(r => setTimeout(r, 500));
+
+            try {
+                let cardDataUrl;
+                
+                // تحديد نوع الجهاز
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                
+                if (isIOS) {
+                    // على iOS، استخدم html2canvas للتوافقية الأفضل مع الصور
+                    if (typeof html2canvas !== 'undefined') {
+                        const canvas = await html2canvas(card, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: '#ffffff'
+                        });
+                        cardDataUrl = canvas.toDataURL('image/png');
+                    } else {
+                        // fallback إذا لم تكن html2canvas متاحة
+                        cardDataUrl = await htmlToImage.toPng(card, {
+                            pixelRatio: 2, 
+                            cacheBust: true,
+                            allowTaint: true,
+                            useCORS: true,
+                            backgroundColor: '#ffffff'
+                        });
+                    }
+                } else {
+                    // على أجهزة أخرى، استخدم htmlToImage
+                    cardDataUrl = await htmlToImage.toPng(card, {
+                        pixelRatio: 2, 
+                        cacheBust: true,
+                        allowTaint: true,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        style: { 
+                            transform: 'none', 
+                            boxShadow: 'none', 
+                            border: 'none', 
+                            margin: '0',
+                            padding: '0'
+                        }
+                    });
+                }
+                
+                currentCardData = cardDataUrl;
+
+            // إعداد أبعاد A4 (300 DPI)
+            const A4_WIDTH = 2480;
+            const A4_HEIGHT = 3508;
+            
+            const cardW = card.offsetWidth; 
+            const cardH = card.offsetHeight;
+            const GAP = 40; // مسافة القص (حوالي 3-4 ملم)
+
+            // حساب التوزيع الأمثل مع الفراغ
+            const portraitCols = Math.floor((A4_WIDTH + GAP) / (cardW + GAP));
+            const portraitRows = Math.floor((A4_HEIGHT + GAP) / (cardH + GAP));
+            const portraitCount = portraitCols * portraitRows;
+
+            const landscapeCols = Math.floor((A4_HEIGHT + GAP) / (cardW + GAP));
+            const landscapeRows = Math.floor((A4_WIDTH + GAP) / (cardH + GAP));
+            const landscapeCount = landscapeCols * landscapeRows;
+
+            let finalCanvasW, finalCanvasH, cols, rows, orientation;
+
+            if (landscapeCount > portraitCount) {
+                // A4 بالعرض
+                finalCanvasW = A4_HEIGHT; 
+                finalCanvasH = A4_WIDTH;  
+                cols = landscapeCols;
+                rows = landscapeRows;
+                orientation = 'landscape';
+            } else {
+                // A4 بالطول
+                finalCanvasW = A4_WIDTH;
+                finalCanvasH = A4_HEIGHT;
+                cols = portraitCols;
+                rows = portraitRows;
+                orientation = 'portrait';
+            }
+            
+            // تخزين إعدادات التخطيط
+            currentA4Layout = {
+                canvasW: finalCanvasW,
+                canvasH: finalCanvasH,
+                cols: cols,
+                rows: rows,
+                cardW: cardW,
+                cardH: cardH,
+                gap: GAP,
+                maxCopies: cols * rows
+            };
+
+            // تحميل الصورة إلى كائن Image مرة واحدة
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => {
+                    cachedCardImage = img; // حفظ كائن الصورة
+                    
+                    // تحديث واجهة المودال
+                    const countInput = document.getElementById('a4-count');
+                    const maxText = document.getElementById('a4-max-text');
+                    
+                    countInput.max = currentA4Layout.maxCopies;
+                    countInput.value = currentA4Layout.maxCopies; // الافتراضي: الكل
+                    maxText.innerText = `(من أصل ${currentA4Layout.maxCopies})`;
+                    
+                    // رسم المعاينة الأولية
+                    renderA4Preview(currentA4Layout.maxCopies);
+                    
+                    const modal = document.getElementById('save-modal');
+                    overlay.style.display = 'none';
+                    modal.style.display = 'flex';
+                    resolve();
+                };
+                img.onerror = () => {
+                    console.error("خطأ في تحميل الصورة");
+                    overlay.style.display = 'none';
+                };
+                img.src = cardDataUrl;
+            });
+            } catch (err) {
+                console.error("خطأ في تحضير A4:", err);
+                overlay.style.display = 'none';
+                alert("حدث خطأ. جرب إعادة تحميل الصفحة وإضافة الصور مرة أخرى");
+            }
+        }
+        
+        // دالة للانتظار لتحميل جميع الصور
+        function waitForImagesLoad(element) {
+            const images = element.querySelectorAll('img');
+            
+            if (images.length === 0) {
+                return Promise.resolve();
+            }
+            
+            const promises = Array.from(images).map(img => {
+                return new Promise(resolve => {
+                    if (!img.src) {
+                        resolve();
+                        return;
+                    }
+                    
+                    if (img.complete && img.naturalWidth > 0) {
+                        resolve();
+                        return;
+                    }
+                    
+                    const onLoad = () => {
+                        img.removeEventListener('load', onLoad);
+                        img.removeEventListener('error', onLoad);
+                        resolve();
+                    };
+                    
+                    img.addEventListener('load', onLoad, { once: true });
+                    img.addEventListener('error', onLoad, { once: true });
+                    
+                    setTimeout(resolve, 2000);
+                });
+            });
+            
+            return Promise.all(promises);
+        }
+
+        // دالة جديدة لتحديث المعاينة عند تغيير الرقم
+        function updateA4Count() {
+            const input = document.getElementById('a4-count');
+            let count = parseInt(input.value);
+            
+            // التحقق من الحدود
+            if (isNaN(count) || count < 1) count = 1;
+            if (count > currentA4Layout.maxCopies) count = currentA4Layout.maxCopies;
+            
+            renderA4Preview(count);
+        }
+        
+        // دالة الرسم المنفصلة
+        function renderA4Preview(count) {
+            if (!cachedCardImage || !currentA4Layout) return;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = currentA4Layout.canvasW;
+            canvas.height = currentA4Layout.canvasH;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const totalW = currentA4Layout.cols * currentA4Layout.cardW + (currentA4Layout.cols - 1) * currentA4Layout.gap;
+            const totalH = currentA4Layout.rows * currentA4Layout.cardH + (currentA4Layout.rows - 1) * currentA4Layout.gap;
+            const startX = (canvas.width - totalW) / 2;
+            const startY = (canvas.height - totalH) / 2;
+            
+            let drawnCount = 0;
+            
+            // رسم النسخ حسب العدد المطلوب
+            outerLoop:
+            for (let j = 0; j < currentA4Layout.rows; j++) {
+                for (let i = 0; i < currentA4Layout.cols; i++) {
+                    if (drawnCount >= count) break outerLoop;
+                    
+                    const x = startX + (i * (currentA4Layout.cardW + currentA4Layout.gap));
+                    const y = startY + (j * (currentA4Layout.cardH + currentA4Layout.gap));
+                    
+                    ctx.drawImage(cachedCardImage, x, y, currentA4Layout.cardW, currentA4Layout.cardH);
+                    
+                    // إطار القص الرمادي
+                    ctx.strokeStyle = '#94a3b8'; 
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, currentA4Layout.cardW, currentA4Layout.cardH);
+                    
+                    drawnCount++;
+                }
+            }
+            
+            const saveImg = document.getElementById('save-img');
+            saveImg.src = canvas.toDataURL('image/png');
+        }
+        
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const imgData = document.getElementById('save-img').src;
+            // A4 size in mm: 210 x 297
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const width = pdf.internal.pageSize.getWidth();
+            const height = pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+            pdf.save(`dalal-studio-${Date.now()}.pdf`);
+        }
+
+        async function sendToTelegramPDF(btnElement) {
+            if (TG_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || TG_CHAT_ID === "YOUR_CHAT_ID_HERE") {
+                alert("الرجاء وضع التوكن والشات آيدي في الكود أولاً (في بداية السكربت)!");
+                return;
+            }
+
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            btnElement.disabled = true;
+            btnElement.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const imgData = document.getElementById('save-img').src;
+                // A4 size in mm: 210 x 297
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const width = pdf.internal.pageSize.getWidth();
+                const height = pdf.internal.pageSize.getHeight();
+                pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+                
+                // تحويل الـ PDF إلى Blob
+                const pdfBlob = pdf.output('blob');
+                
+                // تجهيز البيانات للإرسال
+                const formData = new FormData();
+                formData.append("chat_id", TG_CHAT_ID);
+                formData.append("document", pdfBlob, `dalal-studio-${Date.now()}.pdf`);
+                formData.append("caption", "تم إرسال التصميم من أستوديو دلال 🎨✨");
+
+                // الإرسال إلى تليجرام
+                const response = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.ok) {
+                    alert("✅ تم الإرسال بنجاح إلى تليجرام!");
+                } else {
+                    console.error(result);
+                    alert("❌ فشل الإرسال: " + (result.description || "خطأ غير معروف"));
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("❌ حدث خطأ أثناء الاتصال بتليجرام");
+            } finally {
+                btnElement.innerHTML = originalText;
+                btnElement.disabled = false;
+                btnElement.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        // --- باقي الوظائف الأساسية ---
+
+        function saveState() {
+            const card = document.getElementById('card');
+            undoStack.push(card.innerHTML);
+            if (undoStack.length > 20) undoStack.shift();
+            redoStack = [];
+        }
+
+        function undoAction() {
+            if(undoStack.length === 0) return;
+            const card = document.getElementById('card');
+            redoStack.push(card.innerHTML);
+            card.innerHTML = undoStack.pop();
+            rebindEvents();
+            deselect();
+        }
+
+        function redoAction() {
+            if(redoStack.length === 0) return;
+            const card = document.getElementById('card');
+            undoStack.push(card.innerHTML);
+            card.innerHTML = redoStack.pop();
+            rebindEvents();
+            deselect();
+        }
+
+        function rebindEvents() {
+            document.querySelectorAll('.draggable-el').forEach(el => {
+                // إزالة الخصائص القديمة لفرض إعادة ربط الأحداث
+                el.removeAttribute('data-events-bound');
+                setupInteract(el, el.classList.contains('text-layer') ? 'text' : 'box');
+            });
+        }
+
+        function createWrapper(type) {
+            const div = document.createElement('div');
+            div.className = `draggable-el ${type} selected`;
+            
+            const controls = `
+                <div class="control-btn delete-btn" onclick="removeEl(this.parentNode)" ontouchend="removeEl(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-times"></i></div>
+                <div class="move-handle" title="اسحب للتحريك"><i class="fas fa-arrows-alt"></i></div>
+                <div class="handle resize-nw"></div>
+                <div class="handle resize-ne"></div>
+                <div class="handle resize-sw"></div>
+                <div class="handle resize-se"></div>
+                <div class="handle resize-n"></div>
+                <div class="handle resize-e"></div>
+                <div class="handle resize-s"></div>
+            `;
+            div.innerHTML = controls;
+            
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'content-wrapper';
+            contentWrapper.style.width = '100%';
+            contentWrapper.style.height = '100%';
+            div.appendChild(contentWrapper);
+            
+            div.insertBefore(contentWrapper, div.lastChild);
+            
+            return div;
+        }
+
+        function addUserText() {
+            const input = document.getElementById('user-text-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            addTextToCanvas(text, false);
+            saveState();
+            input.value = '';
+        }
+
+        function addTextToCanvas(content, isQuran) {
+            const wrapper = createWrapper('text-layer');
+            wrapper.style.color = '#1e293b';
+            wrapper.style.fontSize = '24px';
+            wrapper.style.fontFamily = "'Cairo', sans-serif";
+            wrapper.style.fontWeight = '600';
+            wrapper.style.letterSpacing = '0.3px';
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'user-text';
+            textDiv.contentEditable = true;
+            textDiv.innerText = content;
+            textDiv.onblur = function() { if(this.innerText.trim() === '') this.innerText = 'نص...'; saveState(); };
+
+            wrapper.appendChild(textDiv);
+            document.getElementById('card').appendChild(wrapper);
+            
+            selectEl(wrapper);
+            setupInteract(wrapper, 'text');
+        }
+
+        function addFrame() {
+            const wrapper = createWrapper('frame-layer');
+            wrapper.style.borderColor = '#1e293b';
+            wrapper.style.borderWidth = '2px';
+            // تحديد الحجم بهوامش آمنة (20% من كل جانب)
+            wrapper.style.width = '60%';
+            wrapper.style.height = '60%';
+            document.getElementById('card').appendChild(wrapper);
+            selectEl(wrapper);
+            setupInteract(wrapper, 'box');
+            saveState();
+        }
+
+        function addShape() {
+            const wrapper = createWrapper('frame-layer');
+            wrapper.style.backgroundColor = '#1e293b';
+            wrapper.style.borderWidth = '0px';
+            // تحديد الحجم بهوامش آمنة (20% من كل جانب)
+            wrapper.style.width = '60%';
+            wrapper.style.height = '60%';
+            document.getElementById('card').appendChild(wrapper);
+            selectEl(wrapper);
+            setupInteract(wrapper, 'box');
+            saveState();
+        }
+
+        function addImageLayer(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'draggable-el image-layer bg-image is-locked';
+                    const img = document.createElement('img');
+                    img.crossOrigin = "anonymous"; // إضافة CrossOrigin
+                    img.src = e.target.result; 
+                    img.loading = "eager";
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.pointerEvents = 'none';
+                    wrapper.appendChild(img);
+                    const card = document.getElementById('card');
+                    const gradient = document.getElementById('card-gradient');
+                    if(gradient.nextSibling) card.insertBefore(wrapper, gradient.nextSibling);
+                    else card.appendChild(wrapper);
+                    setupInteract(wrapper, 'box');
+                    saveState();
+                };
+                reader.readAsDataURL(input.files[0]);
+                input.value = ''; 
+            }
+        }
+
+        function addRegularImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const wrapper = createWrapper('image-layer');
+                    const contentWrapper = wrapper.querySelector('.content-wrapper');
+                    wrapper.style.width = '60%';
+                    wrapper.style.height = '60%';
+                    contentWrapper.style.width = '100%';
+                    contentWrapper.style.height = '100%';
+                    contentWrapper.style.overflow = 'hidden';
+                    contentWrapper.style.borderRadius = '8px';
+                    contentWrapper.style.display = 'flex';
+                    
+                    const img = document.createElement('img');
+                    img.crossOrigin = "anonymous"; // إضافة CrossOrigin
+                    img.src = e.target.result;
+                    img.loading = "eager";
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'fill';
+                    img.style.pointerEvents = 'none';
+                    img.style.imageRendering = 'high-quality';
+                    
+                    wrapper.setAttribute('data-original-image', e.target.result);
+                    
+                    contentWrapper.appendChild(img);
+                    document.getElementById('card').appendChild(wrapper);
+                    selectEl(wrapper);
+                    setupInteract(wrapper, 'box');
+                    saveState();
+                };
+                reader.readAsDataURL(input.files[0]);
+                input.value = '';
+            }
+        }
+
+        function toggleEraserMode() {
+            eraserMode = !eraserMode;
+            magicMode = false;
+            const btn = document.getElementById('btn-eraser');
+            const controls = document.getElementById('eraser-controls');
+            const magicBtn = document.getElementById('btn-magic');
+            const magicControls = document.getElementById('magic-tolerance-control');
+            if(magicBtn) {
+                magicBtn.classList.remove('bg-[#6366f1]', 'text-white');
+                magicBtn.classList.add('bg-white', 'text-[#1e293b]');
+                magicControls.classList.add('hidden');
+                magicControls.classList.remove('flex');
+            }
+            if(eraserMode) {
+                deselect();
+                btn.classList.add('bg-[#6366f1]', 'text-white');
+                controls.classList.add('active');
+                document.getElementById('card').style.cursor = 'crosshair';
+                initEraserCanvas();
+                // Disable interaction with other layers while erasing
+                document.querySelectorAll('.draggable-el').forEach(el => el.style.pointerEvents = 'none');
+            } else {
+                exitEraserMode();
+            }
+        }
+        
+        function toggleMagicMode() {
+            magicMode = !magicMode;
+            const btn = document.getElementById('btn-magic');
+            const magicControls = document.getElementById('magic-tolerance-control');
+            if(magicMode) {
+                btn.classList.add('bg-[#6366f1]', 'text-white');
+                btn.classList.remove('bg-white', 'text-[#1e293b]');
+                document.getElementById('card').style.cursor = 'alias';
+                magicControls.classList.remove('hidden');
+                magicControls.classList.add('flex');
+            } else {
+                btn.classList.remove('bg-[#6366f1]', 'text-white');
+                btn.classList.add('bg-white', 'text-[#1e293b]');
+                document.getElementById('card').style.cursor = 'crosshair';
+                magicControls.classList.add('hidden');
+                magicControls.classList.remove('flex');
+            }
+        }
+
+        function exitEraserMode() {
+            eraserMode = false;
+            magicMode = false;
+            const btn = document.getElementById('btn-eraser');
+            const controls = document.getElementById('eraser-controls');
+            btn.classList.remove('bg-[#6366f1]', 'text-white');
+            controls.classList.remove('active');
+            document.getElementById('card').style.cursor = 'default';
+            if(eraserCanvas) {
+                eraserCanvas.remove();
+                eraserCanvas = null;
+            }
+            // Re-enable interaction with other layers
+            document.querySelectorAll('.draggable-el').forEach(el => el.style.pointerEvents = '');
+        }
+
+        function initEraserCanvas() {
+            const card = document.getElementById('card');
+            if(eraserCanvas) eraserCanvas.remove();
+            eraserCanvas = document.createElement('canvas');
+            eraserCanvas.width = card.offsetWidth;
+            eraserCanvas.height = card.offsetHeight;
+            eraserCanvas.style.position = 'absolute';
+            eraserCanvas.style.top = '0';
+            eraserCanvas.style.left = '0';
+            eraserCanvas.style.cursor = 'crosshair';
+            eraserCanvas.style.zIndex = '200';
+            const ctx = eraserCanvas.getContext('2d', { willReadFrequently: true });
+            let isDrawing = false;
+            
+            eraserCanvas.addEventListener('mousedown', startErasing);
+            eraserCanvas.addEventListener('touchstart', startErasing, { passive: false });
+            
+            function startErasing(e) {
+                e.preventDefault();
+                const rect = eraserCanvas.getBoundingClientRect();
+                const cardRect = card.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - cardRect.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - cardRect.top;
+                
+                if(magicMode) {
+                    saveState();
+                    magicErase(x, y, ctx);
+                    return;
+                }
+                isDrawing = true;
+                saveState();
+                erase(x, y, ctx);
+            }
+            
+            // دالة الممحاة السحرية الجديدة (Flood Fill)
+            function magicErase(x, y, ctx) {
+                const protectBg = document.getElementById('eraser-protect-bg').checked;
+                const images = Array.from(card.querySelectorAll('.image-layer')).reverse();
+                
+                for (let imgLayer of images) {
+                    if(protectBg && imgLayer.classList.contains('bg-image')) continue;
+                    
+                    const rect = imgLayer.getBoundingClientRect();
+                    const cardRect = card.getBoundingClientRect();
+                    const layerLeft = rect.left - cardRect.left;
+                    const layerTop = rect.top - cardRect.top;
+                    
+                    const relX = Math.floor(x - layerLeft);
+                    const relY = Math.floor(y - layerTop);
+                    const width = rect.width;
+                    const height = rect.height;
+                    
+                    // Check if click is inside this layer
+                    if(relX >= 0 && relX < width && relY >= 0 && relY < height) {
+                        const img = imgLayer.querySelector('img');
+                        if(!img) continue;
+                        
+                        // Create or use existing canvas
+                        if(!imgLayer.magicCanvas) {
+                            imgLayer.magicCanvas = document.createElement('canvas');
+                            imgLayer.magicCanvas.width = img.naturalWidth || width;
+                            imgLayer.magicCanvas.height = img.naturalHeight || height;
+                            const magicCtx = imgLayer.magicCanvas.getContext('2d');
+                            magicCtx.drawImage(img, 0, 0, imgLayer.magicCanvas.width, imgLayer.magicCanvas.height);
+                        }
+                        
+                        performFloodFill(imgLayer, relX, relY, width, height);
+                        break;
+                    }
+                }
+                
+                function performFloodFill(imgLayer, clickX, clickY, displayWidth, displayHeight) {
+                    const img = imgLayer.querySelector('img');
+                    const canvas = imgLayer.magicCanvas;
+                    const imgCtx = canvas.getContext('2d', { willReadFrequently: true });
+                    const imageData = imgCtx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    // Scale click position to image coordinates
+                    const scaleX = canvas.width / displayWidth;
+                    const scaleY = canvas.height / displayHeight;
+                    const imgX = Math.floor(clickX * scaleX);
+                    const imgY = Math.floor(clickY * scaleY);
+                    
+                    // Check bounds
+                    if(imgX < 0 || imgX >= canvas.width || imgY < 0 || imgY >= canvas.height) return;
+                    
+                    const startIdx = (imgY * canvas.width + imgX) * 4;
+                    const sr = data[startIdx];
+                    const sg = data[startIdx + 1];
+                    const sb = data[startIdx + 2];
+                    const sa = data[startIdx + 3];
+                    
+                    if(sa === 0) return; // Clicked on transparent
+                    
+                    const tolerance = magicTolerance;
+                    
+                    function colorsMatch(r, g, b, a) {
+                        if(a === 0) return false;
+                        const dr = r - sr;
+                        const dg = g - sg;
+                        const db = b - sb;
+                        return (Math.abs(dr) + Math.abs(dg) + Math.abs(db)) < (tolerance * 3 * 2.55);
+                    }
+                    
+                    // Flood fill using queue
+                    const queue = [startIdx];
+                    const visited = new Set();
+                    visited.add(startIdx);
+                    
+                    while(queue.length > 0) {
+                        const idx = queue.shift();
+                        data[idx + 3] = 0; // Make transparent
+                        
+                        const pixelIndex = idx / 4;
+                        const px = pixelIndex % canvas.width;
+                        const py = Math.floor(pixelIndex / canvas.width);
+                        
+                        // Check 4 neighbors
+                        const neighbors = [
+                            {x: px - 1, y: py},
+                            {x: px + 1, y: py},
+                            {x: px, y: py - 1},
+                            {x: px, y: py + 1}
+                        ];
+                        
+                        for(let neighbor of neighbors) {
+                            if(neighbor.x >= 0 && neighbor.x < canvas.width && neighbor.y >= 0 && neighbor.y < canvas.height) {
+                                const nIdx = (neighbor.y * canvas.width + neighbor.x) * 4;
+                                if(!visited.has(nIdx)) {
+                                    visited.add(nIdx);
+                                    const nr = data[nIdx];
+                                    const ng = data[nIdx + 1];
+                                    const nb = data[nIdx + 2];
+                                    const na = data[nIdx + 3];
+                                    
+                                    if(colorsMatch(nr, ng, nb, na)) {
+                                        queue.push(nIdx);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    imgCtx.putImageData(imageData, 0, 0);
+                    img.src = canvas.toDataURL();
+                }
+            }
+            
+            function erase(x, y, ctx) {
+                const protectBg = document.getElementById('eraser-protect-bg').checked;
+                const images = card.querySelectorAll('.image-layer');
+                images.forEach(imgLayer => {
+                    if(protectBg && imgLayer.classList.contains('bg-image')) {
+                        return;
+                    }
+                    const rect = imgLayer.getBoundingClientRect();
+                    const cardRect = card.getBoundingClientRect();
+                    const relX = rect.left - cardRect.left;
+                    const relY = rect.top - cardRect.top;
+                    const width = rect.width;
+                    const height = rect.height;
+                    if(x >= relX && x <= relX + width && y >= relY && y <= relY + height) {
+                        const img = imgLayer.querySelector('img');
+                        if(img && img.complete) {
+                            // استخدم الدقة الأصلية للصورة، لا البكسل المعروض
+                            const naturalWidth = img.naturalWidth || width;
+                            const naturalHeight = img.naturalHeight || height;
+                            
+                            if(!imgLayer.canvas) {
+                                imgLayer.canvas = document.createElement('canvas');
+                                imgLayer.canvas.width = naturalWidth;
+                                imgLayer.canvas.height = naturalHeight;
+                                const imgCtx = imgLayer.canvas.getContext('2d');
+                                imgCtx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
+                            }
+                            
+                            // حساب الإحداثيات بناءً على الدقة الأصلية
+                            const scaleX = naturalWidth / width;
+                            const scaleY = naturalHeight / height;
+                            const scaledX = (x - relX) * scaleX;
+                            const scaledY = (y - relY) * scaleY;
+                            const scaledSize = (eraserSize / 2) * Math.max(scaleX, scaleY);
+                            
+                            const imgCtx = imgLayer.canvas.getContext('2d');
+                            imgCtx.globalCompositeOperation = 'destination-out';
+                            imgCtx.shadowBlur = eraserSoftness * Math.max(scaleX, scaleY);
+                            imgCtx.shadowColor = "black";
+                            imgCtx.fillStyle = "black";
+                            imgCtx.beginPath();
+                            imgCtx.arc(scaledX, scaledY, scaledSize, 0, Math.PI * 2);
+                            imgCtx.fill();
+                            img.src = imgLayer.canvas.toDataURL();
+                        }
+                    }
+                });
+            }
+            
+            eraserCanvas.addEventListener('mousemove', (e) => {
+                if(!isDrawing) return;
+                const rect = eraserCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                erase(x, y, ctx);
+            });
+            
+            eraserCanvas.addEventListener('touchmove', (e) => {
+                if(!isDrawing) return;
+                e.preventDefault();
+                const rect = eraserCanvas.getBoundingClientRect();
+                const x = e.touches[0].clientX - rect.left;
+                const y = e.touches[0].clientY - rect.top;
+                erase(x, y, ctx);
+            });
+            
+            eraserCanvas.addEventListener('mouseup', () => { isDrawing = false; });
+            eraserCanvas.addEventListener('touchend', () => { isDrawing = false; });
+            
+            card.appendChild(eraserCanvas);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const eraserSizeInput = document.getElementById('eraser-size');
+            const eraserSoftnessInput = document.getElementById('eraser-softness');
+            const magicToleranceInput = document.getElementById('magic-tolerance');
+            
+            if(eraserSizeInput) {
+                eraserSizeInput.addEventListener('input', (e) => {
+                    eraserSize = parseInt(e.target.value);
+                    document.getElementById('eraser-size-display').textContent = eraserSize;
+                });
+            }
+            if(eraserSoftnessInput) {
+                eraserSoftnessInput.addEventListener('input', (e) => {
+                    eraserSoftness = parseInt(e.target.value);
+                    document.getElementById('eraser-softness-display').textContent = eraserSoftness;
+                });
+            }
+            if(magicToleranceInput) {
+                magicToleranceInput.addEventListener('input', (e) => {
+                    magicTolerance = parseInt(e.target.value);
+                    document.getElementById('magic-tolerance-display').textContent = magicTolerance;
+                });
+            }
+        });
+
+        function setupInteract(el, type) {
+            if(el.hasAttribute('data-events-bound')) return;
+            el.setAttribute('data-events-bound', 'true');
+            
+            let tapCount = 0;
+            let tapTimeout;
+            let lastClickTime = 0;
+            
+            function handleDoubleTap() {
+                const now = Date.now();
+                if (now - lastClickTime < 300) {
+                    tapCount++;
+                } else {
+                    tapCount = 1;
+                }
+                lastClickTime = now;
+                
+                if (tapCount === 2) {
+                    toggleLock(el);
+                    tapCount = 0;
+                    lastClickTime = 0;
+                    return;
+                }
+                
+                clearTimeout(tapTimeout);
+                tapTimeout = setTimeout(() => {
+                    tapCount = 0;
+                    lastClickTime = 0;
+                }, 300);
+            }
+            
+            el.addEventListener('click', function(e) {
+                handleDoubleTap();
+            });
+            
+            el.addEventListener('touchend', function(e) {
+                if (e.target.closest('.control-btn')) return;
+                handleDoubleTap();
+            });
+            
+            el.addEventListener('dblclick', function(e) {
+                toggleLock(el);
+                e.stopPropagation();
+            });
+
+            el.addEventListener('mousedown', startDrag);
+            el.addEventListener('touchstart', startDrag, {passive: false});
+
+            function startDrag(e) {
+                // Fix for iOS delete button tap - Check this FIRST
+                if(e.target.closest('.control-btn')) return;
+
+                if(el.classList.contains('is-locked')) return;
+                
+                // Content editable check - simple return allows focus
+                if(e.target.isContentEditable || e.target.closest('.user-text')) {
+                     if (!e.target.classList.contains('move-handle') && !e.target.closest('.move-handle')) {
+                          selectEl(el);
+                          if (e.type === 'touchstart') {
+                              e.target.focus(); 
+                          }
+                          return;
+                      }
+                }
+                
+                const isTouch = e.type === 'touchstart';
+                const startX = isTouch ? e.touches[0].clientX : e.clientX;
+                const startY = isTouch ? e.touches[0].clientY : e.clientY;
+                
+                if(e.target.classList.contains('handle')) {
+                    handleResize(e, el, e.target, startX, startY);
+                    return;
+                }
+                
+                if(el.classList.contains('frame-layer') && e.target === el) {
+                    selectEl(el);
+                    return;
+                }
+
+                e.preventDefault(); 
+                e.stopPropagation();
+                
+                selectEl(el);
+
+                const startLeft = el.offsetLeft;
+                const startTop = el.offsetTop;
+
+                function onMove(ev) {
+                    ev.preventDefault();
+                    const cx = isTouch ? ev.touches[0].clientX : ev.clientX;
+                    const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
+
+                    const dx = cx - startX;
+                    const dy = cy - startY;
+
+                    let newLeft = startLeft + dx;
+                    let newTop = startTop + dy;
+
+                    el.style.left = `${newLeft}px`;
+                    el.style.top = `${newTop}px`;
+                    el.style.transform = 'translate(-50%, -50%)';
+                }
+
+                function onUp() {
+                    document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+                    document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+                    saveState();
+                }
+
+                document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove, {passive: false});
+                document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+            }
+        }
+
+        function handleResize(e, el, handle, startX, startY) {
+            const isTouch = e.type === 'touchstart';
+            const startW = el.offsetWidth;
+            const startH = el.offsetHeight;
+            const startLeft = el.offsetLeft;
+            const startTop = el.offsetTop;
+            const startFontSize = parseInt(window.getComputedStyle(el).fontSize);
+
+            function onResize(ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                
+                const cx = isTouch ? ev.touches[0].clientX : ev.clientX;
+                const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
+                
+                const dx = cx - startX;
+                const dy = cy - startY;
+
+                let newW = startW;
+                let newH = startH;
+                let newLeft = startLeft;
+                let newTop = startTop;
+
+                if (handle.classList.contains('resize-n') || handle.classList.contains('resize-ne') || handle.classList.contains('resize-nw')) {
+                    let potentialH = startH - dy;
+                    newH = Math.max(50, potentialH);
+                    newTop = startTop - (newH - startH) / 2;
+                } else if (handle.classList.contains('resize-s') || handle.classList.contains('resize-se') || handle.classList.contains('resize-sw')) {
+                    let potentialH = startH + dy;
+                    newH = Math.max(50, potentialH);
+                    newTop = startTop + (newH - startH) / 2;
+                }
+
+                if (handle.classList.contains('resize-e') || handle.classList.contains('resize-ne') || handle.classList.contains('resize-se')) {
+                    let potentialW = startW + dx;
+                    newW = Math.max(50, potentialW);
+                    newLeft = startLeft + (newW - startW) / 2;
+                } else if (handle.classList.contains('resize-nw') || handle.classList.contains('resize-sw')) { 
+                    let potentialW = startW - dx;
+                    newW = Math.max(50, potentialW);
+                    newLeft = startLeft - (newW - startW) / 2;
+                }
+
+                el.style.width = newW + 'px';
+                el.style.left = newLeft + 'px';
+                el.style.top = newTop + 'px';
+
+                if(el.classList.contains('text-layer') && (handle.classList.contains('resize-e') || handle.classList.contains('resize-w') || handle.classList.contains('resize-nw') || handle.classList.contains('resize-ne') || handle.classList.contains('resize-sw') || handle.classList.contains('resize-se'))) {
+                     if(!(handle.classList.contains('resize-n') || handle.classList.contains('resize-s'))) {
+                        el.style.height = 'auto'; 
+                     } else {
+                        el.style.height = newH + 'px';
+                     }
+                } else {
+                    el.style.height = newH + 'px';
+                }
+            }
+
+            function onUp() {
+                document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onResize);
+                document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+                saveState();
+            }
+
+            document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onResize, {passive: false});
+            document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+        }
+
+        function selectEl(el) {
+            if(activeEl) activeEl.classList.remove('selected');
+            
+            activeEl = el;
+            activeEl.classList.add('selected');
+
+            const panel = document.getElementById('style-panel');
+            panel.classList.remove('opacity-50', 'pointer-events-none');
+            
+            document.getElementById('quick-props').classList.remove('hidden');
+            document.getElementById('quick-props').classList.add('active');
+            document.getElementById('no-selection-msg').classList.add('hidden');
+
+            document.getElementById('text-controls').classList.add('hidden');
+            document.getElementById('frame-controls').classList.add('hidden');
+            document.getElementById('frame-controls-toolbar').classList.add('hidden');
+            
+            document.getElementById('top-font-controls').classList.add('hidden');
+
+            if(el.classList.contains('text-layer')) {
+                document.getElementById('text-controls').classList.remove('hidden');
+                document.getElementById('top-font-controls').classList.remove('hidden');
+                document.getElementById('top-font-controls').classList.add('flex');
+                
+                document.getElementById('panel-title').innerText = "تحرير النص";
+                
+                const fSize = parseInt(el.style.fontSize);
+                document.getElementById('font-size').value = fSize;
+                document.getElementById('font-size-input').value = fSize;
+                document.getElementById('top-font-size').value = fSize;
+                document.getElementById('top-font-size-input').value = fSize;
+                
+                const fontFamily = el.style.fontFamily.replace(/"/g, "'");
+                document.getElementById('font-family').value = fontFamily;
+                document.getElementById('top-font-family').value = fontFamily;
+                document.getElementById('quick-color').value = rgbToHex(el.style.color);
+                
+                document.getElementById('color-label').innerText = "لون النص:";
+                updateBoldButtonState();
+            } else if(el.classList.contains('frame-layer')) {
+                document.getElementById('frame-controls').classList.remove('hidden');
+                document.getElementById('frame-controls-toolbar').classList.remove('hidden');
+                document.getElementById('frame-controls-toolbar').classList.add('flex');
+                document.getElementById('panel-title').innerText = "تنسيق الإطار";
+                const borderColor = el.style.borderColor || el.style.backgroundColor || '#334155';
+                document.getElementById('quick-color').value = rgbToHex(borderColor);
+                document.getElementById('color-label').innerText = "اللون:";
+            }
+        }
+
+        // دالة تبديل البولد
+        function toggleBold() {
+            if (!activeEl) return;
+            const currentWeight = activeEl.style.fontWeight;
+            const btn = document.getElementById('btn-bold');
+            
+            if (currentWeight === 'bold' || currentWeight === '700') {
+                activeEl.style.fontWeight = 'normal';
+                btn.classList.remove('bg-[#6366f1]', 'text-white');
+                btn.classList.add('bg-white', 'text-[#1e293b]');
+            } else {
+                activeEl.style.fontWeight = 'bold';
+                btn.classList.add('bg-[#6366f1]', 'text-white');
+                btn.classList.remove('bg-white', 'text-[#1e293b]');
+            }
+            saveState();
+        }
+
+        // تحديث حالة زر البولد عند التحديد
+        function updateBoldButtonState() {
+            const btn = document.getElementById('btn-bold');
+            if (!activeEl || !btn) return;
+            const currentWeight = activeEl.style.fontWeight;
+            if (currentWeight === 'bold' || currentWeight === '700') {
+                btn.classList.add('bg-[#6366f1]', 'text-white');
+                btn.classList.remove('bg-white', 'text-[#1e293b]');
+            } else {
+                btn.classList.remove('bg-[#6366f1]', 'text-white');
+                btn.classList.add('bg-white', 'text-[#1e293b]');
+            }
+        }
+
+        function deselect(e) {
+            if(e && (e.target.closest('.draggable-el') || e.target.closest('#style-panel') || e.target.closest('select') || e.target.closest('input') || e.target.closest('.controls-row'))) return;
+
+            if(activeEl) activeEl.classList.remove('selected');
+            activeEl = null;
+            
+            document.getElementById('quick-props').classList.add('hidden');
+            document.getElementById('quick-props').classList.remove('active');
+            document.getElementById('text-controls').classList.add('hidden');
+            document.getElementById('frame-controls').classList.add('hidden');
+            document.getElementById('frame-controls-toolbar').classList.add('hidden');
+            
+            document.getElementById('top-font-controls').classList.add('hidden');
+            document.getElementById('top-font-controls').classList.remove('flex');
+            
+            document.getElementById('no-selection-msg').classList.remove('hidden');
+            document.getElementById('panel-title').innerText = "الخصائص";
+        }
+
+        function toggleLock(el) {
+            el.classList.toggle('is-locked');
+            if(el.classList.contains('is-locked')) {
+                el.classList.remove('selected');
+                if(activeEl === el) deselect();
+            }
+        }
+
+        function updateStyle(prop, val) {
+            if(!activeEl) return;
+            activeEl.style[prop] = val;
+            
+            if(prop === 'fontSize') {
+                const numVal = parseInt(val);
+                document.getElementById('font-size').value = numVal;
+                document.getElementById('font-size-input').value = numVal;
+                document.getElementById('top-font-size').value = numVal;
+                document.getElementById('top-font-size-input').value = numVal;
+            }
+            
+            if(prop === 'color' || prop === 'borderColor') {
+                document.getElementById('quick-color').value = val;
+                const surahLabel = activeEl.querySelector('.surah-label');
+                if(surahLabel) surahLabel.style.color = val;
+            }
+            saveState();
+        }
+
+        function removeEl(el) {
+            el.remove();
+            deselect();
+            saveState();
+        }
+        
+        function deleteActive() {
+            if(activeEl) removeEl(activeEl);
+        }
+
+        function toggleGradient() {
+            hasGradient = !hasGradient;
+            const grad = document.getElementById('card-gradient');
+            const controls = document.getElementById('grad-controls');
+            const btn = document.getElementById('btn-grad');
+            
+            if(hasGradient) {
+                grad.style.display = 'block';
+                controls.classList.add('active');
+                btn.classList.add('bg-[#6366f1]', 'text-white');
+            } else {
+                grad.style.display = 'none';
+                controls.classList.remove('active');
+                btn.classList.remove('bg-[#6366f1]', 'text-white');
+            }
+        }
+        
+        function setGradientColor(color) {
+            const grad = document.getElementById('card-gradient');
+            const end = color === 'white' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.95)';
+            const start = color === 'white' ? 'rgba(255,255,255,0)' : 'rgba(0,0,0,0)';
+            grad.style.background = `linear-gradient(to top, ${end}, ${start})`;
+            
+            const blackBtn = document.getElementById('grad-black-btn');
+            const whiteBtn = document.getElementById('grad-white-btn');
+            if(color === 'white') {
+                whiteBtn.classList.add('ring-2', 'ring-[#6366f1]');
+                blackBtn.classList.remove('ring-2', 'ring-[#6366f1]');
+            } else {
+                blackBtn.classList.add('ring-2', 'ring-[#6366f1]');
+                whiteBtn.classList.remove('ring-2', 'ring-[#6366f1]');
+            }
+        }
+        
+        function setGradientOpacity(val) {
+            document.getElementById('card-gradient').style.opacity = val;
+        }
+
+        function setGradientHeight(val) {
+            document.getElementById('card-gradient').style.height = val + '%';
+        }
+
+        function toggleBg() {
+            isTransparent = !isTransparent;
+            document.getElementById('card').style.backgroundColor = isTransparent ? 'transparent' : 'white';
+            document.getElementById('btn-bg').innerText = isTransparent ? 'خلفية بيضاء' : 'خلفية شفافة';
+        }
+
+        function setCardSize(w, h) {
+            const card = document.getElementById('card');
+            // تعيين المقاس بدقة - بدون أي انضغاط أو توسع
+            card.style.width = w + 'px';
+            card.style.height = h + 'px';
+            card.style.minWidth = w + 'px';
+            card.style.maxWidth = w + 'px';
+            card.style.minHeight = h + 'px';
+            card.style.maxHeight = h + 'px';
+            
+            // حفظ المقاس في data attribute للطباعة
+            card.setAttribute('data-card-width', w);
+            card.setAttribute('data-card-height', h);
+            
+            // حساب zoom تلقائي للعرض في منطقة المعاينة
+            const previewArea = document.querySelector('.preview-area');
+            const maxWidth = previewArea.offsetWidth - 100; // مساحة إضافية للمساطر
+            const maxHeight = previewArea.offsetHeight - 100; // مساحة إضافية للمساطر
+            
+            const zoomByWidth = (maxWidth / w) * 100;
+            const zoomByHeight = (maxHeight / h) * 100;
+            const autoZoom = Math.min(zoomByWidth, zoomByHeight, 200); // حد أقصى 200%
+            
+            // تطبيق الـ zoom الأمثل
+            const optimalZoom = Math.max(25, Math.min(autoZoom, 200));
+            setCustomZoom(optimalZoom);
+            
+            // تحديث عرض المقاس على الشاشة
+            const displayEl = document.getElementById('size-display');
+            if (displayEl) {
+                const cmW = (w / DPI_RATIO).toFixed(2);
+                const cmH = (h / DPI_RATIO).toFixed(2);
+                displayEl.textContent = `${w} × ${h} px (${cmW} × ${cmH} سم)`;
+            }
+
+            // رسم المسطرة
+            drawRulers(w, h);
+        }
+        
+        // دالة رسم المسطرة
+        function drawRulers(w, h) {
+            const rulerH = document.getElementById('ruler-h');
+            const rulerV = document.getElementById('ruler-v');
+            
+            if(!rulerH || !rulerV) return;
+
+            rulerH.innerHTML = '';
+            rulerV.innerHTML = '';
+
+            const cmW = Math.ceil(w / DPI_RATIO);
+            const cmH = Math.ceil(h / DPI_RATIO);
+
+            // Horizontal Ruler
+            for (let i = 0; i <= cmW; i++) {
+                const leftPos = i * DPI_RATIO;
+                if(leftPos > w) break;
+
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.left = leftPos + 'px';
+                tick.style.bottom = '0';
+                tick.style.width = '1px';
+                tick.style.height = '100%';
+                
+                const num = document.createElement('span');
+                num.className = 'tick-num';
+                num.innerText = i;
+                num.style.left = (leftPos + 4) + 'px'; // offset slightly
+                num.style.bottom = '4px';
+
+                rulerH.appendChild(tick);
+                rulerH.appendChild(num);
+            }
+
+            // Vertical Ruler
+            for (let i = 0; i <= cmH; i++) {
+                const topPos = i * DPI_RATIO;
+                if(topPos > h) break;
+
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.top = topPos + 'px';
+                tick.style.left = '0';
+                tick.style.height = '1px';
+                tick.style.width = '100%';
+                
+                const num = document.createElement('span');
+                num.className = 'tick-num';
+                num.innerText = i;
+                num.style.top = (topPos + 4) + 'px';
+                num.style.left = '4px';
+
+                rulerV.appendChild(tick);
+                rulerV.appendChild(num);
+            }
+        }
+
+        function setCustomZoom(zoomValue) {
+            currentZoom = Math.max(25, Math.min(zoomValue, 200)); // بين 25% و 200%
+            const zoomDecimal = currentZoom / 100;
+            
+            document.documentElement.style.setProperty('--card-zoom', zoomDecimal);
+            
+            // تحديث عرض النسبة
+            const displayEl = document.getElementById('zoom-display');
+            if (displayEl) {
+                displayEl.textContent = `${Math.round(currentZoom)}%`;
+            }
+            
+            // تحديث قيمة الـ slider
+            const slider = document.getElementById('zoom-slider');
+            if (slider) {
+                slider.value = currentZoom;
+            }
+            
+            saveState();
+        }
+
+        function applyCustomSizeSimple() {
+            const wInput = document.getElementById('custom-width');
+            const hInput = document.getElementById('custom-height');
+            
+            let widthCm = parseFloat(wInput.value);
+            let heightCm = parseFloat(hInput.value);
+            
+            if (!widthCm || !heightCm) {
+                alert('الرجاء إدخال القيم');
+                return;
+            }
+            
+            // تحويل السنتيمتر إلى بكسل بدقة (1 سم = 118.11 بكسل @ 300 DPI)
+            const widthPx = Math.round(widthCm * DPI_RATIO);
+            const heightPx = Math.round(heightCm * DPI_RATIO);
+            
+            // تحديث الحقول للتأكد من المقاس الفعلي
+            wInput.value = (widthPx / DPI_RATIO).toFixed(2);
+            hInput.value = (heightPx / DPI_RATIO).toFixed(2);
+            
+            setCardSize(widthPx, heightPx);
+            saveState();
+        }
+        
+        function rgbToHex(rgb) {
+            if(!rgb || rgb === 'transparent') return '#000000';
+            if(rgb.startsWith('#')) return rgb;
+            try {
+                return '#' + rgb.match(/\d+/g).map(x => (+x).toString(16).padStart(2, '0')).join('');
+            } catch(e) { return '#000000'; }
+        }
+
+        function downloadImage() {
+            const img = document.getElementById('save-img');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = `dalal-studio-${new Date().getTime()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function printDesignDirect() {
+            // حفظ التصميم وطباعته نظيف بدون خلفية
+            const card = document.getElementById('card');
+            const originalBg = card.style.backgroundColor;
+            
+            // تعيين خلفية شفافة مؤقتاً
+            card.style.backgroundColor = 'transparent';
+            
+            html2canvas(card, {
+                scale: 2,
+                allowTaint: true,
+                useCORS: true,
+                backgroundColor: null,
+                logging: false
+            }).then(canvas => {
+                // استرجاع اللون الأصلي
+                card.style.backgroundColor = originalBg;
+                
+                const printWindow = window.open('', '', 'width=800,height=600');
+                const img = canvas.toDataURL('image/png');
+                
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>طباعة</title>
+                        <style>
+                            * { margin: 0; padding: 0; }
+                            @page { margin: 0; padding: 0; }
+                            body { margin: 0; padding: 0; }
+                            img { display: block; }
+                        </style>
+                    </head>
+                    <body onload="print()">
+                        <img src="${img}" style="width: 100%; height: auto;">
+                    </body>
+                    </html>
+                `);
+                
+                printWindow.document.close();
+            });
+        }
+
+        // ===== دوال التحديد والحذف =====
+        
+        // ===== دوال الاستيراد والتحميل =====
+        function exportTemplates() {
+            const templates = getTemplates();
+            if (templates.length === 0) {
+                alert('⚠️ لا توجد قوالب لتحميلها!');
+                return;
+            }
+            
+            // إنشاء ملف JSON
+            const dataStr = JSON.stringify(templates, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            // إنشاء رابط التحميل
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `dalal_templates_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('✅ تم تحميل القوالب بنجاح!');
+        }
+        
+        function importTemplates() {
+            // إنشاء input لاختيار الملف
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.style.display = 'none';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const importedTemplates = JSON.parse(event.target.result);
+                        
+                        // التحقق من صيغة الملف
+                        if (!Array.isArray(importedTemplates)) {
+                            alert('❌ صيغة الملف غير صحيحة!');
+                            return;
+                        }
+                        
+                        // سؤال المستخدم
+                        const currentTemplates = getTemplates();
+                        let message = `سيتم استيراد ${importedTemplates.length} قالب.\n\n`;
+                        
+                        if (currentTemplates.length > 0) {
+                            message += 'هل تريد:\n✅ دمج القوالب مع الموجود\n❌ استبدال جميع القوالب';
+                            
+                            if (confirm(message)) {
+                                // دمج
+                                const merged = [...currentTemplates, ...importedTemplates];
+                                if (merged.length > MAX_TEMPLATES) {
+                                    alert(`⚠️ سيتم حفظ أول ${MAX_TEMPLATES} قالب فقط (الحد الأقصى)`);
+                                    saveTemplates(merged.slice(0, MAX_TEMPLATES));
+                                } else {
+                                    saveTemplates(merged);
+                                }
+                            } else {
+                                // استبدال
+                                if (importedTemplates.length > MAX_TEMPLATES) {
+                                    alert(`⚠️ سيتم حفظ أول ${MAX_TEMPLATES} قالب فقط (الحد الأقصى)`);
+                                    saveTemplates(importedTemplates.slice(0, MAX_TEMPLATES));
+                                } else {
+                                    saveTemplates(importedTemplates);
+                                }
+                            }
+                        } else {
+                            // لا توجد قوالب موجودة، استورد مباشرة
+                            if (importedTemplates.length > MAX_TEMPLATES) {
+                                alert(`⚠️ سيتم حفظ أول ${MAX_TEMPLATES} قالب فقط (الحد الأقصى)`);
+                                saveTemplates(importedTemplates.slice(0, MAX_TEMPLATES));
+                            } else {
+                                saveTemplates(importedTemplates);
+                            }
+                        }
+                        
+                        alert('✅ تم استيراد القوالب بنجاح!');
+                    } catch(error) {
+                        alert('❌ خطأ في قراءة الملف!\n' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            document.body.appendChild(input);
+            input.click();
+            document.body.removeChild(input);
+        }
+    </script>
+</body>
+</html>

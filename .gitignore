@@ -1,34 +1,14 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-.venv
-venv/
-
-# Environment
+node_modules/
+.DS_Store
+*.log
+.vscode/
+.idea/
+dist/
+build/
+*.swp
+*.swo
+*~
 .env
 .env.local
-
-# Node
-node_modules/
-
-# Logs
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Large data files (not needed for website)
-*.csv
-*.zip
-quran-svg-pages/
-mushaf_pages/
-__pycache__/
-*.json.bak
-
-# Temporary
-temp/
-tmp/
+package-lock.json
+yarn.lock

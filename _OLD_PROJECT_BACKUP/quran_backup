@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أستوديو القرآن | Quran Studio Pro</title>
+    
+    <!-- مكتبات التنسيق والخطوط -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    
+    <!-- مكتبة الأيقونات -->
+    <link id="fa-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    
+    <!-- تحميل الخطوط العربية -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;700&family=El+Messiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Lalezar&family=Mada:wght@400;700&family=Reem+Kufi:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+
+    <style>
+        /* إعدادات أساسية */
+        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #334155; user-select: none; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+        
+        /* شاشات التحميل والتصدير */
+        #startup-overlay, #export-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; }
+        #export-overlay { background: rgba(0,0,0,0.95); z-index: 100000; display: none; }
+        
+        .spinner { width: 50px; height: 50px; border: 5px solid #334155; border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* منطقة العمل */
+        .preview-area {
+            background-color: #e2e8f0;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 20px; min-height: 400px; display: flex; justify-content: center; align-items: center;
+            overflow: hidden; border: 2px solid white; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); padding: 20px; position: relative;
+        }
+
+        /* البطاقة الرئيسية */
+        #card {
+            background-color: white; 
+            position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            overflow: hidden; 
+            margin: auto; direction: rtl; 
+            width: 378px; height: 672px; 
+            transition: width 0.3s, height 0.3s;
+            transform-origin: center;
+        }
+        
+        /* التدرج اللوني */
+        #card-gradient {
+            position: absolute; 
+            bottom: 0; left: 0; right: 0; 
+            height: 50%; /* نصف الصورة */
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            z-index: 10; 
+            pointer-events: none; 
+            display: none;
+        }
+
+        /* العناصر القابلة للسحب */
+        .draggable-el { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            cursor: grab; touch-action: none; 
+            border: 1px solid transparent;
+        }
+        .draggable-el:active { cursor: grabbing; }
+        
+        /* حالة القفل */
+        .draggable-el.is-locked { cursor: default; pointer-events: none; }
+        .draggable-el.is-locked { pointer-events: auto; }
+
+        /* طبقات الصور والنصوص والإطارات */
+        .image-layer { z-index: 5; width: 100%; height: 100%; top: 0 !important; left: 0 !important; transform: none !important; } 
+        /* تم استرجاع تنسيق الصورة الطبيعي */
+        .image-layer img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        
+        .frame-layer { z-index: 20; width: 80%; height: 80%; background: transparent; border-style: solid; pointer-events: none; }
+        .text-layer { z-index: 30; width: auto; min-width: 100px; text-align: center; padding: 5px; position: relative; }
+        
+        /* أدوات التحكم (المقابض) */
+        .draggable-el.selected { border: 1px dashed #10b981; z-index: 100; }
+        .draggable-el.selected.is-locked { border-color: #ef4444; border-style: dotted; }
+
+        /* مقابض التحجيم */
+        .handle { position: absolute; background: white; border: 1px solid #10b981; width: 12px; height: 12px; border-radius: 50%; z-index: 101; display: none; }
+        .draggable-el.selected .handle { display: block; }
+        
+        .resize-nw { top: -6px; left: -6px; cursor: nw-resize; }
+        .resize-ne { top: -6px; right: -6px; cursor: ne-resize; }
+        .resize-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+        .resize-se { bottom: -6px; right: -6px; cursor: se-resize; }
+        
+        /* زر الحذف ومقبض التحريك */
+        .control-btn { position: absolute; width: 28px; height: 28px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 102; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .delete-btn { top: -35px; left: -10px; background: #ef4444; }
+        
+        /* مقبض التحريك المميز */
+        .move-handle { 
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%); 
+            width: 40px; height: 28px; background: #10b981; border-radius: 8px; 
+            cursor: move; display: none; align-items: center; justify-content: center; 
+            z-index: 102; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+        }
+        
+        .draggable-el.selected .control-btn, .draggable-el.selected .move-handle { display: flex; }
+        .draggable-el.is-locked .control-btn, .draggable-el.is-locked .handle, .draggable-el.is-locked .move-handle { display: none !important; }
+
+        /* النصوص */
+        .ayah-text { line-height: 1.8; display: block; white-space: pre-wrap; outline: none; }
+        .extra-text { outline: none; background: transparent; border: none; text-align: center; width: 100%; resize: none; overflow: visible; white-space: pre-wrap; }
+
+        /* مودال الحفظ */
+        #save-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
+        #save-img { max-width: 100%; max-height: 80vh; border: 5px solid white; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        /* تحميل الخطوط المخفي */
+        #hidden-font-loader { opacity: 0; pointer-events: none; position: absolute; top: -9999px; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen" onclick="deselect(event)">
+
+    <!-- تحميل الخطوط لضمان ظهورها في التصدير -->
+    <div id="hidden-font-loader">
+        <span style="font-family: 'Amiri', serif;">أ</span>
+        <span style="font-family: 'Cairo', sans-serif;">أ</span>
+        <span style="font-family: 'Aref Ruqaa', serif;">أ</span>
+        <span style="font-family: 'El Messiri', sans-serif;">أ</span>
+        <span style="font-family: 'Lalezar', cursive;">أ</span>
+        <span style="font-family: 'Mada', sans-serif;">أ</span>
+        <span style="font-family: 'Almarai', sans-serif;">أ</span>
+        <span style="font-family: 'Reem Kufi', sans-serif;">أ</span>
+        <span style="font-family: 'Tajawal', sans-serif;">أ</span>
+        <span style="font-family: 'IBM Plex Sans Arabic', sans-serif;">أ</span>
+    </div>
+
+    <!-- شاشات التنبيه -->
+    <div id="startup-overlay"><div class="spinner mb-4"></div><div class="text-white font-bold">جاري تجهيز الأستوديو...</div></div>
+    <div id="export-overlay"><div class="spinner mb-4"></div><div class="text-white font-bold text-xl">جاري إنشاء الصورة...</div></div>
+    
+    <div id="save-modal">
+        <div class="text-white font-bold mb-2 text-center text-lg">✨ تم إنشاء التصميم</div>
+        <p class="text-gray-400 text-sm mb-4">اضغط مطولاً على الصورة لحفظها</p>
+        <img id="save-img" alt="تصميم قرآني">
+        <button onclick="document.getElementById('save-modal').style.display='none'" class="mt-6 bg-white text-slate-900 px-8 py-2 rounded-full font-bold hover:bg-emerald-50 transition">إغلاق</button>
+    </div>
+
+    <!-- واجهة التطبيق -->
+    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
+        
+        <!-- اللوحة الجانبية (أدوات) -->
+        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white"><i class="fas fa-kaaba"></i></div>
+                <div>
+                    <h1 class="font-bold text-slate-800">أستوديو القرآن</h1>
+                    <p class="text-[10px] text-emerald-600 font-bold">الإصدار المحسن Pro</p>
+                </div>
+            </div>
+
+            <!-- اختيار الآيات -->
+            <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <label class="text-xs font-bold text-slate-500">إضافة آيات</label>
+                <select id="surah-select" onchange="loadAyahs()" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-emerald-500"><option>اختر السورة...</option></select>
+                
+                <div class="flex gap-2">
+                    <select id="ayah-select" class="flex-[3] p-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-emerald-500"><option>الآية...</option></select>
+                    <button onclick="addAyah()" class="bg-emerald-600 text-white w-10 rounded-lg hover:bg-emerald-700 flex items-center justify-center"><i class="fas fa-plus"></i></button>
+                </div>
+
+                <div class="text-center">
+                   <button onclick="toggleRangeMode()" class="text-[10px] text-emerald-600 font-bold underline cursor-pointer">وضع آيات متعددة</button>
+                </div>
+
+                <div id="range-ayah-container" class="hidden flex-col gap-2 mt-2 pt-2 border-t border-slate-200">
+                     <div class="flex gap-2">
+                        <select id="ayah-from" class="flex-1 p-2 bg-white border border-slate-200 rounded-lg text-xs"><option value="">من</option></select>
+                        <select id="ayah-to" class="flex-1 p-2 bg-white border border-slate-200 rounded-lg text-xs"><option value="">إلى</option></select>
+                        <button onclick="addMultipleAyahs()" class="bg-emerald-600 text-white w-10 rounded-lg hover:bg-emerald-700 flex items-center justify-center"><i class="fas fa-check"></i></button>
+                     </div>
+                </div>
+            </div>
+
+            <!-- أدوات الإضافة -->
+            <div class="grid grid-cols-3 gap-2">
+                <label class="col-span-3 bg-white border border-dashed border-slate-300 py-3 rounded-lg text-slate-600 hover:border-emerald-500 hover:text-emerald-600 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition">
+                    <i class="far fa-image text-lg"></i> صورة خلفية
+                    <input type="file" onchange="addImageLayer(this)" class="hidden" accept="image/*">
+                </label>
+                <button onclick="addExtraText()" class="bg-white border border-slate-200 py-2 rounded-lg text-slate-600 text-[10px] font-bold hover:bg-emerald-50 flex flex-col items-center gap-1"><i class="fas fa-font"></i> نص</button>
+                <button onclick="addFrame()" class="bg-white border border-slate-200 py-2 rounded-lg text-slate-600 text-[10px] font-bold hover:bg-emerald-50 flex flex-col items-center gap-1"><i class="far fa-square"></i> إطار</button>
+                <button onclick="addShape()" class="bg-white border border-slate-200 py-2 rounded-lg text-slate-600 text-[10px] font-bold hover:bg-emerald-50 flex flex-col items-center gap-1"><i class="fas fa-square-full"></i> شكل</button>
+            </div>
+            
+            <div class="bg-amber-50 p-2 rounded text-[10px] text-amber-700 border border-amber-100 flex items-center gap-2">
+                <i class="fas fa-info-circle"></i> <span>اضغط مرتين (Double Tap) لقفل/فتح العنصر</span>
+            </div>
+        </div>
+
+        <!-- منطقة العمل -->
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            
+            <!-- شريط الأدوات العلوي -->
+            <div class="flex flex-wrap gap-2 items-center bg-white p-2 rounded-xl border border-slate-200 shadow-sm" onclick="event.stopPropagation()">
+                <button onclick="undoAction()" class="p-2 text-slate-500 hover:text-emerald-600"><i class="fas fa-undo"></i></button>
+                <button onclick="redoAction()" class="p-2 text-slate-500 hover:text-emerald-600"><i class="fas fa-redo"></i></button>
+                <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                
+                <!-- زر التدرج -->
+                <button onclick="toggleGradient()" id="btn-grad" class="px-3 py-1.5 rounded text-xs font-bold bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 transition flex items-center gap-1">
+                    <i class="fas fa-adjust"></i> التدرج
+                </button>
+                
+                <!-- خيارات التدرج -->
+                <div id="grad-controls" class="hidden items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm animate-fade-in">
+                    <span class="text-[10px] font-bold text-slate-500">اللون:</span>
+                    <button id="grad-black-btn" onclick="setGradientColor('black')" class="px-3 py-1 rounded-md text-[10px] font-bold bg-slate-900 text-white hover:bg-slate-700 transition ring-2 ring-emerald-500">أسود</button>
+                    <button id="grad-white-btn" onclick="setGradientColor('white')" class="px-3 py-1 rounded-md text-[10px] font-bold bg-white text-slate-900 border border-slate-300 hover:bg-slate-50 transition">أبيض</button>
+                    <div class="w-px h-4 bg-slate-300 mx-1"></div>
+                    <input type="range" min="0" max="1" step="0.1" value="0.8" oninput="setGradientOpacity(this.value)" class="w-16 h-1.5 accent-emerald-600 cursor-pointer" title="الشفافية">
+                </div>
+
+                <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                <button onclick="toggleBg()" id="btn-bg" class="px-3 py-1.5 rounded text-xs font-bold bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 transition">خلفية شفافة</button>
+                
+                <div class="flex-1"></div>
+                
+                <!-- لوحة تحكم علوية للنص -->
+                <div id="top-font-controls" class="hidden items-center gap-2 bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                    <span class="text-[12px] text-slate-600 font-bold"><i class="fas fa-font"></i></span>
+                    <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px')" class="w-20 h-1.5 accent-emerald-600" title="حجم الخط">
+                    <div class="w-px h-4 bg-slate-300 mx-1"></div>
+                    <select id="top-font-family" onchange="updateStyle('fontFamily', this.value)" class="bg-white border border-slate-200 rounded text-[10px] py-0.5 px-1 font-bold outline-none focus:border-emerald-500">
+                        <option value="'Amiri', serif">أميري</option>
+                        <option value="'Aref Ruqaa', serif">رقعة</option>
+                        <option value="'Cairo', sans-serif">كايرو</option>
+                        <option value="'Tajawal', sans-serif">تجوال</option>
+                        <option value="'Reem Kufi', sans-serif">كوفي</option>
+                        <option value="'El Messiri', sans-serif">مسيري</option>
+                        <option value="'Lalezar', cursive">عريض</option>
+                        <option value="'Mada', sans-serif">مدى</option>
+                        <option value="'Almarai', sans-serif">مراعي</option>
+                        <option value="'IBM Plex Sans Arabic', sans-serif">IBM</option>
+                    </select>
+                </div>
+
+                <!-- لوحة الخصائص السريعة -->
+                <div id="quick-props" class="flex gap-2 items-center hidden">
+                     <input type="color" id="quick-color" oninput="updateStyle('color', this.value)" class="w-6 h-6 rounded cursor-pointer border-none bg-transparent">
+                     <button onclick="deleteActive()" class="text-red-500 hover:bg-red-50 p-1 rounded"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+
+            <!-- الكانفاس -->
+            <div class="preview-area" onclick="deselect(event)">
+                <div id="card" onclick="event.stopPropagation()">
+                    <div id="card-gradient"></div>
+                    <!-- العناصر ستضاف هنا -->
+                </div>
+            </div>
+
+            <!-- لوحة الخصائص السفلية -->
+            <div id="style-panel" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-200 transition-all" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-wider" id="panel-title">الخصائص</span>
+                    <button onclick="exportCard()" class="bg-slate-900 text-white px-6 py-1.5 rounded-lg text-xs font-bold hover:bg-black flex items-center gap-2 shadow-lg shadow-slate-300">
+                        <i class="fas fa-file-export text-emerald-400"></i> تصدير
+                    </button>
+                </div>
+
+                <div id="no-selection-msg" class="text-center py-4 text-slate-400 text-xs font-bold">
+                    حدد عنصراً للتعديل عليه
+                </div>
+
+                <div id="text-controls" class="hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] text-slate-400 font-bold block mb-1">نوع الخط</label>
+                            <select id="font-family" onchange="updateStyle('fontFamily', this.value)" class="w-full p-2 bg-slate-50 rounded-lg text-xs font-bold border border-slate-200 outline-none">
+                                <option value="'Amiri', serif">النسخ (أميري)</option>
+                                <option value="'Aref Ruqaa', serif">الرقعة</option>
+                                <option value="'Cairo', sans-serif">كايرو (مودرن)</option>
+                                <option value="'Tajawal', sans-serif">تجوال</option>
+                                <option value="'Reem Kufi', sans-serif">كوفي</option>
+                                <option value="'El Messiri', sans-serif">المسيري</option>
+                                <option value="'Lalezar', cursive">عريض</option>
+                                <option value="'Mada', sans-serif">مدى</option>
+                                <option value="'Almarai', sans-serif">المراعي</option>
+                                <option value="'IBM Plex Sans Arabic', sans-serif">IBM Plex</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 font-bold block mb-1">حجم الخط</label>
+                            <input type="range" id="font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px')" class="w-full h-2 bg-slate-200 rounded-lg accent-emerald-600">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="frame-controls" class="hidden space-y-4">
+                     <div class="flex gap-4">
+                        <div class="flex-1">
+                             <label class="text-[10px] text-slate-400 font-bold block mb-1">الحدود</label>
+                             <div class="flex items-center gap-2">
+                                <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-8 h-8 rounded cursor-pointer border border-slate-200">
+                                <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="flex-1 h-2 bg-slate-200 rounded-lg accent-emerald-600">
+                             </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 font-bold block mb-1">تعبئة</label>
+                            <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-8 h-8 rounded cursor-pointer border border-slate-200">
+                        </div>
+                     </div>
+                </div>
+
+                <div id="dimensions-controls" class="mt-4 pt-4 border-t border-slate-100 flex justify-center gap-3">
+                     <button onclick="setCardSize(378, 672)" class="text-[10px] bg-slate-50 px-3 py-1 rounded border hover:border-emerald-500">Story</button>
+                     <button onclick="setCardSize(400, 400)" class="text-[10px] bg-slate-50 px-3 py-1 rounded border hover:border-emerald-500">Square</button>
+                     <button onclick="setCardSize(378, 500)" class="text-[10px] bg-slate-50 px-3 py-1 rounded border hover:border-emerald-500">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // المتغيرات العامة
+        let activeEl = null;
+        let currentSurahName = "";
+        let undoStack = [];
+        let redoStack = [];
+        let isTransparent = false;
+        let hasGradient = false;
+
+        // تهيئة التطبيق
+        window.onload = async () => {
+            await document.fonts.ready;
+            setTimeout(() => {
+                document.getElementById('startup-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
+            }, 800);
+
+            try {
+                const res = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await res.json();
+                const sel = document.getElementById('surah-select');
+                data.data.forEach(s => {
+                    sel.innerHTML += `<option value="${s.number}">${s.number}. ${s.name}</option>`;
+                });
+            } catch(e) {
+                console.error("Failed to load surahs", e);
+            }
+        };
+
+        function saveState() {
+            const card = document.getElementById('card');
+            undoStack.push(card.innerHTML);
+            if (undoStack.length > 20) undoStack.shift();
+            redoStack = [];
+        }
+
+        function undoAction() {
+            if(undoStack.length === 0) return;
+            const card = document.getElementById('card');
+            redoStack.push(card.innerHTML);
+            card.innerHTML = undoStack.pop();
+            rebindEvents();
+            deselect();
+        }
+
+        function redoAction() {
+            if(redoStack.length === 0) return;
+            const card = document.getElementById('card');
+            undoStack.push(card.innerHTML);
+            card.innerHTML = redoStack.pop();
+            rebindEvents();
+            deselect();
+        }
+
+        function rebindEvents() {
+            document.querySelectorAll('.draggable-el').forEach(el => {
+                let type = el.classList.contains('text-layer') ? 'text' : 'box';
+                setupInteract(el, type);
+            });
+        }
+
+        async function loadAyahs() {
+            const num = document.getElementById('surah-select').value;
+            if(!num) return;
+            
+            const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}`);
+            const data = await res.json();
+            currentSurahName = data.data.name;
+            
+            const sel = document.getElementById('ayah-select');
+            const fromSel = document.getElementById('ayah-from');
+            const toSel = document.getElementById('ayah-to');
+            
+            sel.innerHTML = '<option value="">الآية...</option>';
+            fromSel.innerHTML = '<option value="">من</option>';
+            toSel.innerHTML = '<option value="">إلى</option>';
+            
+            data.data.ayahs.forEach(a => {
+                const opt = `<option value="${a.numberInSurah}" data-text="${a.text}">آية ${a.numberInSurah}</option>`;
+                sel.innerHTML += opt;
+                fromSel.innerHTML += `<option value="${a.numberInSurah}">${a.numberInSurah}</option>`;
+                toSel.innerHTML += `<option value="${a.numberInSurah}">${a.numberInSurah}</option>`;
+            });
+        }
+
+        function toggleRangeMode() {
+            const container = document.getElementById('range-ayah-container');
+            container.classList.toggle('hidden');
+            container.classList.toggle('flex');
+        }
+
+        function createWrapper(type) {
+            const div = document.createElement('div');
+            div.className = `draggable-el ${type} selected`;
+            
+            const controls = `
+                <div class="control-btn delete-btn" onclick="removeEl(this.parentNode)"><i class="fas fa-times"></i></div>
+                <div class="move-handle" title="اسحب للتحريك"><i class="fas fa-arrows-alt"></i></div>
+                <div class="handle resize-nw"></div>
+                <div class="handle resize-ne"></div>
+                <div class="handle resize-sw"></div>
+                <div class="handle resize-se"></div>
+            `;
+            div.innerHTML = controls;
+            return div;
+        }
+
+        function addAyah() {
+            const sel = document.getElementById('ayah-select');
+            if(!sel.value) return;
+            const text = sel.options[sel.selectedIndex].getAttribute('data-text');
+            addTextToCanvas(text.trim() + ' ﴿' + sel.value + '﴾', true);
+            saveState();
+        }
+
+        function addMultipleAyahs() {
+            const from = parseInt(document.getElementById('ayah-from').value);
+            const to = parseInt(document.getElementById('ayah-to').value);
+            const sel = document.getElementById('ayah-select');
+            
+            if(!from || !to || from > to) return alert('تأكد من اختيار نطاق صحيح');
+            
+            let fullText = "";
+            for(let i=from; i<=to; i++) {
+                for(let opt of sel.options) {
+                    if(parseInt(opt.value) === i) {
+                        fullText += opt.getAttribute('data-text').trim() + ' ﴿' + i + '﴾ ';
+                        break;
+                    }
+                }
+            }
+            addTextToCanvas(fullText, true);
+            saveState();
+        }
+
+        function addExtraText() {
+            addTextToCanvas("نص جديد", false);
+            saveState();
+        }
+
+        function addTextToCanvas(content, isQuran) {
+            const wrapper = createWrapper('text-layer');
+            wrapper.style.color = '#334155';
+            wrapper.style.fontSize = isQuran ? '28px' : '24px';
+            wrapper.style.fontFamily = isQuran ? "'Amiri', serif" : "'Cairo', sans-serif";
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = isQuran ? 'ayah-text' : 'extra-text';
+            textDiv.contentEditable = true;
+            textDiv.innerText = content;
+            textDiv.onblur = function() { if(this.innerText.trim() === '') this.innerText = 'نص...'; saveState(); };
+            
+            if(isQuran) {
+                const surahSpan = document.createElement('div');
+                surahSpan.innerText = currentSurahName;
+                surahSpan.style.fontSize = '0.6em';
+                surahSpan.style.marginTop = '8px';
+                surahSpan.style.opacity = '0.8';
+                surahSpan.className = 'surah-label';
+                textDiv.appendChild(surahSpan);
+            }
+
+            wrapper.appendChild(textDiv);
+            document.getElementById('card').appendChild(wrapper);
+            
+            selectEl(wrapper);
+            setupInteract(wrapper, 'text');
+        }
+
+        function addFrame() {
+            const wrapper = createWrapper('frame-layer');
+            wrapper.style.borderColor = '#334155';
+            wrapper.style.borderWidth = '2px';
+            document.getElementById('card').appendChild(wrapper);
+            selectEl(wrapper);
+            setupInteract(wrapper, 'box');
+            saveState();
+        }
+
+        function addShape() {
+            const wrapper = createWrapper('frame-layer');
+            wrapper.style.backgroundColor = '#334155';
+            wrapper.style.borderWidth = '0px';
+            document.getElementById('card').appendChild(wrapper);
+            selectEl(wrapper);
+            setupInteract(wrapper, 'box');
+            saveState();
+        }
+
+        function addImageLayer(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'draggable-el image-layer is-locked';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result; 
+                    // هام للآيفون: التأكد من عدم استخدام loading=lazy
+                    img.loading = "eager";
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.pointerEvents = 'none';
+                    
+                    wrapper.appendChild(img);
+                    
+                    const card = document.getElementById('card');
+                    const gradient = document.getElementById('card-gradient');
+                    if(gradient.nextSibling) card.insertBefore(wrapper, gradient.nextSibling);
+                    else card.appendChild(wrapper);
+
+                    setupInteract(wrapper, 'box');
+                    saveState();
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+                input.value = ''; 
+            }
+        }
+
+        function setupInteract(el, type) {
+            let lastTap = 0;
+            el.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 500 && tapLength > 0) {
+                    toggleLock(el);
+                    e.preventDefault();
+                }
+                lastTap = currentTime;
+            });
+            el.addEventListener('dblclick', function(e) {
+                toggleLock(el);
+            });
+
+            el.addEventListener('mousedown', startDrag);
+            el.addEventListener('touchstart', startDrag, {passive: false});
+
+            function startDrag(e) {
+                if(el.classList.contains('is-locked') || e.target.classList.contains('control-btn') || e.target.classList.contains('handle')) return;
+                
+                if(e.target.isContentEditable && !e.target.classList.contains('move-handle') && !e.target.closest('.move-handle')) {
+                    selectEl(el);
+                    return;
+                }
+
+                e.preventDefault(); 
+                e.stopPropagation();
+                
+                selectEl(el);
+
+                const isTouch = e.type === 'touchstart';
+                const startX = isTouch ? e.touches[0].clientX : e.clientX;
+                const startY = isTouch ? e.touches[0].clientY : e.clientY;
+                
+                const startLeft = el.offsetLeft;
+                const startTop = el.offsetTop;
+                
+                if(e.target.classList.contains('handle')) {
+                    handleResize(e, el, e.target, startX, startY);
+                    return;
+                }
+
+                function onMove(ev) {
+                    ev.preventDefault();
+                    const cx = isTouch ? ev.touches[0].clientX : ev.clientX;
+                    const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
+
+                    const dx = cx - startX;
+                    const dy = cy - startY;
+
+                    el.style.left = `${startLeft + dx}px`;
+                    el.style.top = `${startTop + dy}px`;
+                    el.style.transform = 'translate(-50%, -50%)';
+                }
+
+                function onUp() {
+                    document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+                    document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+                    saveState();
+                }
+
+                document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove, {passive: false});
+                document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+            }
+        }
+
+        function handleResize(e, el, handle, startX, startY) {
+            const isTouch = e.type === 'touchstart';
+            const startW = el.offsetWidth;
+            const startH = el.offsetHeight;
+            const startFontSize = parseInt(window.getComputedStyle(el).fontSize);
+
+            function onResize(ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                
+                const cx = isTouch ? ev.touches[0].clientX : ev.clientX;
+                const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
+                
+                const dx = cx - startX;
+                const dy = cy - startY;
+
+                if(el.classList.contains('text-layer')) {
+                    const scale = (dx + dy) / 2; 
+                    const newSize = Math.max(10, startFontSize + (scale / 2));
+                    el.style.fontSize = newSize + 'px';
+                    document.getElementById('font-size').value = newSize;
+                    document.getElementById('top-font-size').value = newSize;
+                } else {
+                    if(handle.classList.contains('resize-se')) {
+                        el.style.width = Math.max(50, startW + dx*2) + 'px';
+                        el.style.height = Math.max(50, startH + dy*2) + 'px';
+                    }
+                }
+            }
+
+            function onUp() {
+                document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onResize);
+                document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+                saveState();
+            }
+
+            document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onResize, {passive: false});
+            document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+        }
+
+        function selectEl(el) {
+            if(activeEl) activeEl.classList.remove('selected');
+            
+            activeEl = el;
+            activeEl.classList.add('selected');
+
+            const panel = document.getElementById('style-panel');
+            panel.classList.remove('opacity-50', 'pointer-events-none');
+            
+            document.getElementById('quick-props').classList.remove('hidden');
+            document.getElementById('no-selection-msg').classList.add('hidden');
+
+            document.getElementById('text-controls').classList.add('hidden');
+            document.getElementById('frame-controls').classList.add('hidden');
+            
+            document.getElementById('top-font-controls').classList.add('hidden');
+
+            if(el.classList.contains('text-layer')) {
+                document.getElementById('text-controls').classList.remove('hidden');
+                document.getElementById('top-font-controls').classList.remove('hidden');
+                document.getElementById('top-font-controls').classList.add('flex');
+                
+                document.getElementById('panel-title').innerText = "تحرير النص";
+                
+                const fSize = parseInt(el.style.fontSize);
+                document.getElementById('font-size').value = fSize;
+                document.getElementById('top-font-size').value = fSize;
+                
+                const fontFamily = el.style.fontFamily.replace(/"/g, "'");
+                document.getElementById('font-family').value = fontFamily;
+                document.getElementById('top-font-family').value = fontFamily;
+                document.getElementById('quick-color').value = rgbToHex(el.style.color);
+            } else if(el.classList.contains('frame-layer')) {
+                document.getElementById('frame-controls').classList.remove('hidden');
+                document.getElementById('panel-title').innerText = "تنسيق الإطار";
+                document.getElementById('quick-color').value = rgbToHex(el.style.borderColor);
+            }
+        }
+
+        function deselect(e) {
+            if(e && (e.target.closest('.draggable-el') || e.target.closest('#style-panel') || e.target.closest('select') || e.target.closest('input') || e.target.closest('#top-font-controls'))) return;
+
+            if(activeEl) activeEl.classList.remove('selected');
+            activeEl = null;
+            
+            document.getElementById('quick-props').classList.add('hidden');
+            document.getElementById('text-controls').classList.add('hidden');
+            document.getElementById('frame-controls').classList.add('hidden');
+            
+            document.getElementById('top-font-controls').classList.add('hidden');
+            document.getElementById('top-font-controls').classList.remove('flex');
+            
+            document.getElementById('no-selection-msg').classList.remove('hidden');
+            document.getElementById('panel-title').innerText = "الخصائص";
+        }
+
+        function toggleLock(el) {
+            el.classList.toggle('is-locked');
+            if(el.classList.contains('is-locked')) {
+                el.classList.remove('selected');
+                if(activeEl === el) deselect();
+            }
+        }
+
+        function updateStyle(prop, val) {
+            if(!activeEl) return;
+            activeEl.style[prop] = val;
+            
+            if(prop === 'fontSize') {
+                const numVal = parseInt(val);
+                document.getElementById('font-size').value = numVal;
+                document.getElementById('top-font-size').value = numVal;
+            }
+            
+            if(prop === 'color' || prop === 'borderColor') {
+                document.getElementById('quick-color').value = val;
+                const surahLabel = activeEl.querySelector('.surah-label');
+                if(surahLabel) surahLabel.style.color = val;
+            }
+            saveState();
+        }
+
+        function removeEl(el) {
+            el.remove();
+            deselect();
+            saveState();
+        }
+        
+        function deleteActive() {
+            if(activeEl) removeEl(activeEl);
+        }
+
+        function toggleGradient() {
+            hasGradient = !hasGradient;
+            const grad = document.getElementById('card-gradient');
+            const controls = document.getElementById('grad-controls');
+            const btn = document.getElementById('btn-grad');
+            
+            if(hasGradient) {
+                grad.style.display = 'block';
+                controls.classList.remove('hidden');
+                controls.classList.add('flex');
+                btn.classList.add('bg-emerald-100', 'text-emerald-700');
+            } else {
+                grad.style.display = 'none';
+                controls.classList.add('hidden');
+                controls.classList.remove('flex');
+                btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+            }
+        }
+        
+        function setGradientColor(color) {
+            const grad = document.getElementById('card-gradient');
+            const end = color === 'white' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.95)';
+            const start = color === 'white' ? 'rgba(255,255,255,0)' : 'rgba(0,0,0,0)';
+            grad.style.background = `linear-gradient(to top, ${end}, ${start})`;
+            
+            const blackBtn = document.getElementById('grad-black-btn');
+            const whiteBtn = document.getElementById('grad-white-btn');
+            if(color === 'white') {
+                whiteBtn.classList.add('ring-2', 'ring-emerald-500');
+                blackBtn.classList.remove('ring-2', 'ring-emerald-500');
+            } else {
+                blackBtn.classList.add('ring-2', 'ring-emerald-500');
+                whiteBtn.classList.remove('ring-2', 'ring-emerald-500');
+            }
+        }
+        
+        function setGradientOpacity(val) {
+            document.getElementById('card-gradient').style.opacity = val;
+        }
+
+        function toggleBg() {
+            isTransparent = !isTransparent;
+            document.getElementById('card').style.backgroundColor = isTransparent ? 'transparent' : 'white';
+            document.getElementById('btn-bg').innerText = isTransparent ? 'خلفية بيضاء' : 'خلفية شفافة';
+        }
+
+        function setCardSize(w, h) {
+            const card = document.getElementById('card');
+            card.style.width = w + 'px';
+            card.style.height = h + 'px';
+        }
+
+        async function exportCard() {
+            deselect();
+            const card = document.getElementById('card');
+            const overlay = document.getElementById('export-overlay');
+            const modal = document.getElementById('save-modal');
+            const imgPreview = document.getElementById('save-img');
+            const faSheet = document.getElementById('fa-stylesheet');
+
+            overlay.style.display = 'flex';
+
+            const allElements = card.querySelectorAll('.draggable-el');
+            allElements.forEach(el => el.classList.add('exporting'));
+            
+            if(faSheet) faSheet.disabled = true;
+
+            const w = card.offsetWidth;
+            const h = card.offsetHeight;
+            
+            // إعدادات التصدير الموحدة
+            const config = {
+                width: w,
+                height: h,
+                backgroundColor: isTransparent ? 'transparent' : '#ffffff', 
+                useCORS: true,
+                allowTaint: true,
+                style: { 
+                    transform: 'none', 
+                    boxShadow: 'none',
+                    margin: '0',
+                    left: '0',
+                    top: '0',
+                    border: 'none',
+                    borderRadius: '0' 
+                },
+                filter: (node) => {
+                    if(node.classList && (node.classList.contains('control-btn') || node.classList.contains('handle') || node.classList.contains('move-handle'))) return false;
+                    return true;
+                }
+            };
+
+            // دالة للتحقق من وجود الخلفية بفعل في الصورة
+            function hasBackgroundContent(dataUrl) {
+                return new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // فحص أول 10% من الصورة (الخلفية عادة في الأعلى)
+                        const imageData = ctx.getImageData(0, 0, w, Math.ceil(h * 0.1));
+                        const data = imageData.data;
+                        
+                        // عد البكسلات التي ليست بيضاء (غير 255,255,255)
+                        let nonWhitePixels = 0;
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i];
+                            const g = data[i + 1];
+                            const b = data[i + 2];
+                            // إذا الألوان مختلفة عن الأبيض
+                            if (r < 250 || g < 250 || b < 250) {
+                                nonWhitePixels++;
+                            }
+                        }
+                        
+                        // إذا أكثر من 20% من البكسلات ليست بيضاء = في خلفية
+                        const hasContent = nonWhitePixels > (data.length / 4) * 0.2;
+                        resolve(hasContent);
+                    };
+                    img.src = dataUrl;
+                });
+            }
+
+            let lastDataUrl = null;
+            let attemptCount = 0;
+            const maxAttempts = 4;
+
+            async function tryExport() {
+                attemptCount++;
+                
+                try {
+                    // انتظار تحميل الصور
+                    const images = card.querySelectorAll('img');
+                    const decodePromises = Array.from(images).map(img => {
+                        return new Promise(resolve => {
+                            if (img.complete) {
+                                if (typeof img.decode === 'function') {
+                                    img.decode().then(resolve).catch(resolve);
+                                } else {
+                                    resolve();
+                                }
+                            } else {
+                                img.onload = () => {
+                                    if (typeof img.decode === 'function') {
+                                        img.decode().then(resolve).catch(resolve);
+                                    } else {
+                                        resolve();
+                                    }
+                                };
+                                img.onerror = resolve;
+                                setTimeout(resolve, 2000);
+                            }
+                        });
+                    });
+                    
+                    if (decodePromises.length > 0) {
+                        await Promise.all(decodePromises);
+                    }
+                    
+                    // استنى قبل الرسم
+                    await new Promise(r => setTimeout(r, 400));
+
+                    // التصوير
+                    const dataUrl = await htmlToImage.toPng(card, { 
+                        ...config, 
+                        pixelRatio: 2,
+                        cacheBust: true
+                    });
+
+                    // التحقق من وجود محتوى الخلفية
+                    const hasContent = await hasBackgroundContent(dataUrl);
+                    
+                    if (hasContent || attemptCount >= maxAttempts) {
+                        // الخلفية موجودة أو انتهينا المحاولات
+                        lastDataUrl = dataUrl;
+                        imgPreview.src = dataUrl;
+                        modal.style.display = 'flex';
+                    } else {
+                        // الخلفية مفقودة، أعد المحاولة
+                        console.warn(`Attempt ${attemptCount}: Background missing, retrying...`);
+                        await new Promise(r => setTimeout(r, 800));
+                        return tryExport();
+                    }
+
+                } catch(err) {
+                    console.warn(`Attempt ${attemptCount} failed:`, err);
+                    
+                    if (attemptCount < maxAttempts) {
+                        // جرب مرة أخرى بطريقة مختلفة
+                        await new Promise(r => setTimeout(r, 1000));
+                        return tryExport();
+                    } else {
+                        // آخر محاولة: pixelRatio أقل
+                        try {
+                            await new Promise(r => setTimeout(r, 500));
+                            const dataUrl = await htmlToImage.toPng(card, {
+                                ...config,
+                                pixelRatio: 1
+                            });
+                            imgPreview.src = dataUrl;
+                            modal.style.display = 'flex';
+                        } catch(e2) {
+                            alert('عذراً، التصدير فشل. تأكد من الصورة وحاول مرة أخرى.');
+                        }
+                    }
+                }
+            }
+
+            try {
+                await tryExport();
+            } finally {
+                if(faSheet) faSheet.disabled = false;
+                overlay.style.display = 'none';
+                allElements.forEach(el => el.classList.remove('exporting'));
+            }
+        }
+
+        function rgbToHex(rgb) {
+            if(!rgb || rgb === 'transparent') return '#000000';
+            if(rgb.startsWith('#')) return rgb;
+            try {
+                return '#' + rgb.match(/\d+/g).map(x => (+x).toString(16).padStart(2, '0')).join('');
+            } catch(e) { return '#000000'; }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2392 @@
+{
+  "SDM": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Media"
+  },
+  "AZI": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Insurance"
+  },
+  "RZLV": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:44.4% L:12.3% P:0.0%"
+  },
+  "ASNS": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:11.1 L:21.0 P:0.0"
+  },
+  "ATMV": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Financial Sector"
+  },
+  "SONN": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:3.3 L:15.6 P:0.0"
+  },
+  "VERO": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:53.0% L:9.6% P:0.0%"
+  },
+  "UCFI": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Financial Sector"
+  },
+  "CYN": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:13.6% L:70.8% P:0.0%"
+  },
+  "CGC": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Cannabis"
+  },
+  "ARBKL": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Asset Management"
+  },
+  "ATON": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Financial Sector"
+  },
+  "RILY": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Financial Sector"
+  },
+  "ONDS": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:3.3% L:82.1% P:19.7%"
+  },
+  "PLUG": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:31.9 L:5.3 P:2.4"
+  },
+  "OPEN": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Insurance"
+  },
+  "BEAT": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Credit"
+  },
+  "DVLT": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:20.9 L:7.1 P:0.0"
+  },
+  "BYND": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Pork"
+  },
+  "BITF": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:9.2 L:32.2 P:0.8"
+  },
+  "MARA": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Financial Sector"
+  },
+  "VBIX": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:22.2 L:12.8 P:0.0"
+  },
+  "RR": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:0.7% L:79.7% P:0.0%"
+  },
+  "PTNM": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:45.7% L:33.5% P:0.0%"
+  },
+  "SOUN": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:0.7% L:38.3% P:0.0%"
+  },
+  "TLRY": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Alcohol"
+  },
+  "MIST": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:65.2% L:94.1% P:100.0%"
+  },
+  "BDRX": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Gold"
+  },
+  "USARW": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Defense"
+  },
+  "SQFT": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Interest"
+  },
+  "ABTC": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:88.6% L:26.9% P:0.0%"
+  },
+  "CMND": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Alcohol"
+  },
+  "LAES": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:4.5% L:85.2% P:33.4%"
+  },
+  "VNET": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Financial"
+  },
+  "RXRX": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:5.9% L:47.1% P:0.0%"
+  },
+  "GRAB": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Financial"
+  },
+  "QUBT": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:0.3% L:61.9% P:922.9%"
+  },
+  "OGI": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Adult"
+  },
+  "LWLG": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Media"
+  },
+  "SLDP": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:2.0% L:60.4% P:81.7%"
+  },
+  "RZLT": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:0.9% L:95.9% P:0.0%"
+  },
+  "NVA": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Gold"
+  },
+  "HIVE": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:3.3 L:7.0 P:0.0"
+  },
+  "NVTS": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:2.1% L:35.0% P:0.0%"
+  },
+  "CLSK": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:25.9 L:31.7 P:0.1"
+  },
+  "NFE": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:78.2% L:1.2% P:0.0%"
+  },
+  "BTBT": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:3.7 L:15.9 P:1.5"
+  },
+  "FOLD": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:51.0% L:30.4% P:0.5%"
+  },
+  "JBLU": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:56.8% L:15.8% P:1.3%"
+  },
+  "BULL": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Investment"
+  },
+  "SNDL": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Adult"
+  },
+  "ULCC": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:75.1% L:8.4% P:0.7%"
+  },
+  "ALDX": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:20.0% L:96.8% P:100.0%"
+  },
+  "CLYM": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:0.3% L:47.7% P:0.0%"
+  },
+  "AGNC": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Interest"
+  },
+  "AUR": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:4.3% L:49.7% P:0.0%"
+  },
+  "BTDR": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:37.6% L:11.7% P:0.0%"
+  },
+  "VRA": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:35.5% L:4.4% P:0.0%"
+  },
+  "CRML": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:3.4 L:4.2 P:0.0"
+  },
+  "GUTS": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:54.4% L:68.0% P:0.0%"
+  },
+  "SANA": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:20.6% L:35.1% P:0.0%"
+  },
+  "NNDM": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Defense"
+  },
+  "SERV": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:1.4% L:70.4% P:248.7%"
+  },
+  "POET": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:6.8% L:86.0% P:331.4%"
+  },
+  "ARTV": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:7.9% L:82.6% P:100.0%"
+  },
+  "DGXX": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:0.0 L:12.1 P:0.3"
+  },
+  "IOVA": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:5.8 L:33.2 P:0.0"
+  },
+  "SIDU": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Defense"
+  },
+  "SLS": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:1.2% L:86.2% P:100.0%"
+  },
+  "RCAT": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:7.8% L:72.2% P:0.0%"
+  },
+  "QSI": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:1.8% L:86.8% P:0.0%"
+  },
+  "LUNR": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Defense"
+  },
+  "SBET": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Gambling"
+  },
+  "ABAT": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:9.3 L:3.7 P:0.0"
+  },
+  "LCID": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:31.9% L:26.5% P:10.3%"
+  },
+  "SGML": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Keyword: Interest"
+  },
+  "RNW": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:74.9% L:10.9% P:2.9%"
+  },
+  "VLY": {
+    "status": "haram_activity",
+    "date": "2025-12-16",
+    "reason": "Financial Sector"
+  },
+  "CYPH": {
+    "status": "haram_financial",
+    "date": "2025-12-16",
+    "reason": "Fail: D:1.1% L:59.1% P:58.9%"
+  },
+  "NEOG": {
+    "status": "halal",
+    "date": "2025-12-16",
+    "reason": "D:23.5 L:4.1 P:0.4"
+  },
+  "AKAN": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Cannabis"
+  },
+  "UDMY": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:1.9% L:60.0% P:1.9%"
+  },
+  "VTGN": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:2.3% L:95.4% P:244.2%"
+  },
+  "ELAB": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Investment"
+  },
+  "ISPO": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Resort"
+  },
+  "MBRX": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:1.9% L:32.9% P:100.0%"
+  },
+  "ADTX": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:46.8% L:1.4% P:24549.6%"
+  },
+  "JFBR": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:43.9% L:26.5% P:0.1%"
+  },
+  "KYTX": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:2.7% L:91.4% P:100.0%"
+  },
+  "TRAW": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:0.0% L:83.7% P:0.0%"
+  },
+  "KCHV": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Financial Sector"
+  },
+  "PLCE": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:22.7 L:1.0 P:0.0"
+  },
+  "PGEN": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:57.3% L:70.7% P:18.3%"
+  },
+  "MGNX": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Adult"
+  },
+  "VFF": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Cannabis"
+  },
+  "CGEN": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:3.0% L:88.0% P:0.0%"
+  },
+  "GOGO": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Entertainment"
+  },
+  "ACB": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Cannabis"
+  },
+  "SLNH": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:17.7% L:36.2% P:0.0%"
+  },
+  "ASPI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:50.3% L:50.4% P:37.7%"
+  },
+  "HUMA": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:32.6% L:21.3% P:78.4%"
+  },
+  "TMC": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:0.0% L:65.9% P:100.0%"
+  },
+  "OCGN": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:57.2% L:56.5% P:11.8%"
+  },
+  "LION": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Entertainment"
+  },
+  "IMTX": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Adult"
+  },
+  "CRON": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Adult"
+  },
+  "FFAI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:43.3% L:19.9% P:0.0%"
+  },
+  "PACB": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:87.5% L:37.2% P:0.0%"
+  },
+  "DEFT": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Financial Sector"
+  },
+  "IQ": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Entertainment"
+  },
+  "IRBT": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:46.3% L:5.2% P:0.0%"
+  },
+  "PCSA": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:0.0% L:83.2% P:0.0%"
+  },
+  "XTKG": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:5.7 L:3.7 P:0.0"
+  },
+  "IMG": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:3.4 L:0.0 P:0.0"
+  },
+  "CCC": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Insurance"
+  },
+  "BLDP": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:3.2% L:74.3% P:0.0%"
+  },
+  "VTRS": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:38.8% L:2.9% P:0.0%"
+  },
+  "GTM": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Financial"
+  },
+  "MIGI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:52.4% L:4.4% P:0.0%"
+  },
+  "PTON": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:46.8% L:50.9% P:1.8%"
+  },
+  "PTEN": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Interest"
+  },
+  "RANI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:173.1% L:40.9% P:0.0%"
+  },
+  "ERIC": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Media"
+  },
+  "IRWD": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:151.0% L:35.5% P:0.8%"
+  },
+  "MBLY": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:0.0 L:14.0 P:0.0"
+  },
+  "SABR": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:96.4% L:15.6% P:0.0%"
+  },
+  "OTLK": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:155.0% L:39.8% P:0.0%"
+  },
+  "WRD": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:4.2% L:77.2% P:103.5%"
+  },
+  "GERN": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:21.5% L:67.1% P:9.0%"
+  },
+  "ENVX": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:2.4% L:61.2% P:31.8%"
+  },
+  "CLOV": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Insurance"
+  },
+  "MVST": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:15.5 L:9.0 P:0.2"
+  },
+  "UPXI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:62.1% L:1.5% P:0.0%"
+  },
+  "NWL": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:47.2% L:2.0% P:0.0%"
+  },
+  "NVAX": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:21.3% L:64.7% P:0.0%"
+  },
+  "NEXT": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:67.5% L:2.1% P:0.0%"
+  },
+  "DJT": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Media"
+  },
+  "ALT": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:7.3% L:96.5% P:48520.0%"
+  },
+  "AZ": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:2.5% L:86.0% P:0.0%"
+  },
+  "GOSS": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:97.2% L:86.3% P:5.2%"
+  },
+  "SHLS": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:19.5 L:1.0 P:0.0"
+  },
+  "KOPN": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Defense"
+  },
+  "SATL": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:134.4% L:39.9% P:0.0%"
+  },
+  "WEN": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Restaurant"
+  },
+  "ALTS": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:24.0 L:10.1 P:0.0"
+  },
+  "ESPR": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:165.1% L:25.4% P:0.0%"
+  },
+  "PSEC": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Lending"
+  },
+  "VERI": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Entertainment"
+  },
+  "REKR": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Financial"
+  },
+  "ARRY": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:42.3% L:13.7% P:0.8%"
+  },
+  "AREC": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:116.1% L:1.0% P:19.8%"
+  },
+  "PETS": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Television"
+  },
+  "SNGX": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Defense"
+  },
+  "VUZI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:2.7% L:53.2% P:0.0%"
+  },
+  "CRMD": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:19.8 L:7.4 P:1.5"
+  },
+  "ABSI": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:2.5% L:62.2% P:0.0%"
+  },
+  "NTLA": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:10.6% L:55.2% P:48.7%"
+  },
+  "MAPS": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Cannabis"
+  },
+  "MITK": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Financial"
+  },
+  "FLWS": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:44.6% L:0.9% P:0.1%"
+  },
+  "BLMN": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Keyword: Wine"
+  },
+  "WULF": {
+    "status": "haram_financial",
+    "date": "2025-12-17",
+    "reason": "Fail: D:44.2% L:29.0% P:8.1%"
+  },
+  "SHFS": {
+    "status": "haram_activity",
+    "date": "2025-12-17",
+    "reason": "Financial Sector"
+  },
+  "TGL": {
+    "status": "halal",
+    "date": "2025-12-17",
+    "reason": "D:0.7 L:7.5 P:0.0"
+  },
+  "LHAI": {
+    "status": "haram_activity",
+    "date": "2025-12-18",
+    "reason": "Keyword: Brokerage"
+  },
+  "FCEL": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:3.5 L:23.0 P:3.6"
+  },
+  "SPAI": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.542"
+  },
+  "BRY": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:29.1 L:1.0 P:0.0"
+  },
+  "LOKV": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.543"
+  },
+  "PYXS": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:18.1% L:73.6% P:100.0%"
+  },
+  "SOPA": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:2.9 L:19.8 P:0.1"
+  },
+  "PCT": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.531"
+  },
+  "WKSP": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.1"
+  },
+  "KITT": {
+    "status": "haram_activity",
+    "date": "2025-12-18",
+    "reason": "Keyword: Defense"
+  },
+  "DAWN": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:0.6% L:87.9% P:11.5%"
+  },
+  "INVZ": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "Fail: D:11.2 L:13.6 P:0.54"
+  },
+  "OVID": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.43"
+  },
+  "EHTH": {
+    "status": "haram_activity",
+    "date": "2025-12-18",
+    "reason": "Financial Sector"
+  },
+  "MENS": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.44"
+  },
+  "PAVS": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.77"
+  },
+  "GANX": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.188"
+  },
+  "HTZ": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:34.5% L:4.8% P:0.0%"
+  },
+  "ABCL": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:10.1% L:38.4% P:75.5%"
+  },
+  "APPS": {
+    "status": "haram_activity",
+    "date": "2025-12-18",
+    "reason": "Keyword: Media"
+  },
+  "ARBK": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:443.4% L:20.3% P:0.0%"
+  },
+  "PRME": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.66"
+  },
+  "MREO": {
+    "status": "halal",
+    "date": "2025-12-18",
+    "reason": "D:11.2 L:13.6 P:0.88"
+  },
+  "INDI": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:42.9% L:20.0% P:3.1%"
+  },
+  "GT": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:45.4% L:4.0% P:0.0%"
+  },
+  "ARBE": {
+    "status": "haram_financial",
+    "date": "2025-12-18",
+    "reason": "Fail: D:19.5% L:92.9% P:187.4%"
+  },
+  "MVIS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:30.9% L:66.0% P:0.0%"
+  },
+  "IVVD": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.9% L:61.1% P:0.0%"
+  },
+  "EU": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Interest"
+  },
+  "CTMX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:3.5% L:90.8% P:26.7%"
+  },
+  "MNKD": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "ANNX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:11.8% L:82.4% P:100.0%"
+  },
+  "PALI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:3.0% L:75.0% P:0.0%"
+  },
+  "ATAI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.2% L:47.8% P:67.3%"
+  },
+  "ERAS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:11.5% L:68.6% P:100.0%"
+  },
+  "TNGX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:16.5% L:72.7% P:2.0%"
+  },
+  "FRMI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:25.0% L:36.4% P:0.0%"
+  },
+  "PAYO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Bank"
+  },
+  "LXEO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.9% L:28.5% P:100.0%"
+  },
+  "TSHA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:21.8% L:93.9% P:100.0%"
+  },
+  "MQ": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "SVRA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:21.2% L:88.3% P:100.0%"
+  },
+  "EVLV": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:13.9 L:18.5 P:1.0"
+  },
+  "LFST": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:22.0 L:9.5 P:0.0"
+  },
+  "PSNL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:17.2% L:62.0% P:11.1%"
+  },
+  "CMPX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:4.3% L:95.1% P:100.0%"
+  },
+  "UNIT": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Investment"
+  },
+  "ARDX": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "NB": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.1% L:83.6% P:100.0%"
+  },
+  "FSLY": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "IMRX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.6% L:94.4% P:100.0%"
+  },
+  "IMSR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:75.5% L:92.1% P:100.0%"
+  },
+  "THRY": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Credit"
+  },
+  "ALLO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "KDK": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Defense"
+  },
+  "BCRX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:153.0% L:47.7% P:1.4%"
+  },
+  "VSTM": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:50.6% L:77.9% P:7.7%"
+  },
+  "GO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Beer"
+  },
+  "AKBA": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "AVXL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.0% L:98.8% P:100.0%"
+  },
+  "ORBS": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:1.9 L:6.7 P:0.0"
+  },
+  "CRVS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.3% L:81.6% P:100.0%"
+  },
+  "RLAY": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.0% L:89.0% P:100.0%"
+  },
+  "OPK": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:19.8 L:20.8 P:2.0"
+  },
+  "INV": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "BGC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "ORIC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.8% L:66.6% P:0.0%"
+  },
+  "EM": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "XRX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:43.8% L:4.8% P:0.2%"
+  },
+  "BMBL": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:27.4 L:14.0 P:0.0"
+  },
+  "NIU": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Insurance"
+  },
+  "XRAY": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:43.9% L:6.4% P:0.0%"
+  },
+  "EVGO": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:28.1 L:19.5 P:2.0"
+  },
+  "UROY": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.1% L:17.7% P:991.5%"
+  },
+  "VIR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:9.8% L:49.7% P:3901.3%"
+  },
+  "FDMT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.3% L:72.0% P:4811.1%"
+  },
+  "GEVO": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:24.5 L:10.6 P:2.3"
+  },
+  "TTSH": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:43.1% L:7.7% P:0.0%"
+  },
+  "GALT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:950.7% L:89.6% P:100.0%"
+  },
+  "KURA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:3.0% L:84.6% P:28.3%"
+  },
+  "CNDT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:35.3% L:10.6% P:0.0%"
+  },
+  "HEPS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:8.5% L:28.4% P:5.8%"
+  },
+  "ALM": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Precious Metals"
+  },
+  "BTCS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "GPRO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Media"
+  },
+  "PRTA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:2.6% L:93.8% P:138.8%"
+  },
+  "ADV": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Media"
+  },
+  "CERT": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:19.7 L:11.2 P:0.0"
+  },
+  "TALK": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.0% L:71.0% P:1.8%"
+  },
+  "ABUS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.9% L:95.9% P:180.0%"
+  },
+  "AVAH": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "XERS": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "GDRX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:41.1% L:20.6% P:0.0%"
+  },
+  "NXXT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:137.5% L:3.3% P:0.0%"
+  },
+  "SFIX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:16.4% L:46.0% P:0.7%"
+  },
+  "PTLO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:41.2% L:1.1% P:0.1%"
+  },
+  "RUM": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.6% L:73.5% P:11.7%"
+  },
+  "WOOF": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Insurance"
+  },
+  "IEP": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Capital"
+  },
+  "REAX": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Brokerage"
+  },
+  "AQST": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:78.8% L:78.9% P:0.0%"
+  },
+  "LXRX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:28.2% L:56.3% P:0.0%"
+  },
+  "FGNX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "DVAX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:30.1% L:68.4% P:6.9%"
+  },
+  "TDUP": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:31.5 L:29.6 P:0.0"
+  },
+  "LX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "BRR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "INTR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "ADAM": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Mortgage"
+  },
+  "GDYN": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "LAB": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.1% L:36.1% P:10.9%"
+  },
+  "CFFN": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "SPRY": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.4% L:77.3% P:0.0%"
+  },
+  "CVAC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.2% L:57.5% P:0.8%"
+  },
+  "DNUT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:55.3% L:1.2% P:0.0%"
+  },
+  "VTYX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:4.7% L:91.1% P:100.0%"
+  },
+  "OABI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:6.8% L:19.2% P:20.6%"
+  },
+  "CTKB": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Interest"
+  },
+  "REPL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:19.6% L:83.1% P:0.0%"
+  },
+  "RLMD": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.0% L:93.3% P:100.0%"
+  },
+  "NMFC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "MYGN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:29.2 L:20.0 P:0.2"
+  },
+  "XWIN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:7.7 L:9.4 P:0.0"
+  },
+  "HRTX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:56.4% L:22.3% P:0.0%"
+  },
+  "AHCO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Insurance"
+  },
+  "RCKT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:6.8% L:60.5% P:0.0%"
+  },
+  "NEO": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:29.8 L:11.9 P:0.8"
+  },
+  "ACDC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:44.0% L:2.1% P:0.0%"
+  },
+  "CABA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:13.6% L:84.3% P:100.0%"
+  },
+  "CRSR": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Gaming"
+  },
+  "TBLA": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:11.0 L:7.6 P:0.0"
+  },
+  "AIOT": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Asset Management"
+  },
+  "ALEC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:11.3% L:86.8% P:0.0%"
+  },
+  "PNBK": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "HOPE": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "WB": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Interest"
+  },
+  "ASST": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Asset Management"
+  },
+  "CAN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:7.1 L:17.8 P:0.1"
+  },
+  "AIIO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:49.0% L:0.4% P:0.0%"
+  },
+  "NAKA": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:29.4 L:3.5 P:0.0"
+  },
+  "NUAI": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  },
+  "SGMO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:28.7% L:34.4% P:61.1%"
+  },
+  "TNYA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:11.0% L:53.6% P:100.0%"
+  },
+  "SAVA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.0% L:81.8% P:100.0%"
+  },
+  "HAIN": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:49.3% L:3.0% P:0.0%"
+  },
+  "ZNB": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "BTQ": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  },
+  "AGEN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:19.6 L:1.5 P:0.0"
+  },
+  "FATE": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:23.1% L:62.7% P:147.9%"
+  },
+  "CTOR": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:4.1 L:0.0 P:0.0"
+  },
+  "LIDR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.3% L:96.3% P:0.0%"
+  },
+  "MAGH": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  },
+  "DFDV": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:27.4 L:2.1 P:0.0"
+  },
+  "RPAY": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Credit"
+  },
+  "ACRS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.3% L:54.6% P:55.1%"
+  },
+  "ECX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:73.1% L:13.8% P:0.1%"
+  },
+  "SSYS": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:2.9 L:23.5 P:1.9"
+  },
+  "OMER": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:103.2% L:19.4% P:0.0%"
+  },
+  "PEPG": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:9.2% L:86.1% P:100.0%"
+  },
+  "AUTL": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "DHC": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Asset Management"
+  },
+  "PRCH": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Insurance"
+  },
+  "HNST": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:2.7 L:29.6 P:0.6"
+  },
+  "EXPI": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Brokerage"
+  },
+  "TLS": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Defense"
+  },
+  "INO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Defense"
+  },
+  "LUCD": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:45.7% L:89.0% P:8.3%"
+  },
+  "TIGR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "EDIT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:9.7% L:82.1% P:24.3%"
+  },
+  "STGW": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Media"
+  },
+  "CCCC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:23.2% L:72.3% P:20.0%"
+  },
+  "TOI": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "SPWR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:96.8% L:6.8% P:0.0%"
+  },
+  "EVO": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:27.3 L:13.4 P:0.0"
+  },
+  "ASTL": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:30.6 L:0.2 P:0.2"
+  },
+  "ALTO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Alcohol"
+  },
+  "HLIT": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Media"
+  },
+  "VOXR": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Precious Metals"
+  },
+  "HSDT": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:0.0 L:26.1 P:0.0"
+  },
+  "SLDB": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:8.0% L:86.2% P:100.0%"
+  },
+  "MOMO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "DENN": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Restaurant"
+  },
+  "PROP": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:44.7% L:1.1% P:0.3%"
+  },
+  "ABVE": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:119.1% L:0.6% P:0.0%"
+  },
+  "CGEM": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.2% L:68.7% P:100.0%"
+  },
+  "CLNE": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:33.9% L:20.8% P:2.7%"
+  },
+  "CRBU": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:13.1% L:75.5% P:0.0%"
+  },
+  "SSP": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "GSM": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:13.8 L:8.7 P:0.3"
+  },
+  "CAMP": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:7.3% L:87.1% P:53.2%"
+  },
+  "TCPC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "BZAI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.1% L:39.4% P:0.0%"
+  },
+  "SVC": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Asset Management"
+  },
+  "TMCI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:35.8% L:29.2% P:1.3%"
+  },
+  "SLMT": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  },
+  "PDYN": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Interest"
+  },
+  "MBOT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.1% L:98.0% P:0.0%"
+  },
+  "EOLS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:70.7% L:19.9% P:0.7%"
+  },
+  "GRWG": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Media"
+  },
+  "MASS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:2.3% L:58.7% P:7.9%"
+  },
+  "ZENA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:40.9% L:24.9% P:167.2%"
+  },
+  "ACVA": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:18.9 L:27.1 P:1.1"
+  },
+  "ELDN": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.6% L:71.9% P:0.0%"
+  },
+  "LRMR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:2.3% L:93.6% P:0.0%"
+  },
+  "HYPR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.0% L:51.9% P:5.4%"
+  },
+  "MCW": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:29.8 L:1.1 P:0.0"
+  },
+  "CGTX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.9% L:91.8% P:0.0%"
+  },
+  "ARCT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:7.7% L:63.9% P:18.9%"
+  },
+  "PLTK": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Casino"
+  },
+  "LUNG": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "GPRE": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Alcohol"
+  },
+  "VNDA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.0% L:48.9% P:0.0%"
+  },
+  "MXCT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:8.5% L:49.5% P:25.4%"
+  },
+  "BDTX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:10.2% L:85.9% P:100.0%"
+  },
+  "PROK": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.2% L:77.3% P:1501.4%"
+  },
+  "DOMO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:68.7% L:23.7% P:0.0%"
+  },
+  "DCGO": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:8.3 L:20.7 P:0.0"
+  },
+  "DH": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "CERS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:45.6% L:36.5% P:0.0%"
+  },
+  "ARAY": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:39.2% L:14.0% P:0.3%"
+  },
+  "NNOX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:4.5% L:25.7% P:13.3%"
+  },
+  "ABEO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:10.4% L:89.8% P:100.0%"
+  },
+  "SRTA": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:1.0 L:22.7 P:2.3"
+  },
+  "IHRT": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "HIMX": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Television"
+  },
+  "HPK": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:0.9 L:5.1 P:0.6"
+  },
+  "SKYX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:66.3% L:13.4% P:0.0%"
+  },
+  "MDXG": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.7% L:44.5% P:0.0%"
+  },
+  "HLMN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:32.7 L:1.6 P:0.0"
+  },
+  "TLSI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:93.6% L:62.2% P:1.5%"
+  },
+  "LPTH": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Defense"
+  },
+  "TSSI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:25.0% L:42.7% P:0.0%"
+  },
+  "LFMD": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:9.9% L:36.0% P:0.0%"
+  },
+  "OLPX": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:23.3 L:18.9 P:2.3"
+  },
+  "FIP": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:69.7% L:0.6% P:0.0%"
+  },
+  "ADTN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:20.2 L:7.7 P:0.1"
+  },
+  "ARKO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:72.2% L:9.3% P:0.2%"
+  },
+  "ORGO": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:8.0 L:12.6 P:0.0"
+  },
+  "EXFY": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:3.2 L:32.9 P:0.0"
+  },
+  "PROF": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.7% L:58.7% P:2.3%"
+  },
+  "STKL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:56.4% L:0.3% P:0.3%"
+  },
+  "NMRA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.3% L:96.5% P:100.0%"
+  },
+  "OSUR": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Alcohol"
+  },
+  "RXT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:115.2% L:3.5% P:0.0%"
+  },
+  "MLCO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Casino"
+  },
+  "CDXS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:55.4% L:47.7% P:7.4%"
+  },
+  "MRVI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:4.2% L:28.7% P:36.8%"
+  },
+  "CADL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:6.7% L:92.9% P:100.0%"
+  },
+  "BIOX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:36.4% L:2.3% P:0.0%"
+  },
+  "KELYA": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:7.4 L:1.3 P:0.0"
+  },
+  "LPRO": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "AMCX": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "EGHT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:60.1% L:12.9% P:0.3%"
+  },
+  "GSIT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:17.4% L:48.7% P:0.0%"
+  },
+  "BLZE": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:33.5% L:26.2% P:1.3%"
+  },
+  "ALLT": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "RGP": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "KRNY": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "STIM": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "NBP": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.7% L:80.1% P:100.0%"
+  },
+  "SGMT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.1% L:90.9% P:0.0%"
+  },
+  "SENS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:29.4% L:79.5% P:15.3%"
+  },
+  "ABL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "PURR": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  },
+  "SNBR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:125.5% L:0.2% P:0.0%"
+  },
+  "TTEC": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Financial"
+  },
+  "HITI": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Cannabis"
+  },
+  "GAMB": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Gambling"
+  },
+  "HTLD": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:15.0 L:2.6 P:0.1"
+  },
+  "AISP": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:11.9% L:71.0% P:4.5%"
+  },
+  "CURI": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "EMPD": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:10.3% L:4.2% P:42.4%"
+  },
+  "IMPP": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:0.0 L:20.9 P:3.6"
+  },
+  "ATOS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.0% L:89.4% P:100.0%"
+  },
+  "ETHZ": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "AIRO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Defense"
+  },
+  "FNKO": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Gold"
+  },
+  "CRNT": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:14.6 L:13.1 P:0.0"
+  },
+  "CNTX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.2% L:97.1% P:100.0%"
+  },
+  "TRUE": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Loan"
+  },
+  "SUIG": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "CHRS": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:7.9% L:37.1% P:0.0%"
+  },
+  "CRDF": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.6% L:95.0% P:596.7%"
+  },
+  "TARA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:2.5% L:91.7% P:0.0%"
+  },
+  "FOSL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:48.5% L:11.9% P:0.0%"
+  },
+  "PUBM": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Media"
+  },
+  "ILLR": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Entertainment"
+  },
+  "SWIM": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:37.3% L:8.4% P:0.0%"
+  },
+  "LNKB": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Bank"
+  },
+  "CCRN": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:0.4 L:18.4 P:0.3"
+  },
+  "CRCT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:2.2% L:36.7% P:1.4%"
+  },
+  "AVIR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.3% L:96.0% P:0.0%"
+  },
+  "NKTX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:17.9% L:66.1% P:100.0%"
+  },
+  "DSGN": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:0.8% L:97.3% P:100.0%"
+  },
+  "BYSI": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.4% L:42.8% P:100.0%"
+  },
+  "ZVRA": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:23.2% L:73.9% P:0.0%"
+  },
+  "QIPT": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:39.1% L:4.8% P:0.1%"
+  },
+  "QTRX": {
+    "status": "halal",
+    "date": "2025-12-19",
+    "reason": "D:9.0 L:30.4 P:3.6"
+  },
+  "STTK": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:1.8% L:42.4% P:0.0%"
+  },
+  "CMRC": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:53.6% L:45.9% P:1.4%"
+  },
+  "DNMX": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  },
+  "NVX": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Investment"
+  },
+  "ELBM": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Silver"
+  },
+  "CNCK": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "PRQR": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:13.3% L:86.0% P:0.0%"
+  },
+  "HRZN": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Financial Sector"
+  },
+  "PBYI": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Adult"
+  },
+  "ZNTL": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:11.2% L:85.8% P:0.0%"
+  },
+  "IMMX": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:5.5% L:79.4% P:100.0%"
+  },
+  "NAGE": {
+    "status": "haram_financial",
+    "date": "2025-12-19",
+    "reason": "Fail: D:3.1% L:65.4% P:1.7%"
+  },
+  "RBBN": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Defense"
+  },
+  "MERC": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Liquor"
+  },
+  "UXIN": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "Keyword: Investment"
+  },
+  "LAWR": {
+    "status": "haram_activity",
+    "date": "2025-12-19",
+    "reason": "New IPO"
+  }
+}

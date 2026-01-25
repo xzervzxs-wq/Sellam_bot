@@ -1,0 +1,539 @@
+import pandas as pd
+
+import warnings
+
+from datetime import datetime, time
+
+import requests
+
+import os
+
+import json
+
+import time as tm
+
+import pytz
+
+from dotenv import load_dotenv
+
+
+
+# =========================================================
+
+# 1. إعدادات ومفاتيح التشغيل
+
+# =========================================================
+
+load_dotenv()
+
+API_KEY = os.getenv('FMP_API_KEY')
+
+EODHD_API_KEY = os.getenv('EODHD_API_KEY')
+
+if not API_KEY and not EODHD_API_KEY:
+
+    API_KEY = "YOUR_FMP_API_KEY_HERE"  # ضع مفتاحك هنا إذا لم يكن في .env
+
+    print("⚠️ تحذير: لم يتم العثور على FMP_API_KEY أو EODHD_API_KEY في .env، استخدم المفتاح المباشر.")
+
+
+
+TELEGRAM_BOT_TOKEN = "8130586876:AAFZBPEDJ2o-WOyqDOhltG69lnw2YN0-bDg"
+
+TELEGRAM_CHAT_ID = "237657512"
+
+
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+
+FLOAT_CACHE_FILE = "float_cache.json"
+
+DAILY_WATCH_FILE = "daily_watch_list.json"
+
+
+
+# =========================================================
+
+# 2. أدوات مساعدة (إصلاح الكاش + تنسيق)
+
+# =========================================================
+
+def fmt_shares(n):
+
+    if not isinstance(n, (int, float)): return "غير متاح"
+
+    if n >= 1_000_000: return f"{n/1_000_000:.1f}M".replace(".0M", "M")
+
+    if n >= 1_000: return f"{n/1_000:.1f}K".replace(".0K", "K")
+
+    return str(int(n))
+
+
+
+def load_json_file(filename):
+
+    if os.path.exists(filename):
+
+        try:
+
+            with open(filename, 'r') as f: return json.load(f)
+
+        except: return {}
+
+    return {}
+
+
+
+def save_json_file(filename, data):
+
+    try:
+
+        with open(filename, 'w') as f: json.dump(data, f)
+
+    except: pass
+
+
+
+# تحميل الكاش
+
+float_data_store = load_json_file(FLOAT_CACHE_FILE)
+
+
+
+def get_float_shares(symbol):
+
+    """جلب الفلوت مع إصلاح الكاش القديم تلقائياً"""
+
+    global float_data_store
+
+    
+
+    # 1. محاولة القراءة من الكاش
+
+    val = float_data_store.get(symbol)
+
+    
+
+    # 🛠️ إصلاح المشكلة هنا: لو الكاش قديم (dict)، نستخرج الرقم منه
+
+    if isinstance(val, dict):
+
+        val = val.get('value', 0)
+
+    
+
+    # إذا القيمة صالحة (رقم)، نرجعها
+
+    if isinstance(val, (int, float)) and val > 0:
+
+        return val
+
+
+
+    # 2. إذا غير موجود، نجلب من API
+
+    val = None
+
+    try:
+
+        url = f"https://financialmodelingprep.com/api/v4/shares_float?symbol={symbol}&apikey={API_KEY}"
+
+        data = requests.get(url, timeout=5).json()
+
+        if data and isinstance(data, list): val = float(data[0].get('floatShares', 0))
+
+    except: pass
+
+    
+
+    if not val:
+
+        try:
+
+            url = f"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={API_KEY}"
+
+            data = requests.get(url, timeout=5).json()
+
+            if data and isinstance(data, list):
+
+                val = float(data[0].get('mktCap', 0)) / float(data[0].get('price', 1))
+
+        except: pass
+
+        
+
+    # حفظ القيمة الجديدة (كرقم صافي)
+
+    val = val if val else 0
+
+    float_data_store[symbol] = val
+
+    save_json_file(FLOAT_CACHE_FILE, float_data_store)
+
+    return val
+
+
+
+# =========================================================
+
+# 3. جلب القائمة (موسعة: Actives + Gainers)
+
+# =========================================================
+
+def get_watchlist():
+
+    print("📡 سحب قوائم السوق (Actives + Gainers)...")
+
+    url_actives = f"https://financialmodelingprep.com/api/v3/stock_market/actives?limit=100&apikey={API_KEY}"
+
+    url_gainers = f"https://financialmodelingprep.com/api/v3/stock_market/gainers?limit=100&apikey={API_KEY}"
+
+    
+
+    candidates = {}
+
+    price_filtered = 0
+
+    volume_filtered = 0
+
+    
+
+    for url in [url_actives, url_gainers]:
+
+        try:
+
+            data = requests.get(url, timeout=10).json()
+
+            print(f"من {url.split('/')[-2]}: {len(data) if isinstance(data, list) else 0} سهم")
+
+            if isinstance(data, list):
+
+                for item in data:
+
+                    sym = item.get('symbol')
+
+                    price = float(item.get('price', 0))
+
+                    vol = int(item.get('volume', 0))
+
+                    if (1.0 <= price <= 15.0):
+
+                        price_filtered += 1
+
+                        if vol >= 0:  # للتجربة, حجم >=0
+
+                            volume_filtered += 1
+
+                            candidates[sym] = vol
+
+        except: pass
+
+    
+
+    print(f"بعد فلتر السعر (1-15$): {price_filtered} سهم")
+
+    print(f"بعد فلتر الحجم (>=100k): {volume_filtered} سهم")
+
+    final_list = list(candidates.keys())
+
+    print(f"📊 التقرير: تم تجميع {len(final_list)} سهم للفحص.")
+
+    return final_list
+
+
+
+# =========================================================
+
+# 4. تحليل السلم الصاعد (مع استثناء شمعة الافتتاح)
+
+# =========================================================
+
+def get_fmp_data(symbol):
+
+    url = f"https://financialmodelingprep.com/api/v3/historical-chart/5min/{symbol}?apikey={API_KEY}"
+
+    try:
+
+        r = requests.get(url, timeout=10).json()
+
+        print(f"📊 بيانات FMP {symbol}: {len(r) if isinstance(r, list) else 'غير قائمة'} نقطة")
+
+        if not r: return pd.DataFrame()
+
+        df = pd.DataFrame(r)
+
+        try:
+
+            df['date'] = pd.to_datetime(df['date'], errors='coerce')
+
+        except Exception as e:
+
+            print(f"⚠️ خطأ في تحويل التاريخ لـ {symbol}: {e}")
+
+            return pd.DataFrame()
+
+        df = df.set_index('date').sort_index()
+
+        df.columns = df.columns.str.capitalize()
+
+        return df
+
+    except Exception as e:
+
+        print(f"⚠️ خطأ في FMP {symbol}: {e}")
+
+        return pd.DataFrame()
+
+
+
+def check_ladder_pattern(df_window):
+
+    if len(df_window) < 5: return False, 0, "بيانات ناقصة"
+
+
+
+    greens = 0
+
+    max_green_body = 0.0001
+
+    candles = [row for _, row in df_window.iterrows()]
+
+
+
+    for i, row in enumerate(candles):
+
+        open_p = float(row['Open'])
+
+        close_p = float(row['Close'])
+
+        high_p = float(row['High'])
+
+        
+
+        body = abs(close_p - open_p)
+
+        upper_wick = high_p - max(open_p, close_p)
+
+        
+
+        if close_p > open_p: 
+
+            greens += 1
+
+            max_green_body = max(max_green_body, body)
+
+            # سماحية الشمعة الأولى 3.0x
+
+            allowance = 3.0 if i == 0 else 1.5
+
+            if body > 0.01 and upper_wick > (body * allowance):
+
+                return False, 0, f"ذيل طويل (شمعة {i+1})"
+
+        else: 
+
+            if body > (max_green_body * 0.6):
+
+                return False, 0, "شمعة حمراء كبيرة"
+
+
+
+    if greens < 4: return False, 0, f"الخضر {greens} فقط"
+
+    
+
+    if df_window['Close'].iloc[-1] <= df_window['Open'].iloc[0]:
+
+        return False, 0, "لم يصعد السعر"
+
+    
+
+    strength_pct = int((greens / len(df_window)) * 100)
+
+    return True, strength_pct, "نمط سليم"
+
+
+
+def send_telegram(message):
+
+    if not TELEGRAM_BOT_TOKEN: return
+
+    try:
+
+        requests.post(
+
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+
+            data={'chat_id': TELEGRAM_CHAT_ID, 'text': message, 'parse_mode': 'Markdown'},
+
+            timeout=5
+
+        )
+
+    except: pass
+
+
+
+# =========================================================
+
+# 5. التشغيل
+
+# =========================================================
+
+def main():
+
+    print("🛡️ البوت جاهز (مع إصلاح الكاش)... بانتظار 10:00 NY")
+
+
+
+    while True:
+
+        ny_tz = pytz.timezone('America/New_York')
+
+        now_ny = datetime.now(ny_tz)
+
+
+
+        if now_ny.time() >= time(10, 0, 15) or True:
+
+            print("\n🚀 بدء الفحص...")
+
+            send_telegram("🚀 بدء فحص السلم الصاعد...")
+
+
+
+            market_list = get_watchlist()
+
+            saved_list = load_json_file(DAILY_WATCH_FILE)
+
+            
+
+            # إصلاح: التأكد من أن saved_list هو قائمة
+
+            if isinstance(saved_list, dict):
+
+                saved_list = list(saved_list.keys())
+
+            elif not isinstance(saved_list, list):
+
+                saved_list = []
+
+            
+
+            full_list = list(set(market_list + saved_list))
+
+            
+
+            matches = 0
+
+            skipped_old = 0
+
+            skipped_empty = 0
+
+            print(f"🔬 فحص {len(full_list)} سهم...")
+
+
+
+            for ticker in full_list:
+
+                try:
+
+                    df = get_fmp_data(ticker)
+
+                    if df.empty: 
+
+                        skipped_empty += 1
+
+                        continue
+
+                    
+
+                    last_ts = df.index[-1]
+
+                    if (now_ny.date() - last_ts.date()).days > 1: 
+
+                        skipped_old += 1
+
+                        continue 
+
+                    
+
+                    day_data = df[df.index.date == last_ts.date()]
+
+                    setup = day_data.between_time('09:30', '10:00')
+
+                    
+
+                    is_valid, strength, reason = check_ladder_pattern(setup)
+
+                    
+
+                    if is_valid:
+
+                        price = setup['Close'].iloc[-1]
+
+                        float_val = get_float_shares(ticker) # هنا كان الخطأ سابقاً وتم إصلاحه
+
+                        
+
+                        msg = (
+
+                            f"🪜 *فرصة السلم الصاعد* 🪜\n\n"
+
+                            f"✅ السهم: *{ticker}*\n"
+
+                            f"💵 السعر: *${price:.2f}*\n"
+
+                            f"💪 القوة: *{strength}%*\n"
+
+                            f"🪶 الفلوت: *{fmt_shares(float_val)}*\n"
+
+                            f"🕒 التوقيت: 10:00 NY"
+
+                        )
+
+                        send_telegram(msg)
+
+                        print(f"✅ تم قبول {ticker}")
+
+                        matches += 1
+
+                except Exception as e:
+
+                    print(f"⚠️ تجاوز {ticker}: {e}")
+
+                    continue
+
+
+
+            if matches == 0:
+
+                send_telegram("❌ لا توجد فرص اليوم.")
+
+                print("❌ لا توجد فرص.")
+
+            else:
+
+                print(f"🏁 تم إرسال {matches} فرص.")
+
+            
+
+            print(f"📊 إحصائيات: تم فحص فعلي {len(full_list) - skipped_empty - skipped_old} سهم، تجاوز {skipped_empty} فارغ، {skipped_old} قديم.")
+
+            
+
+            break
+
+        else:
+
+            print(f"⏳ {now_ny.strftime('%H:%M:%S')} NY - انتظار...", end='\r')
+
+            tm.sleep(10)
+
+
+
+if __name__ == "__main__":
+
+    main() 
