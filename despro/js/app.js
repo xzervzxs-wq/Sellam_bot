@@ -224,7 +224,6 @@
             currentLoadedTemplateIndex = null;
             
             updateTemplateList(); // تحميل القوالب
-            checkSession(); // التحقق من الجلسة المحفوظة
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
             renderFavoriteColors(); // تحميل الألوان المفضلة
             
@@ -368,7 +367,6 @@
         function loadAssetsLibraryFromGitHub() {
             const grid = document.getElementById('assets-grid');
             const select = document.getElementById('assets-category-select');
-            const loadingBar = document.getElementById('assets-loading-bar');
             
             if (!grid || !select) {
                 console.error('عناصر المكتبة غير موجودة');
@@ -387,16 +385,12 @@
                 });
                 
                 grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
-                if (loadingBar) loadingBar.classList.add('hidden');
                 console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
                 return;
             }
             
-            // عرض شريط التحميل
-            if (loadingBar) {
-                loadingBar.classList.remove('hidden');
-            }
-            grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">جاري التحميل...</p>';
+            // عرض رسالة تحميل
+            grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin ml-2"></i>جاري تحميل المكتبة...</p>';
             
             // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
             fetch('./Official.json?t=' + Date.now())
@@ -419,13 +413,11 @@
                     });
                     
                     grid.innerHTML = '<p class="text-[#64748b] text-[10px] col-span-3 text-center py-4">✅ اختر تصنيفاً لعرض العناصر</p>';
-                    if (loadingBar) loadingBar.classList.add('hidden');
                     console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
                 })
                 .catch(error => {
                     console.error('خطأ في تحميل المكتبة:', error);
                     grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
-                    if (loadingBar) loadingBar.classList.add('hidden');
                 });
         }
 
@@ -3896,15 +3888,12 @@
                     expiryDate.setHours(0, 0, 0, 0);
                     
                     if (expiryDate >= today) {
-                        // حفظ البيانات في localStorage للبقاء مسجلاً للدخول
-                        const sessionData = {
-                            code: code,
-                            name: userData.name,
-                            expiryDate: userData.expiryDate,
-                            tier: 'premium',
-                            loginTime: Date.now()
-                        };
-                        localStorage.setItem('despro_session', JSON.stringify(sessionData));
+                        // إنشاء Session ID عشوائي
+                        const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                        
+                        sessionStorage.setItem('studioName', userData.name);
+                        sessionStorage.setItem('expiryDate', userData.expiryDate);
+                        sessionStorage.setItem('sessionId', sessionId);
                         
                         // تعديل الـ tier إلى premium
                         setPremiumUser();
@@ -3912,7 +3901,6 @@
                         updateStudioName(userData.name);
                         document.getElementById('login-overlay').style.display = 'none';
                         showWelcomeNotification(userData.name);
-                        updateFooterForUser(userData.name); // تحديث الفوتر
                     } else {
                         const formattedDate = expiryDate.toLocaleDateString('ar-SA');
                         errorMsg.innerHTML = `⏰ اشتراكك انتهى في ${formattedDate}<br><small style="font-size: 12px; color: #94a3b8;">تواصل مع المسؤول لتجديد الاشتراك</small>`;
@@ -3933,12 +3921,10 @@
         
         // تحديث اسم الاستوديو في الصفحة
         function updateStudioName(name) {
-            if(!name) return;
-            document.title = `استوديو ${name} | Studio`;
+            document.title = `أستوديو ${name} | Studio`;
             const studioNameDisplay = document.getElementById('studio-name-display');
             if (studioNameDisplay) {
-                // استخدام textContent لضمان عدم وجود أكواد خبيثة
-                studioNameDisplay.textContent = `استوديو ${name} 🎨`;
+                studioNameDisplay.textContent = `أستوديو ${name}`;
             }
         }
         
@@ -5898,39 +5884,18 @@ function checkSession() {
             } else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
                 expiryDate = new Date(dateStr);
             }
-            // إذا فشل التاريخ، نفترض أنه متاح للصيانة (أو تفعيل الخطأ)
-            if(!expiryDate) throw new Error('Invalid Date');
-
             expiryDate.setHours(0, 0, 0, 0);
 
             if (expiryDate >= today) {
                 // الجلسة صالحة
                 userTier = 'premium';
-                updateUserTier(true); // تأكيد التحديث
+                document.documentElement.setAttribute('data-tier', 'premium');
+                updateStudioName(session.name);
+                updateFooterForUser(session.name);
                 
-                // دالة لتحديث الواجهة بقوة
-                const forceUpdateUI = () => {
-                    if(session.name) {
-                         updateStudioName(session.name);
-                         updateFooterForUser(session.name);
-                         
-                         // إخفاء زر الدخول إن وجد
-                        const loginOverlay = document.getElementById('login-overlay');
-                        if(loginOverlay) loginOverlay.style.display = 'none';
-                    }
-                };
-                
-                // 1. تحديث فوري
-                forceUpdateUI();
-                
-                // 2. تكرار المحاولة لضمان الثبات (ضد أي سكريبت آخر أو تحميل الصور)
-                let attempts = 0;
-                const interval = setInterval(() => {
-                    forceUpdateUI();
-                    attempts++;
-                    if(attempts >= 10) clearInterval(interval); // محاولة لمدة ثانية واحدة
-                }, 100);
-                
+                // إخفاء زر الدخول إن وجد
+                const loginOverlay = document.getElementById('login-overlay');
+                if(loginOverlay) loginOverlay.style.display = 'none';
             } else {
                 // الجلسة منتهية
                 logoutUser();
@@ -5943,17 +5908,8 @@ function checkSession() {
 }
 
 function updateFooterForUser(name) {
-    if (!name) return; // حماية ضد الأسماء الفارغة
-    
-    // تحديث العنوان الرئيسي بقوة
-    const studioTitle = document.getElementById('studio-name-display');
-    if(studioTitle) {
-        studioTitle.textContent = `استوديو ${name} 🎨`; // استخدام textContent أسرع وآمن
-    }
-    document.title = `استوديو ${name} | Studio`;
-
-    // البحث عن زر دخول المشتركين في الفوتر
-    // قد لا نجده إذا تم استبداله سابقاً، لذا نبحث عن الحاوية أو الزر
+    // البحث عن زر دخول المشتركين في الفوتر واستبداله
+    // بما أننا لا نملك ID دقيق، سنبحث عن الزر الذي يحتوي على "دخول المشتركين"
     const buttons = document.querySelectorAll('button');
     let loginBtn = null;
     buttons.forEach(btn => {
@@ -5963,58 +5919,42 @@ function updateFooterForUser(name) {
     });
 
     if (loginBtn) {
+        // إنشاء حاوية جديدة للأزرار إذا لزم الأمر أو استبدال الزر فقط
         const parent = loginBtn.parentElement;
+        
+        // إزالة الزر القديم
         loginBtn.remove();
         
-        // منع التكرار (حذف العناصر القديمة إذا وجدت)
-        const oldUserSpan = parent.querySelector('.user-session-span');
-        if(oldUserSpan) oldUserSpan.remove();
-        
+        // إضافة اسم المستخدم وزر الخروج
         // زر الخروج
         const logoutBtn = document.createElement('button');
         logoutBtn.onclick = logoutUser;
-        logoutBtn.className = 'text-sm font-semibold text-red-300 hover:text-red-200 transition flex items-center gap-2 px-3 py-1 user-session-btn';
+        logoutBtn.className = 'text-sm font-semibold text-red-300 hover:text-red-200 transition flex items-center gap-2 px-3 py-1';
         logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> خروج';
         
         // فاصل
         const divider = document.createElement('div');
-        divider.className = 'h-5 w-px bg-white bg-opacity-30 user-session-divider';
+        divider.className = 'h-5 w-px bg-white bg-opacity-30';
         
         // اسم المستخدم
         const userSpan = document.createElement('span');
-        userSpan.className = 'text-sm font-bold text-[#fbbf24] px-3 py-1 flex items-center gap-2 user-session-span';
+        userSpan.className = 'text-sm font-bold text-[#fbbf24] px-3 py-1 flex items-center gap-2';
         userSpan.innerHTML = `<i class="fas fa-user-check"></i> ${name}`;
         
         parent.appendChild(userSpan);
         parent.appendChild(divider);
         parent.appendChild(logoutBtn);
-    } else {
-        // إذا لم نجد زر الدخول، ربما تم تحويله بالفعل؟
-        // لنتأكد من تحديث الاسم فقط إذا كان موجوداً
-        const existingSpan = document.querySelector('.user-session-span');
-        if (existingSpan) {
-             existingSpan.innerHTML = `<i class="fas fa-user-check"></i> ${name}`;
-        }
+    }
+    
+    // تحديث العنوان الرئيسي أيضاً للتأكيد
+    const studioTitle = document.getElementById('studio-name-display');
+    if(studioTitle) {
+        studioTitle.innerHTML = `استوديو ${name} 🎨`;
     }
 }
 
 function logoutUser() {
     localStorage.removeItem('despro_session');
-    localStorage.removeItem('userTier');
     window.location.reload();
 }
-
-// فتح مكتبة العناصر افتراضياً عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    checkSession();
-    // فتح مكتبة العناصر مباشرة
-    const assetsContent = document.getElementById('assets-library-content');
-    const arrow = document.getElementById('assets-library-arrow');
-    if (assetsContent && assetsContent.classList.contains('hidden')) {
-        assetsContent.classList.remove('hidden');
-        assetsContent.classList.add('flex');
-        if (arrow) arrow.style.transform = 'rotate(-90deg)';
-        // تحميل المكتبة
-        loadAssetsLibraryFromGitHub();
-    }
-});
+document.addEventListener('DOMContentLoaded', checkSession);

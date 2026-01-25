@@ -511,19 +511,7 @@
                     <i id="assets-library-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200"></i>
                 </div>
                 
-                <!-- شريط التحميل -->
-                <div id="assets-loading-bar" class="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden hidden">
-                    <div class="assets-loading-progress h-full bg-gradient-to-r from-[#6366f1] via-[#a855f7] to-[#6366f1] animate-pulse" style="width: 100%; animation: slideProgress 2s ease-in-out infinite;"></div>
-                </div>
-                <style>
-                    @keyframes slideProgress {
-                        0% { transform: translateX(-100%); opacity: 0.5; }
-                        50% { opacity: 1; }
-                        100% { transform: translateX(100%); opacity: 0.5; }
-                    }
-                </style>
-                
-                <div id="assets-library-content" class="mt-3 flex-col gap-2">
+                <div id="assets-library-content" class="hidden mt-3 flex-col gap-2">
                     <!-- القائمة المنسدلة للتصنيفات -->
                     <div class="w-full">
                         <select id="assets-category-select" class="w-full p-2 text-[11px] font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]" onchange="loadAssetsCategory()">
