@@ -1009,7 +1009,7 @@
     <div id="close-floating-toolbar" class="hidden"></div>
 
     <!-- Footer - Professional Design -->
-    <footer class="relative bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 text-white py-4 mt-8 border-t border-indigo-500/30 shadow-2xl overflow-hidden">
+    <footer class="relative bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 text-white py-2 mt-2 border-t border-indigo-500/30 shadow-2xl overflow-hidden">
         <!-- Decorative Background Elements -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
@@ -1086,17 +1086,17 @@
                         حسابك
                     </h4>
                     <div id="auth-container" class="flex flex-col gap-1">
-                        <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="w-full text-[10px] font-bold py-1.5 px-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg shadow-lg border border-indigo-400/30 transition hover:shadow-indigo-500/50 flex items-center justify-center gap-1 group">
-                            <i class="fas fa-sign-in-alt group-hover:scale-110 transition-transform"></i>
-                            <span>Premium Members</span>
+                        <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="w-full text-xs font-bold py-2 px-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg shadow-lg border border-indigo-400/30 transition hover:shadow-indigo-500/50 flex items-center justify-center gap-1.5">
+                            <i class="fas fa-crown text-yellow-300"></i>
+                            <span>دخول</span>
                         </button>
                     </div>
                     
                     <!-- Logout Button Container (shows when logged in) -->
                     <div id="logout-container" class="hidden flex flex-col gap-1">
-                        <div id="logout-btn-footer" class="w-full px-2 py-1.5 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 rounded-lg shadow-lg border border-slate-600 transition hover:shadow-red-500/20 cursor-pointer flex items-center justify-center gap-1 group active:bg-red-500/30">
-                            <i class="fas fa-sign-out-alt text-red-400 group-hover:scale-110 transition-transform"></i>
-                            <span class="text-[10px] font-bold text-red-300">تسجيل خروج</span>
+                        <div id="logout-btn-footer" class="w-full px-2.5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 rounded-lg shadow-lg border border-red-500/50 transition hover:shadow-red-500/40 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95" onclick="logoutUser()">
+                            <i class="fas fa-sign-out-alt text-white"></i>
+                            <span class="text-xs font-bold text-white">خروج</span>
                         </div>
                     </div>
                 </div>
