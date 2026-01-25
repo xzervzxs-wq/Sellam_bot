@@ -6116,19 +6116,27 @@ function updateFooterForUser(name) {
     if (authContainer) {
         authContainer.innerHTML = `
             <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-[#fbbf24] flex items-center gap-1">
-                    <i class="fas fa-user-check"></i>
-                    ${name}
-                </span>
-                <div class="h-4 w-px bg-white/30"></div>
-                <button type="button" id="logout-btn" class="text-xs font-bold text-white transition flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 rounded-full shadow-lg border border-red-400">
+                <div class="flex flex-col items-center gap-0.5">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-[#fbbf24]/10 rounded-lg border border-[#fbbf24]/20 text-[#fbbf24] text-xs font-bold shadow-sm">
+                        <i class="fas fa-crown text-[#fbbf24]"></i>
+                        <span>${name}</span>
+                    </div>
+                    <span class="flex items-center gap-1 text-[11px] font-bold text-white/70">
+                        مساحة مخصصة | حيث أنت <i class="fas fa-star text-xs text-yellow-400"></i>
+                    </span>
+                </div>
+                <button type="button" id="logout-btn" class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-lg border border-white/10 transition-all shadow-sm" title="تسجيل خروج">
                     <i class="fas fa-sign-out-alt"></i>
-                    تسجيل خروج
                 </button>
             </div>
         `;
         
-        document.getElementById('logout-btn').addEventListener('click', logoutUser);
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                logoutUser();
+            });
+        }
     }
     
     const studioTitle = document.getElementById('studio-name-display');
