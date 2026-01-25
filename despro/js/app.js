@@ -4309,7 +4309,24 @@
             }
             // -----------------------------------------------------------------
 
+            // تطبيق التغيير على العنصر الأساسي (الغلاف)
             activeEl.style[prop] = val;
+
+            // إذا كنا نغير اللون ولم يكن هناك تحديد جزئي (أعلاه)، فهذا يعني أن المستخدم يريد تلوين النص بالكامل
+            if (prop === 'color' && activeEl.classList.contains('text-layer')) {
+                const textDiv = activeEl.querySelector('.user-text');
+                if (textDiv) {
+                    textDiv.style.color = val; // Force child to take color
+                    // إزالة التلوين الداخلي السابق لتوحيد اللون
+                    const spans = textDiv.querySelectorAll('span, font, b, i, u');
+                    spans.forEach(span => {
+                         // Reset inline color to inherit parent
+                         if(span.style.color) span.style.color = '';
+                         // If it's a font tag with color attr
+                         if(span.tagName === 'FONT') span.removeAttribute('color');
+                    });
+                }
+            }
             
             // إذا كنا نغير المحاذاة، نتأكد من تطبيقها على النص المقروء أيضاً إذا وجد
             if (prop === 'textAlign') {
