@@ -1009,67 +1009,52 @@
     <div id="close-floating-toolbar" class="hidden"></div>
 
     <!-- Footer -->
-    <footer class="relative bg-gradient-to-r from-[#3730a3] to-[#312e81] text-white py-4 mt-8 border-t-2 border-[#4338ca] shadow-md overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 relative z-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Column 1: Brand -->
+    <footer class="relative bg-gradient-to-r from-[#1e1b4b] to-[#312e81] text-white py-3 mt-6 border-t border-[#4338ca]/50 shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <!-- الصف الرئيسي -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                
+                <!-- الجهة اليمنى: الشعار -->
                 <div class="flex items-center gap-2">
-                    <i class="fas fa-palette text-white text-lg"></i>
+                    <div class="w-8 h-8 bg-[#6366f1] rounded-lg flex items-center justify-center">
+                        <i class="fas fa-palette text-white text-sm"></i>
+                    </div>
                     <div>
                         <h3 class="font-bold text-sm text-white">استوديو المصممين</h3>
-                        <p class="text-xs text-white text-opacity-80">للمشاريع الصغيره و المنزلية</p>
+                        <p class="text-[10px] text-white/60">للمشاريع الصغيرة والمنزلية</p>
                     </div>
                 </div>
                 
-                <!-- Column 2: Links & Premium -->
-                <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-link text-xs text-pink-300"></i>
-                        <h4 class="font-bold text-xs text-white uppercase tracking-wide">روابط سريعة</h4>
-                    </div>
-                    <div class="flex items-center gap-0">
-                        <a href="subscriptions.html" class="text-xs font-bold text-[#fbbf24] hover:text-[#f59e0b] transition flex items-center gap-1.5 px-2 py-1 bg-white/10 rounded-lg hover:bg-white/20 border border-white/10">
-                            <i class="fas fa-crown text-[#fbbf24]"></i>
-                            اشتراك
-                        </a>
-                        
-                        <a href="https://wa.me/966531333714" target="_blank" class="text-xs font-bold text-white hover:text-gray-200 transition flex items-center gap-1.5 px-2 py-1">
-                            <i class="fas fa-headset text-pink-300"></i>
-                            دعم
-                        </a>
-                        
-                        <div class="h-4 w-px bg-white/20 mx-1"></div>
-                        
-                        <!-- Login Button Container -->
-                        <div id="auth-container">
-                            <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="text-xs font-bold text-white hover:text-white transition flex items-center gap-1.5 px-3 py-1 bg-[#6366f1] hover:bg-[#4f46e5] rounded-full shadow-lg border border-[#818cf8] animate-pulse-slow">
-                                <i class="fas fa-user-circle"></i>
-                                تسجيل دخول
-                            </button>
-                        </div>
-                    </div>
+                <!-- الوسط: الروابط -->
+                <div class="flex items-center gap-2">
+                    <a href="subscriptions.html" class="text-xs font-bold text-[#fbbf24] hover:text-[#fcd34d] transition flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg border border-white/10">
+                        <i class="fas fa-crown"></i>
+                        اشتراك
+                    </a>
+                    <a href="https://wa.me/966531333714" target="_blank" class="text-xs font-bold text-white/80 hover:text-white transition flex items-center gap-1.5 px-3 py-1.5 hover:bg-white/10 rounded-lg">
+                        <i class="fas fa-headset text-pink-400"></i>
+                        دعم
+                    </a>
+                    <a href="https://wa.me/966531333714" target="_blank" class="w-8 h-8 bg-green-600/80 hover:bg-green-500 rounded-lg flex items-center justify-center transition">
+                        <i class="fab fa-whatsapp text-white"></i>
+                    </a>
+                    <a href="https://x.com/sdr_10" target="_blank" class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition">
+                        <i class="fab fa-x-twitter text-white"></i>
+                    </a>
                 </div>
                 
-                <!-- Column 3: Contact -->
-                <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-comments text-xs text-white"></i>
-                        <h4 class="font-bold text-xs text-white">تواصل معنا</h4>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <a href="https://wa.me/966531333714" target="_blank" title="00966531333714" class="flex items-center justify-center w-8 h-8 bg-white bg-opacity-25 rounded-lg hover:bg-opacity-40 transition group border border-white border-opacity-30">
-                            <i class="fab fa-whatsapp text-sm text-white group-hover:scale-110 transition-transform"></i>
-                        </a>
-                        <a href="https://x.com/sdr_10" target="_blank" title="@sdr_10" class="flex items-center justify-center w-8 h-8 bg-white bg-opacity-25 rounded-lg hover:bg-opacity-40 transition group border border-white border-opacity-30">
-                            <i class="fab fa-x-twitter text-sm text-white group-hover:scale-110 transition-transform"></i>
-                        </a>
-                    </div>
+                <!-- الجهة اليسرى: تسجيل الدخول -->
+                <div id="auth-container">
+                    <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="text-xs font-bold text-white transition flex items-center gap-1.5 px-4 py-2 bg-[#6366f1] hover:bg-[#4f46e5] rounded-lg shadow-md border border-[#818cf8]/50">
+                        <i class="fas fa-user-circle"></i>
+                        تسجيل دخول
+                    </button>
                 </div>
             </div>
             
-            <!-- Bottom -->
-            <div class="border-t border-white border-opacity-30 mt-3 pt-3 text-center text-xs text-white text-opacity-85">
-                <p>© جميع الحقوق محفوظة © despro.net 2026</p>
+            <!-- الحقوق -->
+            <div class="border-t border-white/10 mt-3 pt-2 text-center">
+                <p class="text-[10px] text-white/50">© 2026 despro.net - جميع الحقوق محفوظة</p>
             </div>
         </div>
     </footer>
