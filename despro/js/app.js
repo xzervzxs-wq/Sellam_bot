@@ -6060,44 +6060,38 @@ function checkSession() {
 }
 
 function updateFooterForUser(name) {
-    // استخدام الحاوية الجديدة المخصصة
     const authContainer = document.getElementById('auth-container');
     
     if (authContainer) {
         authContainer.innerHTML = `
-            <div class="flex items-center gap-2 bg-indigo-900/50 px-3 py-1.5 rounded-full border border-indigo-400/30 shadow-inner backdrop-blur-sm">
-                <span class="text-xs font-bold text-[#fbbf24] flex items-center gap-1.5 select-none">
-                    <i class="fas fa-user-check text-xs"></i>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-[#fbbf24] flex items-center gap-1">
+                    <i class="fas fa-user-check"></i>
                     ${name}
                 </span>
-                <div class="w-px h-3 bg-white/20"></div>
-                <button id="logout-btn-footer" class="text-xs font-bold text-red-300 hover:text-red-100 transition flex items-center gap-1" title="تسجيل الخروج">
+                <div class="h-4 w-px bg-white/30"></div>
+                <button type="button" id="logout-btn" class="text-xs font-bold text-white transition flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 rounded-full shadow-lg border border-red-400">
                     <i class="fas fa-sign-out-alt"></i>
+                    تسجيل خروج
                 </button>
             </div>
         `;
-    } else {
-        // Fallback for older HTML structure (if cache persists)
-        const buttons = document.querySelectorAll('button');
-        // ... (legacy logic omitted for cleaner file, assuming HTML is updated)
+        
+        document.getElementById('logout-btn').addEventListener('click', logoutUser);
     }
     
-    // تحديث العنوان الرئيسي أيضاً للتأكيد
     const studioTitle = document.getElementById('studio-name-display');
     if(studioTitle) {
         studioTitle.innerHTML = `استوديو ${name} 🎨`;
     }
 }
 
-function updateFooterLogoutHandler() {
-    const logoutBtn = document.getElementById("logout-btn-footer");
-    if(logoutBtn) {
-        logoutBtn.addEventListener("click", logoutUser);
-    }
-}
-
 function logoutUser() {
     localStorage.removeItem('despro_session');
+    localStorage.removeItem('userTier');
+    sessionStorage.removeItem('studioName');
+    sessionStorage.removeItem('expiryDate');
+    sessionStorage.removeItem('sessionId');
     window.location.reload();
 }
 document.addEventListener('DOMContentLoaded', checkSession);
