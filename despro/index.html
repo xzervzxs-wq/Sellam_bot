@@ -74,77 +74,85 @@
         </div>
 
         <!-- Main Login Card -->
-        <div class="login-container relative w-full max-w-[400px] bg-white/80 backdrop-blur-2xl rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 p-8 transform transition-all duration-500 hover:shadow-[0_30px_80px_-10px_rgba(99,102,241,0.25)] animate-slideUp overflow-hidden">
+        <div class="login-container relative w-full max-w-sm bg-white/90 backdrop-blur-xl rounded-[30px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden border border-white/40 transform transition-all duration-500 hover:shadow-[0_25px_70px_-12px_rgba(79,70,229,0.3)] animate-slideUp">
             
-            <!-- Decorative Background Blobs -->
-            <div class="absolute -top-20 -right-20 w-60 h-60 bg-purple-500/10 rounded-full blur-[80px] pointer-events-none"></div>
-            <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+            <!-- Ambient Light Effect -->
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/30 rounded-full blur-3xl pointer-events-none mix-blend-multiply"></div>
+            <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl pointer-events-none mix-blend-multiply"></div>
 
-            <!-- Close Button -->
-            <button onclick="toggleLoginOverlay()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-full text-gray-400 hover:text-gray-900 hover:border-gray-300 hover:shadow-lg transition-all duration-300 z-20 group">
-                <i class="fas fa-times text-sm group-hover:rotate-90 transition-transform duration-300"></i>
-            </button>
-
-            <!-- Logo Section -->
-            <div class="text-center mt-4 mb-10">
-                <div class="relative w-24 h-24 mx-auto mb-6">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-[30px] rotate-6 opacity-20 blur-sm animate-pulse"></div>
-                    <div class="absolute inset-0 bg-white rounded-[30px] shadow-2xl flex items-center justify-center border border-white/50">
-                       <i class="fas fa-cubes text-4xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"></i>
-                    </div>
-                </div>
-                <h2 class="text-3xl font-black text-slate-800 tracking-tight mb-2">مرحباً بك</h2>
-                <p class="text-slate-400 text-sm font-medium">سجل دخولك لبدء الإبداع</p>
-            </div>
-
-            <!-- Input Section -->
-            <div class="space-y-6 mb-10">
-                <div class="relative group">
-                    <input 
-                        type="text" 
-                        id="login-code-input" 
-                        class="block w-full h-16 text-center text-2xl font-bold tracking-[0.3em] text-slate-800 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-[0_0_0_4px_rgba(99,102,241,0.1)] transition-all duration-300 placeholder:text-slate-300 placeholder:tracking-normal outline-none" 
-                        placeholder="أدخل الكود" 
-                        autocomplete="off"
-                        onkeypress="if(event.key==='Enter') verifyCode()"
-                    >
-                    <div class="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5 pointer-events-none"></div>
-                </div>
-
-                <button id="login-btn" onclick="verifyCode()" class="group relative w-full h-16 bg-slate-900 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                    <span id="login-btn-text" class="relative z-10 flex items-center justify-center gap-3">
-                        <span>تسجيل الدخول</span>
-                        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform duration-300"></i>
-                    </span>
-                    
-                    <span id="login-btn-spinner" class="hidden absolute inset-0 z-20 flex items-center justify-center">
-                        <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </span>
+            <div class="relative z-10 p-8">
+                <!-- Close Button -->
+                <button onclick="toggleLoginOverlay()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-300 group z-20">
+                    <i class="fas fa-times text-sm group-hover:rotate-90 transition-transform"></i>
                 </button>
-                
-                <div id="login-error" class="hidden"></div>
-            </div>
 
-            <!-- Footer Links -->
-            <div class="flex items-center justify-center gap-6 pt-6 border-t border-slate-100">
-                <a href="subscriptions.html" class="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-amber-500 transition-colors py-2">
-                    <i class="fas fa-crown text-base"></i>
-                    <span>الاشتراكات</span>
-                </a>
-                <div class="w-px h-4 bg-slate-200"></div>
-                <a href="https://wa.me/966531333714" target="_blank" class="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-green-500 transition-colors py-2">
-                    <i class="fab fa-whatsapp text-lg"></i>
-                    <span>مساعدة</span>
-                </a>
+                <!-- Header Section -->
+                <div class="text-center mb-8 pt-2">
+                    <div class="relative w-20 h-20 mx-auto mb-5 group">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-500 opacity-20"></div>
+                        <div class="absolute inset-0 bg-white rounded-2xl shadow-xl flex items-center justify-center transform transition-transform duration-500 group-hover:-translate-y-1 border border-indigo-50">
+                            <i class="fas fa-palette text-3xl bg-gradient-to-br from-indigo-600 to-purple-600 bg-clip-text text-transparent"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-1">استوديو المصممين</h2>
+                    <p class="text-[13px] text-gray-500 font-medium">بوابتك للإبداع الرقمي</p>
+                </div>
+
+                <!-- Input Area -->
+                <div class="space-y-5 mb-8">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none z-10">
+                            <i class="fas fa-key text-gray-300 group-focus-within:text-indigo-500 transition-colors duration-300"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="login-code-input" 
+                            class="block w-full py-4 pr-12 pl-4 text-center text-lg font-bold tracking-[0.2em] text-gray-800 bg-gray-50/50 border border-gray-200 rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 placeholder-gray-300 transition-all duration-300 outline-none shadow-sm group-hover:bg-white" 
+                            placeholder="CODE" 
+                            autocomplete="off"
+                            onkeypress="if(event.key==='Enter') verifyCode()"
+                        >
+                    </div>
+
+                    <button id="login-btn" onclick="verifyCode()" class="relative w-full py-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/25 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group">
+                        <span id="login-btn-text" class="relative z-10 flex items-center justify-center gap-2">
+                            <span>دخول المنصة</span>
+                            <i class="fas fa-arrow-left text-sm group-hover:-translate-x-1 transition-transform"></i>
+                        </span>
+                        <span id="login-btn-spinner" class="hidden absolute inset-0 z-20 flex items-center justify-center bg-inherit">
+                            <i class="fas fa-circle-notch fa-spin text-xl"></i>
+                        </span>
+                        <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                    
+                    <!-- عنصر مخفي لتوافق الكود -->
+                    <div id="login-loading" class="hidden"></div>
+                </div>
+
+                <!-- Footer Services -->
+                <div class="grid grid-cols-3 gap-3">
+                    <a href="subscriptions.html" class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-amber-50 border border-transparent hover:border-amber-100 transition-all duration-300 group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-crown text-amber-600 text-xs"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 group-hover:text-amber-700">اشتراك</span>
+                    </a>
+                    
+                    <a href="https://wa.me/966531333714" target="_blank" class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-green-50 border border-transparent hover:border-green-100 transition-all duration-300 group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fab fa-whatsapp text-green-600 text-sm"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 group-hover:text-green-700">دعم فني</span>
+                    </a>
+                    
+                     <a href="https://wa.me/966531333714?text=استفسار" target="_blank" class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all duration-300 group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-question text-blue-600 text-xs"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 group-hover:text-blue-700">استفسار</span>
+                    </a>
+                </div>
             </div>
-            
-             <!-- عنصر مخفي لتوافق الكود -->
-            <div id="login-loading" class="hidden"></div>
         </div>
     </div>
 
