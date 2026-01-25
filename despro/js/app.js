@@ -4283,23 +4283,6 @@
             input.value = ''; // إعادة تعيين الحقل
         }
         
-        function toggleAlignmentMenu() {
-            const dropdown = document.getElementById('alignment-dropdown');
-            if (dropdown) dropdown.classList.toggle('hidden');
-        }
-
-        // إغلاق قائمة المحاذاة عند النقر خارجها
-        window.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('alignment-dropdown');
-            // Check if the click is on the trigger button or inside the dropdown
-            const isTrigger = e.target.closest('button[onclick="toggleAlignmentMenu()"]');
-            const isDropdown = e.target.closest('#alignment-dropdown');
-            
-            if (dropdown && !dropdown.classList.contains('hidden') && !isTrigger && !isDropdown) {
-                dropdown.classList.add('hidden');
-            }
-        });
-
         function updateStyle(prop, val) {
             if(!activeEl) return;
             

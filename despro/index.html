@@ -968,22 +968,19 @@
                 B
             </button>
             
-            <!-- زر المحاذاة (مع قائمة منسدلة) -->
-            <div class="relative inline-block">
-                <button onclick="toggleAlignmentMenu()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1" title="المحاذاة">
-                    <i class="fas fa-align-center"></i>
+            <!-- أزرار المحاذاة (صغيرة جانبية) -->
+            <div class="flex items-center gap-1 bg-white border border-[#cbd5e1] rounded px-1 py-0.5">
+                <button onclick="updateStyle('textAlign', 'right')" class="p-0.5 text-[#64748b] hover:text-[#6366f1] transition" title="يمين">
+                    <i class="fas fa-align-right text-[10px]"></i>
                 </button>
-                <div id="alignment-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg p-1 flex gap-1 z-50 whitespace-nowrap">
-                    <button onclick="updateStyle('textAlign', 'right'); toggleAlignmentMenu()" class="p-1 px-2 hover:bg-gray-100 rounded text-slate-600" title="يمين">
-                        <i class="fas fa-align-right text-xs"></i>
-                    </button>
-                    <button onclick="updateStyle('textAlign', 'center'); toggleAlignmentMenu()" class="p-1 px-2 hover:bg-gray-100 rounded text-slate-600" title="وسط">
-                        <i class="fas fa-align-center text-xs"></i>
-                    </button>
-                    <button onclick="updateStyle('textAlign', 'left'); toggleAlignmentMenu()" class="p-1 px-2 hover:bg-gray-100 rounded text-slate-600" title="يسار">
-                        <i class="fas fa-align-left text-xs"></i>
-                    </button>
-                </div>
+                <div class="w-px h-3 bg-gray-200"></div>
+                <button onclick="updateStyle('textAlign', 'center')" class="p-0.5 text-[#64748b] hover:text-[#6366f1] transition" title="وسط">
+                    <i class="fas fa-align-center text-[10px]"></i>
+                </button>
+                <div class="w-px h-3 bg-gray-200"></div>
+                <button onclick="updateStyle('textAlign', 'left')" class="p-0.5 text-[#64748b] hover:text-[#6366f1] transition" title="يسار">
+                    <i class="fas fa-align-left text-[10px]"></i>
+                </button>
             </div>
         </div>
 
@@ -1072,6 +1069,6 @@
         </div>
     </footer>
 
-    <script src="js/app.js?v=1769353000"></script>
+    <script src="js/app.js?v=1769353020"></script>
 </body>
 </html>
