@@ -224,6 +224,7 @@
             currentLoadedTemplateIndex = null;
             
             updateTemplateList(); // تحميل القوالب
+            checkSession(); // التحقق من الجلسة المحفوظة
             initAssetWindowDrag(); // تفعيل سحب نافذة الأصول
             renderFavoriteColors(); // تحميل الألوان المفضلة
             
@@ -669,13 +670,89 @@
         function updateDesignerStats() {
             const card = document.getElementById('card');
             // حساب عدد العناصر (لا نحسب card-gradient)
-            const elementCount = card.children.length - 1;
-            document.getElementById('element-count').textContent = Math.max(0, elementCount);
+            const elementCount = Math.max(0, card.children.length - 1);
+            document.getElementById('element-count').textContent = elementCount;
 
             // حساب مقاس المربع
             const width = parseInt(card.style.width) / DPI_RATIO || 6;
             const height = parseInt(card.style.height) / DPI_RATIO || 6;
             document.getElementById('canvas-size').textContent = `${width.toFixed(1)} × ${height.toFixed(1)} سم`;
+
+            // === استخراج الألوان المستخدمة (Used Colors) ===
+            const usedColors = new Set();
+            
+            // قائمة الكلمات المحجوزة في Gradients لتجاهلها
+            const ignoredWords = new Set(['linear', 'radial', 'gradient', 'to', 'right', 'left', 'top', 'bottom', 'deg', 'circle', 'at', 'center', 'transparent', 'none', 'url', 'repeat', 'no-repeat', 'scroll']);
+
+            // دالة مساعدة لتنظيف وإضافة اللون
+            const collectColor = (c) => {
+                if (!c) return;
+                const color = c.toString().trim().toLowerCase();
+                if (ignoredWords.has(color) || color === 'rgba(0, 0, 0, 0)' || color === 'inherit' || color === 'none') return;
+                try {
+                    // التحقق من أن اللون صالح بوضعه في عنصر مؤقت (طريقة آمنة)
+                    const s = new Option().style;
+                    s.color = color;
+                    if (s.color !== '') usedColors.add(color);
+                } catch (e) {}
+            };
+
+            // دالة لاستخراج الألوان من التدرجات أو النصوص المعقدة
+            const extractColorsFromString = (str) => {
+                if (!str || str === 'none') return;
+                // Regex for Hex, RGB, HSL, and Names (basic)
+                const regex = /#[0-9a-fA-F]{3,8}|rgba?\([\d\s,.]+\)|hsla?\([\d\s,%.]+\)|[a-z]{3,}/gi;
+                const matches = str.match(regex);
+                if (matches) {
+                    matches.forEach(m => collectColor(m));
+                }
+            };
+
+            // الدوران على العناصر
+            Array.from(card.children).forEach(child => {
+                if (child.id === 'card-gradient') return; // تجاهل التدرج الخلفي
+
+                // 1. فحص أنماط العنصر الأساسي
+                if (child.style.color) collectColor(child.style.color);
+                if (child.style.backgroundColor) collectColor(child.style.backgroundColor);
+                if (child.style.borderColor) collectColor(child.style.borderColor);
+                
+                // فحص التدرجات (Gradients)
+                if (child.style.backgroundImage && child.style.backgroundImage.includes('gradient')) {
+                     extractColorsFromString(child.style.backgroundImage);
+                }
+
+                // 2. فحص النصوص
+                const textElements = child.querySelectorAll('*'); 
+                textElements.forEach(el => {
+                     if (el.style.color) collectColor(el.style.color);
+                     if (el.style.backgroundColor) collectColor(el.style.backgroundColor);
+                });
+
+                // 3. فحص SVG
+                const svgElements = child.tagName === 'svg' ? [child] : child.querySelectorAll('svg, path, circle, rect');
+                svgElements.forEach(el => {
+                    collectColor(el.getAttribute('fill') || el.style.fill);
+                    collectColor(el.getAttribute('stroke') || el.style.stroke);
+                });
+            });
+
+            // تعبئة لوحة الألوان
+            const paletteDiv = document.getElementById('used-colors-palette');
+            if (paletteDiv) {
+                paletteDiv.innerHTML = '';
+                if (usedColors.size === 0) {
+                    paletteDiv.innerHTML = '<span class="text-[10px] text-gray-400 italic">لا توجد عناصر ملونة</span>';
+                } else {
+                    Array.from(usedColors).slice(0, 18).forEach(color => {
+                        const dot = document.createElement('div');
+                        dot.className = 'w-4 h-4 rounded-full border border-gray-200 cursor-help transition hover:scale-110';
+                        dot.style.backgroundColor = color;
+                        dot.title = color; // ظهر كود اللون عند التمرير
+                        paletteDiv.appendChild(dot);
+                    });
+                }
+            }
 
             // تحديث حد الأحرف والملاحظات
             updateCharCount();
@@ -2198,35 +2275,52 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const wrapper = createWrapper('image-layer');
-                    const contentWrapper = wrapper.querySelector('.content-wrapper');
-                    wrapper.style.width = '60%';
-                    wrapper.style.height = '60%';
-                    contentWrapper.style.width = '100%';
-                    contentWrapper.style.height = '100%';
-                    contentWrapper.style.overflow = 'hidden';
-                    contentWrapper.style.borderRadius = '8px';
-                    contentWrapper.style.display = 'flex';
-                    
-                    const img = document.createElement('img');
-                    img.crossOrigin = "anonymous"; // إضافة CrossOrigin
-                    img.src = e.target.result;
-                    img.loading = "eager";
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'contain';
-                    img.style.pointerEvents = 'none';
-                    img.style.imageRendering = 'high-quality';
-                    
-                    wrapper.setAttribute('data-original-image', e.target.result);
-                    // الصور المرفوعة قابلة للتلوين افتراضياً
-                    wrapper.setAttribute('data-colorable', 'true');
-                    
-                    contentWrapper.appendChild(img);
-                    document.getElementById('card').appendChild(wrapper);
-                    selectEl(wrapper);
-                    setupInteract(wrapper, 'box');
-                    saveState();
+                    const tempImg = new Image();
+                    tempImg.src = e.target.result;
+                    tempImg.onload = function() {
+                        const wrapper = createWrapper('image-layer');
+                        const contentWrapper = wrapper.querySelector('.content-wrapper');
+                        
+                        // حساب الأبعاد المناسبة بناءً على نسبة العرض للارتفاع
+                        const card = document.getElementById('card');
+                        const cardRect = card.getBoundingClientRect();
+                        const cardWidth = cardRect.width || card.offsetWidth;
+                        
+                        // جعل العرض الافتراضي 50% من عرض الكارد (بدلاً من 60% ثابتة)
+                        const targetWidth = cardWidth * 0.5;
+                        const aspectRatio = tempImg.width / tempImg.height;
+                        const targetHeight = targetWidth / aspectRatio;
+                        
+                        wrapper.style.width = targetWidth + 'px';
+                        wrapper.style.height = targetHeight + 'px';
+                        
+                        contentWrapper.style.width = '100%';
+                        contentWrapper.style.height = '100%';
+                        contentWrapper.style.overflow = 'hidden';
+                        contentWrapper.style.borderRadius = '8px';
+                        contentWrapper.style.display = 'flex';
+                        
+                        const img = document.createElement('img');
+                        img.crossOrigin = "anonymous";
+                        img.src = e.target.result;
+                        img.loading = "eager";
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        // استخدام fill للسماح بالتشويه اليدوي إذا رغب المستخدم
+                        // وبما أننا ضبطنا أبعاد الـ wrapper لتطابق الصورة، فلن تظهر مشوهة مبدئياً
+                        img.style.objectFit = 'fill'; 
+                        img.style.pointerEvents = 'none';
+                        img.style.imageRendering = 'high-quality';
+                        
+                        wrapper.setAttribute('data-original-image', e.target.result);
+                        wrapper.setAttribute('data-colorable', 'true');
+                        
+                        contentWrapper.appendChild(img);
+                        document.getElementById('card').appendChild(wrapper);
+                        selectEl(wrapper);
+                        setupInteract(wrapper, 'box');
+                        saveState();
+                    };
                 };
                 reader.readAsDataURL(input.files[0]);
                 input.value = '';
@@ -3795,12 +3889,15 @@
                     expiryDate.setHours(0, 0, 0, 0);
                     
                     if (expiryDate >= today) {
-                        // إنشاء Session ID عشوائي
-                        const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-                        
-                        sessionStorage.setItem('studioName', userData.name);
-                        sessionStorage.setItem('expiryDate', userData.expiryDate);
-                        sessionStorage.setItem('sessionId', sessionId);
+                        // حفظ البيانات في localStorage للبقاء مسجلاً للدخول
+                        const sessionData = {
+                            code: code,
+                            name: userData.name,
+                            expiryDate: userData.expiryDate,
+                            tier: 'premium',
+                            loginTime: Date.now()
+                        };
+                        localStorage.setItem('despro_session', JSON.stringify(sessionData));
                         
                         // تعديل الـ tier إلى premium
                         setPremiumUser();
@@ -3808,6 +3905,7 @@
                         updateStudioName(userData.name);
                         document.getElementById('login-overlay').style.display = 'none';
                         showWelcomeNotification(userData.name);
+                        updateFooterForUser(userData.name); // تحديث الفوتر
                     } else {
                         const formattedDate = expiryDate.toLocaleDateString('ar-SA');
                         errorMsg.innerHTML = `⏰ اشتراكك انتهى في ${formattedDate}<br><small style="font-size: 12px; color: #94a3b8;">تواصل مع المسؤول لتجديد الاشتراك</small>`;
@@ -3828,10 +3926,12 @@
         
         // تحديث اسم الاستوديو في الصفحة
         function updateStudioName(name) {
-            document.title = `أستوديو ${name} | Studio`;
+            if(!name) return;
+            document.title = `استوديو ${name} | Studio`;
             const studioNameDisplay = document.getElementById('studio-name-display');
             if (studioNameDisplay) {
-                studioNameDisplay.textContent = `أستوديو ${name}`;
+                // استخدام textContent لضمان عدم وجود أكواد خبيثة
+                studioNameDisplay.textContent = `استوديو ${name} 🎨`;
             }
         }
         
@@ -5769,3 +5869,131 @@
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(restrictFonts, 500);
         });
+
+// ========== إدارة الجلسة (Session Management) ==========
+
+function checkSession() {
+    const sessionStr = localStorage.getItem('despro_session');
+    if (sessionStr) {
+        try {
+            const session = JSON.parse(sessionStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // التحقق من تاريخ التاريخ
+            let expiryDate = null;
+            const dateStr = session.expiryDate.trim();
+            if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                const [day, month, year] = dateStr.split('-');
+                expiryDate = new Date(`${year}-${month}-${day}`);
+            } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                expiryDate = new Date(dateStr);
+            } else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                expiryDate = new Date(dateStr);
+            }
+            // إذا فشل التاريخ، نفترض أنه متاح للصيانة (أو تفعيل الخطأ)
+            if(!expiryDate) throw new Error('Invalid Date');
+
+            expiryDate.setHours(0, 0, 0, 0);
+
+            if (expiryDate >= today) {
+                // الجلسة صالحة
+                userTier = 'premium';
+                updateUserTier(true); // تأكيد التحديث
+                
+                // دالة لتحديث الواجهة بقوة
+                const forceUpdateUI = () => {
+                    if(session.name) {
+                         updateStudioName(session.name);
+                         updateFooterForUser(session.name);
+                         
+                         // إخفاء زر الدخول إن وجد
+                        const loginOverlay = document.getElementById('login-overlay');
+                        if(loginOverlay) loginOverlay.style.display = 'none';
+                    }
+                };
+                
+                // 1. تحديث فوري
+                forceUpdateUI();
+                
+                // 2. تكرار المحاولة لضمان الثبات (ضد أي سكريبت آخر أو تحميل الصور)
+                let attempts = 0;
+                const interval = setInterval(() => {
+                    forceUpdateUI();
+                    attempts++;
+                    if(attempts >= 10) clearInterval(interval); // محاولة لمدة ثانية واحدة
+                }, 100);
+                
+            } else {
+                // الجلسة منتهية
+                logoutUser();
+            }
+        } catch (e) {
+            console.error('Session error', e);
+            logoutUser();
+        }
+    }
+}
+
+function updateFooterForUser(name) {
+    if (!name) return; // حماية ضد الأسماء الفارغة
+    
+    // تحديث العنوان الرئيسي بقوة
+    const studioTitle = document.getElementById('studio-name-display');
+    if(studioTitle) {
+        studioTitle.textContent = `استوديو ${name} 🎨`; // استخدام textContent أسرع وآمن
+    }
+    document.title = `استوديو ${name} | Studio`;
+
+    // البحث عن زر دخول المشتركين في الفوتر
+    // قد لا نجده إذا تم استبداله سابقاً، لذا نبحث عن الحاوية أو الزر
+    const buttons = document.querySelectorAll('button');
+    let loginBtn = null;
+    buttons.forEach(btn => {
+        if(btn.textContent.includes('دخول المشتركين') || btn.innerHTML.includes('fa-user-circle')) {
+            loginBtn = btn;
+        }
+    });
+
+    if (loginBtn) {
+        const parent = loginBtn.parentElement;
+        loginBtn.remove();
+        
+        // منع التكرار (حذف العناصر القديمة إذا وجدت)
+        const oldUserSpan = parent.querySelector('.user-session-span');
+        if(oldUserSpan) oldUserSpan.remove();
+        
+        // زر الخروج
+        const logoutBtn = document.createElement('button');
+        logoutBtn.onclick = logoutUser;
+        logoutBtn.className = 'text-sm font-semibold text-red-300 hover:text-red-200 transition flex items-center gap-2 px-3 py-1 user-session-btn';
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> خروج';
+        
+        // فاصل
+        const divider = document.createElement('div');
+        divider.className = 'h-5 w-px bg-white bg-opacity-30 user-session-divider';
+        
+        // اسم المستخدم
+        const userSpan = document.createElement('span');
+        userSpan.className = 'text-sm font-bold text-[#fbbf24] px-3 py-1 flex items-center gap-2 user-session-span';
+        userSpan.innerHTML = `<i class="fas fa-user-check"></i> ${name}`;
+        
+        parent.appendChild(userSpan);
+        parent.appendChild(divider);
+        parent.appendChild(logoutBtn);
+    } else {
+        // إذا لم نجد زر الدخول، ربما تم تحويله بالفعل؟
+        // لنتأكد من تحديث الاسم فقط إذا كان موجوداً
+        const existingSpan = document.querySelector('.user-session-span');
+        if (existingSpan) {
+             existingSpan.innerHTML = `<i class="fas fa-user-check"></i> ${name}`;
+        }
+    }
+}
+
+function logoutUser() {
+    localStorage.removeItem('despro_session');
+    localStorage.removeItem('userTier');
+    window.location.reload();
+}
+document.addEventListener('DOMContentLoaded', checkSession);

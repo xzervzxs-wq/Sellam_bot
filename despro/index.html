@@ -384,15 +384,14 @@
         <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-[#e2e8f0] pb-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3"><i class="fas fa-palette text-lg"></i></div>
                     <div>
-                        <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-2xl">استوديو المصممين 🎨</h1>
-                        <p class="text-[10px] text-[#94a3b8] font-medium" style="font-family: 'Noto Serif Arabic', serif;">مساحة مخصصة | متاجر | أعمال منزلية صغيره ✨</p>
+                        <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-2xl">أستوديو <span style="color: #6366f1;">Despro</span></h1>
+                        <p class="text-[10px] text-[#94a3b8] font-bold" style="font-family: 'Noto Serif Arabic', serif;">مساحة مخصصة <span style="color: #6366f1; margin: 0 4px;">|</span> متاجر <span style="color: #6366f1; margin: 0 4px;">|</span> مشاريع منزلية صغيره <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-left: 2px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 12l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h6" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2c.39 0 .754 .112 1.061 .304" /><path d="M19 21.5l2.518 -2.58a1.74 1.74 0 0 0 0 -2.413a1.627 1.627 0 0 0 -2.346 0l-.168 .172l-.168 -.172a1.627 1.627 0 0 0 -2.346 0a1.74 1.74 0 0 0 0 2.412l2.51 2.59l0 -.009" /></svg></p>
                     </div>
                 </div>
                 <!-- زر تبديل الوضع الليلي والنهاري -->
                 <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn" title="تبديل الوضع الليلي">
-                    <i class="far fa-sun theme-sun"></i>
+                    <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-moon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
                     <i class="fas fa-moon theme-moon"></i>
                 </button>
             </div>
@@ -736,9 +735,9 @@
                 </div>
             </div>
 
-            <!-- شريط المعلومات الجديد (قابل للفتح) -->
-            <div id="info-bar-placeholder" class="bg-[#f1f5f9] p-2 rounded text-[10px] text-[#1e293b] border border-[#e2e8f0] flex items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] transition" onclick="openDesignerPanel()">
-                <i class="fas fa-info-circle text-[#6366f1]"></i> <span>اضغط هنا لفتح لوحة المصمم 📋</span>
+            <!-- شريط الملاحظات الجديد (قابل للفتح) -->
+            <div id="info-bar-placeholder" class="bg-[#f1f5f9] p-3 rounded text-[11px] text-[#1e293b] border border-[#e2e8f0] flex items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] transition" onclick="openDesignerPanel()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-notebook" style="flex-shrink: 0;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18" /><path d="M13 8l2 0" /><path d="M13 12l2 0" /></svg> <span>اضغط هنا لكتابة ملاحظاتك - write your notes</span>
             </div>
 
             <!-- نافذة لوحة المصمم (Collapsible Designer Panel) -->
@@ -763,12 +762,15 @@
                                 <span class="flex items-center gap-2">
                                     <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
                                 </span>
-                                <span class="text-xs bg-[#f59e0b] text-white px-2 py-0.5 rounded" id="char-count">0/280</span>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xs bg-[#f59e0b] text-white px-2 py-0.5 rounded" id="char-count">0/280</span>
+                                    <span class="text-[9px] text-[#92400e] mt-1 font-medium opactiy-80">البريميوم: 1000</span>
+                                </div>
                             </h3>
                             <textarea 
                                 id="designer-notes" 
-                                class="w-full h-20 p-2 bg-white border border-[#f59e0b] rounded text-[#78350f] text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#f59e0b] focus:ring-offset-2"
-                                placeholder="اكتب ملاحظاتك هنا..."
+                                class="w-full h-20 p-2 bg-white/50 border-none rounded text-[#78350f] text-xs resize-none focus:outline-none focus:ring-0 placeholder:text-gray-500"
+                                placeholder="هنا مساحتك الخاصة.. دوّن أفكارك، تعليقاتك على التصميم، أو أي تفاصيل إبداعية تخطر ببالك لتذكرها لاحقاً"
                                 maxlength="280"
                                 onchange="updateDesignerNotes()"
                                 oninput="updateCharCount()"
@@ -799,6 +801,14 @@
                                 <div>
                                     <span class="text-[#64748b]">المقاس:</span>
                                     <p class="font-bold text-[#1e293b]" id="canvas-size">-</p>
+                                </div>
+                            </div>
+                            
+                            <!-- الألوان المستخدمة -->
+                            <div class="mt-3 pt-3 border-t border-[#e2e8f0]">
+                                <span class="text-[#64748b] text-[10px] block mb-2 font-bold">الألوان المستخدمة:</span>
+                                <div id="used-colors-palette" class="flex flex-wrap gap-1.5 min-h-[20px]">
+                                    <!-- سيتم إضافة الألوان هنا بواسطة JS -->
                                 </div>
                             </div>
                         </div>
@@ -991,23 +1001,23 @@
                 <!-- Column 2: Links & Premium -->
                 <div>
                     <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-link text-xs text-cyan-300"></i>
-                        <h4 class="font-bold text-xs text-cyan-300 uppercase tracking-wide">روابط سريعة</h4>
+                        <i class="fas fa-link text-xs text-pink-300"></i>
+                        <h4 class="font-bold text-xs text-pink-300 uppercase tracking-wide">روابط سريعة</h4>
                     </div>
                     <div class="flex items-center gap-0">
-                        <a href="subscriptions.html" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1 no-underline">
-                            <i class="fas fa-crown text-yellow-300"></i>
-                            الاشتراك
+                        <a href="subscriptions.html" class="text-sm font-semibold text-[#fbbf24] hover:text-[#f59e0b] transition flex items-center gap-2 px-3 py-1 no-underline">
+                            <i class="fas fa-crown text-[#fbbf24]"></i>
+                            PREMIUM
                         </a>
                         <div class="h-5 w-px bg-white bg-opacity-30"></div>
                         <button onclick="toggleLoginOverlay()" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1">
-                            <i class="fas fa-headset text-cyan-300"></i>
+                            <i class="fas fa-headset text-pink-300"></i>
                             الدعم الفني
                         </button>
                         <div class="h-5 w-px bg-white bg-opacity-30"></div>
                         <button onclick="toggleLoginOverlay()" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1">
-                            <i class="fas fa-gem text-pink-300"></i>
-                            Premium
+                            <i class="fas fa-user-circle text-pink-300"></i>
+                            دخول المشتركين
                         </button>
                     </div>
                 </div>

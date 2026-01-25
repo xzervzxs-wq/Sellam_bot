@@ -876,8 +876,8 @@
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            border: 2px solid var(--border-color);
-            background-color: white;
+            border: none;
+            background-color: transparent;
             color: var(--text-dark);
             display: flex;
             align-items: center;
@@ -886,6 +886,7 @@
             transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
+            padding: 0;
         }
 
         .theme-toggle-btn:hover {
@@ -909,6 +910,7 @@
 
         .theme-moon {
             transform: rotate(-180deg) scale(0);
+            opacity: 0;
             opacity: 0;
         }
 
