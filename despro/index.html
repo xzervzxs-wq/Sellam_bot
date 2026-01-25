@@ -386,7 +386,7 @@
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3"><i class="fas fa-palette text-lg"></i></div>
                     <div>
-                        <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-2xl transition-opacity duration-300">أستوديو <span style="color: #6366f1;">Despro</span></h1>
+                        <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-2xl">أستوديو <span style="color: #6366f1;">Despro</span></h1>
                         <p class="text-[10px] text-[#94a3b8] font-bold" style="font-family: 'Noto Serif Arabic', serif;">مساحة مخصصة <span style="color: #6366f1; margin: 0 2px;">|</span> متاجر <span style="color: #6366f1; margin: 0 2px;">|</span> مشاريع منزلية صغيره <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-left: 2px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 12l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h6" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2c.39 0 .754 .112 1.061 .304" /><path d="M19 21.5l2.518 -2.58a1.74 1.74 0 0 0 0 -2.413a1.627 1.627 0 0 0 -2.346 0l-.168 .172l-.168 -.172a1.627 1.627 0 0 0 -2.346 0a1.74 1.74 0 0 0 0 2.412l2.51 2.59l0 -.009" /></svg></p>
                     </div>
                 </div>
@@ -1008,113 +1008,68 @@
     <!-- زر للإغلاق اليدوي للنافذة العائمة - تمت إزالته لدمجه في النافذة -->
     <div id="close-floating-toolbar" class="hidden"></div>
 
-    <!-- Footer - Professional Design -->
-    <footer class="relative bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 text-white py-2 mt-2 border-t border-indigo-500/30 shadow-2xl overflow-hidden">
-        <!-- Decorative Background Elements -->
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
-        </div>
-
+    <!-- Footer -->
+    <footer class="relative bg-gradient-to-r from-[#3730a3] to-[#312e81] text-white py-4 mt-8 border-t-2 border-[#4338ca] shadow-md overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 relative z-10">
-            <!-- Main Content Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Column 1: Brand -->
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-palette text-white text-lg"></i>
+                    <div>
+                        <h3 class="font-bold text-sm text-white">استوديو المصممين</h3>
+                        <p class="text-xs text-white text-opacity-80">للمشاريع الصغيره و المنزلية</p>
+                    </div>
+                </div>
                 
-                <!-- Column 1: Brand Identity -->
-                <div class="flex flex-col gap-1">
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                            <i class="fas fa-palette text-white text-sm"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-xs text-white">DesPro Studio</h3>
-                            <p class="text-[9px] text-indigo-200">Design Excellence</p>
-                        </div>
+                <!-- Column 2: Links & Premium -->
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-link text-xs text-pink-300"></i>
+                        <h4 class="font-bold text-xs text-white uppercase tracking-wide">روابط سريعة</h4>
                     </div>
-                    <p class="text-[10px] text-slate-300 leading-tight">استوديو تصميم احترافي</p>
-                </div>
-
-                <!-- Column 2: Quick Links -->
-                <div>
-                    <h4 class="font-bold text-[10px] text-white uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full"></span>
-                        روابط سريعة
-                    </h4>
-                    <ul class="space-y-1">
-                        <li>
-                            <a href="subscriptions.html" class="text-[10px] text-slate-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                                <i class="fas fa-crown text-yellow-400 group-hover:scale-110 transition-transform"></i>
-                                <span>الاشتراك</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://wa.me/966531333714" target="_blank" class="text-[10px] text-slate-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                                <i class="fas fa-headset text-pink-400 group-hover:scale-110 transition-transform"></i>
-                                <span>الدعم</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-[10px] text-slate-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                                <i class="fas fa-book text-cyan-400 group-hover:scale-110 transition-transform"></i>
-                                <span>التعليمات</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Column 3: Contact Us -->
-                <div>
-                    <h4 class="font-bold text-[10px] text-white uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></span>
-                        تواصل معنا
-                    </h4>
-                    <div class="flex gap-1.5">
-                            <a href="https://x.com/sdr_10" target="_blank" title="X/Twitter" class="w-8 h-8 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 rounded-lg flex items-center justify-center transition group cursor-pointer">
-                                <i class="fab fa-x-twitter text-slate-300 group-hover:text-indigo-400 group-hover:scale-110 transition-all text-sm"></i>
-                            </a>
-                            <a href="https://wa.me/966531333714" target="_blank" title="WhatsApp" class="w-8 h-8 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 rounded-lg flex items-center justify-center transition group cursor-pointer">
-                                <i class="fab fa-whatsapp text-slate-300 group-hover:text-green-400 group-hover:scale-110 transition-all text-sm"></i>
-                            </a>
+                    <div class="flex items-center gap-0">
+                        <a href="subscriptions.html" class="text-xs font-bold text-[#fbbf24] hover:text-[#f59e0b] transition flex items-center gap-1.5 px-2 py-1 bg-white/10 rounded-lg hover:bg-white/20 border border-white/10">
+                            <i class="fas fa-crown text-[#fbbf24]"></i>
+                            اشتراك
+                        </a>
+                        
+                        <a href="https://wa.me/966531333714" target="_blank" class="text-xs font-bold text-white hover:text-gray-200 transition flex items-center gap-1.5 px-2 py-1">
+                            <i class="fas fa-headset text-pink-300"></i>
+                            دعم
+                        </a>
+                        
+                        <div class="h-4 w-px bg-white/20 mx-1"></div>
+                        
+                        <!-- Login Button Container -->
+                        <div id="auth-container">
+                            <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="text-xs font-bold text-white hover:text-white transition flex items-center gap-1.5 px-3 py-1 bg-[#6366f1] hover:bg-[#4f46e5] rounded-full shadow-lg border border-[#818cf8] animate-pulse-slow">
+                                <i class="fas fa-user-circle"></i>
+                                تسجيل دخول
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Column 4: Auth Container -->
+                
+                <!-- Column 3: Contact -->
                 <div>
-                    <h4 class="font-bold text-[10px] text-white uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full"></span>
-                        حسابك
-                    </h4>
-                    <div id="auth-container" class="flex flex-col gap-1">
-                        <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="w-full text-xs font-bold py-2 px-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg shadow-lg border border-indigo-400/30 transition hover:shadow-indigo-500/50 flex items-center justify-center gap-1.5">
-                            <i class="fas fa-crown text-yellow-300"></i>
-                            <span>دخول</span>
-                        </button>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-comments text-xs text-white"></i>
+                        <h4 class="font-bold text-xs text-white">تواصل معنا</h4>
                     </div>
-                    
-                    <!-- Logout Button Container (shows when logged in) -->
-                    <div id="logout-container" class="hidden flex flex-col gap-1">
-                        <div id="logout-btn-footer" class="w-full px-2.5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 rounded-lg shadow-lg border border-red-500/50 transition hover:shadow-red-500/40 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95" onclick="logoutUser()">
-                            <i class="fas fa-sign-out-alt text-white"></i>
-                            <span class="text-xs font-bold text-white">خروج</span>
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <a href="https://wa.me/966531333714" target="_blank" title="00966531333714" class="flex items-center justify-center w-8 h-8 bg-white bg-opacity-25 rounded-lg hover:bg-opacity-40 transition group border border-white border-opacity-30">
+                            <i class="fab fa-whatsapp text-sm text-white group-hover:scale-110 transition-transform"></i>
+                        </a>
+                        <a href="https://x.com/sdr_10" target="_blank" title="@sdr_10" class="flex items-center justify-center w-8 h-8 bg-white bg-opacity-25 rounded-lg hover:bg-opacity-40 transition group border border-white border-opacity-30">
+                            <i class="fab fa-x-twitter text-sm text-white group-hover:scale-110 transition-transform"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <!-- Divider -->
-            <div class="h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent mb-2"></div>
-
-            <!-- Bottom Section -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-2 text-[9px] text-slate-400">
-                <p class="text-center md:text-left">© 2026 <span class="text-indigo-300 font-semibold">DesPro</span> • جميع الحقوق محفوظة</p>
-                <div class="flex items-center gap-2 text-[8px]">
-                    <a href="#" class="hover:text-indigo-300 transition">الخصوصية</a>
-                    <span class="text-slate-600">•</span>
-                    <a href="#" class="hover:text-indigo-300 transition">الشروط</a>
-                    <span class="text-slate-600">•</span>
-                    <a href="#" class="hover:text-indigo-300 transition">الأسئلة</a>
-                </div>
+            
+            <!-- Bottom -->
+            <div class="border-t border-white border-opacity-30 mt-3 pt-3 text-center text-xs text-white text-opacity-85">
+                <p>© جميع الحقوق محفوظة © despro.net 2026</p>
             </div>
         </div>
     </footer>
