@@ -559,8 +559,8 @@
         /* النصوص */
         .text-layer { width: auto; min-width: 100px; text-align: center; padding: 5px; cursor: text; }
         .user-text { 
-            line-height: 1.6; display: block; white-space: pre-wrap; outline: none; 
-            background: transparent; border: none; text-align: center; width: 100%; 
+            line-height: 1.6; display: block; white-space: pre-wrap; outline: none;
+            background: transparent; border: none; text-align: inherit; width: 100%;
             resize: none; overflow: visible; 
             user-select: text !important;
             -webkit-user-select: text !important;

@@ -897,20 +897,7 @@
             <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
         </div>
 
-        <!-- NEW: صف المحاذاة (توسيط، يمين، يسار) -->
-        <div id="text-alignment-row" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-center bg-gray-50/50 border border-gray-100 mx-1">
-             <button onclick="updateStyle('textAlign', 'right')" class="p-1.5 hover:bg-indigo-100 hover:text-indigo-600 rounded text-slate-500 transition" title="محاذاة لليمين">
-                <i class="fas fa-align-right text-xs"></i>
-             </button>
-             <button onclick="updateStyle('textAlign', 'center')" class="p-1.5 hover:bg-indigo-100 hover:text-indigo-600 rounded text-slate-500 transition" title="توسيط">
-                <i class="fas fa-align-center text-xs"></i>
-             </button>
-             <button onclick="updateStyle('textAlign', 'left')" class="p-1.5 hover:bg-indigo-100 hover:text-indigo-600 rounded text-slate-500 transition" title="محاذاة لليسار">
-                <i class="fas fa-align-left text-xs"></i>
-             </button>
-        </div>
-
-        <!-- الصف الثاني: نوع الخط + قائمة الخطوط + نجمة المفضلة + B -->
+        <!-- الصف الثاني: نوع الخط + قائمة الخطوط + نجمة المفضلة + B + المحاذاة -->
         <div id="top-font-controls" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-start flex-wrap">
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">نوع الخط:</span>
             <select id="top-font-family" onchange="handleFontSelection(this)" class="bg-white border border-[#cbd5e1] rounded text-[9px] py-0.5 px-1 font-bold outline-none focus:border-[#6366f1] text-[#1e293b] max-w-[130px]">
@@ -980,6 +967,24 @@
             <button id="btn-bold" onclick="toggleBold()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition" title="خط عريض">
                 B
             </button>
+            
+            <!-- زر المحاذاة (مع قائمة منسدلة) -->
+            <div class="relative inline-block">
+                <button onclick="toggleAlignmentMenu()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1" title="المحاذاة">
+                    <i class="fas fa-align-center"></i>
+                </button>
+                <div id="alignment-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg p-1 flex gap-1 z-50 whitespace-nowrap">
+                    <button onclick="updateStyle('textAlign', 'right'); toggleAlignmentMenu()" class="p-1 px-2 hover:bg-gray-100 rounded text-slate-600" title="يمين">
+                        <i class="fas fa-align-right text-xs"></i>
+                    </button>
+                    <button onclick="updateStyle('textAlign', 'center'); toggleAlignmentMenu()" class="p-1 px-2 hover:bg-gray-100 rounded text-slate-600" title="وسط">
+                        <i class="fas fa-align-center text-xs"></i>
+                    </button>
+                    <button onclick="updateStyle('textAlign', 'left'); toggleAlignmentMenu()" class="p-1 px-2 hover:bg-gray-100 rounded text-slate-600" title="يسار">
+                        <i class="fas fa-align-left text-xs"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- إعدادات التدرج (تظهر عند التفعيل) -->
@@ -1067,6 +1072,6 @@
         </div>
     </footer>
 
-    <script src="js/app.js?v=1769352972"></script>
+    <script src="js/app.js?v=1769353000"></script>
 </body>
 </html>
