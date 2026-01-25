@@ -6071,7 +6071,7 @@ function updateFooterForUser(name) {
                     ${name}
                 </span>
                 <div class="w-px h-3 bg-white/20"></div>
-                <button onclick="logoutUser()" class="text-xs font-bold text-red-300 hover:text-red-100 transition flex items-center gap-1" title="تسجيل الخروج">
+                <button id="logout-btn-footer" class="text-xs font-bold text-red-300 hover:text-red-100 transition flex items-center gap-1" title="تسجيل الخروج">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -6086,6 +6086,13 @@ function updateFooterForUser(name) {
     const studioTitle = document.getElementById('studio-name-display');
     if(studioTitle) {
         studioTitle.innerHTML = `استوديو ${name} 🎨`;
+    }
+}
+
+function updateFooterLogoutHandler() {
+    const logoutBtn = document.getElementById("logout-btn-footer");
+    if(logoutBtn) {
+        logoutBtn.addEventListener("click", logoutUser);
     }
 }
 
