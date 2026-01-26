@@ -6544,3 +6544,19 @@ function deleteElement(elementId) {
 }
 
 document.addEventListener('DOMContentLoaded', updateLayersList);
+
+// Override to ensure update on open
+function toggleLayersPanel() {
+    const content = document.getElementById('layers-panel-content');
+    const arrow = document.getElementById('layers-panel-arrow');
+    if (content.classList.contains('hidden')) {
+        updateLayersList();
+        content.classList.remove('hidden');
+        content.classList.add('flex');
+        arrow.style.transform = 'rotate(-90deg)';
+    } else {
+        content.classList.add('hidden');
+        content.classList.remove('flex');
+        arrow.style.transform = 'rotate(0deg)';
+    }
+}
