@@ -658,10 +658,6 @@
                     <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
                         <i class="fas fa-cut"></i> <span class="ml-1 text-[9px] font-black">قص ذكي</span>
                     </button>
-                    <!-- زر الممحاة الذكية (مسح بالتحديد) -->
-                    <button onclick="toggleSmartEraserMode()" id="btn-smart-eraser" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-draw-polygon"></i> <span class="ml-1 text-[9px] font-black">مسح ذكي</span>
-                    </button>
                     <!-- زر القص (Crop) الجديد -->
                     <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
                         <i class="fas fa-crop"></i> <span class="ml-1 text-[9px] font-black">قص</span>
@@ -783,7 +779,11 @@
                     <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
                     <!-- تعديل زر الممحاة السحرية لإظهار النص -->
                     <button id="btn-magic" onclick="toggleMagicMode()" class="px-2 py-0.5 rounded text-[9px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1" title="ممحاة سحرية">
-                        <i class="fas fa-magic"></i> <span class="ml-1 text-[9px] font-black">الممحاة السحرية</span>
+                        <i class="fas fa-magic"></i> <span class="ml-1 text-[9px] font-black">السحرية</span>
+                    </button>
+                    <!-- زر الممحاة الذكية (مسح بالتحديد) -->
+                    <button id="btn-smart-eraser" onclick="toggleSmartEraserMode()" class="px-2 py-0.5 rounded text-[9px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1" title="ممحاة ذكية بالتحديد">
+                        <i class="fas fa-draw-polygon"></i> <span class="ml-1 text-[9px] font-black">الذكية</span>
                     </button>
                     
                     <div id="magic-tolerance-control" class="hidden items-center gap-1">
