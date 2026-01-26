@@ -2548,32 +2548,37 @@
             const sourceImg = targetEl.querySelector('img');
             if(!sourceImg) return;
             
-            const imgRect = targetEl.getBoundingClientRect();
-            const imgL = imgRect.left - cardRect.left;
-            const imgT = imgRect.top - cardRect.top;
-            const nW = sourceImg.naturalWidth || imgRect.width;
-            const nH = sourceImg.naturalHeight || imgRect.height;
-            const rX = nW / imgRect.width;
-            const rY = nH / imgRect.height;
+                        const imgLeft = targetEl.offsetLeft;
+            const imgTop = targetEl.offsetTop;
+            const imgWidth = targetEl.offsetWidth;
+            const imgHeight = targetEl.offsetHeight;
+
+            const naturalWidth = sourceImg.naturalWidth || imgWidth;
+            const naturalHeight = sourceImg.naturalHeight || imgHeight;
+            const ratioX = naturalWidth / imgWidth;
+            const ratioY = naturalHeight / imgHeight;
+
+            const cornerX = imgLeft - (imgWidth / 2);
+            const cornerY = imgTop - (imgHeight / 2);
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = naturalWidth;
+            tempCanvas.height = naturalHeight;
+            const tCtx = tempCanvas.getContext('2d');
             
-            const tc = document.createElement('canvas');
-            tc.width = nW;
-            tc.height = nH;
-            const tCtx = tc.getContext('2d');
-            tCtx.drawImage(sourceImg, 0, 0, nW, nH);
+            tCtx.drawImage(sourceImg, 0, 0, naturalWidth, naturalHeight);
             tCtx.globalCompositeOperation = 'destination-out';
             tCtx.beginPath();
             
-            for(let i = 0; i < points.length; i++) {
-                const px = (points[i].x - imgL) * rX;
-                const py = (points[i].y - imgT) * rY;
-                if(i === 0) tCtx.moveTo(px, py);
+            for(let i=0; i<points.length; i++) {
+                const px = (points[i].x - cornerX) * ratioX;
+                const py = (points[i].y - cornerY) * ratioY;
+                if(i===0) tCtx.moveTo(px, py);
                 else tCtx.lineTo(px, py);
             }
-            
             tCtx.closePath();
             tCtx.fill();
-            sourceImg.src = tc.toDataURL('image/png');
+            sourceImg.src = tempCanvas.toDataURL('image/png');
             saveState();
             // إنهاء الممحاة الذكية تلقائياً بعد المسح
             exitSmartEraserMode();
