@@ -92,6 +92,10 @@
         let hasGradient = false;
         let eraserMode = false;
         let magicMode = false; 
+        let smartEraserMode = false; // متغير الممحاة الذكية
+        let smartEraserMode = false;
+        let smartEraserCanvas = null;
+        let smartEraserCanvas = null; // كانفاس الممحاة الذكية
         let lassoMode = false; // متغير القص الذكي
         let cropMode = false; // متغير وضع القص
         let handMode = false; // متغير وضع اليد للتحريك
@@ -6179,3 +6183,184 @@ function logoutUser() {
 }
 document.addEventListener('DOMContentLoaded', checkSession);
 document.addEventListener('DOMContentLoaded', loadAssetsLibraryFromGitHub);
+
+        // --- دوال الممحاة الذكية (Smart Eraser) ---
+        function toggleSmartEraserMode() {
+            smartEraserMode = !smartEraserMode;
+            
+            if(smartEraserMode) {
+                if(magicMode) toggleMagicMode();
+                
+                // Initialize canvas
+                initSmartEraserCanvas();
+                document.getElementById('card').style.cursor = 'crosshair';
+            } else {
+                exitSmartEraserMode();
+            }
+            updateToolButtons();
+        }
+
+        function exitSmartEraserMode() {
+            smartEraserMode = false;
+            if(smartEraserCanvas) {
+                smartEraserCanvas.remove();
+                smartEraserCanvas = null;
+            }
+            // Restore eraser cursor if eraser mode is still on
+            if(eraserMode) {
+                document.getElementById('card').style.cursor = 'crosshair';
+            }
+        }
+        
+        function initSmartEraserCanvas() {
+            if(smartEraserCanvas) smartEraserCanvas.remove();
+            const card = document.getElementById('card');
+            
+            smartEraserCanvas = document.createElement('canvas');
+            smartEraserCanvas.width = card.offsetWidth;
+            smartEraserCanvas.height = card.offsetHeight;
+            smartEraserCanvas.style.position = 'absolute';
+            smartEraserCanvas.style.top = '0';
+            smartEraserCanvas.style.left = '0';
+            smartEraserCanvas.style.cursor = 'crosshair';
+            smartEraserCanvas.style.zIndex = '550'; 
+            
+            const ctx = smartEraserCanvas.getContext('2d');
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#ef4444'; 
+            ctx.setLineDash([5, 5]);
+
+            let isDrawing = false;
+            let points = [];
+
+            function getMousePos(e) {
+                const rect = smartEraserCanvas.getBoundingClientRect();
+                const scaleX = smartEraserCanvas.width / rect.width;
+                const scaleY = smartEraserCanvas.height / rect.height;
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            function startDraw(e) {
+                isDrawing = true;
+                points = [];
+                const pos = getMousePos(e);
+                points.push(pos);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+
+            function draw(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                const pos = getMousePos(e);
+                points.push(pos);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
+                
+                ctx.beginPath();
+                if(points.length > 0) {
+                    ctx.moveTo(points[0].x, points[0].y);
+                    for(let i=1; i<points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.strokeStyle = '#ef4444'; 
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.1)';
+                ctx.fill();
+            }
+
+            function endDraw(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                e.stopPropagation();
+                isDrawing = false;
+                ctx.closePath();
+                ctx.stroke();
+                performSmartEraser(points);
+                ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
+                // Exit smart mode after cut? User said "Smart Eraser" like "Smart Cut".
+                // Usually tools toggle off. But eraser can be used multiple times.
+                // Let's keep it on.
+            }
+
+            smartEraserCanvas.addEventListener('mousedown', startDraw);
+            smartEraserCanvas.addEventListener('mousemove', draw);
+            smartEraserCanvas.addEventListener('mouseup', endDraw);
+            
+            smartEraserCanvas.addEventListener('touchstart', startDraw, {passive: false});
+            smartEraserCanvas.addEventListener('touchmove', draw, {passive: false});
+            smartEraserCanvas.addEventListener('touchend', endDraw);
+
+            card.appendChild(smartEraserCanvas);
+        }
+
+        function performSmartEraser(points) {
+            if(points.length < 3) return;
+            
+            const card = document.getElementById('card');
+            const cardRect = card.getBoundingClientRect();
+            
+            const startP = points[0];
+            const images = Array.from(card.querySelectorAll('.image-layer')).reverse(); 
+            let targetEl = null;
+
+            for (let imgLayer of images) {
+                const rect = imgLayer.getBoundingClientRect();
+                const layerLeft = rect.left - cardRect.left; 
+                const layerTop = rect.top - cardRect.top;    
+                const width = rect.width;
+                const height = rect.height;
+                
+                if(startP.x >= layerLeft && startP.x <= layerLeft + width &&
+                   startP.y >= layerTop && startP.y <= layerTop + height) {
+                    targetEl = imgLayer;
+                    break;
+                }
+            }
+            
+            if(!targetEl) return; 
+            
+            const sourceImg = targetEl.querySelector('img');
+            if(!sourceImg) return;
+
+            const imgLeft = targetEl.offsetLeft;
+            const imgTop = targetEl.offsetTop;
+            const imgWidth = targetEl.offsetWidth;
+            const imgHeight = targetEl.offsetHeight;
+
+            const naturalWidth = sourceImg.naturalWidth || imgWidth;
+            const naturalHeight = sourceImg.naturalHeight || imgHeight;
+            const ratioX = naturalWidth / imgWidth;
+            const ratioY = naturalHeight / imgHeight;
+
+            const cornerX = imgLeft - (imgWidth / 2);
+            const cornerY = imgTop - (imgHeight / 2);
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = naturalWidth;
+            tempCanvas.height = naturalHeight;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            tCtx.drawImage(sourceImg, 0, 0, naturalWidth, naturalHeight);
+            
+            tCtx.globalCompositeOperation = 'destination-out';
+            tCtx.beginPath();
+            
+            for(let i=0; i<points.length; i++) {
+                const px = (points[i].x - cornerX) * ratioX;
+                const py = (points[i].y - cornerY) * ratioY;
+                if(i===0) tCtx.moveTo(px, py);
+                else tCtx.lineTo(px, py);
+            }
+            tCtx.closePath();
+            tCtx.fill();
+            
+            sourceImg.src = tempCanvas.toDataURL('image/png');
+            saveState();
+        }
