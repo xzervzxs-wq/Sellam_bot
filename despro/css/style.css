@@ -626,52 +626,65 @@
         /* حاوية شريط الأدوات */
         .control-toolbar-container {
             position: absolute;
-            top: -44px;
+            top: -48px;
             left: 50%;
             transform: translateX(-50%) scale(calc(1 / var(--card-zoom, 1)));
             transform-origin: bottom center;
             display: none;
-            z-index: 102;
+            z-index: 1000;
+            pointer-events: auto;
         }
-        .draggable-el.selected .control-toolbar-container { display: flex; }
+        .draggable-el.selected .control-toolbar-container { display: block !important; }
         .draggable-el.is-locked .control-toolbar-container { display: none !important; }
         
         /* شريط الأدوات الرئيسي */
         .control-toolbar {
-            display: flex;
+            display: flex !important;
+            flex-direction: row !important;
             align-items: center;
             gap: 2px;
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 4px 6px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), 
-                        0 2px 4px rgba(0, 0, 0, 0.1),
+            padding: 6px 8px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 
+                        0 2px 6px rgba(0, 0, 0, 0.15),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+            position: relative;
         }
         
         /* أزرار التحكم */
-        .control-btn { 
-            position: relative;
-            width: 28px; 
-            height: 28px; 
+        .control-toolbar .control-btn { 
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 30px !important; 
+            height: 30px !important; 
+            min-width: 30px !important;
+            min-height: 30px !important;
             border-radius: 6px; 
             color: white; 
-            display: flex; 
+            display: flex !important; 
             align-items: center; 
             justify-content: center; 
-            font-size: 12px; 
+            font-size: 13px; 
             cursor: pointer; 
             z-index: 102; 
-            transition: all 0.2s ease;
-            background: transparent;
+            transition: all 0.15s ease;
+            background: rgba(255, 255, 255, 0.08);
             border: none;
+            flex-shrink: 0;
+            transform: none !important;
         }
-        .control-btn:hover { 
-            transform: translateY(-2px);
+        .control-toolbar .control-btn:hover { 
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1) !important;
         }
-        .control-btn:active {
-            transform: translateY(0) scale(0.95);
+        .control-toolbar .control-btn:active {
+            transform: scale(0.95) !important;
         }
         
         /* ألوان الأزرار */
@@ -716,27 +729,35 @@
         }
         
         /* مقبض الحركة */
-        .move-handle { 
-            position: relative;
-            width: 32px; 
-            height: 28px; 
+        .control-toolbar .move-handle { 
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 34px !important; 
+            height: 30px !important;
+            min-width: 34px !important;
+            min-height: 30px !important;
             background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
             border-radius: 6px; 
             cursor: move; 
-            display: flex; 
+            display: flex !important; 
             align-items: center; 
             justify-content: center; 
             color: white; 
             font-size: 14px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+            flex-shrink: 0;
+            transform: none !important;
         }
-        .move-handle:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        .control-toolbar .move-handle:hover { 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+            transform: scale(1.05) !important;
         }
-        .move-handle:active {
-            transform: translateY(0) scale(0.98);
+        .control-toolbar .move-handle:active {
+            transform: scale(0.98) !important;
         }
         
         /* السهم المؤشر للشريط */
@@ -786,8 +807,10 @@
         }
         
         /* Legacy support - للتوافق مع الكود القديم */
-        .draggable-el.selected .control-btn { display: flex; }
+        .draggable-el.selected > .control-btn { display: flex; position: absolute; }
+        .draggable-el.selected > .move-handle { display: flex; position: absolute; }
         .draggable-el.is-locked .control-btn, .draggable-el.is-locked .handle, .draggable-el.is-locked .move-handle { display: none !important; }
+        .draggable-el.is-locked .control-toolbar-container { display: none !important; }
 
         /* عناصر مكتبة الأصول */
         .asset-item { transition: all 0.2s ease; border: 2px solid transparent; }
