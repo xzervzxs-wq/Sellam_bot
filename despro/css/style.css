@@ -594,8 +594,8 @@
         .rotate-btn { top: -50px; left: 74px; background: #8b5cf6; }
         .layer-up-btn { top: -50px; left: 120px; background: #64748b; }
         .layer-down-btn { top: -50px; left: 166px; background: #64748b; }
-        .move-handle { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) scale(max(0.8, min(1.1, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
-        .move-handle:hover { transform: translateX(-50%) scale(max(0.85, min(1.15, calc(1.1 / var(--card-zoom, 1))))); }
+        .move-handle { position: absolute; top: -50px; right: -18px; transform: scale(max(0.8, min(1.1, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
+        .move-handle:hover { transform: scale(max(0.85, min(1.15, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.8, min(1.1, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
 
         
