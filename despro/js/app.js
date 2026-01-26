@@ -6099,24 +6099,24 @@ function checkSession() {
                 // تحديث العبارة في الهيدر للبريميوم
                 const subtitleEl = document.getElementById('studio-subtitle-display');
                 if(subtitleEl) {
-                    subtitleEl.innerHTML = 'حيث أنت <i class="fas fa-star" style="color: #fbbf24; font-size: 9px;"></i>';
+                    subtitleEl.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>حيث أنت ✨</span>';
                     subtitleEl.classList.remove('text-slate-600');
-                    subtitleEl.classList.add('text-[#6366f1]');
+                    subtitleEl.classList.add('text-[#555555]');
                 }
                 setTimeout(function() {
                     const el = document.getElementById('studio-subtitle-display');
                     if(el) {
-                        el.innerHTML = 'حيث أنت <i class="fas fa-star" style="color: #fbbf24; font-size: 9px;"></i>';
+                        el.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>حيث أنت ✨</span>';
                         el.classList.remove('text-slate-600');
-                        el.classList.add('text-[#6366f1]');
+                        el.classList.add('text-[#555555]');
                     }
                 }, 500);
                 setTimeout(function() {
                     const el = document.getElementById('studio-subtitle-display');
                     if(el) {
-                        el.innerHTML = 'حيث أنت <i class="fas fa-star" style="color: #fbbf24; font-size: 9px;"></i>';
+                        el.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>حيث أنت ✨</span>';
                         el.classList.remove('text-slate-600');
-                        el.classList.add('text-[#6366f1]');
+                        el.classList.add('text-[#555555]');
                     }
                 }, 1500);
                 
