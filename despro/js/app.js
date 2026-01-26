@@ -2352,6 +2352,10 @@
         }
 
         function toggleEraserMode() {
+            if(!eraserMode && (!activeEl || !activeEl.classList.contains("image-layer"))) {
+                showInfoModal("يرجى تحديد طبقة صورة أولاً لاستخدام الممحاة", "تنبيه", "🖼️");
+                return;
+            }
             eraserMode = !eraserMode;
             
             if (eraserMode) {
