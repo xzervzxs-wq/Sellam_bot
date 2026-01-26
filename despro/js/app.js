@@ -1352,7 +1352,7 @@
              overlay.style.display = 'flex';
 
              try {
-                deselect();
+                // لا نلغي التحديد - نحتاج الصورة محددة للممحاة
                 const card = document.getElementById('card');
                 await new Promise(r => setTimeout(r, 200));
 
@@ -2368,7 +2368,7 @@
                     magicControls.classList.remove('flex');
                 }
 
-                deselect();
+                // لا نلغي التحديد - نحتاج الصورة محددة للممحاة
                 const controls = document.getElementById('eraser-controls');
                 controls.classList.add('active');
                 
