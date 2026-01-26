@@ -570,247 +570,37 @@
             -webkit-touch-callout: none;
         }
         
-        /* ═══════════════════════════════════════════════════════════════════════════
-           أدوات التحكم الاحترافية - Professional Element Controls
-           ═══════════════════════════════════════════════════════════════════════════ */
+        /* أدوات التحكم (المقابض) */
+        .draggable-el.selected { border: 1px dashed var(--primary-color); z-index: 100; }
+        .draggable-el.selected.is-locked { border-color: #ef4444; border-style: dotted; }
         
-        /* إطار التحديد */
-        .draggable-el.selected { 
-            border: 2px solid var(--primary-color); 
-            border-radius: 4px;
-            z-index: 100; 
-            box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
-        }
-        .draggable-el.selected.is-locked { 
-            border-color: #ef4444; 
-            border-style: dashed; 
-            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
-        }
-        
-        /* ─────────────────────────────────────────────────────────────────────────
-           مقابض تغيير الحجم (Resize Handles) - تصميم عصري ومضغوط
-           ───────────────────────────────────────────────────────────────────────── */
-        .handle { 
-            position: absolute; 
-            background: #ffffff; 
-            border: 2px solid var(--primary-color); 
-            width: 10px; 
-            height: 10px; 
-            border-radius: 2px; 
-            z-index: 101; 
-            display: none; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transition: all 0.15s ease;
-        }
-        .handle:hover {
-            background: var(--primary-color);
-            transform: scale(1.3) !important;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
-        }
+        .handle { position: absolute; background: white; border: 2.5px solid var(--primary-color); width: 26px; height: 26px; border-radius: 50%; z-index: 101; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .draggable-el.selected .handle { display: block; }
         
-        /* اتجاهات المقابض - Resize Handle Positions */
-        .resize-nw { top: -5px; left: -5px; cursor: nw-resize; }
-        .resize-ne { top: -5px; right: -5px; cursor: ne-resize; }
-        .resize-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
-        .resize-se { bottom: -5px; right: -5px; cursor: se-resize; }
-        .resize-n { top: -5px; left: 50%; transform: translateX(-50%); cursor: n-resize; border-radius: 2px; width: 20px; height: 6px; }
-        .resize-e { top: 50%; right: -5px; transform: translateY(-50%); cursor: e-resize; border-radius: 2px; width: 6px; height: 20px; }
-        .resize-s { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: s-resize; border-radius: 2px; width: 20px; height: 6px; }
-        .resize-w { top: 50%; left: -5px; transform: translateY(-50%); cursor: w-resize; border-radius: 2px; width: 6px; height: 20px; }
+        /* اتجاهات المقابض */
+        .resize-nw { top: -13px; left: -13px; cursor: nw-resize; }
+        .resize-ne { top: -13px; right: -13px; cursor: ne-resize; }
+        .resize-sw { bottom: -13px; left: -13px; cursor: sw-resize; }
+        .resize-se { bottom: -13px; right: -13px; cursor: se-resize; }
+        .resize-n { top: -13px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+        .resize-e { top: 50%; right: -13px; transform: translateY(-50%); cursor: e-resize; }
+        .resize-s { bottom: -13px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+        .resize-w { top: 50%; left: -13px; transform: translateY(-50%); cursor: w-resize; }
         
-        /* ─────────────────────────────────────────────────────────────────────────
-           شريط أدوات التحكم (Control Toolbar) - تصميم احترافي مدمج
-           ───────────────────────────────────────────────────────────────────────── */
+        .control-btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+        .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
+        .delete-btn { top: -50px; left: -18px; background: #ef4444; }
+        .duplicate-btn { top: -50px; left: 28px; background: #3b82f6; }
+        .rotate-btn { top: -50px; left: 74px; background: #8b5cf6; }
+        .layer-up-btn { top: -50px; left: 120px; background: #64748b; }
+        .layer-down-btn { top: -50px; left: 166px; background: #64748b; }
+        .move-handle { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
+        .move-handle:hover { transform: translateX(-50%) scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
+        .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+
         
-        /* حاوية شريط الأدوات */
-        .control-toolbar-container {
-            position: absolute;
-            top: -48px;
-            left: 50%;
-            transform: translateX(-50%) scale(calc(1 / var(--card-zoom, 1)));
-            transform-origin: bottom center;
-            display: none;
-            z-index: 1000;
-            pointer-events: auto;
-        }
-        .draggable-el.selected .control-toolbar-container { display: block !important; }
-        .draggable-el.is-locked .control-toolbar-container { display: none !important; }
-        
-        /* شريط الأدوات الرئيسي */
-        .control-toolbar {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center;
-            gap: 2px;
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 6px 8px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 
-                        0 2px 6px rgba(0, 0, 0, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            white-space: nowrap;
-            position: relative;
-        }
-        
-        /* أزرار التحكم */
-        .control-toolbar .control-btn { 
-            position: relative !important;
-            top: auto !important;
-            left: auto !important;
-            right: auto !important;
-            bottom: auto !important;
-            width: 30px !important; 
-            height: 30px !important; 
-            min-width: 30px !important;
-            min-height: 30px !important;
-            border-radius: 6px; 
-            color: white; 
-            display: flex !important; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 13px; 
-            cursor: pointer; 
-            z-index: 102; 
-            transition: all 0.15s ease;
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            flex-shrink: 0;
-            transform: none !important;
-        }
-        .control-toolbar .control-btn:hover { 
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.1) !important;
-        }
-        .control-toolbar .control-btn:active {
-            transform: scale(0.95) !important;
-        }
-        
-        /* ألوان الأزرار */
-        .delete-btn { 
-            color: #fca5a5;
-        }
-        .delete-btn:hover { 
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-        
-        .duplicate-btn { 
-            color: #93c5fd;
-        }
-        .duplicate-btn:hover { 
-            background: rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
-        }
-        
-        .rotate-btn { 
-            color: #c4b5fd;
-        }
-        .rotate-btn:hover { 
-            background: rgba(139, 92, 246, 0.2);
-            color: #8b5cf6;
-        }
-        
-        .layer-up-btn, .layer-down-btn { 
-            color: #cbd5e1;
-        }
-        .layer-up-btn:hover, .layer-down-btn:hover { 
-            background: rgba(100, 116, 139, 0.3);
-            color: #f1f5f9;
-        }
-        
-        /* فاصل بين مجموعات الأزرار */
-        .control-separator {
-            width: 1px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 0 4px;
-        }
-        
-        /* مقبض الحركة */
-        .control-toolbar .move-handle { 
-            position: relative !important;
-            top: auto !important;
-            left: auto !important;
-            right: auto !important;
-            bottom: auto !important;
-            width: 34px !important; 
-            height: 30px !important;
-            min-width: 34px !important;
-            min-height: 30px !important;
-            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
-            border-radius: 6px; 
-            cursor: move; 
-            display: flex !important; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-size: 14px;
-            transition: all 0.15s ease;
-            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
-            flex-shrink: 0;
-            transform: none !important;
-        }
-        .control-toolbar .move-handle:hover { 
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
-            transform: scale(1.05) !important;
-        }
-        .control-toolbar .move-handle:active {
-            transform: scale(0.98) !important;
-        }
-        
-        /* السهم المؤشر للشريط */
-        .control-toolbar::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #334155;
-        }
-        
-        /* ─────────────────────────────────────────────────────────────────────────
-           دعم الوضع الليلي للأدوات
-           ───────────────────────────────────────────────────────────────────────── */
-        :root.dark-mode .control-toolbar {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-        :root.dark-mode .control-toolbar::after {
-            border-top-color: #1e293b;
-        }
-        :root.dark-mode .handle {
-            background: #1e293b;
-            border-color: #818cf8;
-        }
-        :root.dark-mode .handle:hover {
-            background: #818cf8;
-        }
-        
-        /* ─────────────────────────────────────────────────────────────────────────
-           التحجيم الذكي حسب الزوم - Smart Zoom Scaling
-           ───────────────────────────────────────────────────────────────────────── */
-        .handle { 
-            transform: scale(max(0.6, min(1.2, calc(1 / var(--card-zoom, 1))))); 
-            transform-origin: center center; 
-        }
-        .resize-n, .resize-s { 
-            transform: translateX(-50%) scale(max(0.6, min(1.2, calc(1 / var(--card-zoom, 1))))); 
-        }
-        .resize-e, .resize-w { 
-            transform: translateY(-50%) scale(max(0.6, min(1.2, calc(1 / var(--card-zoom, 1))))); 
-        }
-        
-        /* Legacy support - للتوافق مع الكود القديم */
-        .draggable-el.selected > .control-btn { display: flex; position: absolute; }
-        .draggable-el.selected > .move-handle { display: flex; position: absolute; }
+        .draggable-el.selected .control-btn, .draggable-el.selected .move-handle { display: flex; }
         .draggable-el.is-locked .control-btn, .draggable-el.is-locked .handle, .draggable-el.is-locked .move-handle { display: none !important; }
-        .draggable-el.is-locked .control-toolbar-container { display: none !important; }
 
         /* عناصر مكتبة الأصول */
         .asset-item { transition: all 0.2s ease; border: 2px solid transparent; }
