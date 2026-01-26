@@ -1,937 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>استوديو المصممين | Studio</title>
-    
-    <!-- مكتبات التنسيق والخطوط -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
-    <!-- إضافة مكتبة jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- إضافة مكتبة UTIF لقراءة ملفات TIF -->
-    <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
-    <!-- إضافة مكتبة PDF.js لقراءة ملفات PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    
-    <!-- تحميل بيانات الأصول من GitHub - يتم عبر fetch -->
-    <!-- سيتم تحميل official3.json عبر JavaScript -->
-    
-    <!-- مكتبة الأيقونات -->
-    <link id="fa-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
-    
-    <!-- تحميل الخطوط العربية (مكتبة موسعة - 37 خط) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Akatab:wght@400;700&family=Alexandria:wght@400;700&family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Baloo+Bhaijaan+2:wght@400;700&family=Blaka&family=Blaka+Hollow&family=Blaka+Ink&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=El+Messiri:wght@400;700&family=Gulzar&family=Harmattan:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Katibeh&family=Kufam:wght@400;700&family=Lalezar&family=Lateef:wght@400;700&family=Lemonada:wght@400;700&family=Mada:wght@400;700&family=Marhey:wght@400;700&family=Markazi+Text:wght@400;700&family=Mirza:wght@400;700&family=Noto+Kufi+Arabic:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Serif+Arabic:wght@400;700&family=Rakkas&family=Readex+Pro:wght@400;700&family=Reem+Kufi:wght@400;700&family=Rubik:wght@400;700&family=Scheherazade+New:wght@400;700&family=Tajawal:wght@400;700&family=Vazirmatn:wght@400;700&family=Zain:wght@400;700&display=swap" rel="stylesheet" crossorigin="anonymous">
-
-    <script>
-        // إعداد PDF.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-    </script>
-
-    <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="min-h-screen" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
-
-    <!-- تحميل الخطوط -->
-    <div id="hidden-font-loader">
-        <span style="font-family: 'Amiri', serif;">أ</span>
-        <!-- ... (باقي الخطوط) ... -->
-        <span style="font-family: 'Tajawal', sans-serif;">أ</span>
-    </div>
-
-    <!-- شاشة تسجيل الدخول -->
-    <div id="login-overlay" style="display: none;">
-        <div class="login-container" style="position: relative;">
-            <button onclick="toggleLoginOverlay()" style="position: absolute; top: 8px; right: 10px; background: none; border: none; color: #6366f1; font-size: 12px; cursor: pointer; transition: all 0.3s ease; padding: 5px 8px; font-family: 'Cairo', sans-serif; font-weight: bold;" title="العودة">
-                <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>
-                back
-            </button>
-            <div class="login-title">🎨 استوديو المصممين</div>
-            <div style="text-align: center; font-size: 14px; color: #94a3b8; font-family: 'Cairo', sans-serif; margin-bottom: 20px;">
-                استوديو متخصص | مساحات للإبداع ✨
-            </div>
-            <div class="login-subtitle">أدخل الكود الخاص بك</div>
-            <input 
-                type="text" 
-                id="login-code-input" 
-                class="login-input" 
-                placeholder="الكود" 
-                autocomplete="off"
-                onkeypress="if(event.key==='Enter') verifyCode()"
-            >
-            <button id="login-btn" class="login-btn" onclick="verifyCode()">دخول</button>
-            <div class="login-loading" id="login-loading">
-                <div class="login-spinner"></div>
-            </div>
-            <div class="login-error" id="login-error"></div>
-            
-            <!-- قسم الخدمات -->
-            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-                <p style="font-size: 12px; color: #64748b; font-family: 'Cairo', sans-serif; margin-bottom: 14px; text-align: center; font-weight: bold;">
-                    تواصل معنا عبر واتس اب
-                </p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <!-- إدارة الاشتراك -->
-                    <a href="subscriptions.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
-                        <i class="fas fa-credit-card" style="font-size: 16px;"></i>
-                        إدارة الاشتراك
-                    </a>
-                    
-                    <!-- الاقتراحات -->
-                    <a href="https://wa.me/966531333714?text=لدي%20اقتراح" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
-                        <i class="fas fa-lightbulb" style="font-size: 16px;"></i>
-                        الاقتراحات
-                    </a>
-                    
-                    <!-- الدعم الفني -->
-                    <a href="https://wa.me/966531333714?text=أحتاج%20إلى%20دعم%20فني" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
-                        <i class="fas fa-headset" style="font-size: 16px;"></i>
-                        الدعم الفني
-                    </a>
-                    
-                    <!-- استفسارات -->
-                    <a href="https://wa.me/966531333714?text=لدي%20استفسار" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; background-color: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: bold; font-family: 'Cairo', sans-serif; transition: all 0.3s ease; border: none; cursor: pointer;">
-                        <i class="fas fa-question-circle" style="font-size: 16px;"></i>
-                        استفسارات
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة التنبيه (للتحميل الداخلي) -->
-    <div id="startup-overlay" style="display: none;">
-        <div class="spinner mb-4"></div>
-        <div class="loading-text">جاري تجهيز استوديو المصممين...</div>
-    </div>
-    
-    <!-- نافذة الأصول العائمة -->
-    <div id="asset-window">
-        <div id="asset-header">
-            <span>🎨 عناصر القالب</span>
-            <button onclick="document.getElementById('asset-window').style.display='none'" class="text-white hover:text-red-400"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="asset-content">
-            <!-- سيتم تعبئة العناصر هنا -->
-        </div>
-    </div>
-
-    <!-- شاشة التصدير -->
-    <div id="export-overlay"><div class="spinner mb-4"></div><div class="text-white font-bold text-xl">جاري إنشاء الصورة...</div></div>
-    
-    <!-- نافذة التنبيه الجميلة (المصغرة) -->
-    <div id="info-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 100001; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
-        <div class="bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-indigo-100 p-4 max-w-[280px] mx-4 text-center transform animate-bounce-in relative">
-            
-            <div class="flex items-center gap-2 justify-center mb-2 border-b border-gray-100 pb-2">
-                <div id="info-modal-icon" class="text-xl">💡</div>
-                <h3 id="info-modal-title" class="text-sm font-bold text-slate-800">تنبيه</h3>
-            </div>
-            
-            <p id="info-modal-message" class="text-slate-600 text-xs font-semibold mb-3 leading-relaxed"></p>
-            
-            <button onclick="closeInfoModal()" class="w-full bg-[#6366f1] text-white hover:bg-[#4f46e5] px-4 py-1.5 rounded-lg text-xs font-bold transition shadow-md hover:shadow-lg">
-                حسناً
-            </button>
-        </div>
-    </div>
-    
-    <div id="save-modal">
-        <div class="w-full h-full max-w-[95vw] md:max-w-6xl max-h-[95vh] bg-slate-900 rounded-2xl shadow-2xl flex overflow-hidden border border-slate-700 mx-4">
-            
-            <!-- القسم الأيمن: المعاينة -->
-            <div class="flex-1 bg-[#0f172a] relative p-6 flex items-center justify-center">
-                <!-- خلفية شبكية خفيفة -->
-                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px;"></div>
-                
-                <div class="relative shadow-2xl h-full w-full flex items-center justify-center z-10 pb-4">
-                    <img id="save-img" class="max-h-full max-w-full object-contain bg-white transition-transform duration-300 shadow-xl" alt="معاينة الطباعة">
-                </div>
-            </div>
-
-            <!-- القسم الأيسر: الخيارات -->
-            <div class="w-[320px] bg-slate-800 border-r border-slate-700 flex flex-col z-20 shadow-xl">
-                 <!-- رأس القائمة -->
-                 <div class="p-6 pb-4 border-b border-slate-700/50">
-                     <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2">
-                        <i class="fas fa-print text-[#6366f1]"></i> طباعة وتصدير
-                     </h2>
-                     <p class="text-slate-400 text-[11px] font-bold">معاينة وتخصيص طباعة A4</p>
-                 </div>
-                 
-                 <!-- المحتوى القابل للتمرير -->
-                 <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                     
-                     <!-- إعدادات النسخ -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50">
-                         <div class="flex items-center justify-between mb-3">
-                             <label class="text-slate-200 text-xs font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
-                             <span class="text-sm text-slate-200 font-bold bg-slate-600/70 px-3 py-1 rounded-full" id="a4-max-text"></span>
-                         </div>
-                         
-                         <div class="flex items-center gap-2">
-                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-600 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
-                         </div>
-                     </div>
-
-                     <!-- خيارات إضافية -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 space-y-3">
-                         <label class="flex items-center justify-between cursor-pointer group select-none">
-                             <div class="flex items-center gap-2">
-                                 <div class="w-8 h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
-                                     <i class="fas fa-scissors text-xs"></i>
-                                 </div>
-                                 <span class="text-slate-200 text-xs font-bold group-hover:text-white transition">فواصل القص</span>
-                             </div>
-                             <div class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="show-cut-lines" checked onchange="updateA4Count()" class="sr-only peer">
-                                <div class="w-9 h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#6366f1]"></div>
-                             </div>
-                         </label>
-                         
-                         <!-- Opacity Control for Cut Lines -->
-                         <div class="px-1 pt-2 pb-1">
-                             <div class="flex items-center gap-2">
-                                 <span class="text-[8px] text-slate-400 font-bold whitespace-nowrap">الشفافية:</span>
-                                 <input type="range" id="cut-lines-opacity" min="10" max="100" value="100" onchange="updateA4Count()" oninput="document.getElementById('opacity-value').innerText = this.value + '%'" class="flex-1 h-1.5 accent-[#6366f1] rounded-full" style="cursor: pointer;">
-                                 <span class="text-[8px] text-slate-400 font-bold w-5 text-right" id="opacity-value">100%</span>
-                             </div>
-                         </div>
-                     </div>
-
-                     <!-- ملاحظة -->
-                     <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                         <p class="text-[10px] text-blue-200 leading-relaxed font-bold flex gap-2">
-                             <i class="fas fa-info-circle mt-0.5"></i>
-                             يتم ترتيب البطاقات تلقائياً لاستغلال مساحة الورقة بالكامل.
-                         </p>
-                     </div>
-                 </div>
-
-                 <!-- ذيل القائمة (الأزرار) -->
-                 <div class="p-6 pt-4 border-t border-slate-700/50 bg-slate-800 flex flex-col gap-3">
-                     <button onclick="printDesignDirect()" class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-[#6366f1]/25 border border-white/10 active:scale-[0.98] transition flex items-center justify-center gap-2 group">
-                        <i class="fas fa-print text-lg group-hover:animate-pulse"></i> <span>طباعة فورية</span>
-                     </button>
-                     
-                     <div class="grid grid-cols-2 gap-3">
-                         <button onclick="downloadImage()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/5 active:scale-[0.98]">
-                            <i class="fas fa-image text-emerald-400"></i> صورة
-                         </button>
-                         <button onclick="downloadPDF()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/5 active:scale-[0.98]">
-                            <i class="fas fa-file-pdf text-red-400"></i> PDF
-                         </button>
-                     </div>
-
-                     <button onclick="closeA4Modal()" class="mt-3 text-slate-300 hover:text-white text-xs font-bold py-2 px-4 transition text-center hover:bg-slate-700/50 rounded-lg border border-slate-600 hover:border-slate-500">
-                         إغلاق النافذة
-                     </button>
-                     
-                     <div id="premium-badge" class="text-center mt-3 flex items-center justify-center gap-2">
-                         <i class="fas fa-gem text-pink-400 text-sm"></i>
-                         <div class="flex flex-col gap-0.5">
-                             <p class="text-[9px] text-slate-400 font-medium">خاص بمشتركين</p>
-                             <p class="text-[10px] text-pink-300 font-bold">PREMIUM</p>
-                         </div>
-                     </div>
-                     
-                     <script>
-                         // إخفاء نص البريميوم للأعضاء البريميوم
-                         function updatePremiumBadge() {
-                             const badge = document.getElementById('premium-badge');
-                             if (userTier === 'premium' && badge) {
-                                 badge.style.display = 'none';
-                             } else if (badge) {
-                                 badge.style.display = 'flex';
-                             }
-                         }
-                         // تحديث عند فتح النافذة
-                         const observer = new MutationObserver(() => updatePremiumBadge());
-                         observer.observe(document.getElementById('save-modal'), { attributes: true });
-                         setTimeout(updatePremiumBadge, 100);
-                     </script>
-                 </div>
-            </div>
-            
-            <!-- زر قديم مخفي للحفاظ على التوافق -->
-            <button id="btn-modal-a4" onclick="generateA4Sheet()" class="hidden"></button>
-        </div>
-    </div>
-
-    <!-- مودال المشروع الجديد - ناعم وخفيف مع لون وردي -->
-    <div id="new-project-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onclick="if(event.target.id === 'new-project-modal') closeNewProjectModal()">
-        <div class="bg-white rounded-2xl p-5 shadow-lg max-w-sm w-full mx-4" onclick="event.stopPropagation()">
-            <!-- الرأس البسيط -->
-            <div class="text-center mb-4">
-                <h2 class="text-lg font-bold text-[#1e293b]">هل تريد حفظ العمل؟</h2>
-                <p class="text-xs text-[#94a3b8] mt-1">لديك عمل حالي لم يتم حفظه</p>
-            </div>
-            
-            <!-- الأزرار الثلاث بجانب بعض -->
-            <div class="flex gap-2 justify-center">
-                <button onclick="saveCurrentAsTemplateAndNew()" class="flex-1 bg-[#ec4899] text-white px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#db2777] transition-all shadow-sm flex items-center justify-center gap-2 group">
-                    <i class="fas fa-save group-hover:scale-110 transition-transform"></i>
-                    <span>حفظ العمل</span>
-                </button>
-                
-                <button onclick="resetCanvasWithoutSave()" class="flex-1 bg-white border border-[#ef4444] text-[#ef4444] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#fef2f2] hover:border-[#dc2626] transition-all shadow-sm flex items-center justify-center gap-2 group">
-                    <i class="fas fa-trash-alt group-hover:scale-110 transition-transform"></i>
-                    <span>عدم الحفظ</span>
-                </button>
-                
-                <button onclick="closeNewProjectModal()" class="flex-1 bg-white border border-[#cbd5e1] text-[#64748b] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#f8fafc] hover:border-[#94a3b8] transition-all shadow-sm flex items-center justify-center gap-2 group">
-                    <i class="fas fa-times group-hover:scale-110 transition-transform"></i>
-                    <span>إلغاء</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال حفظ باسم - ناعم وخفيف مع لون وردي -->
-    <div id="save-as-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onclick="if(event.target.id === 'save-as-modal') closeSaveAsModal()">
-        <div class="bg-white rounded-2xl p-5 shadow-lg max-w-sm w-full mx-4" onclick="event.stopPropagation()">
-            <!-- الرأس البسيط -->
-            <div class="text-center mb-4">
-                <h2 class="text-lg font-bold text-[#1e293b] flex items-center justify-center gap-2">
-                    <i class="fas fa-save text-[#ec4899]"></i>
-                    <span>حفظ العمل</span>
-                </h2>
-                <p class="text-xs text-[#94a3b8] mt-1">احفظ عملك كقالب محفوظ</p>
-            </div>
-            
-            <!-- حقل الاسم -->
-            <div class="mb-4">
-                <label class="text-xs font-bold text-[#1e293b] block mb-2">اسم العمل:</label>
-                <input type="text" id="save-as-name" placeholder="أدخل اسم العمل..." class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-lg text-sm outline-none focus:border-[#6366f1] focus:bg-[#f0f9ff] text-[#1e293b] transition-all" />
-                <p class="text-xs text-[#94a3b8] mt-1.5">💡 سيتم حفظ جميع عناصر العمل</p>
-            </div>
-            
-            <!-- الأزرار -->
-            <div class="flex gap-2 justify-center mb-3">
-                <button onclick="executeSaveAsFile()" class="flex-1 bg-[#ec4899] text-white px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#db2777] transition-all shadow-sm flex items-center justify-center gap-2 group">
-                    <i class="fas fa-save group-hover:scale-110 transition-transform"></i>
-                    <span>حفظ الآن</span>
-                </button>
-                <button onclick="closeSaveAsModal()" class="flex-1 bg-white border border-[#cbd5e1] text-[#64748b] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#f8fafc] hover:border-[#94a3b8] transition-all shadow-sm flex items-center justify-center gap-2 group">
-                    <i class="fas fa-times group-hover:scale-110 transition-transform"></i>
-                    <span>إلغاء</span>
-                </button>
-            </div>
-
-            <!-- ملاحظة صغيرة مع أيقونة -->
-            <div class="bg-[#f0f9ff] border border-[#bfdbfe] rounded-lg p-2.5 text-center">
-                <p class="text-xs text-[#1e40af] font-medium">
-                    <i class="fas fa-check-circle ml-1"></i> سيتم حفظ العمل في جهازك محلياً
-                </p>
-            </div>
-            <input type="hidden" id="save-as-callback">
-        </div>
-    </div>
-
-    <!-- مودال النجاح - ناعم وعصري -->
-    <div id="success-modal" class="hidden fixed inset-0 bg-black/40 z-[60] flex items-center justify-center backdrop-blur-sm transition-all duration-300 opacity-0" onclick="closeSuccessModal()">
-        <div class="bg-white rounded-2xl p-6 shadow-2xl max-w-[300px] w-full mx-4 transform transition-all duration-300 scale-90" id="success-modal-content" onclick="event.stopPropagation()">
-            <div class="text-center">
-                <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                    <i class="fas fa-check text-2xl text-green-500 animate-pulse"></i>
-                </div>
-                <h2 class="text-base font-bold text-[#1e293b] mb-1" id="success-modal-title">تمت العملية</h2>
-                <p class="text-[11px] text-[#64748b] mb-5 leading-relaxed" id="success-modal-message">تم تنفيذ الإجراء المطلوب بنجاح</p>
-                <button onclick="closeSuccessModal()" class="w-full bg-[#ec4899] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#db2777] transition-all shadow-md flex items-center justify-center gap-2 group hover:shadow-lg hover:-translate-y-0.5">
-                    <span>حسناً</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- مودال التدرج اللوني - تم إلغاؤه واستبداله بأدوات في الشريط العلوي -->
-
-
-    <!-- واجهة التطبيق -->
-    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
-        
-        <!-- اللوحة الجانبية -->
-        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
-            <div class="flex items-center gap-3 border-b border-[#e2e8f0] pb-3">
-                <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center text-white shadow-md transform rotate-3"><i class="fas fa-palette text-lg"></i></div>
-                <div>
-                    <h1 id="studio-name-display" class="font-bold text-[#1e293b] text-2xl">استوديو المصممين 🎨</h1>
-                    <p class="text-[10px] text-[#94a3b8] font-medium" style="font-family: 'Noto Serif Arabic', serif;">مساحة مخصصة | متاجر | أعمال منزلية صغيره ✨</p>
-                </div>
-            </div>
-
-            <!-- إضافة النصوص -->
-            <div class="space-y-2 bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
-                <label class="text-xs font-bold text-[#1e293b]">إضافة نصوص</label>
-                <div class="flex flex-col gap-2">
-                    <textarea id="user-text-input" rows="2" placeholder="اكتب النص هنا..." class="w-full p-2 bg-white border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-[#1e293b] resize-none"></textarea>
-                    <button onclick="addUserText()" class="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] flex items-center justify-center border border-[#6366f1] text-sm font-bold shadow-sm w-full">
-                        <i class="fas fa-plus ml-2"></i> إضافة النص
-                    </button>
-                </div>
-            </div>
-
-            <!-- أدوات الإضافة -->
-            <div class="grid grid-cols-3 gap-2">
-                <label class="col-span-2 bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition group">
-                    <i class="fas fa-image text-lg text-[#6366f1] group-hover:scale-110 transition-transform"></i> صورة
-                    <input type="file" onchange="addRegularImage(this)" class="hidden" accept="image/*">
-                </label>
-                <button onclick="createNewProject()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-file-circle-plus text-[#6366f1] group-hover:scale-110 transition-transform"></i> جديد</button>
-                
-                <!-- زر الإطارات مع Dropdown -->
-                <div class="relative" onclick="event.stopPropagation();">
-                    <button onclick="toggleFrameDropdown()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group min-w-[50px]">
-                        <i class="far fa-square text-[#6366f1] group-hover:scale-110 transition-transform"></i> إطار
-                    </button>
-                    
-                    <!-- Dropdown Menu -->
-                    <div id="frames-dropdown" class="hidden absolute top-full left-0 mt-2 bg-white border border-[#cbd5e1] rounded-lg shadow-lg z-50 p-1 w-[110px]">
-                        <button onclick="addFrameType('square')" class="w-full px-2 py-1.5 text-left text-[10px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:text-[#6366f1] rounded transition flex items-center gap-2 mb-1">
-                            <i class="far fa-square text-sm"></i> مربع
-                        </button>
-                        <button onclick="addFrameType('rounded')" class="w-full px-2 py-1.5 text-left text-[10px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:text-[#6366f1] rounded transition flex items-center gap-2 mb-1">
-                            <i class="far fa-square text-sm" style="border-radius: 6px;"></i> منحني
-                        </button>
-                        <button onclick="addFrameType('circle')" class="w-full px-2 py-1.5 text-left text-[10px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:text-[#6366f1] rounded transition flex items-center gap-2">
-                             <i class="far fa-circle text-sm"></i> دائرة
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- زر الأشكال مع Dropdown -->
-                <div class="relative" onclick="event.stopPropagation();">
-                    <button onclick="addShape()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-square-full text-[#6366f1] group-hover:scale-110 transition-transform"></i> شكل</button>
-                    
-                    <!-- Dropdown Menu -->
-                    <div id="shapes-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-[#cbd5e1] rounded-lg shadow-lg z-40 p-2">
-                        <button onclick="addShapeType('square')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
-                            <div class="w-4 h-4 bg-[#6366f1] rounded" style="border-radius: 2px;"></div> مربع
-                        </button>
-                        <button onclick="addShapeType('circle')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
-                            <div class="w-4 h-4 bg-[#6366f1] rounded-full"></div> دائرة
-                        </button>
-                        <button onclick="addShapeType('line')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
-                            <div class="w-4 h-0.5 bg-[#6366f1]"></div> خط
-                        </button>
-                        <button onclick="addShapeType('rounded')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
-                            <div class="w-4 h-4 bg-[#6366f1] rounded-lg" style="border-radius: 4px;"></div> منحنى
-                        </button>
-                    </div>
-                </div>
-                
-                <label class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 cursor-pointer group transition">
-                    <i class="fas fa-folder-open text-[#6366f1] group-hover:scale-110 transition-transform"></i> فتح ملف
-                    <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
-                </label>
-            </div>
-
-            <!-- مقاسات العمل (يدوي فقط - 10x10 افتراضي) -->
-            <div class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
-                <label class="text-xs font-bold text-[#1e293b] mb-2 block flex items-center gap-2">
-                    <i class="fas fa-ruler-combined text-[#6366f1]"></i> أبعاد التصميم (سم)
-                </label>
-                
-                <div class="grid grid-cols-2 gap-2 mb-2">
-                    <div class="relative">
-                        <label class="text-[9px] text-[#64748b] font-bold block mb-1">العرض (Width)</label>
-                        <input type="text" inputmode="decimal" id="custom-width" value="6" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
-                        <span class="absolute left-2 top-[26px] text-[12px] font-bold text-black">سم</span>
-                    </div>
-                    <div class="relative">
-                        <label class="text-[9px] text-[#64748b] font-bold block mb-1">الارتفاع (Height)</label>
-                        <input type="text" inputmode="decimal" id="custom-height" value="6" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
-                        <span class="absolute left-2 top-[26px] text-[12px] font-bold text-black">سم</span>
-                    </div>
-                </div>
-                
-                <div class="mt-2 text-center">
-                    <span id="size-display" class="text-[10px] font-bold text-[#64748b] bg-white px-2 py-1 rounded border border-[#e2e8f0]">1181 × 1181 px</span>
-                </div>
-                
-                <!-- التحكم بـ Zoom -->
-                <div class="mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-[9px] text-[#0c4a6e] font-bold">🔍 مستوى الزوم</label>
-                        <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">100%</span>
-                    </div>
-                    <input type="range" id="zoom-slider" min="25" max="200" value="100" class="w-full cursor-pointer" oninput="setCustomZoom(this.value)">
-                    <div class="flex gap-1 mt-2">
-                        <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">50%</button>
-                        <button onclick="setCustomZoom(75)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">75%</button>
-                        <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">100%</button>
-                        <button onclick="setCustomZoom(150)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">150%</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- قسم مكتبة العناصر الرسمية -->
-            <div class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
-                <div class="flex justify-between items-center cursor-pointer" onclick="toggleAssetsLibrary()">
-                    <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
-                        <i class="fas fa-shapes text-[#6366f1]"></i> مكتبة العناصر
-                    </label>
-                    <i id="assets-library-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200"></i>
-                </div>
-                
-                <div id="assets-library-content" class="hidden mt-3 flex-col gap-2">
-                    <!-- القائمة المنسدلة للتصنيفات -->
-                    <div class="w-full">
-                        <select id="assets-category-select" class="w-full p-2 text-[11px] font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]" onchange="loadAssetsCategory()">
-                            <option value="">📂 اختر تصنيفاً...</option>
-                        </select>
-                    </div>
-                    
-                    <!-- شبكة العناصر -->
-                    <div id="assets-grid" class="grid grid-cols-3 gap-2 max-h-[200px] overflow-y-auto p-1 bg-white rounded-lg border border-[#e2e8f0]">
-                        <div class="col-span-3 text-center text-[10px] text-[#64748b] py-4">اختر تصنيفاً لعرض العناصر</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- قسم الخصائص والحفظ -->
-            <div id="style-panel" class="bg-white p-4 rounded-2xl shadow-lg border border-[#cbd5e1] transition-all" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-4 border-b border-[#e2e8f0] pb-2 flex-wrap gap-2">
-                    <span class="text-xs font-black text-[#6366f1] uppercase tracking-wider" id="panel-title">التصدير</span>
-                    <!-- أزرار الحفظ -->
-                    <div class="flex gap-2 flex-wrap">
-                        <button onclick="saveWorkDirectly()" class="bg-[#6366f1] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#4f46e5] flex items-center gap-1 shadow-md transition">
-                            <i class="fas fa-image"></i> حفظ صورة
-                        </button>
-                        <button onclick="openSaveAsModal()" class="bg-[#6366f1] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#4f46e5] flex items-center gap-1 shadow-md transition">
-                            <i class="fas fa-download"></i> حفظ كملف
-                        </button>
-                        <button onclick="generateA4Sheet()" class="bg-[#ec4899] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#db2777] flex items-center gap-1 shadow-md transition">
-                            <i class="fas fa-print"></i> طباعة A4
-                        </button>
-                    </div>
-                </div>
-
-                <div id="no-selection-msg" class="text-center py-4 text-[#64748b] text-xs font-bold opacity-70">
-                    تصدير العمل النهائي
-                </div>
-
-                <div id="text-controls" class="hidden space-y-4">
-                    <input type="hidden" id="font-size">
-                    <input type="hidden" id="font-size-input">
-                    <input type="hidden" id="font-family">
-                </div>
-
-                <div id="frame-controls" class="hidden space-y-4">
-                </div>
-            </div>
-        </div>
-
-        <!-- منطقة العمل -->
-        <div class="lg:col-span-8 flex flex-col gap-1">
-            
-            <!-- شريط الأدوات العلوي -->
-            <div class="flex flex-wrap items-center bg-white p-2 rounded-xl border border-[#cbd5e1] shadow-sm justify-between gap-y-2" onclick="event.stopPropagation()">
-                
-                <!-- مجموعة الأدوات الأساسية -->
-                <div class="flex items-center gap-1 md:gap-2">
-                    <button onclick="undoAction()" class="p-1.5 md:p-2 text-[#64748b] hover:text-[#6366f1]"><i class="fas fa-undo"></i></button>
-                    <button onclick="redoAction()" class="p-1.5 md:p-2 text-[#64748b] hover:text-[#6366f1]"><i class="fas fa-redo"></i></button>
-                    <div class="w-px h-5 bg-[#e2e8f0] mx-1"></div>
-                    
-                    <!-- أدوات الخلفية الجديدة -->
-                    <div class="flex items-center gap-2 px-2 py-1 bg-[#f8fafc] rounded-lg border border-[#e2e8f0]">
-                        <label class="text-[10px] md:text-xs font-bold text-[#1e293b] cursor-pointer flex items-center gap-2 hover:text-[#6366f1] transition group">
-                            <i class="fas fa-fill-drip group-hover:scale-110 transition-transform"></i> لون الخلفية
-                            <!-- Improved Color Circle: Div shows color, input is invisible overlay -->
-                            <div id="bg-color-preview" class="relative w-6 h-6 rounded-full border border-slate-300 shadow-sm transition-transform hover:scale-110" style="background-color: #ffffff;">
-                                <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            </div>
-                        </label>
-                        <div class="w-px h-4 bg-[#cbd5e1]"></div>
-                        <!-- زر الشفافية -->
-                        <button onclick="toggleTransparentMode()" id="btn-transparent" class="px-3 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تفعيل/إلغاء الشفافية">
-                            <i class="fas fa-chess-board"></i> بلا خلفية
-                        </button>
-                    </div>
-                </div>
-
-                <!-- مجموعة أدوات التعديل -->
-                <div class="flex items-center gap-1 md:gap-2">
-                      <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-adjust"></i> التدرج
-                    </button>
-                    <!-- تعديل زر الممحاة حسب الطلب لإظهار النص دائماً -->
-                    <button onclick="toggleEraserMode()" id="btn-eraser" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-eraser"></i> <span class="ml-1 text-[9px] font-black">الممحاة</span>
-                    </button>
-                    <!-- زر القص الذكي (Lasso) الجديد -->
-                    <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-cut"></i> <span class="ml-1 text-[9px] font-black">قص ذكي</span>
-                    </button>
-                    <!-- زر القص (Crop) الجديد -->
-                    <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-crop"></i> <span class="ml-1 text-[9px] font-black">قص</span>
-                    </button>
-                    <!-- زر اليد (Hand Tool) للتحريك -->
-                    <button onclick="toggleHandMode()" id="btn-hand" class="w-8 h-8 rounded-lg text-lg bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center justify-center border border-[#e2e8f0] shadow-sm hover:shadow-md" title="أداة اليد - تحريك منطقة العمل">
-                        <i class="fa-regular fa-hand"></i>
-                    </button>
-                    <!-- Universal File Input: Supports All Formats -->
-                    <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".tif,.tiff,.pdf,.psd,.ai,.eps,.svg,.png,.jpg,.jpeg,.webp,.bmp">
-                </div>
-                
-                <!-- لوحات التحكم -->
-                
-
-                <!-- الألوان المفضلة -->
-                <div id="fav-colors-row" class="bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2">
-                    <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
-                    <div id="fav-colors-container" class="flex items-center gap-1.5 flex-wrap">
-                        <!-- سيتم تعبئتها بواسطة JS -->
-                    </div>
-                    <div class="w-px h-4 bg-[#e2e8f0] mx-1"></div>
-                    <div class="relative" title="إضافة لون جديد">
-                        <label for="add-fav-color" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
-                            <i class="fas fa-plus text-[8px]"></i>
-                        </label>
-                        <input type="color" id="add-fav-color" class="absolute opacity-0 w-0 h-0" onchange="addFavoriteColor(this.value)">
-                    </div>
-
-                    <!-- خصائص العنصر المحدد (شفافية الصورة) -->
-                    <div id="quick-props" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
-                        <span class="text-[9px] text-[#1e293b] font-bold whitespace-nowrap">شفافية:</span>
-                        <input type="range" id="layer-opacity" min="0" max="100" value="100" oninput="updateLayerOpacity(this.value)" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1] cursor-pointer">
-                        <span id="opacity-value" class="text-[9px] font-bold text-[#6366f1] w-6">100%</span>
-                        
-                        <!-- عناصر مخفية للاستخدام الداخلي -->
-                        <span id="text-color-section" class="hidden">
-                             <input type="color" id="quick-color" oninput="updateStyle('color', this.value)">
-                        </span>
-                    </div>
-
-                    <!-- إعدادات الإطار (تم نقلها هنا) -->
-                    <div id="frame-controls-toolbar" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
-                        <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
-                        <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#1e293b]">سمك:</span>
-                        <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
-                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
-                        <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-                    </div>
-                </div>
-
-                <!-- إعدادات التدرج -->
-                <div id="grad-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0]">
-                    <!-- Global Overlay Controls -->
-                    <div id="global-grad-inputs" class="flex items-center gap-2">
-                        <span class="text-[9px] font-bold text-[#1e293b]">تدرج:</span>
-                        <input type="color" id="global-grad-start" value="#000000" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="بداية التدرج (أسفل)">
-                        <input type="color" id="global-grad-end" value="#ffffff" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="نهاية التدرج (أعلى)">
-                        
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <input type="range" min="0" max="1" step="0.1" value="0.8" oninput="updateGlobalGradient()" id="global-grad-opacity" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="الشفافية">
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#1e293b]">التمدد:</span>
-                        <input type="range" min="10" max="100" value="50" oninput="updateGlobalGradient()" id="global-grad-height" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="ارتفاع التدرج">
-                    </div>
-
-                    <!-- Element Gradient Controls -->
-                    <div id="element-grad-inputs" class="hidden items-center gap-2">
-                        <span class="text-[9px] font-bold text-[#1e293b]">البداية:</span>
-                        <input type="color" id="grad-start-color" value="#6366f1" oninput="syncFloatGradientInputs('start', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
-                        
-                        <span class="text-[9px] font-bold text-[#1e293b]">النهاية:</span>
-                        <input type="color" id="grad-end-color" value="#ec4899" oninput="syncFloatGradientInputs('end', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
-                        
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        
-                        <span class="text-[9px] font-bold text-[#1e293b]">الزاوية:</span>
-                        <input type="range" min="0" max="360" value="90" id="grad-angle" oninput="syncFloatGradientInputs('angle', this.value); updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="زاوية التدرج">
-
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-
-                        <span class="text-[9px] font-bold text-[#1e293b]">الشفافية:</span>
-                        <input type="range" min="0" max="1" step="0.1" value="1" id="grad-opacity" oninput="updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="شفافية التدرج">
-                        
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <button onclick="toggleGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
-                            <i class="fas fa-times"></i> إلغاء
-                        </button>
-                    </div>
-                </div>
-
-                <!-- تم نقل أدوات التحكم بالنصوص والأطر إلى نافذة عائمة -->
-
-
-                <!-- إعدادات الممحاة -->
-                <div id="eraser-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0]">
-                    <div class="flex items-center gap-1 pl-2">
-                        <label class="flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" id="eraser-protect-bg" checked class="w-3 h-3 accent-[#6366f1]">
-                            <span class="text-[9px] font-bold text-[#1e293b]">حماية الخلفية</span>
-                        </label>
-                    </div>
-                    
-                    <div class="flex items-center gap-1">
-                         <span class="text-[9px] font-bold text-[#1e293b]">حجم:</span>
-                         <input type="range" min="5" max="100" value="30" id="eraser-size" class="w-12 h-1 accent-[#6366f1] cursor-pointer">
-                         <span id="eraser-size-display" class="text-[9px] font-bold w-4">30</span>
-                    </div>
-
-                    <div class="flex items-center gap-1">
-                        <span class="text-[9px] font-bold text-[#1e293b]">نعومة:</span>
-                        <input type="range" min="0" max="50" value="0" id="eraser-softness" class="w-12 h-1 accent-[#6366f1] cursor-pointer">
-                        <span id="eraser-softness-display" class="text-[9px] font-bold w-4">0</span>
-                    </div>
-                    
-                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                    <!-- تعديل زر الممحاة السحرية لإظهار النص -->
-                    <button id="btn-magic" onclick="toggleMagicMode()" class="px-2 py-0.5 rounded text-[9px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1" title="ممحاة سحرية">
-                        <i class="fas fa-magic"></i> <span class="ml-1 text-[9px] font-black">الممحاة السحرية</span>
-                    </button>
-                    
-                    <div id="magic-tolerance-control" class="hidden items-center gap-1">
-                         <span class="text-[9px] font-bold text-[#6366f1]">دقة:</span>
-                         <input type="range" min="1" max="100" value="30" id="magic-tolerance" class="w-10 h-1 accent-[#6366f1] cursor-pointer">
-                         <span id="magic-tolerance-display" class="text-[9px] font-bold w-4">30</span>
-                    </div>
-
-                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                    <button onclick="exitEraserMode()" class="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-300 text-slate-700 hover:bg-slate-400 transition">إنهاء</button>
-                </div>
-            </div>
-
-            <div class="bg-[#f1f5f9] p-2 rounded text-[10px] text-[#1e293b] border border-[#e2e8f0] flex items-center gap-2 font-bold">
-                <i class="fas fa-info-circle text-[#6366f1]"></i> <span>اضغط مرتين (Double Tap) لقفل/فتح العنصر</span>
-            </div>
-
-            <div class="preview-area" onclick="deselect(event)">
-                <div id="card-wrapper">
-                    <div id="ruler-h" class="ruler ruler-h"></div>
-                    <div id="ruler-v" class="ruler ruler-v"></div>
-                    <div id="card" onmousedown="deselectOnCard(event)" ontouchstart="deselectOnCard(event); event.preventDefault(); event.stopPropagation();" ontouchend="event.preventDefault(); event.stopPropagation();">
-                        <div id="card-gradient"></div>
-                    </div>
-                    <!-- Crop Overlay -->
-                    <div id="crop-overlay" class="hidden absolute top-0 left-0 w-full h-full pointer-events-auto z-[50000]" style="background: rgba(0, 0, 0, 0.5);">
-                        <!-- Crop Area (draggable and resizable) -->
-                        <div id="crop-area" class="absolute border-2 border-yellow-400" style="box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), inset 0 0 0 1000px rgba(0, 0, 0, 0); cursor: move; background-color: transparent;">
-                            <!-- Top-left corner handle -->
-                            <div id="crop-handle-tl" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nwse-resize" style="top: -6px; left: -6px;"></div>
-                            <!-- Top-right corner handle -->
-                            <div id="crop-handle-tr" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nesw-resize" style="top: -6px; right: -6px;"></div>
-                            <!-- Bottom-left corner handle -->
-                            <div id="crop-handle-bl" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nesw-resize" style="bottom: -6px; left: -6px;"></div>
-                            <!-- Bottom-right corner handle -->
-                            <div id="crop-handle-br" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nwse-resize" style="bottom: -6px; right: -6px;"></div>
-                            <!-- Top edge handle -->
-                            <div id="crop-handle-t" class="absolute w-6 h-2 bg-yellow-400 border border-white cursor-ns-resize" style="top: -5px; left: 50%; transform: translateX(-50%);"></div>
-                            <!-- Bottom edge handle -->
-                            <div id="crop-handle-b" class="absolute w-6 h-2 bg-yellow-400 border border-white cursor-ns-resize" style="bottom: -5px; left: 50%; transform: translateX(-50%);"></div>
-                            <!-- Left edge handle -->
-                            <div id="crop-handle-l" class="absolute w-2 h-6 bg-yellow-400 border border-white cursor-ew-resize" style="left: -5px; top: 50%; transform: translateY(-50%);"></div>
-                            <!-- Right edge handle -->
-                            <div id="crop-handle-r" class="absolute w-2 h-6 bg-yellow-400 border border-white cursor-ew-resize" style="right: -5px; top: 50%; transform: translateY(-50%);"></div>
-                        </div>
-                        <!-- Crop Buttons -->
-                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-[50001]">
-                            <button onclick="applyCrop()" class="px-4 py-2 bg-green-500 text-white rounded font-bold text-sm hover:bg-green-600 transition">✓ تطبيق</button>
-                            <button onclick="exitCropMode()" class="px-4 py-2 bg-red-500 text-white rounded font-bold text-sm hover:bg-red-600 transition">✕ إلغاء</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- لا يوجد فوتر -->
-
-    <!-- نافذة أدوات عائمة (بديلة عن الشريط العلوي لمنع إزاحة التصميم) -->
-    <div id="floating-context-toolbar" class="hidden fixed top-[18%] left-1/2 transform -translate-x-1/2 z-[99999] bg-white/95 backdrop-blur shadow-2xl rounded-2xl border border-indigo-100 p-2 flex flex-col gap-2 transition-all duration-300 pointer-events-auto min-w-[280px] max-h-[80vh] overflow-y-auto" style="box-shadow: 0 4px 16px -4px rgba(0,0,0,0.10);">
-        
-        <!-- Header with Close Button (Draggable Handle) -->
-        <div id="floating-toolbar-header" class="flex justify-between items-center px-1 mb-1 border-b border-gray-100 pb-1 cursor-move select-none sticky top-0 bg-white/95" title="اضغط واسحب للتحريك">
-            <span class="text-[10px] text-gray-400 font-bold pointer-events-none">خصائص العنصر</span>
-            <button onclick="closeFloatingToolbar()" class="text-red-500 hover:text-red-700 w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-50 transition" title="إغلاق">
-                <i class="fas fa-times text-[12px]"></i>
-            </button>
-        </div>
-
-        <!-- الصف الأول: زر التدرج + لون النص + حجم الخط -->
-        <div id="gradient-toggle-row" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-start flex-wrap">
-            <button id="btn-toggle-gradient" onclick="toggleGradientMode()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
-                <i class="fas fa-fill-drip text-[8px]"></i> تدرج
-            </button>
-            <div class="w-px h-4 bg-[#e2e8f0]"></div>
-            <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">لون النص:</span>
-            <input type="color" id="top-text-color" value="#1e293b" onchange="applyTextColor(this.value)" oninput="applyTextColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#cbd5e1] bg-transparent" title="لون النص">
-            <div class="w-px h-4 bg-[#e2e8f0]"></div>
-            <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
-            <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
-            <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
-        </div>
-
-        <!-- الصف الثاني: نوع الخط + قائمة الخطوط + نجمة المفضلة + B -->
-        <div id="top-font-controls" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-start flex-wrap">
-            <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">نوع الخط:</span>
-            <select id="top-font-family" onchange="handleFontSelection(this)" class="bg-white border border-[#cbd5e1] rounded text-[9px] py-0.5 px-1 font-bold outline-none focus:border-[#6366f1] text-[#1e293b] max-w-[130px]">
-                <!-- قسم المفضلة (يُملأ ديناميكياً) -->
-                <optgroup id="fav-fonts-group" label="⭐ المفضلة" style="display:none;"></optgroup>
-                <!-- الخطوط الأساسية -->
-                <optgroup label="الخطوط الأساسية">
-                    <option value="'Cairo', sans-serif">كايرو (Cairo) - مودرن</option>
-                    <option value="'Tajawal', sans-serif">تجوال (Tajawal) - المهندس</option>
-                    <option value="'Almarai', sans-serif">المراعي (Almarai) - رسمي</option>
-                    <option value="'Zain', sans-serif">زين (Zain) - عصري</option>
-                    <option value="'Mada', sans-serif">مدى (Mada) - ناعم</option>
-                </optgroup>
-                <!-- الخطوط العصرية الجديدة -->
-                <optgroup label="خطوط عصرية">
-                    <option value="'Rubik', sans-serif">روبيك (Rubik) - تطبيقات</option>
-                    <option value="'Readex Pro', sans-serif">ريدكس (Readex Pro) - واضح</option>
-                    <option value="'Alexandria', sans-serif">إسكندرية (Alexandria) - أنيق</option>
-                    <option value="'Noto Sans Arabic', sans-serif">نوتو سانس (Noto Sans) - حديث</option>
-                    <option value="'Noto Kufi Arabic', sans-serif">نوتو كوفي (Noto Kufi) - كوفي حديث</option>
-                    <option value="'Akatab', sans-serif">أكتب (Akatab) - بسيط</option>
-                    <option value="'Harmattan', sans-serif">هرمتان (Harmattan) - ناعم</option>
-                    <option value="'Mirza', sans-serif">ميرزا (Mirza) - فني</option>
-                </optgroup>
-                <!-- الخطوط الفنية والإبداعية -->
-                <optgroup label="خطوط فنية">
-                    <option value="'Blaka', cursive">بلاكا (Blaka) - إبداعي</option>
-                    <option value="'Blaka Ink', cursive">بلاكا حبر (Blaka Ink) - حبري</option>
-                    <option value="'Blaka Hollow', cursive">بلاكا مفرغ (Blaka Hollow) - مفرغ</option>
-                    <option value="'Marhey', cursive">مرحي (Marhey) - يدوي</option>
-                    <option value="'Katibeh', serif">كاتبة (Katibeh) - مزخرف</option>
-                    <option value="'Rakkas', serif">رقاص (Rakkas) - فني</option>
-                    <option value="'Lalezar', cursive">لاليزار (Lalezar) - عريض</option>
-                </optgroup>
-                <!-- الخطوط الكلاسيكية -->
-                <optgroup label="خطوط كلاسيكية">
-                    <option value="'Noto Serif Arabic', serif">نوتو سيريف (Noto Serif) - سيريف</option>
-                    <option value="'Amiri', serif">أميري (Amiri) - نسخ</option>
-                    <option value="'Aref Ruqaa', serif">عارف (Aref Ruqaa) - رقعة</option>
-                    <option value="'Scheherazade New', serif">شهرزاد (Scheherazade) - تراثي</option>
-                    <option value="'Lateef', serif">لطيف (Lateef) - كلاسيكي</option>
-                    <option value="'Gulzar', serif">جلزار (Gulzar) - نستعليق</option>
-                    <option value="'Markazi Text', serif">مركزي (Markazi) - عناوين</option>
-                </optgroup>
-                <!-- خطوط متنوعة -->
-                <optgroup label="خطوط متنوعة">
-                    <option value="'IBM Plex Sans Arabic', sans-serif">بلكس (IBM Plex) - تقني</option>
-                    <option value="'Vazirmatn', sans-serif">وزير (Vazirmatn) - نظيف</option>
-                    <option value="'Reem Kufi', sans-serif">ريم (Reem Kufi) - كوفي</option>
-                    <option value="'Kufam', sans-serif">كوفم (Kufam) - كوفي مطور</option>
-                    <option value="'El Messiri', sans-serif">المسيري (El Messiri) - مميز</option>
-                    <option value="'Changa', sans-serif">شانجا (Changa) - قوي</option>
-                    <option value="'Baloo Bhaijaan 2', cursive">بالو (Baloo) - طفولي</option>
-                    <option value="'Lemonada', cursive">ليمونادة (Lemonada) - عفوي</option>
-                </optgroup>
-                <!-- إضافة خط مخصص -->
-                <optgroup label="──────────────">
-                    <option value="__ADD_CUSTOM_FONT__" style="color: #6366f1; font-weight: bold;">➕ إضافة خط مخصص...</option>
-                </optgroup>
-            </select>
-            <!-- زر النجمة للمفضلة -->
-            <button id="btn-fav-font" onclick="toggleFavoriteFont()" class="px-1.5 py-0.5 rounded text-[18px] bg-transparent border-none text-[#cbd5e1] hover:text-[#f59e0b] transition" title="إضافة/إزالة من المفضلة">
-                ☆
-            </button>
-            <input type="file" id="custom-font-input" accept=".ttf,.otf,.woff,.woff2" style="display:none" onchange="handleCustomFontUpload(this)">
-            <!-- زر البولد -->
-            <button id="btn-bold" onclick="toggleBold()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition" title="خط عريض">
-                B
-            </button>
-        </div>
-
-        <!-- إعدادات التدرج (تظهر عند التفعيل) -->
-        <div id="floating-grad-settings" class="hidden flex-col gap-2 p-2 bg-slate-50 rounded border border-slate-200 shadow-inner mx-2">
-            <div class="flex items-center gap-1 justify-between">
-                <div class="flex items-center gap-1">
-                    <span class="text-[9px] font-bold">بدء:</span>
-                    <input type="color" id="float-grad-start" value="#6366f1" oninput="syncGradientInputs('start', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
-                    <span class="text-[9px] font-bold ml-1">نهاية:</span>
-                    <input type="color" id="float-grad-end" value="#ec4899" oninput="syncGradientInputs('end', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
-                </div>
-                <div class="flex items-center gap-1">
-                     <span class="text-[9px] font-bold">زاوية:</span>
-                         <input type="range" min="0" max="360" value="90" id="float-grad-angle" oninput="syncGradientInputs('angle', this.value); updateElementGradient()" class="w-10 h-1 accent-[#6366f1]">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- إعدادات الإطار - تم نقلها للشريط العلوي -->
-        
-    </div>
-
-    <!-- زر للإغلاق اليدوي للنافذة العائمة - تمت إزالته لدمجه في النافذة -->
-    <div id="close-floating-toolbar" class="hidden"></div>
-
-    <!-- Footer -->
-    <footer class="relative bg-gradient-to-r from-[#3730a3] to-[#312e81] text-white py-4 mt-8 border-t-2 border-[#4338ca] shadow-md overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 relative z-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Column 1: Brand -->
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-palette text-white text-lg"></i>
-                    <div>
-                        <h3 class="font-bold text-sm text-white">استوديو المصممين</h3>
-                        <p class="text-xs text-white text-opacity-80">للمشاريع الصغيره و المنزلية</p>
-                    </div>
-                </div>
-                
-                <!-- Column 2: Links & Premium -->
-                <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-link text-xs text-cyan-300"></i>
-                        <h4 class="font-bold text-xs text-cyan-300 uppercase tracking-wide">روابط سريعة</h4>
-                    </div>
-                    <div class="flex items-center gap-0">
-                        <a href="subscriptions.html" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1 no-underline">
-                            <i class="fas fa-crown text-yellow-300"></i>
-                            الاشتراك
-                        </a>
-                        <div class="h-5 w-px bg-white bg-opacity-30"></div>
-                        <button onclick="toggleLoginOverlay()" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1">
-                            <i class="fas fa-headset text-cyan-300"></i>
-                            الدعم الفني
-                        </button>
-                        <div class="h-5 w-px bg-white bg-opacity-30"></div>
-                        <button onclick="toggleLoginOverlay()" class="text-sm font-semibold text-white hover:text-gray-200 transition flex items-center gap-2 px-3 py-1">
-                            <i class="fas fa-gem text-pink-300"></i>
-                            Premium
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Column 3: Contact -->
-                <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-comments text-xs text-white"></i>
-                        <h4 class="font-bold text-xs text-white">تواصل معنا</h4>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <a href="https://wa.me/966531333714" target="_blank" title="00966531333714" class="flex items-center justify-center w-8 h-8 bg-white bg-opacity-25 rounded-lg hover:bg-opacity-40 transition group border border-white border-opacity-30">
-                            <i class="fab fa-whatsapp text-sm text-white group-hover:scale-110 transition-transform"></i>
-                        </a>
-                        <a href="https://x.com/sdr_10" target="_blank" title="@sdr_10" class="flex items-center justify-center w-8 h-8 bg-white bg-opacity-25 rounded-lg hover:bg-opacity-40 transition group border border-white border-opacity-30">
-                            <i class="fab fa-x-twitter text-sm text-white group-hover:scale-110 transition-transform"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Bottom -->
-            <div class="border-t border-white border-opacity-30 mt-3 pt-3 text-center text-xs text-white text-opacity-85">
-                <p>© جميع الحقوق محفوظة © despro.net 2026 • حيث الإبداع لا حدود له ✨</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="js/app.js"></script>
-</body>
-</html>
