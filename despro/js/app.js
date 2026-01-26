@@ -6096,6 +6096,30 @@ function checkSession() {
                 updateStudioName(session.name);
                 updateFooterForUser(session.name);
                 
+                // تحديث العبارة في الهيدر للبريميوم
+                const subtitleEl = document.getElementById('studio-subtitle-display');
+                if(subtitleEl) {
+                    subtitleEl.innerHTML = 'حيث أنت <i class="fas fa-star" style="color: #fbbf24; font-size: 9px;"></i>';
+                    subtitleEl.classList.remove('text-slate-600');
+                    subtitleEl.classList.add('text-[#6366f1]');
+                }
+                setTimeout(function() {
+                    const el = document.getElementById('studio-subtitle-display');
+                    if(el) {
+                        el.innerHTML = 'حيث أنت <i class="fas fa-star" style="color: #fbbf24; font-size: 9px;"></i>';
+                        el.classList.remove('text-slate-600');
+                        el.classList.add('text-[#6366f1]');
+                    }
+                }, 500);
+                setTimeout(function() {
+                    const el = document.getElementById('studio-subtitle-display');
+                    if(el) {
+                        el.innerHTML = 'حيث أنت <i class="fas fa-star" style="color: #fbbf24; font-size: 9px;"></i>';
+                        el.classList.remove('text-slate-600');
+                        el.classList.add('text-[#6366f1]');
+                    }
+                }, 1500);
+                
                 // إخفاء زر الدخول إن وجد
                 const loginOverlay = document.getElementById('login-overlay');
                 if(loginOverlay) loginOverlay.style.display = 'none';
