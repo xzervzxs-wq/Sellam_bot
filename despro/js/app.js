@@ -6180,130 +6180,155 @@ function logoutUser() {
 document.addEventListener('DOMContentLoaded', checkSession);
 document.addEventListener('DOMContentLoaded', loadAssetsLibraryFromGitHub);
 
+
 // ==========================================
-//  دوال الممحاة الذكية (Smart Eraser)
+//  دوال الممحاة الذكية (Smart Eraser) - Global Scope
 // ==========================================
-        function toggleSmartEraserMode() {
-            if(!eraserMode) {
-                alert('يرجى تفعيل وضع الممحاة أولاً');
-                return;
-            }
-            if(!activeEl || !activeEl.classList.contains('image-layer')) {
-                alert('يرجى تحديد طبقة صورة أولاً');
-                return;
-            }
-            smartEraserMode = !smartEraserMode;
-            if(smartEraserMode) {
-                if(magicMode) {
-                    magicMode = false;
-                    document.getElementById('magic-tolerance-control').classList.remove('flex');
-                    document.getElementById('magic-tolerance-control').classList.add('hidden');
-                }
-                initSmartEraserCanvas();
-                document.getElementById('card').style.cursor = 'crosshair';
-            } else {
-                exitSmartEraserMode();
-            }
-            updateToolButtons();
+window.toggleSmartEraserMode = function() {
+    if(!eraserMode) {
+        alert('يرجى تفعيل وضع الممحاة أولاً');
+        return;
+    }
+    if(!activeEl || !activeEl.classList.contains('image-layer')) {
+        alert('يرجى تحديد طبقة صورة أولاً');
+        return;
+    }
+    smartEraserMode = !smartEraserMode;
+    const btn = document.getElementById('btn-smart-eraser');
+    if(smartEraserMode) {
+        if(typeof magicMode !== 'undefined' && magicMode) {
+            magicMode = false;
+            const mtc = document.getElementById('magic-tolerance-control');
+            if(mtc) { mtc.classList.remove('flex'); mtc.classList.add('hidden'); }
         }
+        if(btn) btn.classList.add('ring-2', 'ring-red-400');
+        initSmartEraserCanvas();
+        document.getElementById('card').style.cursor = 'crosshair';
+    } else {
+        if(btn) btn.classList.remove('ring-2', 'ring-red-400');
+        exitSmartEraserMode();
+    }
+    if(typeof updateToolButtons === 'function') updateToolButtons();
+};
 
-        function exitSmartEraserMode() {
-            smartEraserMode = false;
-            if(smartEraserCanvas) {
-                smartEraserCanvas.remove();
-                smartEraserCanvas = null;
-            }
-            if(eraserMode) {
-                document.getElementById('card').style.cursor = 'crosshair';
-            } else {
-                document.getElementById('card').style.cursor = 'default';
-            }
-        }
+window.exitSmartEraserMode = function() {
+    smartEraserMode = false;
+    const btn = document.getElementById('btn-smart-eraser');
+    if(btn) btn.classList.remove('ring-2', 'ring-red-400');
+    if(smartEraserCanvas) {
+        smartEraserCanvas.remove();
+        smartEraserCanvas = null;
+    }
+    if(eraserMode) {
+        document.getElementById('card').style.cursor = 'crosshair';
+    } else {
+        document.getElementById('card').style.cursor = 'default';
+    }
+};
 
-        function initSmartEraserCanvas() {
-            if(smartEraserCanvas) smartEraserCanvas.remove();
-            const card = document.getElementById('card');
-            smartEraserCanvas = document.createElement('canvas');
-            smartEraserCanvas.width = card.offsetWidth;
-            smartEraserCanvas.height = card.offsetHeight;
-            smartEraserCanvas.style.cssText = 'position:absolute;top:0;left:0;cursor:crosshair;z-index:550';
-            const ctx = smartEraserCanvas.getContext('2d');
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#ef4444';
-            ctx.setLineDash([5, 5]);
-            let isDrawing = false;
-            let points = [];
-            function getPos(e) {
-                const rect = smartEraserCanvas.getBoundingClientRect();
-                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-                return {x: x * (smartEraserCanvas.width / rect.width), y: y * (smartEraserCanvas.height / rect.height)};
-            }
-            function start(e) { isDrawing = true; points = [getPos(e)]; }
-            function move(e) {
-                if(!isDrawing) return;
-                e.preventDefault();
-                points.push(getPos(e));
-                ctx.clearRect(0,0,smartEraserCanvas.width,smartEraserCanvas.height);
-                ctx.beginPath();
-                ctx.moveTo(points[0].x, points[0].y);
-                for(let i=1;i<points.length;i++) ctx.lineTo(points[i].x, points[i].y);
-                ctx.stroke();
-                ctx.fillStyle = 'rgba(239,68,68,0.15)';
-                ctx.fill();
-            }
-            function end(e) {
-                if(!isDrawing) return;
-                e.preventDefault();
-                isDrawing = false;
-                performSmartEraser(points);
-                ctx.clearRect(0,0,smartEraserCanvas.width,smartEraserCanvas.height);
-                points = [];
-            }
-            smartEraserCanvas.addEventListener('mousedown', start);
-            smartEraserCanvas.addEventListener('mousemove', move);
-            smartEraserCanvas.addEventListener('mouseup', end);
-            smartEraserCanvas.addEventListener('touchstart', start, {passive:false});
-            smartEraserCanvas.addEventListener('touchmove', move, {passive:false});
-            smartEraserCanvas.addEventListener('touchend', end);
-            card.appendChild(smartEraserCanvas);
-        }
+window.initSmartEraserCanvas = function() {
+    if(smartEraserCanvas) smartEraserCanvas.remove();
+    const card = document.getElementById('card');
+    smartEraserCanvas = document.createElement('canvas');
+    smartEraserCanvas.width = card.offsetWidth;
+    smartEraserCanvas.height = card.offsetHeight;
+    smartEraserCanvas.style.cssText = 'position:absolute;top:0;left:0;cursor:crosshair;z-index:550;';
+    const ctx = smartEraserCanvas.getContext('2d');
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#ef4444';
+    ctx.setLineDash([5, 5]);
+    let isDrawing = false;
+    let points = [];
+    
+    function getPos(e) {
+        const rect = smartEraserCanvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        return {x: x * (smartEraserCanvas.width / rect.width), y: y * (smartEraserCanvas.height / rect.height)};
+    }
+    
+    function start(e) { 
+        isDrawing = true; 
+        points = [getPos(e)]; 
+    }
+    
+    function move(e) {
+        if(!isDrawing) return;
+        e.preventDefault();
+        points.push(getPos(e));
+        ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for(let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+        ctx.fill();
+    }
+    
+    function end(e) {
+        if(!isDrawing) return;
+        e.preventDefault();
+        isDrawing = false;
+        performSmartEraser(points);
+        ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
+        points = [];
+    }
+    
+    smartEraserCanvas.addEventListener('mousedown', start);
+    smartEraserCanvas.addEventListener('mousemove', move);
+    smartEraserCanvas.addEventListener('mouseup', end);
+    smartEraserCanvas.addEventListener('touchstart', start, {passive: false});
+    smartEraserCanvas.addEventListener('touchmove', move, {passive: false});
+    smartEraserCanvas.addEventListener('touchend', end);
+    card.appendChild(smartEraserCanvas);
+};
 
-        function performSmartEraser(points) {
-            if(points.length < 3) return;
-            const card = document.getElementById('card');
-            const cardRect = card.getBoundingClientRect();
-            const images = Array.from(card.querySelectorAll('.image-layer')).reverse();
-            let targetEl = null;
-            for(let img of images) {
-                const r = img.getBoundingClientRect();
-                const l = r.left - cardRect.left, t = r.top - cardRect.top;
-                if(points[0].x >= l && points[0].x <= l + r.width && points[0].y >= t && points[0].y <= t + r.height) {
-                    targetEl = img;
-                    break;
-                }
-            }
-            if(!targetEl) return;
-            const sourceImg = targetEl.querySelector('img');
-            if(!sourceImg) return;
-            const imgRect = targetEl.getBoundingClientRect();
-            const imgL = imgRect.left - cardRect.left, imgT = imgRect.top - cardRect.top;
-            const nW = sourceImg.naturalWidth || imgRect.width;
-            const nH = sourceImg.naturalHeight || imgRect.height;
-            const rX = nW / imgRect.width, rY = nH / imgRect.height;
-            const tc = document.createElement('canvas');
-            tc.width = nW; tc.height = nH;
-            const tCtx = tc.getContext('2d');
-            tCtx.drawImage(sourceImg, 0, 0, nW, nH);
-            tCtx.globalCompositeOperation = 'destination-out';
-            tCtx.beginPath();
-            for(let i=0;i<points.length;i++) {
-                const px = (points[i].x - imgL) * rX, py = (points[i].y - imgT) * rY;
-                if(i===0) tCtx.moveTo(px, py);
-                else tCtx.lineTo(px, py);
-            }
-            tCtx.closePath();
-            tCtx.fill();
-            sourceImg.src = tc.toDataURL('image/png');
-            saveState();
+window.performSmartEraser = function(points) {
+    if(points.length < 3) return;
+    const card = document.getElementById('card');
+    const cardRect = card.getBoundingClientRect();
+    const images = Array.from(card.querySelectorAll('.image-layer')).reverse();
+    let targetEl = null;
+    
+    for(let img of images) {
+        const r = img.getBoundingClientRect();
+        const l = r.left - cardRect.left;
+        const t = r.top - cardRect.top;
+        if(points[0].x >= l && points[0].x <= l + r.width && points[0].y >= t && points[0].y <= t + r.height) {
+            targetEl = img;
+            break;
         }
+    }
+    
+    if(!targetEl) return;
+    const sourceImg = targetEl.querySelector('img');
+    if(!sourceImg) return;
+    
+    const imgRect = targetEl.getBoundingClientRect();
+    const imgL = imgRect.left - cardRect.left;
+    const imgT = imgRect.top - cardRect.top;
+    const nW = sourceImg.naturalWidth || imgRect.width;
+    const nH = sourceImg.naturalHeight || imgRect.height;
+    const rX = nW / imgRect.width;
+    const rY = nH / imgRect.height;
+    
+    const tc = document.createElement('canvas');
+    tc.width = nW;
+    tc.height = nH;
+    const tCtx = tc.getContext('2d');
+    tCtx.drawImage(sourceImg, 0, 0, nW, nH);
+    tCtx.globalCompositeOperation = 'destination-out';
+    tCtx.beginPath();
+    
+    for(let i = 0; i < points.length; i++) {
+        const px = (points[i].x - imgL) * rX;
+        const py = (points[i].y - imgT) * rY;
+        if(i === 0) tCtx.moveTo(px, py);
+        else tCtx.lineTo(px, py);
+    }
+    
+    tCtx.closePath();
+    tCtx.fill();
+    sourceImg.src = tc.toDataURL('image/png');
+    if(typeof saveState === 'function') saveState();
+};
