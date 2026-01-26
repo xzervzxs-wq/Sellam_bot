@@ -6325,7 +6325,6 @@ function updateFooterForUser(name) {
                         <span>${name}</span>
                     </div>
                     <span class="flex items-center gap-1 text-[11px] font-bold text-white/70">
-                        مساحة مخصصة | حيث أنت <i class="fas fa-star text-xs text-yellow-400"></i>
                     </span>
                 </div>
                 <button type="button" id="logout-btn" class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-lg border border-white/10 transition-all shadow-sm" title="تسجيل خروج">
