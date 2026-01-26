@@ -4023,7 +4023,7 @@
         });
 
         function deselect(e) {
-            if(e && (e.target.closest('.draggable-el') || e.target.closest('#style-panel') || e.target.closest('#floating-context-toolbar') || e.target.closest('select') || e.target.closest('input') || e.target.closest('.controls-row'))) return;
+            if(e && (e.target.closest(".draggable-el") || e.target.closest("#style-panel") || e.target.closest("#floating-context-toolbar") || e.target.closest("select") || e.target.closest("input") || e.target.closest(".controls-row") || e.target.closest("button") || e.target.closest("#eraser-controls"))) return;
 
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
