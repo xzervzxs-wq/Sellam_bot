@@ -6643,3 +6643,162 @@ function updateLayersList() {
         layersList.appendChild(layerItem);
     });
 }
+
+// === تحريك الطبقة للأعلى (z-index أكبر) ===
+function moveLayerUp(elementId) {
+    const card = document.getElementById('card');
+    const element = card.querySelector('[data-element-id="' + elementId + '"]');
+    if (!element) return;
+    
+    const allElements = Array.from(card.querySelectorAll('.draggable-el'));
+    const currentZ = parseInt(element.style.zIndex) || 10;
+    
+    // البحث عن العنصر الذي فوقه مباشرة
+    let nextHigherZ = Infinity;
+    let swapElement = null;
+    
+    allElements.forEach(el => {
+        if (el === element) return;
+        const z = parseInt(el.style.zIndex) || 10;
+        if (z > currentZ && z < nextHigherZ) {
+            nextHigherZ = z;
+            swapElement = el;
+        }
+    });
+    
+    if (swapElement) {
+        // تبديل z-index
+        element.style.zIndex = nextHigherZ;
+        swapElement.style.zIndex = currentZ;
+    } else {
+        // لا يوجد عنصر فوقه، زد z-index بـ 1
+        element.style.zIndex = currentZ + 1;
+    }
+    
+    updateLayersList();
+    saveState();
+}
+
+// === تحريك الطبقة للأسفل (z-index أقل) ===
+function moveLayerDown(elementId) {
+    const card = document.getElementById('card');
+    const element = card.querySelector('[data-element-id="' + elementId + '"]');
+    if (!element) return;
+    
+    const allElements = Array.from(card.querySelectorAll('.draggable-el'));
+    const currentZ = parseInt(element.style.zIndex) || 10;
+    
+    // البحث عن العنصر الذي تحته مباشرة
+    let nextLowerZ = -Infinity;
+    let swapElement = null;
+    
+    allElements.forEach(el => {
+        if (el === element) return;
+        const z = parseInt(el.style.zIndex) || 10;
+        if (z < currentZ && z > nextLowerZ) {
+            nextLowerZ = z;
+            swapElement = el;
+        }
+    });
+    
+    if (swapElement) {
+        // تبديل z-index
+        element.style.zIndex = nextLowerZ;
+        swapElement.style.zIndex = currentZ;
+    } else if (currentZ > 1) {
+        // لا يوجد عنصر تحته، قلل z-index بـ 1
+        element.style.zIndex = currentZ - 1;
+    }
+    
+    updateLayersList();
+    saveState();
+}
+
+// === نسخة محدثة مع أزرار الترتيب ===
+function updateLayersList() {
+    const card = document.getElementById('card');
+    const layersList = document.getElementById('layers-list');
+    
+    if (!card || !layersList) return;
+    
+    const elements = card.querySelectorAll('.draggable-el');
+    
+    if (elements.length === 0) {
+        layersList.innerHTML = '<div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>';
+        return;
+    }
+    
+    layersList.innerHTML = '';
+    
+    // ترتيب العناصر حسب z-index (الأعلى أولاً)
+    const elementsArray = Array.from(elements).sort((a, b) => {
+        return (parseInt(b.style.zIndex) || 10) - (parseInt(a.style.zIndex) || 10);
+    });
+    
+    elementsArray.forEach((element, index) => {
+        let elementId = element.getAttribute('data-element-id');
+        if (!elementId) {
+            elementId = 'el-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+            element.setAttribute('data-element-id', elementId);
+        }
+        
+        let elementType = '';
+        let icon = 'fa-square';
+        
+        if (element.classList.contains('text-layer')) {
+            elementType = 'نص';
+            icon = 'fa-font';
+        } else if (element.classList.contains('image-layer')) {
+            elementType = 'صورة';
+            icon = 'fa-image';
+        } else if (element.classList.contains('frame-layer')) {
+            elementType = 'إطار';
+            icon = 'fa-vector-square';
+        } else if (element.classList.contains('shape-layer')) {
+            elementType = 'شكل';
+            icon = 'fa-shapes';
+        } else {
+            elementType = 'عنصر';
+        }
+        
+        const isSelected = element.classList.contains('selected');
+        const isHidden = element.style.display === 'none';
+        const zIndex = parseInt(element.style.zIndex) || 10;
+        
+        const layerItem = document.createElement('div');
+        layerItem.className = 'layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ' + 
+            (isSelected 
+                ? 'bg-[#6366f1] text-white border-[#6366f1]' 
+                : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]');
+        
+        layerItem.innerHTML = '<div class="flex-1 flex items-center gap-2 min-w-0">' +
+            '<i class="fas ' + icon + '"></i>' +
+            '<div class="flex-1 min-w-0">' +
+                '<div class="text-[10px] font-bold truncate">' + elementType + '</div>' +
+            '</div>' +
+        '</div>' +
+        '<div class="flex items-center gap-0.5" onclick="event.stopPropagation()">' +
+            '<button class="p-1 text-[10px] hover:bg-[#e2e8f0] rounded transition" onclick="moveLayerUp(\'' + elementId + '\')" title="تقديم للأمام">' +
+                '<i class="fas fa-chevron-up"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:bg-[#e2e8f0] rounded transition" onclick="moveLayerDown(\'' + elementId + '\')" title="إرسال للخلف">' +
+                '<i class="fas fa-chevron-down"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:opacity-70 transition ' + (isHidden ? 'opacity-50' : '') + '" onclick="toggleLayerVisibility(this, \'' + elementId + '\')" title="إظهار/إخفاء">' +
+                '<i class="fas ' + (isHidden ? 'fa-eye-slash' : 'fa-eye') + '"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:text-red-500 transition" onclick="deleteElement(\'' + elementId + '\')" title="حذف">' +
+                '<i class="fas fa-trash"></i>' +
+            '</button>' +
+        '</div>';
+        
+        layerItem.addEventListener('click', function(e) {
+            if (!e.target.closest('button')) {
+                selectEl(element);
+                updateLayersList();
+            }
+        });
+        
+        layersList.appendChild(layerItem);
+    });
+}
