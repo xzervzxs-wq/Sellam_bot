@@ -119,7 +119,7 @@
         
         // --- إدارة الألوان المفضلة ---
         let favoriteColors = JSON.parse(localStorage.getItem('dalal_fav_colors')) || [
-            '#000000', '#ffffff', '#6366f1', '#ec4899', '#ef4444', 
+            '#000000', '#ffffff', '#6366f1', '#ec4899', '#6366f1', 
             '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#64748b'
         ];
 
@@ -2428,11 +2428,11 @@
                     const mtc = document.getElementById('magic-tolerance-control');
                     if(mtc) { mtc.classList.remove('flex'); mtc.classList.add('hidden'); }
                 }
-                if(btn) btn.classList.add('ring-2', 'ring-red-400');
+                if(btn) btn.classList.add('ring-2', 'ring-indigo-400');
                 initSmartEraserCanvas();
                 document.getElementById('card').style.cursor = 'crosshair';
             } else {
-                if(btn) btn.classList.remove('ring-2', 'ring-red-400');
+                if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
                 exitSmartEraserMode();
             }
             updateToolButtons();
@@ -2441,7 +2441,7 @@
         window.exitSmartEraserMode = function() {
             smartEraserMode = false;
             const btn = document.getElementById('btn-smart-eraser');
-            if(btn) btn.classList.remove('ring-2', 'ring-red-400');
+            if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
             if(smartEraserCanvas) {
                 smartEraserCanvas.remove();
                 smartEraserCanvas = null;
@@ -2462,7 +2462,7 @@
             smartEraserCanvas.style.cssText = 'position:absolute;top:0;left:0;cursor:crosshair;z-index:550;';
             const ctx = smartEraserCanvas.getContext('2d');
             ctx.lineWidth = 2;
-            ctx.strokeStyle = '#ef4444';
+            ctx.strokeStyle = '#6366f1';
             ctx.setLineDash([5, 5]);
             let isDrawing = false;
             let points = [];
@@ -2489,9 +2489,9 @@
                 ctx.setLineDash([]);
                 ctx.beginPath();
                 ctx.arc(points[0].x, points[0].y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = "rgba(239, 68, 68, 0.5)";
+                ctx.fillStyle = "rgba(99, 102, 241, 0.5)";
                 ctx.fill();
-                ctx.strokeStyle = "#ef4444";
+                ctx.strokeStyle = "#6366f1";
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 ctx.restore();
@@ -2500,7 +2500,7 @@
                 ctx.moveTo(points[0].x, points[0].y);
                 for(let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.15)';
                 ctx.fill();
             }
             
@@ -2526,16 +2526,21 @@
             if(points.length < 3) return;
             const card = document.getElementById('card');
             const cardRect = card.getBoundingClientRect();
-            const images = Array.from(card.querySelectorAll('.image-layer')).reverse();
-            let targetEl = null;
             
-            for(let img of images) {
-                const r = img.getBoundingClientRect();
-                const l = r.left - cardRect.left;
-                const t = r.top - cardRect.top;
-                if(points[0].x >= l && points[0].x <= l + r.width && points[0].y >= t && points[0].y <= t + r.height) {
-                    targetEl = img;
-                    break;
+            // استخدام العنصر المحدد أولاً
+            let targetEl = activeEl;
+            
+            // إذا لم يكن محدداً، ابحث تحت نقطة البداية
+            if(!targetEl || !targetEl.classList.contains('image-layer')) {
+                const images = Array.from(card.querySelectorAll('.image-layer')).reverse();
+                for(let img of images) {
+                    const r = img.getBoundingClientRect();
+                    const l = r.left - cardRect.left;
+                    const t = r.top - cardRect.top;
+                    if(points[0].x >= l && points[0].x <= l + r.width && points[0].y >= t && points[0].y <= t + r.height) {
+                        targetEl = img;
+                        break;
+                    }
                 }
             }
             
