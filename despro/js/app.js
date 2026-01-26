@@ -6466,3 +6466,81 @@ selectEl = function(el) {
     }
 };
 
+
+function updateLayersList() {
+    const card = document.getElementById('card');
+    const layersList = document.getElementById('layers-list');
+    
+    if (!card || !layersList) return;
+    
+    const elements = card.querySelectorAll('[data-element-id]');
+    
+    if (elements.length === 0) {
+        layersList.innerHTML = '<div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>';
+        return;
+    }
+    
+    layersList.innerHTML = '';
+    const elementsArray = Array.from(elements).reverse();
+    
+    elementsArray.forEach((element) => {
+        const elementId = element.getAttribute('data-element-id');
+        const elementType = element.getAttribute('data-element-type') || 'عنصر';
+        const isSelected = element.classList.contains('selected');
+        
+        const layerItem = document.createElement('div');
+        layerItem.className = `layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ${
+            isSelected 
+                ? 'bg-[#6366f1] text-white border-[#6366f1]' 
+                : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]'
+        }`;
+        
+        let icon = 'fa-square';
+        if (element.tagName.toLowerCase() === 'img') icon = 'fa-image';
+        else if (elementType.includes('text')) icon = 'fa-font';
+        
+        layerItem.innerHTML = `<div class="flex-1 flex items-center gap-2 min-w-0">
+            <i class="fas ${icon}"></i>
+            <div class="flex-1 min-w-0">
+                <div class="text-[10px] font-bold truncate">${elementType}</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+            <button class="p-1 text-[10px] hover:opacity-70 transition" onclick="toggleLayerVisibility(this, '${elementId}')" title="إظهار/إخفاء">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="p-1 text-[10px] hover:opacity-70 transition" onclick="deleteElement('${elementId}')" title="حذف">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+        
+        layerItem.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                selectEl(element);
+                updateLayersList();
+            }
+        });
+        
+        layersList.appendChild(layerItem);
+    });
+}
+
+function toggleLayerVisibility(button, elementId) {
+    const card = document.getElementById('card');
+    const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+    if (element) {
+        element.style.display = element.style.display === 'none' ? '' : 'none';
+        button.querySelector('i').classList.toggle('fa-eye-slash');
+        button.classList.toggle('opacity-50');
+    }
+}
+
+function deleteElement(elementId) {
+    const card = document.getElementById('card');
+    const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+    if (element && confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+        removeEl(element);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', updateLayersList);
