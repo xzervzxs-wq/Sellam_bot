@@ -709,6 +709,12 @@
             order: 99; 
         }
         .controls-row.active { display: flex; }
+
+        /* منع التفاف النص داخل أزرار الأدوات */
+        button[id^="btn-"] {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
         
         /* تنسيق الحقول */
         input[type="number"], input[type="text"], textarea, select {
@@ -1095,3 +1101,24 @@
         :root.dark-mode #info-bar-placeholder svg {
             stroke: #f1f5f9 !important;
         }
+
+/* إصلاح مكان أزرار التحكم في العنصر */
+.control-toolbar-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    z-index: 103;
+    pointer-events: none;
+}
+.control-toolbar {
+    position: relative;
+    width: 100%;
+    height: 0;
+}
+
+/* تأكيد تفاعل الأزرار */
+.control-btn {
+    pointer-events: auto;
+}
