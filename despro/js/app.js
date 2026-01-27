@@ -99,6 +99,9 @@
         let handMode = false; // متغير وضع اليد للتحريك
         let eraserCanvas = null; 
         let lassoCanvas = null; // كانفاس القص
+        let smartFillMode = false; // متغير التلوين الذكي
+        let smartFillCanvas = null; // كانفاس التلوين الذكي
+        let smartFillColor = "#6366f1"; // لون التعبئة الافتراضي
         let eraserSize = 30;
         let eraserSoftness = 0; 
         let magicTolerance = 30; 
