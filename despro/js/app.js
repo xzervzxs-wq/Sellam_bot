@@ -2444,12 +2444,12 @@
                 }
                 if(btn) btn.classList.add('ring-2', 'ring-indigo-400');
                 if(btnTop) btnTop.classList.add('ring-2', 'ring-indigo-400');
-                initSmartEraserCanvas();
+                window.initSmartEraserCanvas();
                 document.getElementById('card').style.cursor = 'crosshair';
             } else {
                 if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
                 if(btnTop) btnTop.classList.remove('ring-2', 'ring-indigo-400');
-                exitSmartEraserMode();
+                window.exitSmartEraserMode();
             }
             updateToolButtons();
         }
@@ -2601,7 +2601,7 @@
             sourceImg.src = tempCanvas.toDataURL('image/png');
             saveState();
             // إنهاء الممحاة الذكية تلقائياً بعد المسح
-            exitSmartEraserMode();
+            window.exitSmartEraserMode();
         }
 
         // --- دوال القص الذكي (Lasso) ---
