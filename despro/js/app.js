@@ -4873,6 +4873,7 @@
         function removeEl(el) {
             el.remove();
             deselect();
+            if (typeof updateLayersList === 'function') updateLayersList();
             saveState();
         }
         
