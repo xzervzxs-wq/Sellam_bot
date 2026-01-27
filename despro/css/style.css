@@ -587,14 +587,14 @@
         .resize-s { bottom: -13px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
         .resize-w { top: 50%; left: -13px; transform: translateY(-50%); cursor: w-resize; }
         
-        .control-btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+        .control-btn { position: absolute; width: 24px; height: 24px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 102; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
         .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
-        .delete-btn { top: -50px; left: -18px; background: #ef4444; }
-        .duplicate-btn { top: -50px; left: 28px; background: #3b82f6; }
-        .rotate-btn { top: -50px; left: 74px; background: #8b5cf6; }
-        .layer-up-btn { top: -50px; left: 120px; background: #64748b; }
-        .layer-down-btn { top: -50px; left: 166px; background: #64748b; }
-        .move-handle { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
+        .delete-btn { top: -35px; left: -12px; background: #ef4444; }
+        .duplicate-btn { top: -35px; left: 18px; background: #3b82f6; }
+        .rotate-btn { top: -35px; left: 48px; background: #8b5cf6; }
+        .layer-up-btn { top: -35px; left: 78px; background: #64748b; }
+        .layer-down-btn { top: -35px; left: 108px; background: #64748b; }
+        .move-handle { position: absolute; top: -35px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 36px; height: 24px; background: var(--primary-color); border-radius: 6px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 11px; }
         .move-handle:hover { transform: translateX(-50%) scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
 
