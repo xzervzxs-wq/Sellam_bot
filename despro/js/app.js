@@ -2156,7 +2156,7 @@
         function addTextToCanvas(content, isQuran) {
             const wrapper = createWrapper('text-layer');
             wrapper.style.color = '#1e293b';
-            wrapper.style.fontSize = '40px';
+            wrapper.style.fontSize = '30px';
             wrapper.style.fontFamily = "'Cairo', sans-serif";
             wrapper.style.fontWeight = '600';
             wrapper.style.letterSpacing = '0.3px';
