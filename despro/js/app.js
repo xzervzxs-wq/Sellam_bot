@@ -2608,13 +2608,13 @@
             const eraserBtn = document.getElementById('btn-eraser');
             const lassoBtn = document.getElementById('btn-lasso');
             const magicBtn = document.getElementById('btn-magic');
+            const smartFillBtn = document.getElementById('btn-smart-fill');
             
-            // Reset styles
-            [eraserBtn, lassoBtn, magicBtn].forEach(btn => {
+            [eraserBtn, lassoBtn, magicBtn, smartFillBtn].forEach(btn => {
                 if(btn) {
                     btn.classList.remove('bg-[#6366f1]', 'text-white');
-                    btn.classList.remove('bg-white'); // Ensure white is gone to prevent conflict
-                    btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]'); 
+                    btn.classList.remove('bg-white');
+                    btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
                 }
             });
 
@@ -2626,15 +2626,21 @@
             }
             if(lassoMode) {
                 if(lassoBtn) {
-                    lassoBtn.classList.add('bg-[#6366f1]', 'text-white'); // لون القص
+                    lassoBtn.classList.add('bg-[#6366f1]', 'text-white');
                     lassoBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
                 }
             }
-            if(magicMode && eraserMode) { // Magic is sub-mode of eraser
-                 if(magicBtn) {
+            if(smartFillMode) {
+                if(smartFillBtn) {
+                    smartFillBtn.classList.add('bg-[#6366f1]', 'text-white');
+                    smartFillBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                }
+            }
+            if(magicMode && eraserMode) {
+                if(magicBtn) {
                     magicBtn.classList.add('bg-[#6366f1]', 'text-white');
                     magicBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
-                 }
+                }
             }
         }
 
