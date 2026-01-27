@@ -671,55 +671,66 @@
             <!-- شريط الأدوات العلوي -->
             <div class="flex flex-wrap items-center bg-white p-2 rounded-xl border border-[#cbd5e1] shadow-sm justify-between gap-y-2" onclick="event.stopPropagation()">
                 
-                <!-- مجموعة الأدوات الأساسية -->
-                <div class="flex items-center gap-1 md:gap-2">
-                    <button onclick="undoAction()" class="p-1.5 md:p-2 text-[#64748b] hover:text-[#6366f1]"><i class="fas fa-undo"></i></button>
-                    <button onclick="redoAction()" class="p-1.5 md:p-2 text-[#64748b] hover:text-[#6366f1]"><i class="fas fa-redo"></i></button>
-                    <div class="w-px h-5 bg-[#e2e8f0] mx-1"></div>
+                <!-- الصف الأول: الأدوات مرتبة في أقسام -->
+                <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
                     
-                    <!-- أدوات الخلفية الجديدة -->
-                    <div id="bg-tools-container" class="flex items-center gap-2 px-2 py-1 bg-[#f8fafc] rounded-lg border border-[#e2e8f0]">
-                        <label class="text-[10px] md:text-xs font-bold text-[#1e293b] cursor-pointer flex items-center gap-2 hover:text-[#6366f1] transition group">
-                            <i class="fas fa-fill-drip group-hover:scale-110 transition-transform"></i> لون الخلفية
-                            <!-- Improved Color Circle: Div shows color, input is invisible overlay -->
-                            <div id="bg-color-preview" class="relative w-6 h-6 rounded-full border border-slate-300 shadow-sm transition-transform hover:scale-110" style="background-color: #ffffff;">
-                                <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            </div>
-                        </label>
-                        <div class="w-px h-4 bg-[#cbd5e1]"></div>
-                        <!-- زر الشفافية -->
-                        <button onclick="toggleTransparentMode()" id="btn-transparent" class="px-3 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تفعيل/إلغاء الشفافية">
-                            <i class="fas fa-chess-board"></i> بلا خلفية
+                    <!-- أزرار التراجع والإعادة -->
+                    <div class="flex items-center gap-1 bg-[#f8fafc] px-2 py-1 rounded-lg border border-[#e2e8f0]">
+                        <button onclick="undoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
+                        <div class="w-px h-4 bg-[#e2e8f0]"></div>
+                        <button onclick="redoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
+                    </div>
+                    
+                    <!-- قسم الخلفية - BACKGROUND -->
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#10b981]/20">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 w-full text-center">
+                            BACKGROUND
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <label class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition flex items-center gap-1 shadow-sm cursor-pointer" title="لون الخلفية">
+                                <i class="fas fa-fill-drip"></i> لون الخلفية
+                                <div id="bg-color-preview" class="relative w-5 h-5 rounded-full border-2 border-white shadow-sm" style="background-color: #ffffff;">
+                                    <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                </div>
+                            </label>
+                            <button onclick="toggleTransparentMode()" id="btn-transparent" class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition flex items-center gap-1 shadow-sm" title="تفعيل/إلغاء الشفافية">
+                                <i class="fas fa-chess-board"></i> شفاف
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- قسم الأدوات الذكية - SMART TOOLS -->
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
+                            SMART TOOLS
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition flex items-center gap-1 shadow-sm" title="قص ذكي بالتحديد">
+                                <i class="fas fa-cut"></i> قص ذكي
+                            </button>
+                            <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition flex items-center gap-1 shadow-sm" title="تلوين ذكي بالتحديد">
+                                <i class="fas fa-fill-drip"></i> تلوين ذكي
+                            </button>
+                            <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-2 border-white shadow-sm" title="اختر لون التعبئة">
+                        </div>
+                    </div>
+                    
+                    <!-- أدوات التحرير الأساسية -->
+                    <div class="flex items-center gap-1 px-2 py-1 bg-[#f8fafc] rounded-lg border border-[#e2e8f0]">
+                        <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1 rounded text-[10px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
+                            <i class="fas fa-adjust"></i> التدرج
+                        </button>
+                        <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1 rounded text-[10px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
+                            <i class="fas fa-eraser"></i> الممحاة
+                        </button>
+                        <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1 rounded text-[10px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]" title="قص الصورة">
+                            <i class="fas fa-crop"></i> قص
+                        </button>
+                        <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]" title="أداة اليد">
+                            <i class="fa-regular fa-hand"></i> تحريك
                         </button>
                     </div>
-                </div>
-
-                <!-- مجموعة أدوات التعديل -->
-                <div class="flex items-center gap-1 md:gap-2">
-                      <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-adjust"></i> التدرج
-                    </button>
-                    <!-- تعديل زر الممحاة حسب الطلب لإظهار النص دائماً -->
-                    <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-eraser"></i> <span class="ml-1 text-[9px] font-black">الممحاة</span>
-                    </button>
-                    <!-- زر القص الذكي (Lasso) الجديد -->
-                    <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-cut"></i> <span class="ml-1 text-[9px] font-black">قص ذكي</span>
-                    </button>
-                    <!-- زر التلوين الذكي -->
-                    <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-fill-drip"></i> <span class="ml-1 text-[9px] font-black">تلوين ذكي</span>
-                    </button>
-                    <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="w-8 h-8 rounded cursor-pointer border border-[#e2e8f0]" title="اختر لون التعبئة">
-                    <!-- زر القص (Crop) الجديد -->
-                    <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
-                        <i class="fas fa-crop"></i> <span class="ml-1 text-[9px] font-black">قص</span>
-                    </button>
-                    <!-- زر اليد (Hand Tool) للتحريك -->
-                    <button onclick="toggleHandMode()" id="btn-hand" class="w-8 h-8 rounded-lg text-lg bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center justify-center border border-[#e2e8f0] shadow-sm hover:shadow-md" title="أداة اليد - تحريك منطقة العمل">
-                        <i class="fa-regular fa-hand"></i>
-                    </button>
+                    
                     <!-- Universal File Input: Supports All Formats -->
                     <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".tif,.tiff,.pdf,.psd,.ai,.eps,.svg,.png,.jpg,.jpeg,.webp,.bmp">
                 </div>
