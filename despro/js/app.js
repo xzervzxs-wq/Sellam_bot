@@ -4793,8 +4793,9 @@
                 contentWrapper.style.backgroundImage = 'none';
                 contentWrapper.style.webkitMaskImage = `url(${img.src})`;
                 contentWrapper.style.maskImage = `url(${img.src})`;
-                contentWrapper.style.webkitMaskSize = '100% 100%';
-                contentWrapper.style.maskSize = '100% 100%';
+                // استخدام contain بدلاً من 100% 100% ليتطابق مع objectFit للصورة
+                contentWrapper.style.webkitMaskSize = 'contain';
+                contentWrapper.style.maskSize = 'contain';
                 contentWrapper.style.webkitMaskRepeat = 'no-repeat';
                 contentWrapper.style.maskRepeat = 'no-repeat';
                 contentWrapper.style.webkitMaskPosition = 'center';
@@ -4826,8 +4827,8 @@
                 contentWrapper.style.backgroundColor = 'transparent';
                 contentWrapper.style.webkitMaskImage = `url(${img.src})`;
                 contentWrapper.style.maskImage = `url(${img.src})`;
-                contentWrapper.style.webkitMaskSize = '100% 100%';
-                contentWrapper.style.maskSize = '100% 100%';
+                contentWrapper.style.webkitMaskSize = 'contain';
+                contentWrapper.style.maskSize = 'contain';
                 contentWrapper.style.webkitMaskRepeat = 'no-repeat';
                 contentWrapper.style.maskRepeat = 'no-repeat';
                 contentWrapper.style.webkitMaskPosition = 'center';
@@ -5104,8 +5105,8 @@
                 contentWrapper.style.webkitMaskImage = `url(${img.src})`;
                 contentWrapper.style.maskImage = `url(${img.src})`;
                 
-                contentWrapper.style.webkitMaskSize = '100% 100%';
-                contentWrapper.style.maskSize = '100% 100%';
+                contentWrapper.style.webkitMaskSize = 'contain';
+                contentWrapper.style.maskSize = 'contain';
                 contentWrapper.style.webkitMaskRepeat = 'no-repeat';
                 contentWrapper.style.maskRepeat = 'no-repeat';
                 contentWrapper.style.webkitMaskPosition = 'center';
