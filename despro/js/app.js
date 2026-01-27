@@ -2422,6 +2422,16 @@
 
         // --- دوال الممحاة الذكية (Smart Eraser) ---
         window.toggleSmartEraserMode = function() {
+            console.log('🧹 Smart Eraser clicked!');
+            console.log('activeEl:', activeEl);
+            
+            // التحقق من تحديد طبقة صورة أولاً
+            if(!activeEl || !activeEl.classList.contains('image-layer')) {
+                console.log('⚠️ No image layer selected - showing modal');
+                showInfoModal('يرجى تحديد طبقة صورة أولاً لاستخدام الممحاة الذكية', 'الممحاة الذكية', '🧹');
+                return;
+            }
+            
             smartEraserMode = !smartEraserMode;
             const btn = document.getElementById('btn-smart-eraser');
             
