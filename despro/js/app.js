@@ -2422,18 +2422,19 @@
 
         // --- دوال الممحاة الذكية (Smart Eraser) ---
         window.toggleSmartEraserMode = function() {
-            console.log('🧹 Smart Eraser clicked!');
+            console.log('Smart Eraser clicked!');
             console.log('activeEl:', activeEl);
             
             // التحقق من تحديد طبقة صورة أولاً
             if(!activeEl || !activeEl.classList.contains('image-layer')) {
-                console.log('⚠️ No image layer selected - showing modal');
+                console.log('No image layer selected - showing modal');
                 showInfoModal('يرجى تحديد طبقة صورة أولاً لاستخدام الممحاة الذكية', 'الممحاة الذكية', '🧹');
                 return;
             }
             
             smartEraserMode = !smartEraserMode;
             const btn = document.getElementById('btn-smart-eraser');
+            const btnTop = document.getElementById('btn-smart-eraser-top');
             
             if(smartEraserMode) {
                 if(magicMode) {
@@ -2442,10 +2443,12 @@
                     if(mtc) { mtc.classList.remove('flex'); mtc.classList.add('hidden'); }
                 }
                 if(btn) btn.classList.add('ring-2', 'ring-indigo-400');
+                if(btnTop) btnTop.classList.add('ring-2', 'ring-indigo-400');
                 initSmartEraserCanvas();
                 document.getElementById('card').style.cursor = 'crosshair';
             } else {
                 if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
+                if(btnTop) btnTop.classList.remove('ring-2', 'ring-indigo-400');
                 exitSmartEraserMode();
             }
             updateToolButtons();
@@ -2454,7 +2457,9 @@
         window.exitSmartEraserMode = function() {
             smartEraserMode = false;
             const btn = document.getElementById('btn-smart-eraser');
+            const btnTop = document.getElementById('btn-smart-eraser-top');
             if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
+            if(btnTop) btnTop.classList.remove('ring-2', 'ring-indigo-400');
             if(smartEraserCanvas) {
                 smartEraserCanvas.remove();
                 smartEraserCanvas = null;
