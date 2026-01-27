@@ -1094,12 +1094,38 @@
 
         /* إصلاح شريط الملاحظات في الوضع الليلي */
         :root.dark-mode #info-bar-placeholder {
-            background-color: #1a1a2e !important;
-            border-color: #334155 !important;
-            color: #f1f5f9 !important;
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #info-bar-placeholder:hover {
+            background-color: #1e293b !important;
         }
         :root.dark-mode #info-bar-placeholder svg {
-            stroke: #f1f5f9 !important;
+            stroke: #6366f1 !important;
+        }
+        :root.dark-mode #info-bar-placeholder span {
+            color: #94a3b8 !important;
+        }
+        
+        /* إصلاح قسم الطبقات في الوضع الليلي */
+        :root.dark-mode #layers-container {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+        }
+        :root.dark-mode #layers-container label {
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #layers-list {
+            background-color: #0f172a !important;
+        }
+        :root.dark-mode #layers-list > div {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+        :root.dark-mode #layers-list > div:hover {
+            background-color: #334155 !important;
         }
 
 /* إصلاح مكان أزرار التحكم في العنصر */
