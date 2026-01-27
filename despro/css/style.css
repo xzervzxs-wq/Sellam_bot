@@ -1127,6 +1127,33 @@
         :root.dark-mode #layers-list > div:hover {
             background-color: #334155 !important;
         }
+        
+        /* إصلاح نافذة الملاحظات (designer-panel) في الوضع الليلي */
+        :root.dark-mode #designer-panel > div {
+            background-color: #0f172a !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] {
+            background-color: #1e293b !important;
+            border-color: #6366f1 !important;
+        }
+        :root.dark-mode #designer-panel .text-\[\#92400e\],
+        :root.dark-mode #designer-panel .text-\[\#78350f\] {
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #designer-panel textarea {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#f8fafc\] {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .text-\[\#1e293b\] {
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #designer-panel .text-\[\#64748b\] {
+            color: #94a3b8 !important;
+        }
 
 /* إصلاح مكان أزرار التحكم في العنصر */
 .control-toolbar-container {
