@@ -1122,3 +1122,28 @@
         :root.dark-mode #designer-panel span {
             color: #e2e8f0 !important;
         }
+
+        /* أنماط السحب والإفلات للطبقات */
+        .layer-item {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        
+        .layer-item.drag-over-top {
+            border-top: 3px solid #6366f1 !important;
+            margin-top: -3px;
+        }
+        
+        .layer-item.drag-over-bottom {
+            border-bottom: 3px solid #6366f1 !important;
+            margin-bottom: -3px;
+        }
+        
+        .layer-item[draggable="true"]:active {
+            cursor: grabbing !important;
+        }
+        
+        .drag-handle:hover {
+            color: #6366f1 !important;
+        }
