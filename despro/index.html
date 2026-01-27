@@ -682,8 +682,8 @@
                     </div>
                     
                     <!-- قسم الخلفية - BACKGROUND -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#10b981]/20 min-h-[52px]">
-                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 w-full text-center">
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#ec4899]/20 min-h-[52px]">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500 w-full text-center">
                             BACKGROUND
                         </span>
                         <div class="flex items-center gap-1.5">
@@ -741,7 +741,7 @@
                 <!-- لوحات التحكم -->
                 
                 <!-- إعدادات الممحاة - تظهر فوق الألوان -->
-                <div id="eraser-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 mb-2">
+                <div id="eraser-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 mb-2" style="order: 1 !important;">
                     <div class="flex items-center gap-1 pl-2">
                         <label class="flex items-center gap-1 cursor-pointer">
                             <input type="checkbox" id="eraser-protect-bg" checked class="w-3 h-3 accent-[#6366f1]">
@@ -780,7 +780,7 @@
                 </div>
 
                 <!-- الألوان المفضلة -->
-                <div id="fav-colors-row" class="bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2">
+                <div id="fav-colors-row" class="bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2" style="order: 2;">
                     <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
                     <div id="fav-colors-container" class="flex items-center gap-1.5 flex-wrap">
                         <!-- سيتم تعبئتها بواسطة JS -->
