@@ -589,11 +589,11 @@
         
         .control-btn { position: absolute; width: 24px; height: 24px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 102; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
         .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
-        .delete-btn { top: -35px; left: -10px; background: #ef4444; }
-        .duplicate-btn { top: -35px; left: 18px; background: #3b82f6; }
-        .rotate-btn { top: -35px; left: 46px; background: #8b5cf6; }
-        .layer-up-btn { top: -35px; left: 74px; background: #64748b; }
-        .layer-down-btn { top: -35px; left: 102px; background: #64748b; }
+        .delete-btn { top: -35px; left: 0px; background: #ef4444; }
+        .duplicate-btn { top: -35px; left: 26px; background: #3b82f6; }
+        .rotate-btn { top: -35px; left: 52px; background: #8b5cf6; }
+        .layer-up-btn { top: -35px; left: 78px; background: #64748b; }
+        .layer-down-btn { top: -35px; left: 104px; background: #64748b; }
         .move-handle { position: absolute; top: -35px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 36px; height: 24px; background: var(--primary-color); border-radius: 6px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 11px; }
         .move-handle:hover { transform: translateX(-50%) scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
