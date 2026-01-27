@@ -4722,6 +4722,16 @@
             // -----------------------------------------------------------------
 
             // تطبيق التغيير على العنصر الأساسي (الغلاف)
+            // إصلاح: تلوين صور العناصر (Stickers/Icons) باستخدام Mask بدلاً من خلفية الصندوق
+            if (prop === 'backgroundColor' && activeEl.classList.contains('image-layer') && activeEl.getAttribute('data-colorable') !== 'false') {
+                 if (activeEl.querySelector('img')) {
+                     updateColorableColor(val);
+                     // تحديث المدخلات المرتبطة
+                     if (document.getElementById('colorable-color')) document.getElementById('colorable-color').value = val;
+                     if (document.getElementById('bg-color')) document.getElementById('bg-color').value = val;
+                     return; 
+                 }
+            }
             activeEl.style[prop] = val;
 
             // إذا كنا نغير اللون ولم يكن هناك تحديد جزئي (أعلاه)، فهذا يعني أن المستخدم يريد تلوين النص بالكامل
@@ -4777,7 +4787,7 @@
             if(!img) return;
             
             // استخدام الصورة كـ mask والخلفية كلون
-            const contentWrapper = activeEl.querySelector('.content-wrapper');
+            const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
             if(contentWrapper) {
                 contentWrapper.style.backgroundColor = color;
                 contentWrapper.style.backgroundImage = 'none';
@@ -4810,7 +4820,7 @@
             const endColor = document.getElementById('colorable-grad-end').value;
             
             // استخدام الصورة كـ mask والتدرج كخلفية
-            const contentWrapper = activeEl.querySelector('.content-wrapper');
+            const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
             if(contentWrapper) {
                 contentWrapper.style.backgroundImage = `linear-gradient(to top, ${startColor}, ${endColor})`;
                 contentWrapper.style.backgroundColor = 'transparent';
@@ -4833,7 +4843,7 @@
             if(!activeEl.classList.contains('image-layer')) return;
             
             // إزالة اللون والتدرج وإعادة الصورة
-            const contentWrapper = activeEl.querySelector('.content-wrapper');
+            const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
             const img = activeEl.querySelector('img');
             
             if(contentWrapper) {
