@@ -214,7 +214,7 @@
             }, 800);
             
             // تعيين المقاس الافتراضي 6 سم * 6 سم
-            const defaultSize = Math.round(6 * DPI_RATIO);
+            const defaultSize = Math.round(10 * DPI_RATIO);
             setCardSize(defaultSize, defaultSize);
             
             // إخفاء التدرج عند البدء
@@ -1070,8 +1070,8 @@
             card.innerHTML = '<div id="card-gradient"></div>'; // إعادة إنشاء التدرج مخفياً
             
             // إعادة تعيين الأبعاد الافتراضية
-            const defaultSize = Math.round(6 * DPI_RATIO); // 6cm افتراضي
-            document.getElementById('custom-width').value = '6';
+            const defaultSize = Math.round(10 * DPI_RATIO); // 6cm افتراضي
+            document.getElementById('custom-width').value = '10';
             document.getElementById('custom-height').value = '6';
             
             setCardSize(defaultSize, defaultSize);
