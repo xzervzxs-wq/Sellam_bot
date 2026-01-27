@@ -1122,3 +1122,20 @@
 .control-btn {
     pointer-events: auto;
 }
+
+/* فرض تثبيت شريط الأدوات في أعلى العنصر بقوة */
+.draggable-el .control-toolbar-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 0 !important;
+    transform: none !important;
+    z-index: 9999 !important;
+}
+
+/* رفع الأزرار للأعلى لضمان عدم تداخلها مع المحتوى */
+.draggable-el .control-btn, 
+.draggable-el .move-handle {
+    margin-top: -10px !important; /* تحسين المكان */
+}
