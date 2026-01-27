@@ -2820,6 +2820,147 @@
             }
         }
 
+
+        // --- دوال التلوين الذكي (Smart Fill) ---
+        function toggleSmartFillMode() {
+            smartFillMode = !smartFillMode;
+            if (smartFillMode) {
+                if (eraserMode) exitEraserMode();
+                if (lassoMode) exitLassoMode();
+                magicMode = false;
+                document.getElementById('card').style.cursor = 'crosshair';
+                initSmartFillCanvas();
+            } else {
+                exitSmartFillMode();
+            }
+            updateToolButtons();
+        }
+
+        function initSmartFillCanvas() {
+            if(smartFillCanvas) smartFillCanvas.remove();
+            const card = document.getElementById('card');
+            smartFillCanvas = document.createElement('canvas');
+            smartFillCanvas.width = card.offsetWidth;
+            smartFillCanvas.height = card.offsetHeight;
+            smartFillCanvas.style.position = 'absolute';
+            smartFillCanvas.style.top = '0';
+            smartFillCanvas.style.left = '0';
+            smartFillCanvas.style.cursor = 'crosshair';
+            smartFillCanvas.style.zIndex = '500';
+            const ctx = smartFillCanvas.getContext('2d');
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = smartFillColor;
+            ctx.setLineDash([5, 5]);
+            let isDrawing = false;
+            let points = [];
+            function getMousePos(e) {
+                const rect = smartFillCanvas.getBoundingClientRect();
+                const scaleX = smartFillCanvas.width / rect.width;
+                const scaleY = smartFillCanvas.height / rect.height;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+            }
+            function startDraw(e) {
+                isDrawing = true;
+                points = [];
+                const pos = getMousePos(e);
+                points.push(pos);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+            function draw(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                const pos = getMousePos(e);
+                points.push(pos);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.clearRect(0, 0, smartFillCanvas.width, smartFillCanvas.height);
+                ctx.beginPath();
+                if(points.length > 0) {
+                    ctx.moveTo(points[0].x, points[0].y);
+                    for(let i=1; i<points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+            function endDraw(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                isDrawing = false;
+                ctx.closePath();
+                ctx.stroke();
+                performSmartFill(points);
+                exitSmartFillMode();
+            }
+            smartFillCanvas.addEventListener('mousedown', startDraw);
+            smartFillCanvas.addEventListener('mousemove', draw);
+            smartFillCanvas.addEventListener('mouseup', endDraw);
+            smartFillCanvas.addEventListener('touchstart', startDraw, {passive: false});
+            smartFillCanvas.addEventListener('touchmove', draw, {passive: false});
+            smartFillCanvas.addEventListener('touchend', endDraw);
+            card.appendChild(smartFillCanvas);
+        }
+        function performSmartFill(points) {
+            if(points.length < 3) return;
+            const card = document.getElementById('card');
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            for(let i = 0; i < points.length; i++) {
+                if(points[i].x < minX) minX = points[i].x;
+                if(points[i].y < minY) minY = points[i].y;
+                if(points[i].x > maxX) maxX = points[i].x;
+                if(points[i].y > maxY) maxY = points[i].y;
+            }
+            const shapeWidth = Math.max(1, maxX - minX);
+            const shapeHeight = Math.max(1, maxY - minY);
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = shapeWidth;
+            tempCanvas.height = shapeHeight;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.beginPath();
+            tCtx.moveTo(points[0].x - minX, points[0].y - minY);
+            for(let i=1; i<points.length; i++) {
+                tCtx.lineTo(points[i].x - minX, points[i].y - minY);
+            }
+            tCtx.closePath();
+            tCtx.fillStyle = smartFillColor;
+            tCtx.fill();
+            const newDataUrl = tempCanvas.toDataURL('image/png');
+            const wrapper = createWrapper('image-layer');
+            const contentWrapper = wrapper.querySelector('.content-wrapper');
+            wrapper.style.width = shapeWidth + 'px';
+            wrapper.style.height = shapeHeight + 'px';
+            wrapper.style.left = (minX + shapeWidth / 2) + 'px';
+            wrapper.style.top = (minY + shapeHeight / 2) + 'px';
+            wrapper.style.transform = 'translate(-50%, -50%)';
+            contentWrapper.style.width = '100%';
+            contentWrapper.style.height = '100%';
+            contentWrapper.style.display = 'flex';
+            const newImg = document.createElement('img');
+            newImg.src = newDataUrl;
+            newImg.style.width = '100%';
+            newImg.style.height = '100%';
+            newImg.style.objectFit = 'contain';
+            newImg.style.pointerEvents = 'none';
+            contentWrapper.appendChild(newImg);
+            card.appendChild(wrapper);
+            setTimeout(() => {
+                selectEl(wrapper);
+                setupInteract(wrapper, 'box');
+                saveState();
+            }, 50);
+        }
+        function exitSmartFillMode() {
+            smartFillMode = false;
+            updateToolButtons();
+            document.getElementById('card').style.cursor = 'default';
+            if(smartFillCanvas) {
+                smartFillCanvas.remove();
+                smartFillCanvas = null;
+            }
+        }
+        function setSmartFillColor(color) {
+            smartFillColor = color;
+        }
         // --- Crop Tool Functions ---
         function toggleCropMode() {
             cropMode = !cropMode;
