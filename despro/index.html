@@ -33,7 +33,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=20260127_13">
+    <link rel="stylesheet" href="css/style.css?v=20260127_14">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -707,6 +707,11 @@
                     <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
                         <i class="fas fa-cut"></i> <span class="ml-1 text-[9px] font-black">قص ذكي</span>
                     </button>
+                    <!-- زر التلوين الذكي -->
+                    <button onclick="toggleSmartColorMode()" id="btn-smart-color" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
+                        <i class="fas fa-fill-drip"></i> <span class="ml-1 text-[9px] font-black">تلوين ذكي</span>
+                    </button>
+                    <input type="color" id="smart-color-picker" value="#6366f1" onchange="setSmartColorFill(this.value)" class="w-8 h-8 rounded cursor-pointer border border-[#e2e8f0]" title="اختر لون التعبئة">
                     <!-- زر القص (Crop) الجديد -->
                     <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1.5 rounded text-[10px] md:text-xs font-bold bg-[#f8fafc] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]">
                         <i class="fas fa-crop"></i> <span class="ml-1 text-[9px] font-black">قص</span>
