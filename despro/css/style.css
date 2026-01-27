@@ -587,16 +587,19 @@
         .resize-s { bottom: -13px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
         .resize-w { top: 50%; left: -13px; transform: translateY(-50%); cursor: w-resize; }
         
-        .control-btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+        .control-btn { position: absolute; width: 32px; height: 32px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 102; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; pointer-events: auto; }
         .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
-        .delete-btn { top: -50px; left: -18px; background: #ef4444; }
-        .duplicate-btn { top: -50px; left: 28px; background: #3b82f6; }
-        .rotate-btn { top: -50px; left: 74px; background: #8b5cf6; }
-        .layer-up-btn { top: -50px; left: 120px; background: #64748b; }
-        .layer-down-btn { top: -50px; left: 166px; background: #64748b; }
-        .move-handle { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 56px; height: 40px; background: var(--primary-color); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 16px; }
+        .delete-btn { top: -45px; left: 0px; background: #ef4444; }
+        .duplicate-btn { top: -45px; left: 38px; background: #3b82f6; }
+        .rotate-btn { top: -45px; left: 76px; background: #8b5cf6; }
+        .layer-up-btn { top: -45px; right: 38px; background: #64748b; }
+        .layer-down-btn { top: -45px; right: 0px; background: #64748b; }
+        .move-handle { position: absolute; top: -45px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 44px; height: 32px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 103; color: white; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); transition: transform 0.2s; font-size: 14px; pointer-events: auto; }
         .move-handle:hover { transform: translateX(-50%) scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+        
+        /* حاوية أدوات التحكم - تبقى ثابتة فوق العنصر */
+        .control-toolbar-container { position: absolute; top: -50px; left: 0; right: 0; height: 40px; pointer-events: none; z-index: 102; }
 
         
         .draggable-el.selected .control-btn, .draggable-el.selected .move-handle { display: flex; }
