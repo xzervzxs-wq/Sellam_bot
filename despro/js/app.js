@@ -93,6 +93,8 @@
         let eraserMode = false;
         let magicMode = false; 
         let lassoMode = false; // متغير القص الذكي
+        let smartEraserMode = false; // متغير الممحاة الذكية
+        let smartEraserCanvas = null; // كانفاس الممحاة الذكية
         let cropMode = false; // متغير وضع القص
         let handMode = false; // متغير وضع اليد للتحريك
         let eraserCanvas = null; 
@@ -117,7 +119,7 @@
         
         // --- إدارة الألوان المفضلة ---
         let favoriteColors = JSON.parse(localStorage.getItem('dalal_fav_colors')) || [
-            '#000000', '#ffffff', '#6366f1', '#ec4899', '#ef4444', 
+            '#000000', '#ffffff', '#6366f1', '#ec4899', '#6366f1', 
             '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#64748b'
         ];
 
@@ -1352,7 +1354,7 @@
              overlay.style.display = 'flex';
 
              try {
-                deselect();
+                // لا نلغي التحديد - نحتاج الصورة محددة للممحاة
                 const card = document.getElementById('card');
                 await new Promise(r => setTimeout(r, 200));
 
@@ -2352,6 +2354,10 @@
         }
 
         function toggleEraserMode() {
+            if(!eraserMode && (!activeEl || !activeEl.classList.contains("image-layer"))) {
+                showInfoModal("يرجى تحديد طبقة صورة أولاً لاستخدام الممحاة", "تنبيه", "🖼️");
+                return;
+            }
             eraserMode = !eraserMode;
             
             if (eraserMode) {
@@ -2364,7 +2370,7 @@
                     magicControls.classList.remove('flex');
                 }
 
-                deselect();
+                // لا نلغي التحديد - نحتاج الصورة محددة للممحاة
                 const controls = document.getElementById('eraser-controls');
                 controls.classList.add('active');
                 
@@ -2409,6 +2415,173 @@
             // Re-enable interaction with other layers
             document.querySelectorAll('.draggable-el').forEach(el => el.style.pointerEvents = '');
             updateToolButtons();
+        }
+
+        // --- دوال الممحاة الذكية (Smart Eraser) ---
+        window.toggleSmartEraserMode = function() {
+            smartEraserMode = !smartEraserMode;
+            const btn = document.getElementById('btn-smart-eraser');
+            
+            if(smartEraserMode) {
+                if(magicMode) {
+                    magicMode = false;
+                    const mtc = document.getElementById('magic-tolerance-control');
+                    if(mtc) { mtc.classList.remove('flex'); mtc.classList.add('hidden'); }
+                }
+                if(btn) btn.classList.add('ring-2', 'ring-indigo-400');
+                initSmartEraserCanvas();
+                document.getElementById('card').style.cursor = 'crosshair';
+            } else {
+                if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
+                exitSmartEraserMode();
+            }
+            updateToolButtons();
+        }
+
+        window.exitSmartEraserMode = function() {
+            smartEraserMode = false;
+            const btn = document.getElementById('btn-smart-eraser');
+            if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
+            if(smartEraserCanvas) {
+                smartEraserCanvas.remove();
+                smartEraserCanvas = null;
+            }
+            if(eraserMode) {
+                document.getElementById('card').style.cursor = 'crosshair';
+            } else {
+                document.getElementById('card').style.cursor = 'default';
+            }
+        }
+
+        window.initSmartEraserCanvas = function() {
+            if(smartEraserCanvas) smartEraserCanvas.remove();
+            const card = document.getElementById('card');
+            smartEraserCanvas = document.createElement('canvas');
+            smartEraserCanvas.width = card.offsetWidth;
+            smartEraserCanvas.height = card.offsetHeight;
+            smartEraserCanvas.style.cssText = 'position:absolute;top:0;left:0;cursor:crosshair;z-index:550;';
+            const ctx = smartEraserCanvas.getContext('2d');
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#6366f1';
+            ctx.setLineDash([5, 5]);
+            let isDrawing = false;
+            let points = [];
+            
+            function getPos(e) {
+                const rect = smartEraserCanvas.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                return {x: x * (smartEraserCanvas.width / rect.width), y: y * (smartEraserCanvas.height / rect.height)};
+            }
+            
+            function start(e) { 
+                isDrawing = true; 
+                points = [getPos(e)]; 
+            }
+            
+            function move(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                points.push(getPos(e));
+                ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
+                // رسم دائرة البداية
+                ctx.save();
+                ctx.setLineDash([]);
+                ctx.beginPath();
+                ctx.arc(points[0].x, points[0].y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(99, 102, 241, 0.5)";
+                ctx.fill();
+                ctx.strokeStyle = "#6366f1";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for(let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.15)';
+                ctx.fill();
+            }
+            
+            function end(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                isDrawing = false;
+                performSmartEraser(points);
+                ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
+                points = [];
+            }
+            
+            smartEraserCanvas.addEventListener('mousedown', start);
+            smartEraserCanvas.addEventListener('mousemove', move);
+            smartEraserCanvas.addEventListener('mouseup', end);
+            smartEraserCanvas.addEventListener('touchstart', start, {passive: false});
+            smartEraserCanvas.addEventListener('touchmove', move, {passive: false});
+            smartEraserCanvas.addEventListener('touchend', end);
+            card.appendChild(smartEraserCanvas);
+        }
+
+        window.performSmartEraser = function(points) {
+            if(points.length < 3) return;
+            const card = document.getElementById('card');
+            const cardRect = card.getBoundingClientRect();
+            
+            // استخدام العنصر المحدد أولاً
+            let targetEl = activeEl;
+            
+            // إذا لم يكن محدداً، ابحث تحت نقطة البداية
+            if(!targetEl || !targetEl.classList.contains('image-layer')) {
+                const images = Array.from(card.querySelectorAll('.image-layer')).reverse();
+                for(let img of images) {
+                    const r = img.getBoundingClientRect();
+                    const l = r.left - cardRect.left;
+                    const t = r.top - cardRect.top;
+                    if(points[0].x >= l && points[0].x <= l + r.width && points[0].y >= t && points[0].y <= t + r.height) {
+                        targetEl = img;
+                        break;
+                    }
+                }
+            }
+            
+            if(!targetEl) return;
+            const sourceImg = targetEl.querySelector('img');
+            if(!sourceImg) return;
+            
+                        const imgLeft = targetEl.offsetLeft;
+            const imgTop = targetEl.offsetTop;
+            const imgWidth = targetEl.offsetWidth;
+            const imgHeight = targetEl.offsetHeight;
+
+            const naturalWidth = sourceImg.naturalWidth || imgWidth;
+            const naturalHeight = sourceImg.naturalHeight || imgHeight;
+            const ratioX = naturalWidth / imgWidth;
+            const ratioY = naturalHeight / imgHeight;
+
+            const cornerX = imgLeft - (imgWidth / 2);
+            const cornerY = imgTop - (imgHeight / 2);
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = naturalWidth;
+            tempCanvas.height = naturalHeight;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            tCtx.drawImage(sourceImg, 0, 0, naturalWidth, naturalHeight);
+            tCtx.globalCompositeOperation = 'destination-out';
+            tCtx.beginPath();
+            
+            for(let i=0; i<points.length; i++) {
+                const px = (points[i].x - cornerX) * ratioX;
+                const py = (points[i].y - cornerY) * ratioY;
+                if(i===0) tCtx.moveTo(px, py);
+                else tCtx.lineTo(px, py);
+            }
+            tCtx.closePath();
+            tCtx.fill();
+            sourceImg.src = tempCanvas.toDataURL('image/png');
+            saveState();
+            // إنهاء الممحاة الذكية تلقائياً بعد المسح
+            exitSmartEraserMode();
         }
 
         // --- دوال القص الذكي (Lasso) ---
@@ -4023,10 +4196,13 @@
         });
 
         function deselect(e) {
-            if(e && (e.target.closest('.draggable-el') || e.target.closest('#style-panel') || e.target.closest('#floating-context-toolbar') || e.target.closest('select') || e.target.closest('input') || e.target.closest('.controls-row'))) return;
+            if(e && (e.target.closest(".draggable-el") || e.target.closest("#style-panel") || e.target.closest("#floating-context-toolbar") || e.target.closest("select") || e.target.closest("input") || e.target.closest(".controls-row") || e.target.closest("button") || e.target.closest("#eraser-controls"))) return;
 
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
+            
+            // إلغاء وضع الممحاة عند إزالة التحديد
+            if(eraserMode) exitEraserMode();
 
             // إخفاء النافذة العائمة
             const floatToolbar = document.getElementById('floating-context-toolbar');
@@ -4087,6 +4263,9 @@
             // إلغاء التحديد
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
+            
+            // إلغاء وضع الممحاة عند إزالة التحديد
+            if(eraserMode) exitEraserMode();
             
             // إخفاء النافذة العائمة
             const floatToolbar = document.getElementById('floating-context-toolbar');
@@ -6146,7 +6325,6 @@ function updateFooterForUser(name) {
                         <span>${name}</span>
                     </div>
                     <span class="flex items-center gap-1 text-[11px] font-bold text-white/70">
-                        مساحة مخصصة | حيث أنت <i class="fas fa-star text-xs text-yellow-400"></i>
                     </span>
                 </div>
                 <button type="button" id="logout-btn" class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-lg border border-white/10 transition-all shadow-sm" title="تسجيل خروج">
@@ -6179,3 +6357,448 @@ function logoutUser() {
 }
 document.addEventListener('DOMContentLoaded', checkSession);
 document.addEventListener('DOMContentLoaded', loadAssetsLibraryFromGitHub);
+
+
+// ============ دوال الطبقات (Layers Panel) ============
+
+function toggleLayersPanel() {
+    const content = document.getElementById('layers-panel-content');
+    const arrow = document.getElementById('layers-panel-arrow');
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        content.classList.add('flex');
+        arrow.style.transform = 'rotate(-90deg)';
+    } else {
+        content.classList.add('hidden');
+        content.classList.remove('flex');
+        arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+function updateLayersList() {
+    const card = document.getElementById('card');
+    const layersList = document.getElementById('layers-list');
+    
+    if (!card) return;
+    
+    const elements = card.querySelectorAll('[data-element-id]');
+    
+    if (elements.length === 0) {
+        layersList.innerHTML = '<div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>';
+        return;
+    }
+    
+    layersList.innerHTML = '';
+    
+    // ترتيب العناصر من الأحدث للأقدم
+    const elementsArray = Array.from(elements).reverse();
+    
+    elementsArray.forEach((element) => {
+        const elementId = element.getAttribute('data-element-id');
+        const elementType = element.getAttribute('data-element-type') || 'عنصر';
+        const isSelected = element.classList.contains('selected');
+        
+        const layerItem = document.createElement('div');
+        layerItem.className = `layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ${
+            isSelected 
+                ? 'bg-[#6366f1] text-white border-[#6366f1]' 
+                : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]'
+        }`;
+        
+        let icon = 'fa-square';
+        if (element.tagName.toLowerCase() === 'img') icon = 'fa-image';
+        else if (elementType.includes('text')) icon = 'fa-font';
+        
+        layerItem.innerHTML = `<div class="flex-1 flex items-center gap-2 min-w-0">
+            <i class="fas ${icon}"></i>
+            <div class="flex-1 min-w-0">
+                <div class="text-[10px] font-bold truncate">${elementType}</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+            <button class="p-1 text-[10px] hover:opacity-70 transition" onclick="toggleLayerVisibility(this, '${elementId}')" title="إظهار/إخفاء">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="p-1 text-[10px] hover:opacity-70 transition" onclick="deleteElement('${elementId}')" title="حذف">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+        
+        layerItem.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                selectEl(element);
+                updateLayersList();
+            }
+        });
+        
+        document.getElementById('layers-list').appendChild(layerItem);
+    });
+}
+
+function toggleLayerVisibility(button, elementId) {
+    const card = document.getElementById('card');
+    const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+    
+    if (element) {
+        element.style.display = element.style.display === 'none' ? '' : 'none';
+        button.querySelector('i').classList.toggle('fa-eye-slash');
+        button.classList.toggle('opacity-50');
+    }
+}
+
+function deleteElement(elementId) {
+    const card = document.getElementById('card');
+    const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+    
+    if (element && confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+        removeEl(element);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', updateLayersList);
+
+// تحديث الطبقات عند تغيير الاختيار
+const originalSelectEl = selectEl;
+selectEl = function(el) {
+    originalSelectEl(el);
+    if (typeof updateLayersList === 'function') {
+        updateLayersList();
+    }
+};
+
+
+function updateLayersList() {
+    const card = document.getElementById('card');
+    const layersList = document.getElementById('layers-list');
+    
+    if (!card || !layersList) return;
+    
+    const elements = card.querySelectorAll('[data-element-id]');
+    
+    if (elements.length === 0) {
+        layersList.innerHTML = '<div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>';
+        return;
+    }
+    
+    layersList.innerHTML = '';
+    const elementsArray = Array.from(elements).reverse();
+    
+    elementsArray.forEach((element) => {
+        const elementId = element.getAttribute('data-element-id');
+        const elementType = element.getAttribute('data-element-type') || 'عنصر';
+        const isSelected = element.classList.contains('selected');
+        
+        const layerItem = document.createElement('div');
+        layerItem.className = `layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ${
+            isSelected 
+                ? 'bg-[#6366f1] text-white border-[#6366f1]' 
+                : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]'
+        }`;
+        
+        let icon = 'fa-square';
+        if (element.tagName.toLowerCase() === 'img') icon = 'fa-image';
+        else if (elementType.includes('text')) icon = 'fa-font';
+        
+        layerItem.innerHTML = `<div class="flex-1 flex items-center gap-2 min-w-0">
+            <i class="fas ${icon}"></i>
+            <div class="flex-1 min-w-0">
+                <div class="text-[10px] font-bold truncate">${elementType}</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+            <button class="p-1 text-[10px] hover:opacity-70 transition" onclick="toggleLayerVisibility(this, '${elementId}')" title="إظهار/إخفاء">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="p-1 text-[10px] hover:opacity-70 transition" onclick="deleteElement('${elementId}')" title="حذف">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+        
+        layerItem.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                selectEl(element);
+                updateLayersList();
+            }
+        });
+        
+        layersList.appendChild(layerItem);
+    });
+}
+
+function toggleLayerVisibility(button, elementId) {
+    const card = document.getElementById('card');
+    const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+    if (element) {
+        element.style.display = element.style.display === 'none' ? '' : 'none';
+        button.querySelector('i').classList.toggle('fa-eye-slash');
+        button.classList.toggle('opacity-50');
+    }
+}
+
+function deleteElement(elementId) {
+    const card = document.getElementById('card');
+    const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+    if (element && confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+        removeEl(element);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', updateLayersList);
+
+// Override to ensure update on open
+function toggleLayersPanel() {
+    const content = document.getElementById('layers-panel-content');
+    const arrow = document.getElementById('layers-panel-arrow');
+    if (content.classList.contains('hidden')) {
+        updateLayersList();
+        content.classList.remove('hidden');
+        content.classList.add('flex');
+        arrow.style.transform = 'rotate(-90deg)';
+    } else {
+        content.classList.add('hidden');
+        content.classList.remove('flex');
+        arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+// === FIXED updateLayersList - finds ALL elements ===
+function updateLayersList() {
+    const card = document.getElementById('card');
+    const layersList = document.getElementById('layers-list');
+    
+    if (!card || !layersList) return;
+    
+    // البحث عن جميع العناصر القابلة للسحب (وليس فقط اللي عندها ID)
+    const elements = card.querySelectorAll('.draggable-el');
+    
+    if (elements.length === 0) {
+        layersList.innerHTML = '<div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>';
+        return;
+    }
+    
+    layersList.innerHTML = '';
+    
+    // ترتيب العناصر من الأحدث للأقدم
+    const elementsArray = Array.from(elements).reverse();
+    
+    elementsArray.forEach((element, index) => {
+        // إضافة ID للعناصر القديمة التي لا تملك ID
+        let elementId = element.getAttribute('data-element-id');
+        if (!elementId) {
+            elementId = 'el-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+            element.setAttribute('data-element-id', elementId);
+        }
+        
+        // تحديد نوع العنصر
+        let elementType = element.getAttribute('data-element-type') || '';
+        let icon = 'fa-square';
+        
+        if (element.classList.contains('text-layer')) {
+            elementType = 'نص';
+            icon = 'fa-font';
+        } else if (element.classList.contains('image-layer')) {
+            elementType = 'صورة';
+            icon = 'fa-image';
+        } else if (element.classList.contains('frame-layer')) {
+            elementType = 'إطار';
+            icon = 'fa-vector-square';
+        } else if (element.classList.contains('shape-layer')) {
+            elementType = 'شكل';
+            icon = 'fa-shapes';
+        } else {
+            elementType = 'عنصر';
+        }
+        
+        const isSelected = element.classList.contains('selected');
+        const isHidden = element.style.display === 'none';
+        
+        const layerItem = document.createElement('div');
+        layerItem.className = 'layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ' + 
+            (isSelected 
+                ? 'bg-[#6366f1] text-white border-[#6366f1]' 
+                : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]');
+        
+        layerItem.innerHTML = '<div class="flex-1 flex items-center gap-2 min-w-0">' +
+            '<i class="fas ' + icon + '"></i>' +
+            '<div class="flex-1 min-w-0">' +
+                '<div class="text-[10px] font-bold truncate">' + elementType + ' #' + (index + 1) + '</div>' +
+            '</div>' +
+        '</div>' +
+        '<div class="flex items-center gap-1" onclick="event.stopPropagation()">' +
+            '<button class="p-1 text-[10px] hover:opacity-70 transition ' + (isHidden ? 'opacity-50' : '') + '" onclick="toggleLayerVisibility(this, \'' + elementId + '\')" title="إظهار/إخفاء">' +
+                '<i class="fas ' + (isHidden ? 'fa-eye-slash' : 'fa-eye') + '"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:opacity-70 transition" onclick="deleteElement(\'' + elementId + '\')" title="حذف">' +
+                '<i class="fas fa-trash"></i>' +
+            '</button>' +
+        '</div>';
+        
+        layerItem.addEventListener('click', function(e) {
+            if (!e.target.closest('button')) {
+                selectEl(element);
+                updateLayersList();
+            }
+        });
+        
+        layersList.appendChild(layerItem);
+    });
+}
+
+// === تحريك الطبقة للأعلى (z-index أكبر) ===
+function moveLayerUp(elementId) {
+    const card = document.getElementById('card');
+    const element = card.querySelector('[data-element-id="' + elementId + '"]');
+    if (!element) return;
+    
+    const allElements = Array.from(card.querySelectorAll('.draggable-el'));
+    const currentZ = parseInt(element.style.zIndex) || 10;
+    
+    // البحث عن العنصر الذي فوقه مباشرة
+    let nextHigherZ = Infinity;
+    let swapElement = null;
+    
+    allElements.forEach(el => {
+        if (el === element) return;
+        const z = parseInt(el.style.zIndex) || 10;
+        if (z > currentZ && z < nextHigherZ) {
+            nextHigherZ = z;
+            swapElement = el;
+        }
+    });
+    
+    if (swapElement) {
+        // تبديل z-index
+        element.style.zIndex = nextHigherZ;
+        swapElement.style.zIndex = currentZ;
+    } else {
+        // لا يوجد عنصر فوقه، زد z-index بـ 1
+        element.style.zIndex = currentZ + 1;
+    }
+    
+    updateLayersList();
+    saveState();
+}
+
+// === تحريك الطبقة للأسفل (z-index أقل) ===
+function moveLayerDown(elementId) {
+    const card = document.getElementById('card');
+    const element = card.querySelector('[data-element-id="' + elementId + '"]');
+    if (!element) return;
+    
+    const allElements = Array.from(card.querySelectorAll('.draggable-el'));
+    const currentZ = parseInt(element.style.zIndex) || 10;
+    
+    // البحث عن العنصر الذي تحته مباشرة
+    let nextLowerZ = -Infinity;
+    let swapElement = null;
+    
+    allElements.forEach(el => {
+        if (el === element) return;
+        const z = parseInt(el.style.zIndex) || 10;
+        if (z < currentZ && z > nextLowerZ) {
+            nextLowerZ = z;
+            swapElement = el;
+        }
+    });
+    
+    if (swapElement) {
+        // تبديل z-index
+        element.style.zIndex = nextLowerZ;
+        swapElement.style.zIndex = currentZ;
+    } else if (currentZ > 1) {
+        // لا يوجد عنصر تحته، قلل z-index بـ 1
+        element.style.zIndex = currentZ - 1;
+    }
+    
+    updateLayersList();
+    saveState();
+}
+
+// === نسخة محدثة مع أزرار الترتيب ===
+function updateLayersList() {
+    const card = document.getElementById('card');
+    const layersList = document.getElementById('layers-list');
+    
+    if (!card || !layersList) return;
+    
+    const elements = card.querySelectorAll('.draggable-el');
+    
+    if (elements.length === 0) {
+        layersList.innerHTML = '<div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>';
+        return;
+    }
+    
+    layersList.innerHTML = '';
+    
+    // ترتيب العناصر حسب z-index (الأعلى أولاً)
+    const elementsArray = Array.from(elements).sort((a, b) => {
+        return (parseInt(b.style.zIndex) || 10) - (parseInt(a.style.zIndex) || 10);
+    });
+    
+    elementsArray.forEach((element, index) => {
+        let elementId = element.getAttribute('data-element-id');
+        if (!elementId) {
+            elementId = 'el-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+            element.setAttribute('data-element-id', elementId);
+        }
+        
+        let elementType = '';
+        let icon = 'fa-square';
+        
+        if (element.classList.contains('text-layer')) {
+            elementType = 'نص';
+            icon = 'fa-font';
+        } else if (element.classList.contains('image-layer')) {
+            elementType = 'صورة';
+            icon = 'fa-image';
+        } else if (element.classList.contains('frame-layer')) {
+            elementType = 'إطار';
+            icon = 'fa-vector-square';
+        } else if (element.classList.contains('shape-layer')) {
+            elementType = 'شكل';
+            icon = 'fa-shapes';
+        } else {
+            elementType = 'عنصر';
+        }
+        
+        const isSelected = element.classList.contains('selected');
+        const isHidden = element.style.display === 'none';
+        const zIndex = parseInt(element.style.zIndex) || 10;
+        
+        const layerItem = document.createElement('div');
+        layerItem.className = 'layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ' + 
+            (isSelected 
+                ? 'bg-[#6366f1] text-white border-[#6366f1]' 
+                : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]');
+        
+        layerItem.innerHTML = '<div class="flex-1 flex items-center gap-2 min-w-0">' +
+            '<i class="fas ' + icon + '"></i>' +
+            '<div class="flex-1 min-w-0">' +
+                '<div class="text-[10px] font-bold truncate">' + elementType + '</div>' +
+            '</div>' +
+        '</div>' +
+        '<div class="flex items-center gap-0.5" onclick="event.stopPropagation()">' +
+            '<button class="p-1 text-[10px] hover:bg-[#e2e8f0] rounded transition" onclick="moveLayerUp(\'' + elementId + '\')" title="تقديم للأمام">' +
+                '<i class="fas fa-chevron-up"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:bg-[#e2e8f0] rounded transition" onclick="moveLayerDown(\'' + elementId + '\')" title="إرسال للخلف">' +
+                '<i class="fas fa-chevron-down"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:opacity-70 transition ' + (isHidden ? 'opacity-50' : '') + '" onclick="toggleLayerVisibility(this, \'' + elementId + '\')" title="إظهار/إخفاء">' +
+                '<i class="fas ' + (isHidden ? 'fa-eye-slash' : 'fa-eye') + '"></i>' +
+            '</button>' +
+            '<button class="p-1 text-[10px] hover:text-red-500 transition" onclick="deleteElement(\'' + elementId + '\')" title="حذف">' +
+                '<i class="fas fa-trash"></i>' +
+            '</button>' +
+        '</div>';
+        
+        layerItem.addEventListener('click', function(e) {
+            if (!e.target.closest('button')) {
+                selectEl(element);
+                updateLayersList();
+            }
+        });
+        
+        layersList.appendChild(layerItem);
+    });
+}
