@@ -592,10 +592,10 @@
         .delete-btn { top: -45px; left: 0px; background: #ef4444; }
         .duplicate-btn { top: -45px; left: 38px; background: #3b82f6; }
         .rotate-btn { top: -45px; left: 76px; background: #8b5cf6; }
-        .layer-up-btn { top: -45px; right: 38px; background: #64748b; }
-        .layer-down-btn { top: -45px; right: 0px; background: #64748b; }
-        .move-handle { position: absolute; top: -45px; left: 50%; transform: translateX(-50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 44px; height: 32px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 103; color: white; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); transition: transform 0.2s; font-size: 14px; pointer-events: auto; }
-        .move-handle:hover { transform: translateX(-50%) scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
+        .layer-up-btn { top: -45px; left: 114px; background: #64748b; }
+        .layer-down-btn { top: -45px; left: 152px; background: #64748b; }
+        .move-handle { position: absolute; top: -45px; left: 190px; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 38px; height: 32px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 8px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 103; color: white; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); transition: transform 0.2s; font-size: 14px; pointer-events: auto; }
+        .move-handle:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
         
         /* حاوية أدوات التحكم - تبقى ثابتة فوق العنصر */
