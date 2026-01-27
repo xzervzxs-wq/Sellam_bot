@@ -6802,3 +6802,34 @@ function updateLayersList() {
         layersList.appendChild(layerItem);
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btn-smart-fill');
+    if(btn) {
+        // Remove onclick attribute to avoid double firing
+        btn.removeAttribute('onclick');
+        
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('Smart Fill Clicked via Listener');
+            if (typeof window.toggleSmartFillMode === 'function') {
+                window.toggleSmartFillMode();
+            } else {
+                console.error('toggleSmartFillMode not found');
+            }
+        });
+        
+        btn.addEventListener('touchstart', (e) => {
+             e.stopPropagation(); // Just stop propagation on touchstart
+        }, {passive: false});
+
+        btn.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (typeof window.toggleSmartFillMode === 'function') {
+                window.toggleSmartFillMode();
+            }
+        });
+    }
+});
