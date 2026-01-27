@@ -497,14 +497,14 @@
                     };
                 } else {
                     // إذا كان مفتوح، أضفه للـ canvas
-                    div.onclick = () => addAssetToCanvas(item.src, item.colorable);
+                    div.onclick = () => addAssetToCanvas(item.src, item.colorable, category.name);
                 }
                 
                 grid.appendChild(div);
             });
         }
 
-        function addAssetToCanvas(src, colorable) {
+        function addAssetToCanvas(src, colorable, categoryName) {
             const img = new Image();
             img.onload = function() {
                 const card = document.getElementById('card');
@@ -527,13 +527,18 @@
                 const centerX = (cardW - w) / 2;
                 const centerY = (cardH - h) / 2;
                 
-                // إنشاء العنصر
-                const wrapper = createWrapper('image-layer');
+                // إنشاء العنصر مع اسم التصنيف
+                const wrapper = createWrapper(categoryName || 'image-layer');
                 wrapper.style.width = w + 'px';
                 wrapper.style.height = h + 'px';
                 wrapper.style.left = Math.max(10, centerX) + 'px';
                 wrapper.style.top = Math.max(10, centerY) + 'px';
                 
+                
+                // إضافة اسم التصنيف للعنصر
+                if (categoryName) {
+                    wrapper.setAttribute('data-category-name', categoryName);
+                }
                 const imgEl = document.createElement('img');
                 imgEl.src = src;
                 imgEl.style.width = '100%';
@@ -6677,7 +6682,13 @@ function updateLayersList() {
             elementType = 'شكل';
             icon = 'fa-shapes';
         } else {
-            elementType = 'عنصر';
+            // استخدام اسم التصنيف إذا كان موجود
+            const categoryName = element.getAttribute('data-category-name');
+            if (categoryName) {
+                elementType = categoryName;
+            } else {
+                elementType = 'عنصر';
+            }
         }
         
         const isSelected = element.classList.contains('selected');
