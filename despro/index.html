@@ -33,7 +33,40 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260127_5">
+    
+    <!-- Dark mode fixes - inline للتأكد من التطبيق -->
+    <style>
+        :root.dark-mode #layers-container {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+        }
+        :root.dark-mode #info-bar-placeholder {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #info-bar-placeholder svg {
+            stroke: #94a3b8 !important;
+        }
+        :root.dark-mode #designer-panel {
+            background-color: transparent !important;
+        }
+        :root.dark-mode #designer-panel .bg-white\/5 {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+        }
+        :root.dark-mode #designer-panel h3,
+        :root.dark-mode #designer-panel p,
+        :root.dark-mode #designer-panel span {
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #studio-subtitle-display {
+            color: #cbd5e1 !important;
+        }
+        :root.dark-mode #no-selection-msg {
+            color: #cbd5e1 !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
 
