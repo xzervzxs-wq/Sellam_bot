@@ -687,13 +687,13 @@
                             BACKGROUND
                         </span>
                         <div class="flex items-center gap-1.5">
-                            <label class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition flex items-center gap-1 shadow-sm cursor-pointer" title="لون الخلفية">
+                            <label class="px-2 py-1 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] cursor-pointer" title="لون الخلفية">
                                 <i class="fas fa-fill-drip"></i> لون الخلفية
-                                <div id="bg-color-preview" class="relative w-5 h-5 rounded-full border-2 border-white shadow-sm" style="background-color: #ffffff;">
+                                <div id="bg-color-preview" class="relative w-5 h-5 rounded-full border border-slate-300 shadow-sm" style="background-color: #ffffff;">
                                     <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                 </div>
                             </label>
-                            <button onclick="toggleTransparentMode()" id="btn-transparent" class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition flex items-center gap-1 shadow-sm" title="تفعيل/إلغاء الشفافية">
+                            <button onclick="toggleTransparentMode()" id="btn-transparent" class="px-2 py-1 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]" title="تفعيل/إلغاء الشفافية">
                                 <i class="fas fa-chess-board"></i> شفاف
                             </button>
                         </div>
@@ -705,13 +705,16 @@
                             SMART TOOLS
                         </span>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition flex items-center gap-1 shadow-sm" title="قص ذكي بالتحديد">
+                            <button onclick="toggleLassoMode()" id="btn-lasso" class="px-2 py-1 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]" title="قص ذكي بالتحديد">
                                 <i class="fas fa-cut"></i> قص ذكي
                             </button>
-                            <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="px-2 py-1 rounded text-[9px] font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition flex items-center gap-1 shadow-sm" title="تلوين ذكي بالتحديد">
+                            <button onclick="event.stopPropagation(); toggleSmartEraserMode()" id="btn-smart-eraser-top" class="px-2 py-1 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]" title="ممحاة ذكية بالتحديد">
+                                <i class="fas fa-eraser"></i> ممحاة ذكية
+                            </button>
+                            <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="px-2 py-1 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0]" title="تلوين ذكي بالتحديد">
                                 <i class="fas fa-fill-drip"></i> تلوين ذكي
                             </button>
-                            <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-2 border-white shadow-sm" title="اختر لون التعبئة">
+                            <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#e2e8f0]" title="اختر لون التعبئة">
                         </div>
                     </div>
                     
