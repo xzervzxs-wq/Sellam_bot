@@ -1243,15 +1243,21 @@
     </nav>
 
     <script>
-        // ==================== MUSHAF IMAGE VARIABLES ====================
-        const MUSHAF_CDN = 'https://www.mp3quran.net/api/quran_pages_arabic/';
-        let currentMushafPage = 1;
+        // ==================== MUSHAF VARIABLES - UPDATED FOR SVG ====================
+        const SVG_BASE_URL = 'https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/quran-svg-pages/';
+        const TOTAL_PAGES = 604;
+        let currentMushafPage = parseInt(localStorage.getItem('lastPage')) || 1;
         let mushafInitialized = false;
         let isMushafNightMode = false;
         let mushafBarVisible = false;
         let touchStartX = 0;
         let touchCurrentX = 0;
         let isSwiping = false;
+        
+        // Interactive Ayah Coordinates
+        let quranCoordinates = {};
+        let pageAyahsData = [];
+        let selectedAyahData = null;
         
         // Surah data
         const SURAH_START_PAGES = {
@@ -1454,7 +1460,7 @@
         
         function getPageImageUrl(pageNum) {
             const padded = String(pageNum).padStart(3, '0');
-            return `${MUSHAF_CDN}${padded}.png`;
+            return `${SVG_BASE_URL}${padded}.svg`;
         }
         
         function preloadMushafPages() {
@@ -1780,6 +1786,19 @@
             await inlineStyles();
             resizeCardToFit();
             window.addEventListener('resize', resizeCardToFit);
+            
+            // Load Quran Coordinates for Interactive Ayahs
+            try {
+                const coordRes = await fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/ayat_map?v=' + Date.now());
+                if (coordRes.ok) {
+                    quranCoordinates = await coordRes.json();
+                    console.log("✅ Ayah coordinates loaded successfully - 585 pages");
+                } else {
+                    console.error("❌ Failed to load ayah coordinates");
+                }
+            } catch (e) {
+                console.error("❌ Error fetching coordinates:", e);
+            }
             
             // Initialize Mushaf if it's the active section
             if (document.getElementById('mushaf-section').classList.contains('active')) {
