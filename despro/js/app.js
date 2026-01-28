@@ -2284,23 +2284,61 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'draggable-el image-layer bg-image is-locked';
-                    const img = document.createElement('img');
-                    img.crossOrigin = "anonymous"; // إضافة CrossOrigin
-                    img.src = e.target.result;
-                    img.loading = "eager";
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'fill';
-                    img.style.pointerEvents = 'none';
-                    wrapper.appendChild(img);
-                    const card = document.getElementById('card');
-                    const gradient = document.getElementById('card-gradient');
-                    if(gradient.nextSibling) card.insertBefore(wrapper, gradient.nextSibling);
-                    else card.appendChild(wrapper);
-                    setupInteract(wrapper, 'box');
-                    saveState();
+                    const tempImg = new Image();
+                    tempImg.src = e.target.result;
+                    tempImg.onload = function() {
+                        const card = document.getElementById('card');
+                        const cardW = card.offsetWidth;
+                        const cardH = card.offsetHeight;
+                        
+                        // حساب الحجم المناسب
+                        const imgRatio = tempImg.width / tempImg.height;
+                        const cardRatio = cardW / cardH;
+                        let displayW, displayH;
+                        
+                        if (imgRatio > cardRatio) {
+                            displayW = cardW * 0.9;
+                            displayH = displayW / imgRatio;
+                        } else {
+                            displayH = cardH * 0.9;
+                            displayW = displayH * imgRatio;
+                        }
+                        
+                        // إنشاء طبقة صورة عادية قابلة للتحكم
+                        const wrapper = createWrapper('image-layer');
+                        wrapper.setAttribute('data-colorable', 'false');
+                        wrapper.setAttribute('data-high-res', 'true');
+                        
+                        const contentWrapper = wrapper.querySelector('.content-wrapper');
+                        contentWrapper.style.width = '100%';
+                        contentWrapper.style.height = '100%';
+                        contentWrapper.style.display = 'flex';
+                        
+                        const img = document.createElement('img');
+                        img.crossOrigin = "anonymous";
+                        img.src = e.target.result;
+                        img.loading = "eager";
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'contain';
+                        img.style.pointerEvents = 'none';
+                        
+                        contentWrapper.appendChild(img);
+                        
+                        wrapper.style.width = displayW + 'px';
+                        wrapper.style.height = displayH + 'px';
+                        wrapper.style.left = (cardW / 2) + 'px';
+                        wrapper.style.top = (cardH / 2) + 'px';
+                        wrapper.style.transform = 'translate(-50%, -50%)';
+                        
+                        card.appendChild(wrapper);
+                        
+                        setTimeout(() => {
+                            selectEl(wrapper);
+                            setupInteract(wrapper, 'box');
+                            saveState();
+                        }, 50);
+                    };
                 };
                 reader.readAsDataURL(input.files[0]);
                 input.value = '';
