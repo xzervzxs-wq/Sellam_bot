@@ -69,6 +69,25 @@
                 restrictFonts();
                 restrictShapes();
                 restrictFrames();
+                showFloatingPaymentButton();
+            } else {
+                hideFloatingPaymentButton();
+            }
+        }
+
+        // إظهار زر الدفع العائم للمستخدمين المجانيين
+        function showFloatingPaymentButton() {
+            const btn = document.getElementById('floating-payment-btn');
+            if (btn) {
+                btn.style.display = 'block';
+            }
+        }
+
+        // إخفاء زر الدفع العائم للمستخدمين المميزين
+        function hideFloatingPaymentButton() {
+            const btn = document.getElementById('floating-payment-btn');
+            if (btn) {
+                btn.style.display = 'none';
             }
         }
 
@@ -6565,6 +6584,17 @@
                             هذا العنصر متاح فقط للمشتركين.<br>امتلك هذا العنصر وآلاف العناصر الأخرى الآن!
                         </p>
 
+                        <div style="background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 15px; text-align: right;">
+                            <p style="color: #475569; font-size: 10px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; justify-content: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 2v20m0-20l7 7m-7-7l-7 7"/></svg>
+                                ابدأ من 99 ريال فقط
+                            </p>
+                            <p style="color: #64748b; font-size: 9px; line-height: 1.4;">
+                                💳 ادفع بسهولة عبر واتساب<br>
+                                ⚡ تفعيل فوري خلال دقائق
+                            </p>
+                        </div>
+
                         <button onclick="window.location.href = 'subscriptions.html'" style="
                             width: 100%;
                             background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -6579,7 +6609,8 @@
                             transition: all 0.3s;
                             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
                         " onmouseover="this.style.transform='translateY(-2px) shadow-lg'" onmouseout="this.style.transform='translateY(0)'">
-                            ترقية للباقة الكاملة 💎
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-left: 5px;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            اشترك وادفع الآن 💎
                         </button>
 
                         <button onclick="this.parentElement.parentElement.parentElement.remove();" style="

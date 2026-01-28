@@ -61,6 +61,24 @@
         <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-pink-100 rounded-full blur-[80px] opacity-60"></div>
     </div>
 
+    <!-- Payment Notice Banner -->
+    <div class="w-full max-w-4xl mx-auto mb-8 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-200 rounded-2xl p-4 shadow-md">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-white shadow-md">
+                <i class="fas fa-coins text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-base font-black text-slate-800 mb-1 flex items-center gap-2">
+                    كيف أدفع؟ 💰
+                </h3>
+                <p class="text-xs text-slate-700 font-semibold leading-relaxed">
+                    <strong>سهل جداً!</strong> اختر باقتك واضغط "اشترك الآن"، ثم تواصل معنا عبر واتساب لإتمام الدفع. 
+                    نوفر عدة طرق للدفع: تحويل بنكي، بطاقة ائتمانية، أو أي طريقة تناسبك. التفعيل فوري! ⚡
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="text-center mb-10 max-w-2xl mx-auto animate-fade-in-up">
         <div class="inline-flex items-center justify-center p-3 bg-white rounded-2xl shadow-sm mb-4">
@@ -139,8 +157,9 @@
                 <p class="flex items-center gap-2 text-xs font-bold text-slate-700 bg-indigo-50/50 p-1.5 rounded-lg"><span class="check-icon"><i class="fas fa-check"></i></span> ملاحظات مطولة (1000 حرف)</p>
             </div>
             
-            <button onclick="subscribe('basic')" class="w-full py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
-                اشترك الآن
+            <button onclick="subscribe('basic')" class="w-full py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm flex items-center justify-center gap-2">
+                <i class="fas fa-credit-card text-sm"></i>
+                اشترك الآن وادفع
             </button>
         </div>
 
@@ -168,8 +187,9 @@
                 <p class="flex items-center gap-2 text-xs font-bold text-slate-700 bg-indigo-50/50 p-1.5 rounded-lg"><span class="check-icon"><i class="fas fa-check"></i></span> ملاحظات مطولة (1000 حرف)</p>
             </div>
             
-            <button onclick="subscribe('premium')" class="w-full py-4 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white font-bold rounded-xl hover:shadow-lg hover:shadow-indigo-200 transition-all transform hover:-translate-y-1">
-                اشترك الآن ⚡
+            <button onclick="subscribe('premium')" class="w-full py-4 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white font-bold rounded-xl hover:shadow-lg hover:shadow-indigo-200 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                <i class="fas fa-credit-card"></i>
+                اشترك الآن وادفع ⚡
             </button>
         </div>
 
@@ -195,9 +215,91 @@
                 <p class="flex items-center gap-2 text-xs font-bold text-slate-700 bg-indigo-50/50 p-1.5 rounded-lg"><span class="check-icon"><i class="fas fa-check"></i></span> ملاحظات مطولة (1000 حرف)</p>
             </div>
             
-            <button onclick="subscribe('yearly')" class="w-full py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
-                اشترك الآن
+            <button onclick="subscribe('yearly')" class="w-full py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm flex items-center justify-center gap-2">
+                <i class="fas fa-credit-card text-sm"></i>
+                اشترك الآن وادفع
             </button>
+        </div>
+    </div>
+
+    <!-- Payment Methods Section -->
+    <div class="mt-16 mb-8 max-w-3xl w-full">
+        <div class="bg-white rounded-3xl p-8 shadow-lg border border-slate-100">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mb-4 shadow-lg">
+                    <i class="fas fa-credit-card text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-800 mb-2">طرق الدفع المتاحة 💳</h3>
+                <p class="text-sm text-slate-500 font-semibold">اختر الطريقة الأنسب لك لإتمام عملية الدفع</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <!-- WhatsApp Payment -->
+                <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-2xl border-2 border-emerald-200 hover:border-emerald-300 transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+                            <i class="fab fa-whatsapp text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-black text-slate-800">دفع عبر واتساب</h4>
+                            <p class="text-[10px] text-emerald-700 font-bold">سريع ومباشر</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 font-semibold mb-4 leading-relaxed">
+                        تواصل معنا مباشرة عبر واتساب لإتمام عملية الدفع. سنرسل لك رابط الدفع أو تفاصيل التحويل البنكي.
+                    </p>
+                    <a href="https://wa.me/966531333714?text=مرحباً،%20أريد%20الاشتراك%20في%20Despro%20Studio%20والدفع" target="_blank" class="block w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all text-center shadow-md hover:shadow-lg text-sm">
+                        <i class="fab fa-whatsapp ml-2"></i>
+                        ابدأ الدفع عبر واتساب
+                    </a>
+                </div>
+
+                <!-- Bank Transfer -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-md">
+                            <i class="fas fa-university text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-black text-slate-800">تحويل بنكي</h4>
+                            <p class="text-[10px] text-indigo-700 font-bold">آمن وموثوق</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 font-semibold mb-4 leading-relaxed">
+                        احصل على تفاصيل الحساب البنكي للتحويل المباشر. بعد التحويل، أرسل إيصال الدفع وسيتم تفعيل حسابك فوراً.
+                    </p>
+                    <a href="https://wa.me/966531333714?text=أريد%20تفاصيل%20الحساب%20البنكي%20للدفع" target="_blank" class="block w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-xl transition-all text-center shadow-md hover:shadow-lg text-sm">
+                        <i class="fas fa-info-circle ml-2"></i>
+                        احصل على تفاصيل الحساب
+                    </a>
+                </div>
+            </div>
+
+            <!-- Payment Process Steps -->
+            <div class="bg-slate-50 rounded-2xl p-6 mt-6">
+                <h4 class="text-sm font-black text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-list-check text-indigo-500"></i>
+                    خطوات إتمام الدفع
+                </h4>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+                        <p class="text-xs text-slate-700 font-semibold">اختر الباقة المناسبة من الأعلى</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                        <p class="text-xs text-slate-700 font-semibold">اضغط على "اشترك الآن" وتواصل معنا عبر واتساب</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                        <p class="text-xs text-slate-700 font-semibold">أرسل إيصال الدفع أو قم بالتحويل حسب التعليمات</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs font-bold">✓</div>
+                        <p class="text-xs text-slate-700 font-semibold">سيتم تفعيل حسابك خلال دقائق!</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -213,10 +315,18 @@
 
     <script>
         function subscribe(plan) {
-            let message = "مرحباً، أرغب في الاشتراك في باقة ";
-            if(plan === 'basic') message += "3 أشهر بـ 99 ريال";
-            else if(plan === 'premium') message += "6 أشهر بـ 180 ريال";
-            else if(plan === 'yearly') message += "سنة كاملة بـ 300 ريال";
+            let message = "مرحباً 👋\n\nأريد الاشتراك والدفع للباقة التالية:\n\n";
+            if(plan === 'basic') {
+                message += "📦 الباقة الأساسية (3 أشهر)\n💰 السعر: 99 ريال";
+            }
+            else if(plan === 'premium') {
+                message += "⭐ الباقة المميزة (6 أشهر)\n💰 السعر: 180 ريال\n🔥 الأكثر طلباً!";
+            }
+            else if(plan === 'yearly') {
+                message += "💎 الباقة السنوية (12 شهر)\n💰 السعر: 300 ريال\n💸 أفضل توفير!";
+            }
+            
+            message += "\n\nكيف يمكنني الدفع؟";
             
             const url = `https://wa.me/966531333714?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
