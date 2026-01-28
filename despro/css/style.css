@@ -574,7 +574,7 @@
         .draggable-el.selected { border: 1px dashed var(--primary-color); z-index: 100; }
         .draggable-el.selected.is-locked { border-color: #ef4444; border-style: dotted; }
         
-        .handle { position: absolute; background: white; border: 2.5px solid var(--primary-color); width: 26px; height: 26px; border-radius: 50%; z-index: 101; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .handle { position: absolute; background: white; border: 2.5px solid var(--primary-color); width: 26px; height: 26px; border-radius: 4px; z-index: 101; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .draggable-el.selected .handle { display: block; }
         
         /* اتجاهات المقابض */
