@@ -6716,12 +6716,12 @@ function updateFooterForUser(name) {
     if (authContainer) {
         authContainer.innerHTML = `
             <div class="flex items-center gap-2">
-                <div class="flex items-center justify-center gap-2 px-3 py-1.5 bg-[#fbbf24]/10 rounded-lg border border-[#fbbf24]/20 text-[#fbbf24] text-xs font-bold shadow-sm">
+                <div class="flex items-center justify-center gap-2 px-5 py-2 bg-[#fbbf24]/10 rounded-lg border border-[#fbbf24]/20 text-[#fbbf24] text-xs font-bold shadow-sm">
                     <i class="fas fa-crown text-[#fbbf24] text-[10px]"></i>
                     <span>${name}</span>
                 </div>
-                <button type="button" id="logout-btn" class="flex items-center justify-center gap-2 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-xs font-bold rounded-lg border border-white/10 transition-all shadow-sm" title="تسجيل خروج">
-                    <i class="fas fa-sign-out-alt"></i>
+                <button type="button" id="logout-btn" class="flex items-center justify-center gap-1.5 px-2 py-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-[10px] font-bold rounded-lg border border-white/10 transition-all shadow-sm" title="تسجيل خروج">
+                    <i class="fas fa-sign-out-alt text-[10px]"></i>
                     <span class="font-sans tracking-wide">Log out</span>
                 </button>
             </div>
