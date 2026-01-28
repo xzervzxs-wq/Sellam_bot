@@ -67,11 +67,17 @@
             color: #cbd5e1 !important;
         }
         /* تغميق خلفيات الأزرار في الدارك مود */
-        :root.dark-mode .bg-\[#f8fafc\] {
+        :root.dark-mode .bg-\[#f8fafc\],
+        :root.dark-mode #fav-colors-row,
+        :root.dark-mode #grad-controls,
+        :root.dark-mode .controls-row {
             background-color: #1e293b !important;
         }
         :root.dark-mode .border-\[#e2e8f0\] {
             border-color: #334155 !important;
+        }
+        :root.dark-mode .bg-\[#e2e8f0\] {
+            background-color: #334155 !important;
         }
     </style>
 </head>
@@ -806,6 +812,46 @@
                     <button onclick="exitEraserMode()" class="h-7 px-2.5 rounded text-[9px] font-bold bg-slate-300 text-slate-700 hover:bg-slate-400 transition">إنهاء</button>
                 </div>
 
+                <!-- إعدادات التدرج -->
+                <div id="grad-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] mb-2">
+                    <!-- Global Overlay Controls -->
+                    <div id="global-grad-inputs" class="flex items-center gap-2">
+                        <span class="text-[9px] font-bold text-[#1e293b]">تدرج:</span>
+                        <input type="color" id="global-grad-start" value="#000000" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="بداية التدرج (أسفل)">
+                        <input type="color" id="global-grad-end" value="#ffffff" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="نهاية التدرج (أعلى)">
+                        
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        <input type="range" min="0" max="1" step="0.1" value="0.8" oninput="updateGlobalGradient()" id="global-grad-opacity" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="الشفافية">
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        <span class="text-[9px] font-bold text-[#1e293b]">التمدد:</span>
+                        <input type="range" min="10" max="100" value="50" oninput="updateGlobalGradient()" id="global-grad-height" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="ارتفاع التدرج">
+                    </div>
+
+                    <!-- Element Gradient Controls -->
+                    <div id="element-grad-inputs" class="hidden items-center gap-2">
+                        <span class="text-[9px] font-bold text-[#1e293b]">البداية:</span>
+                        <input type="color" id="grad-start-color" value="#6366f1" oninput="syncFloatGradientInputs('start', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                        
+                        <span class="text-[9px] font-bold text-[#1e293b]">النهاية:</span>
+                        <input type="color" id="grad-end-color" value="#ec4899" oninput="syncFloatGradientInputs('end', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                        
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        
+                        <span class="text-[9px] font-bold text-[#1e293b]">الزاوية:</span>
+                        <input type="range" min="0" max="360" value="90" id="grad-angle" oninput="syncFloatGradientInputs('angle', this.value); updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="زاوية التدرج">
+
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+
+                        <span class="text-[9px] font-bold text-[#1e293b]">الشفافية:</span>
+                        <input type="range" min="0" max="1" step="0.1" value="1" id="grad-opacity" oninput="updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="شفافية التدرج">
+                        
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        <button onclick="toggleGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </div>
+
                 <!-- الألوان المفضلة -->
                 <div id="fav-colors-row" class="bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2" style="order: 2;">
                     <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
@@ -842,46 +888,6 @@
                         <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
                         <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
                         <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-                    </div>
-                </div>
-
-                <!-- إعدادات التدرج -->
-                <div id="grad-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0]">
-                    <!-- Global Overlay Controls -->
-                    <div id="global-grad-inputs" class="flex items-center gap-2">
-                        <span class="text-[9px] font-bold text-[#1e293b]">تدرج:</span>
-                        <input type="color" id="global-grad-start" value="#000000" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="بداية التدرج (أسفل)">
-                        <input type="color" id="global-grad-end" value="#ffffff" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="نهاية التدرج (أعلى)">
-                        
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <input type="range" min="0" max="1" step="0.1" value="0.8" oninput="updateGlobalGradient()" id="global-grad-opacity" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="الشفافية">
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#1e293b]">التمدد:</span>
-                        <input type="range" min="10" max="100" value="50" oninput="updateGlobalGradient()" id="global-grad-height" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="ارتفاع التدرج">
-                    </div>
-
-                    <!-- Element Gradient Controls -->
-                    <div id="element-grad-inputs" class="hidden items-center gap-2">
-                        <span class="text-[9px] font-bold text-[#1e293b]">البداية:</span>
-                        <input type="color" id="grad-start-color" value="#6366f1" oninput="syncFloatGradientInputs('start', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
-                        
-                        <span class="text-[9px] font-bold text-[#1e293b]">النهاية:</span>
-                        <input type="color" id="grad-end-color" value="#ec4899" oninput="syncFloatGradientInputs('end', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
-                        
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        
-                        <span class="text-[9px] font-bold text-[#1e293b]">الزاوية:</span>
-                        <input type="range" min="0" max="360" value="90" id="grad-angle" oninput="syncFloatGradientInputs('angle', this.value); updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="زاوية التدرج">
-
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-
-                        <span class="text-[9px] font-bold text-[#1e293b]">الشفافية:</span>
-                        <input type="range" min="0" max="1" step="0.1" value="1" id="grad-opacity" oninput="updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="شفافية التدرج">
-                        
-                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
-                        <button onclick="toggleGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
-                            <i class="fas fa-times"></i> إلغاء
-                        </button>
                     </div>
                 </div>
 
