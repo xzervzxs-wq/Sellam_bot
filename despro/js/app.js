@@ -5740,47 +5740,45 @@
         }
 
         function printDesignDirect() {
-            // حفظ التصميم وطباعته نظيف بدون خلفية
-            const card = document.getElementById('card');
-            const originalBg = card.style.backgroundColor;
-
-            // تعيين خلفية شفافة مؤقتاً
-            card.style.backgroundColor = 'transparent';
-
-            html2canvas(card, {
-                scale: 2,
-                allowTaint: true,
-                useCORS: true,
-                backgroundColor: null,
-                logging: false
-            }).then(canvas => {
-                // استرجاع اللون الأصلي
-                card.style.backgroundColor = originalBg;
-
-                const printWindow = window.open('', '', 'width=800,height=600');
-                const img = canvas.toDataURL('image/png');
-
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>طباعة</title>
-                        <style>
-                            * { margin: 0; padding: 0; }
-                            @page { margin: 0; padding: 0; }
-                            body { margin: 0; padding: 0; }
-                            img { display: block; }
-                        </style>
-                    </head>
-                    <body onload="print()">
-                        <img src="${img}" style="width: 100%; height: auto;">
-                    </body>
-                    </html>
-                `);
-
-                printWindow.document.close();
-            });
+            // طباعة فورية - نفس ملف PDF بالضبط الذي يتم تحميله
+            const imgData = document.getElementById('save-img').src;
+            
+            if (!imgData || imgData === '') {
+                showInfoModal('⚠️ انتظر', 'يرجى الانتظار حتى يتم تحميل المعاينة');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const width = pdf.internal.pageSize.getWidth();
+            const height = pdf.internal.pageSize.getHeight();
+            
+            const img = new Image();
+            img.onload = function() {
+                const imgWidth = img.width;
+                const imgHeight = img.height;
+                const imgAspectRatio = imgWidth / imgHeight;
+                const pageAspectRatio = width / height;
+                
+                let finalWidth = width;
+                let finalHeight = height;
+                
+                if(imgAspectRatio > pageAspectRatio) {
+                    finalHeight = width / imgAspectRatio;
+                } else {
+                    finalWidth = height * imgAspectRatio;
+                }
+                
+                const x = (width - finalWidth) / 2;
+                const y = (height - finalHeight) / 2;
+                
+                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                
+                // فتح PDF مباشرة للطباعة - نفس الملف بالضبط
+                const pdfDataUri = pdf.output('bloburl');
+                window.open(pdfDataUri, '_blank');
+            };
+            img.src = imgData;
         }
 
         // ===== دوال التحديد والحذف =====
