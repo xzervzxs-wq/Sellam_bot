@@ -528,7 +528,7 @@
                 
                 <!-- زر الإطارات مع Dropdown -->
                 <div class="relative" onclick="event.stopPropagation();">
-                    <button onclick="toggleFrameDropdown()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group min-w-[50px]">
+                    <button onclick="toggleFrameDropdown()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group min-w-[50px]">
                         <i class="far fa-square text-[#6366f1] group-hover:scale-110 transition-transform"></i> إطار
                     </button>
                     
@@ -548,7 +548,7 @@
                 
                 <!-- زر الأشكال مع Dropdown -->
                 <div class="relative" onclick="event.stopPropagation();">
-                    <button onclick="addShape()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-square-full text-[#6366f1] group-hover:scale-110 transition-transform"></i> شكل</button>
+                    <button onclick="addShape()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-square-full text-[#6366f1] group-hover:scale-110 transition-transform"></i> شكل</button>
                     
                     <!-- Dropdown Menu -->
                     <div id="shapes-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-[#cbd5e1] rounded-lg shadow-lg z-40 p-2">
@@ -567,7 +567,7 @@
                     </div>
                 </div>
                 
-                <label class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-[10px] font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 cursor-pointer group transition">
+                <label class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 cursor-pointer group transition">
                     <i class="fas fa-folder-open text-[#6366f1] group-hover:scale-110 transition-transform"></i> فتح ملف
                     <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
                 </label>
