@@ -2542,6 +2542,7 @@
                     ctx.clearRect(0, 0, smartEraserCanvas.width, smartEraserCanvas.height);
                     points = [];
                     showSmartToolTutorial('smartEraser');
+                    isDrawing = false;
                     return;
                 }
                 
@@ -2757,6 +2758,7 @@
                     ctx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
                     points = [];
                     showSmartToolTutorial('lasso');
+                    isDrawing = false;
                     return;
                 }
                 
@@ -2955,6 +2957,7 @@
                     ctx.clearRect(0, 0, smartFillCanvas.width, smartFillCanvas.height);
                     points = [];
                     showSmartToolTutorial('smartFill');
+                    isDrawing = false;
                     return;
                 }
                 
