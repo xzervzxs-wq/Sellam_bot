@@ -2720,42 +2720,41 @@
             const eraserBtn = document.getElementById('btn-eraser');
             const lassoBtn = document.getElementById('btn-lasso');
             const magicBtn = document.getElementById('btn-magic');
+            const smartEraserBtn = document.getElementById('btn-smart-eraser');
+            const smartEraserTopBtn = document.getElementById('btn-smart-eraser-top');
             const smartFillBtn = document.getElementById('btn-smart-fill');
+            
+            // قائمة بجميع الأزرار لإعادة تعيينها
+            const allButtons = [eraserBtn, lassoBtn, magicBtn, smartEraserBtn, smartEraserTopBtn, smartFillBtn];
 
-            [eraserBtn, lassoBtn, magicBtn, smartFillBtn].forEach(btn => {
+            allButtons.forEach(btn => {
                 if(btn) {
                     btn.classList.remove('bg-[#6366f1]', 'text-white');
-                    btn.classList.remove('bg-white');
-                    btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
+                    // إزالة ألوان الخلفية الفاتحة المستخدمة سابقاً
+                    btn.classList.remove('bg-white'); 
+                    // إعادة تعيين إلى الوضع الافتراضي الموحد
+                    btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]'); 
                 }
             });
 
-            if(eraserMode) {
-                if(eraserBtn) {
-                    eraserBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    eraserBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
+            // دالة مساعدة لتفعيل الزر بلون موحد (أزرق ونص أبيض)
+            const activate = (btn) => {
+                if(btn) {
+                    btn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                    btn.classList.remove('bg-white');
+                    btn.classList.add('bg-[#6366f1]', 'text-white');
                 }
-            }
-            if(lassoMode) {
-                if(lassoBtn) {
-                    lassoBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    lassoBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
-                }
-            }
-            if(smartFillMode) {
-                if(smartFillBtn) {
-                    smartFillBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    smartFillBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
-                }
-            }
-            if(magicMode && eraserMode) {
-                if(magicBtn) {
-                    magicBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    magicBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
-                }
-            }
-        }
+            };
+            
+            if(eraserMode) activate(eraserBtn);
+            if(lassoMode) activate(lassoBtn);
+            if(smartFillMode) activate(smartFillBtn);
+            if(smartEraserMode) activate(smartEraserTopBtn);
 
+            // الأزرار الفرعية (تظهر نشطة أيضاً إذا كان الوضع مفعلاً)
+            if(magicMode && eraserMode) activate(magicBtn);
+            if(smartEraserMode && eraserMode) activate(smartEraserBtn);
+        }
         function initLassoCanvas() {
             if(lassoCanvas) lassoCanvas.remove();
             const card = document.getElementById('card');
@@ -5085,9 +5084,9 @@
                 </style>
                 <div style="
                     background: linear-gradient(145deg, #1e293b, #0f172a);
-                    border-radius: 24px;
-                    padding: 32px;
-                    max-width: 400px;
+                    border-radius: 20px;
+                    padding: 24px;
+                    max-width: 340px;
                     width: 90%;
                     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.2);
                     animation: slideUp 0.4s ease;
@@ -5098,46 +5097,46 @@
                     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
                     
                     <!-- الأيقونة والعنوان -->
-                    <div style="text-align: center; margin-bottom: 24px; position: relative;">
+                    <div style="text-align: center; margin-bottom: 20px; position: relative;">
                         <div style="
-                            width: 80px;
-                            height: 80px;
+                            width: 64px;
+                            height: 64px;
                             background: linear-gradient(135deg, #6366f1, #8b5cf6);
                             border-radius: 50%;
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            font-size: 36px;
-                            margin: 0 auto 16px;
+                            font-size: 28px;
+                            margin: 0 auto 12px;
                             box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
                             animation: pulse 2s infinite;
                         ">${icon}</div>
                         <h3 style="
                             color: white;
-                            font-size: 22px;
+                            font-size: 20px;
                             font-weight: 700;
                             margin: 0;
                             background: linear-gradient(90deg, #6366f1, #a78bfa);
                             -webkit-background-clip: text;
                             -webkit-text-fill-color: transparent;
                         ">${title}</h3>
-                        <p style="color: #94a3b8; font-size: 13px; margin-top: 8px;">كيفية استخدام هذه الأداة</p>
+                        <p style="color: #94a3b8; font-size: 13px; margin-top: 6px;">كيفية استخدام هذه الأداة</p>
                     </div>
                     
                     <!-- الخطوات -->
-                    <div style="background: rgba(0, 0, 0, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px; position: relative;">
+                    <div style="background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px; position: relative;">
                         ${steps.map((step, i) => `
                             <div style="
                                 display: flex;
                                 align-items: center;
-                                gap: 12px;
-                                padding: 12px 0;
+                                gap: 10px;
+                                padding: 10px 0;
                                 ${i < steps.length - 1 ? 'border-bottom: 1px solid rgba(99, 102, 241, 0.1);' : ''}
                             ">
                                 <span style="
                                     color: ${i === steps.length - 1 ? '#10b981' : '#e2e8f0'};
-                                    font-size: 14px;
-                                    line-height: 1.6;
+                                    font-size: 13px;
+                                    line-height: 1.5;
                                     ${i === steps.length - 1 ? 'font-weight: 600;' : ''}
                                 ">${step}</span>
                             </div>
@@ -5148,10 +5147,10 @@
                     <div style="
                         background: rgba(99, 102, 241, 0.05);
                         border: 2px dashed rgba(99, 102, 241, 0.2);
-                        border-radius: 16px;
-                        padding: 24px;
+                        border-radius: 12px;
+                        padding: 16px;
                         text-align: center;
-                        margin-bottom: 24px;
+                        margin-bottom: 20px;
                         position: relative;
                         overflow: visible;
                     ">
