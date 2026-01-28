@@ -497,14 +497,14 @@
                     };
                 } else {
                     // إذا كان مفتوح، أضفه للـ canvas
-                    div.onclick = () => addAssetToCanvas(item.src, item.colorable);
+                    div.onclick = () => addAssetToCanvas(item.src, item.colorable, category.name);
                 }
                 
                 grid.appendChild(div);
             });
         }
 
-        function addAssetToCanvas(src, colorable) {
+        function addAssetToCanvas(src, colorable, categoryName) {
             const img = new Image();
             img.onload = function() {
                 const card = document.getElementById('card');
@@ -546,6 +546,12 @@
                     wrapper.setAttribute('data-colorable', 'true');
                 } else {
                     wrapper.setAttribute('data-colorable', 'false');
+                }
+
+                // حفظ معلومات الصورة المصغرة واسم الفئة للطبقات
+                wrapper.setAttribute('data-thumb', src);
+                if (categoryName) {
+                    wrapper.setAttribute('data-category-name', categoryName);
                 }
                 
                 // إضافة الصورة داخل content-wrapper
@@ -6661,6 +6667,10 @@ function updateLayersList() {
             element.setAttribute('data-element-id', elementId);
         }
         
+        // الحصول على اسم التصنيف والصورة المصغرة
+        const categoryName = element.getAttribute('data-category-name');
+        const thumbSrc = element.getAttribute('data-thumb');
+        
         let elementType = '';
         let icon = 'fa-square';
         
@@ -6680,20 +6690,38 @@ function updateLayersList() {
             elementType = 'عنصر';
         }
         
+        // استخدام اسم التصنيف إذا كان موجود
+        const displayName = categoryName || elementType;
+        
+        // أيقونة خاصة للتصنيفات
+        if (categoryName) {
+            if (categoryName.includes('زخارف') || categoryName.includes('إطارات')) icon = 'fa-vector-square';
+            else if (categoryName.includes('رمضان')) icon = 'fa-moon';
+            else if (categoryName.includes('ورد') || categoryName.includes('زهور')) icon = 'fa-seedling';
+            else if (categoryName.includes('كرتون') || categoryName.includes('شخصيات')) icon = 'fa-user';
+        }
+        
         const isSelected = element.classList.contains('selected');
         const isHidden = element.style.display === 'none';
-        const zIndex = parseInt(element.style.zIndex) || 10;
         
         const layerItem = document.createElement('div');
-        layerItem.className = 'layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ' + 
+        layerItem.className = 'layer-item p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ' +
             (isSelected 
                 ? 'bg-[#6366f1] text-white border-[#6366f1]' 
                 : 'bg-white border-[#e2e8f0] text-[#1e293b] hover:border-[#6366f1]');
         
+        // الصورة المصغرة أو الأيقونة
+        let thumbHtml = '';
+        if (thumbSrc) {
+            thumbHtml = '<img src="' + thumbSrc + '" class="w-6 h-6 object-contain rounded bg-[#f1f5f9] flex-shrink-0" onerror="this.style.display=\'none\'">';
+        } else {
+            thumbHtml = '<i class="fas ' + icon + ' flex-shrink-0"></i>';
+        }
+        
         layerItem.innerHTML = '<div class="flex-1 flex items-center gap-2 min-w-0">' +
-            '<i class="fas ' + icon + '"></i>' +
+            thumbHtml +
             '<div class="flex-1 min-w-0">' +
-                '<div class="text-[10px] font-bold truncate">' + elementType + '</div>' +
+                '<div class="text-[10px] font-bold truncate">' + displayName + '</div>' +
             '</div>' +
         '</div>' +
         '<div class="flex items-center gap-0.5" onclick="event.stopPropagation()">' +
