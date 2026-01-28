@@ -107,7 +107,7 @@
         let eraserSoftness = 0;
         let magicTolerance = 30;
         let isSnappingEnabled = false;
-        let currentZoom = 100; // متغير التحكم بـ zoom
+        let currentZoom = 50; // متغير التحكم بـ zoom (الافتراضي 50%)
 
         // Crop variables
         let cropStartX = 0, cropStartY = 0;
@@ -217,10 +217,13 @@
                 setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
             }, 800);
 
-            // تعيين المقاس الافتراضي 6 سم * 6 سم
-            const defaultSize = Math.round(6 * DPI_RATIO);
+            // تعيين المقاس الافتراضي 10 سم * 10 سم
+            const defaultSize = Math.round(10 * DPI_RATIO);
             setCardSize(defaultSize, defaultSize);
 
+            
+            // تعيين الزووم الافتراضي 50%
+            setCustomZoom(50);
             // إخفاء التدرج عند البدء
             hasGradient = false;
             const grad = document.getElementById('card-gradient');
@@ -710,8 +713,8 @@
             document.getElementById('element-count').textContent = elementCount;
 
             // حساب مقاس المربع
-            const width = parseInt(card.style.width) / DPI_RATIO || 6;
-            const height = parseInt(card.style.height) / DPI_RATIO || 6;
+            const width = parseInt(card.style.width) / DPI_RATIO || 10;
+            const height = parseInt(card.style.height) / DPI_RATIO || 10;
             document.getElementById('canvas-size').textContent = `${width.toFixed(1)} × ${height.toFixed(1)} سم`;
 
             // === استخراج الألوان المستخدمة (Used Colors) ===
@@ -6997,3 +7000,4 @@ function updateLayersList() {
         layersList.appendChild(layerItem);
     });
 }
+ 
