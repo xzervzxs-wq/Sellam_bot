@@ -80,7 +80,6 @@
             const btn = document.getElementById('floating-payment-btn');
             if (btn) {
                 btn.style.display = 'block';
-                setTimeout(() => btn.classList.remove('hidden'), 100);
             }
         }
 
@@ -88,8 +87,7 @@
         function hideFloatingPaymentButton() {
             const btn = document.getElementById('floating-payment-btn');
             if (btn) {
-                btn.classList.add('hidden');
-                setTimeout(() => btn.style.display = 'none', 300);
+                btn.style.display = 'none';
             }
         }
 
