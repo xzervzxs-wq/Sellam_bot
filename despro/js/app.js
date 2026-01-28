@@ -4905,35 +4905,20 @@
         }
         // دالة عرض نافذة تعليمية للأدوات الذكية عند الضغطة الواحدة
         function showSmartToolTutorial(toolType) {
-            let title, icon, steps;
+            let title, icon, tip;
             
             if (toolType === 'lasso') {
-                title = 'القص الذكي ✂️';
+                title = 'القص الذكي';
                 icon = '✂️';
-                steps = [
-                    '1️⃣ اضغط مع الاستمرار على الماوس',
-                    '2️⃣ ارسم شكلاً حول المنطقة المراد قصها',
-                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
-                    '🎯 سيتم قص المنطقة المحددة تلقائياً!'
-                ];
+                tip = 'اضغط مستمر + ارسم شكل حول المنطقة';
             } else if (toolType === 'smartFill') {
-                title = 'التلوين الذكي 🎨';
+                title = 'التلوين الذكي';
                 icon = '🎨';
-                steps = [
-                    '1️⃣ اضغط مع الاستمرار على الماوس',
-                    '2️⃣ ارسم شكلاً بالمنطقة المراد تلوينها',
-                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
-                    '🎯 سيتم تعبئة الشكل باللون المحدد!'
-                ];
+                tip = 'اضغط مستمر + ارسم شكل للتلوين';
             } else if (toolType === 'smartEraser') {
-                title = 'الممحاة الذكية 🧹';
+                title = 'الممحاة الذكية';
                 icon = '🧹';
-                steps = [
-                    '1️⃣ اضغط مع الاستمرار على الماوس',
-                    '2️⃣ ارسم شكلاً حول المنطقة المراد مسحها',
-                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
-                    '🎯 سيتم مسح المنطقة المحددة تلقائياً!'
-                ];
+                tip = 'اضغط مستمر + ارسم شكل للمسح';
             }
             
             const existingModal = document.getElementById('smart-tool-tutorial-modal');
@@ -4941,14 +4926,14 @@
             
             const modal = document.createElement('div');
             modal.id = 'smart-tool-tutorial-modal';
-            modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.85);z-index:100002;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);';
+            modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100002;';
             
-            let stepsHTML = steps.map((step, i) => '<div style="padding:12px 0;' + (i < steps.length - 1 ? 'border-bottom:1px solid rgba(99,102,241,0.1);' : '') + '"><span style="color:' + (i === steps.length - 1 ? '#10b981' : '#e2e8f0') + ';font-size:14px;">' + step + '</span></div>').join('');
-            
-            modal.innerHTML = '<div style="background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:24px;padding:32px;max-width:400px;width:90%;box-shadow:0 25px 50px rgba(0,0,0,0.5);position:relative;"><div style="text-align:center;margin-bottom:24px;"><div style="width:80px;height:80px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;box-shadow:0 10px 30px rgba(99,102,241,0.4);">' + icon + '</div><h3 style="color:white;font-size:22px;font-weight:700;margin:0;">' + title + '</h3><p style="color:#94a3b8;font-size:13px;margin-top:8px;">كيفية استخدام هذه الأداة</p></div><div style="background:rgba(0,0,0,0.2);border-radius:16px;padding:20px;margin-bottom:24px;">' + stepsHTML + '</div><button onclick="closeSmartToolTutorial()" style="width:100%;padding:14px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:white;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 15px rgba(99,102,241,0.4);">✨ فهمت، شكراً!</button></div>';
+            modal.innerHTML = '<div style="background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:16px;padding:16px 24px;box-shadow:0 15px 40px rgba(0,0,0,0.5);text-align:center;min-width:220px;"><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;"><span style="font-size:24px;">' + icon + '</span><span style="color:white;font-size:14px;font-weight:600;">' + title + '</span></div><p style="color:#94a3b8;font-size:12px;margin:0 0 12px 0;">' + tip + '</p><button onclick="closeSmartToolTutorial()" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;">فهمت ✓</button></div>';
             
             document.body.appendChild(modal);
-            modal.addEventListener('click', (e) => { if (e.target === modal) closeSmartToolTutorial(); });
+            
+            // إغلاق تلقائي بعد 3 ثواني
+            setTimeout(() => { closeSmartToolTutorial(); }, 3000);
         }
         
         function closeSmartToolTutorial() {
