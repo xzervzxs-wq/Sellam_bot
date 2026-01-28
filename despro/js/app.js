@@ -5997,7 +5997,7 @@
                         saveState();
                     }, 50);
                     
-                    alert('✅ تم فتح الملف كطبقة عالية الدقة!');
+                    showInfoModal('تم فتح الملف كطبقة عالية الدقة', 'تم بنجاح', '✅');
                 });
             });
         }
@@ -6023,7 +6023,7 @@
                     const buffer = e.target.result;
                     const ifds = UTIF.decode(buffer);
                     if (ifds.length === 0) {
-                        alert('❌ فشل قراءة ملف TIF');
+                        showInfoModal('فشل قراءة ملف TIF', 'خطأ', '❌');
                         return;
                     }
 
@@ -6115,9 +6115,9 @@
                         saveState();
                     }, 50);
                     
-                    alert('✅ تم فتح ملف TIF كطبقة عالية الدقة!');
+                    showInfoModal('تم فتح ملف TIF كطبقة عالية الدقة', 'تم بنجاح', '✅');
                 } catch(err) {
-                    alert('❌ خطأ في فتح ملف TIF: ' + err.message);
+                    showInfoModal('خطأ في فتح ملف TIF: ' + err.message, 'خطأ', '❌');
                 }
             };
             reader.readAsArrayBuffer(file);
