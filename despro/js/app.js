@@ -5191,22 +5191,6 @@
                         `).join('')}
                     </div>
                     
-                    <button onclick="closeSmartToolTutorial()" style="
-                        width: 100%;
-                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-                        color: white;
-                        border: none;
-                        padding: 8px;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        font-size: 12px;
-                        cursor: pointer;
-                        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-                        transition: all 0.2s;
-                    " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                       فهمت، إغلاق
-                    </button>
-                    
                     <!-- زر إغلاق صغير في الزاوية -->
                     <button onclick="closeSmartToolTutorial()" style="
                         position: absolute;
@@ -5226,6 +5210,8 @@
             `;
             document.body.appendChild(modal);
             modal.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            // إغلاق تلقائي بعد 3 ثواني
+            setTimeout(() => closeSmartToolTutorial(), 3000);
             modal.addEventListener('click', (e) => { e.stopPropagation(); });
             modal.addEventListener('touchstart', (e) => { e.stopPropagation(); }, {passive: false});
         }
