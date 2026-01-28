@@ -785,7 +785,7 @@
                 } else {
                     Array.from(usedColors).slice(0, 18).forEach(color => {
                         const dot = document.createElement('div');
-                        dot.className = 'w-4 h-4 rounded-full border border-gray-200 cursor-help transition hover:scale-110';
+                        dot.className = 'w-4 h-4 rounded-full cursor-help transition hover:scale-110';
                         dot.style.backgroundColor = color;
                         dot.title = color; // ظهر كود اللون عند التمرير
                         paletteDiv.appendChild(dot);
@@ -2503,6 +2503,10 @@
             // حفظ الطبقة المستهدفة وتفعيل الممحاة
             smartEraserTargetEl = activeEl;
             smartEraserMode = true;
+            // إغلاق الأدوات الأخرى
+            if(eraserMode) exitEraserMode();
+            if(lassoMode) exitLassoMode();
+            if(smartFillMode) exitSmartFillMode();
             
             if(magicMode) {
                 magicMode = false;
@@ -2707,6 +2711,8 @@
 
             if (lassoMode) {
                 if (eraserMode) exitEraserMode();
+                if (smartFillMode) exitSmartFillMode();
+                if (smartEraserMode) window.exitSmartEraserMode();
 
                 magicMode = false;
                 document.getElementById('card').style.cursor = 'crosshair';
@@ -2962,6 +2968,7 @@
             if (smartFillMode) {
                 if (eraserMode) exitEraserMode();
                 if (lassoMode) exitLassoMode();
+                if (smartEraserMode) window.exitSmartEraserMode();
                 magicMode = false;
                 document.getElementById('card').style.cursor = 'crosshair';
                 initSmartFillCanvas();
