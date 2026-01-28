@@ -799,6 +799,23 @@
         }
 
         // === دوال ملاحظات المصمم ===
+        function getMaxCharLimit() {
+            return userTier === 'premium' ? 1000 : 280;
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('designer-notes');
+            const charCount = document.getElementById('char-count');
+
+            if(!textarea || !charCount) return; // safety check
+
+            const maxLimit = getMaxCharLimit();
+            const currentLength = textarea.value.length;
+
+            charCount.textContent = `${currentLength}/${maxLimit}`;
+            textarea.maxLength = maxLimit;
+
+            // تحديث الألوان بناءً على الامتلاء
             if (currentLength > maxLimit * 0.8) {
                 charCount.classList.remove('bg-[#f59e0b]');
                 charCount.classList.add('bg-red-500');
@@ -2690,8 +2707,7 @@
 
             if (lassoMode) {
                 if (eraserMode) exitEraserMode();
-                if (smartFillMode) exitSmartFillMode();
-                if (typeof smartEraserMode !== 'undefined' && smartEraserMode) exitSmartEraserMode();
+
                 magicMode = false;
                 document.getElementById('card').style.cursor = 'crosshair';
                 initLassoCanvas();
@@ -2946,7 +2962,6 @@
             if (smartFillMode) {
                 if (eraserMode) exitEraserMode();
                 if (lassoMode) exitLassoMode();
-                if (typeof smartEraserMode !== 'undefined' && smartEraserMode) exitSmartEraserMode();
                 magicMode = false;
                 document.getElementById('card').style.cursor = 'crosshair';
                 initSmartFillCanvas();
