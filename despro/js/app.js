@@ -4786,22 +4786,28 @@
             const img = activeEl.querySelector('img');
             if(!img) return;
             
-            // استخدام الصورة كـ mask والخلفية كلون
             const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
+            
+            // إزالة overflow و borderRadius مؤقتاً للسماح للـ mask بالعمل بشكل صحيح
             if(contentWrapper) {
-                contentWrapper.style.backgroundColor = color;
-                contentWrapper.style.backgroundImage = 'none';
-                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
-                contentWrapper.style.maskImage = `url(${img.src})`;
-                // استخدام contain بدلاً من 100% 100% ليتطابق مع objectFit للصورة
-                contentWrapper.style.webkitMaskSize = 'contain';
-                contentWrapper.style.maskSize = 'contain';
-                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
-                contentWrapper.style.maskRepeat = 'no-repeat';
-                contentWrapper.style.webkitMaskPosition = 'center';
-                contentWrapper.style.maskPosition = 'center';
-                img.style.opacity = '0';
+                contentWrapper.style.overflow = 'visible';
+                contentWrapper.style.borderRadius = '0';
             }
+            
+            // تطبيق اللون على الصورة مباشرة باستخدام mask
+            img.style.backgroundColor = color;
+            img.style.webkitMaskImage = `url(${img.src})`;
+            img.style.maskImage = `url(${img.src})`;
+            img.style.webkitMaskSize = '100% 100%';
+            img.style.maskSize = '100% 100%';
+            img.style.webkitMaskRepeat = 'no-repeat';
+            img.style.maskRepeat = 'no-repeat';
+            img.style.webkitMaskPosition = 'center';
+            img.style.maskPosition = 'center';
+            // إخفاء الصورة الأصلية وإظهار اللون فقط
+            img.style.objectFit = 'contain';
+            
+            activeEl.setAttribute('data-colored', 'true');
             saveState();
         }
         
@@ -4820,21 +4826,28 @@
             const startColor = document.getElementById('colorable-grad-start').value;
             const endColor = document.getElementById('colorable-grad-end').value;
             
-            // استخدام الصورة كـ mask والتدرج كخلفية
             const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
+            
+            // إزالة overflow و borderRadius مؤقتاً للسماح للـ mask بالعمل بشكل صحيح
             if(contentWrapper) {
-                contentWrapper.style.backgroundImage = `linear-gradient(to top, ${startColor}, ${endColor})`;
-                contentWrapper.style.backgroundColor = 'transparent';
-                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
-                contentWrapper.style.maskImage = `url(${img.src})`;
-                contentWrapper.style.webkitMaskSize = 'contain';
-                contentWrapper.style.maskSize = 'contain';
-                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
-                contentWrapper.style.maskRepeat = 'no-repeat';
-                contentWrapper.style.webkitMaskPosition = 'center';
-                contentWrapper.style.maskPosition = 'center';
-                img.style.opacity = '0';
+                contentWrapper.style.overflow = 'visible';
+                contentWrapper.style.borderRadius = '0';
             }
+            
+            // تطبيق التدرج على الصورة مباشرة باستخدام mask
+            img.style.backgroundImage = `linear-gradient(to top, ${startColor}, ${endColor})`;
+            img.style.backgroundColor = 'transparent';
+            img.style.webkitMaskImage = `url(${img.src})`;
+            img.style.maskImage = `url(${img.src})`;
+            img.style.webkitMaskSize = '100% 100%';
+            img.style.maskSize = '100% 100%';
+            img.style.webkitMaskRepeat = 'no-repeat';
+            img.style.maskRepeat = 'no-repeat';
+            img.style.webkitMaskPosition = 'center';
+            img.style.maskPosition = 'center';
+            img.style.objectFit = 'contain';
+            
+            activeEl.setAttribute('data-colored', 'true');
             saveState();
         }
         
@@ -5088,7 +5101,7 @@
                     activeEl.style.color = ''; 
                 }
             } else if(activeEl.classList.contains('image-layer') && activeEl.querySelector('img')) {
-                // تفعيل التدرج للصور باستخدام Mask
+                // تفعيل التدرج للصور باستخدام Mask على الصورة مباشرة
                 const img = activeEl.querySelector('img');
                 const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
                 
@@ -5097,23 +5110,23 @@
                      activeEl.setAttribute('data-prev-opacity', img.style.opacity || '1');
                 }
                 
-                // تطبيق التدرج كخلفية
-                contentWrapper.style.backgroundImage = gradient;
-                contentWrapper.style.backgroundColor = 'transparent';
+                // إزالة overflow و borderRadius للسماح للـ mask بالعمل
+                if(contentWrapper) {
+                    contentWrapper.style.overflow = 'visible';
+                    contentWrapper.style.borderRadius = '0';
+                }
                 
-                // استخدام الصورة كـ Mask
-                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
-                contentWrapper.style.maskImage = `url(${img.src})`;
-                
-                contentWrapper.style.webkitMaskSize = 'contain';
-                contentWrapper.style.maskSize = 'contain';
-                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
-                contentWrapper.style.maskRepeat = 'no-repeat';
-                contentWrapper.style.webkitMaskPosition = 'center';
-                contentWrapper.style.maskPosition = 'center';
-                
-                // إخفاء الصورة الأصلية
-                img.style.opacity = '0';
+                // تطبيق التدرج على الصورة مباشرة
+                img.style.backgroundImage = gradient;
+                img.style.backgroundColor = 'transparent';
+                img.style.webkitMaskImage = `url(${img.src})`;
+                img.style.maskImage = `url(${img.src})`;
+                img.style.webkitMaskSize = '100% 100%';
+                img.style.maskSize = '100% 100%';
+                img.style.webkitMaskRepeat = 'no-repeat';
+                img.style.maskRepeat = 'no-repeat';
+                img.style.webkitMaskPosition = 'center';
+                img.style.maskPosition = 'center';
 
             } else {
                 if (!activeEl.hasAttribute('data-has-gradient')) {
