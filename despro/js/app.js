@@ -6997,3 +6997,4 @@ function updateLayersList() {
         layersList.appendChild(layerItem);
     });
 }
+ 
