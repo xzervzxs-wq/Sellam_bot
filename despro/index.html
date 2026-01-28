@@ -341,7 +341,7 @@
                      </button>
                      
                      <!-- زر Premium لغير المشتركين -->
-                     <div id="premium-upgrade-btn" class="mt-3">
+                     <div id="premium-upgrade-btn" class="mt-2">
                          <a href="subscriptions.html" class="flex flex-col items-center gap-1.5 bg-[#000000]/10 px-5 py-2.5 rounded-xl border border-amber-500/20 hover:border-amber-500/40 transition-all hover:bg-[#000000]/20">
                              <span class="text-[10px] font-extrabold tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 font-[sans-serif]">
                                  PREMIUM
@@ -1202,11 +1202,17 @@
                 
                 <!-- الجهة اليسرى: منطقة الأعضاء -->
                 <div class="flex flex-col items-center gap-2 bg-[#000000]/20 px-5 py-2 rounded-xl border border-white/5">
-                    <a href="subscriptions.html" class="flex flex-col items-center gap-1 hover:scale-105 transition-transform">
-                        <span class="text-[10px] font-extrabold tracking-[0.5em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 font-[sans-serif] w-full text-center">
-                            PREMIUM
-                        </span>
-                    </a>
+                    <span class="text-[10px] font-extrabold tracking-[0.5em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 font-[sans-serif] w-full text-center">
+                        PREMIUM MEMBERS
+                    </span>
+                    <div id="auth-container">
+                        <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="w-full text-xs font-bold text-white transition flex items-center justify-center gap-2 px-6 py-1.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg shadow-lg hover:shadow-violet-500/25 border border-white/10">
+                            <i class="fas fa-key text-xs"></i>
+                            <span>تسجيل دخول</span>
+                            <span class="text-white/40 font-light mx-0.5">|</span>
+                            <span class="font-sans tracking-wide text-[10px]">Login</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
