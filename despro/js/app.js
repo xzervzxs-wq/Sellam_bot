@@ -5028,41 +5028,196 @@
         }
         // دالة عرض نافذة تعليمية للأدوات الذكية عند الضغطة الواحدة
         function showSmartToolTutorial(toolType) {
-            let title, icon, tip;
+            let title, icon, steps = [];
             
             if (toolType === 'lasso') {
-                title = 'القص الذكي';
+                title = 'القص الذكي ✂️';
                 icon = '✂️';
-                tip = 'اضغط مستمر + ارسم شكل حول المنطقة';
+                steps = [
+                    '1️⃣ اضغط مع الاستمرار على الماوس',
+                    '2️⃣ ارسم شكلاً حول المنطقة المراد قصها',
+                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
+                    '🎯 سيتم قص المنطقة المحددة تلقائياً!'
+                ];
             } else if (toolType === 'smartFill') {
-                title = 'التلوين الذكي';
+                title = 'التلوين الذكي 🎨';
                 icon = '🎨';
-                tip = 'اضغط مستمر + ارسم شكل للتلوين';
+                steps = [
+                    '1️⃣ اضغط مع الاستمرار على الماوس',
+                    '2️⃣ ارسم شكلاً بالمنطقة المراد تلوينها',
+                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
+                    '🎯 سيتم تعبئة الشكل باللون المحدد!'
+                ];
             } else if (toolType === 'smartEraser') {
-                title = 'الممحاة الذكية';
+                title = 'الممحاة الذكية 🧹';
                 icon = '🧹';
-                tip = 'اضغط مستمر + ارسم شكل للمسح';
+                steps = [
+                    '1️⃣ اضغط مع الاستمرار على الماوس',
+                    '2️⃣ ارسم شكلاً حول المنطقة المراد مسحها',
+                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
+                    '🎯 سيتم مسح المنطقة المحددة تلقائياً!'
+                ];
             }
             
+            // إنشاء النافذة التعليمية الاحترافية
             const existingModal = document.getElementById('smart-tool-tutorial-modal');
             if (existingModal) existingModal.remove();
             
             const modal = document.createElement('div');
             modal.id = 'smart-tool-tutorial-modal';
-            modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100002;';
+            modal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.85);
+                z-index: 100002;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(8px);
+                animation: fadeIn 0.3s ease;
+            `;
             
-            modal.innerHTML = '<div style="background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:16px;padding:16px 24px;box-shadow:0 15px 40px rgba(0,0,0,0.5);text-align:center;min-width:220px;"><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;"><span style="font-size:24px;">' + icon + '</span><span style="color:white;font-size:14px;font-weight:600;">' + title + '</span></div><p style="color:#94a3b8;font-size:12px;margin:0 0 12px 0;">' + tip + '</p><button onclick="event.stopPropagation();closeSmartToolTutorial()" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;">فهمت ✓</button></div>';
+            modal.innerHTML = `
+                <style>
+                    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+                </style>
+                <div style="
+                    background: linear-gradient(145deg, #1e293b, #0f172a);
+                    border-radius: 24px;
+                    padding: 32px;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.2);
+                    animation: slideUp 0.4s ease;
+                    position: relative;
+                    overflow: hidden;
+                ">
+                    <!-- خلفية زخرفية -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
+                    
+                    <!-- الأيقونة والعنوان -->
+                    <div style="text-align: center; margin-bottom: 24px; position: relative;">
+                        <div style="
+                            width: 80px;
+                            height: 80px;
+                            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 36px;
+                            margin: 0 auto 16px;
+                            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                            animation: pulse 2s infinite;
+                        ">${icon}</div>
+                        <h3 style="
+                            color: white;
+                            font-size: 22px;
+                            font-weight: 700;
+                            margin: 0;
+                            background: linear-gradient(90deg, #6366f1, #a78bfa);
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                        ">${title}</h3>
+                        <p style="color: #94a3b8; font-size: 13px; margin-top: 8px;">كيفية استخدام هذه الأداة</p>
+                    </div>
+                    
+                    <!-- الخطوات -->
+                    <div style="background: rgba(0, 0, 0, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px; position: relative;">
+                        ${steps.map((step, i) => `
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding: 12px 0;
+                                ${i < steps.length - 1 ? 'border-bottom: 1px solid rgba(99, 102, 241, 0.1);' : ''}
+                            ">
+                                <span style="
+                                    color: ${i === steps.length - 1 ? '#10b981' : '#e2e8f0'};
+                                    font-size: 14px;
+                                    line-height: 1.6;
+                                    ${i === steps.length - 1 ? 'font-weight: 600;' : ''}
+                                ">${step}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- رسم توضيحي متحرك (محسن) -->
+                    <div style="
+                        background: rgba(99, 102, 241, 0.05);
+                        border: 2px dashed rgba(99, 102, 241, 0.2);
+                        border-radius: 16px;
+                        padding: 24px;
+                        text-align: center;
+                        margin-bottom: 24px;
+                        position: relative;
+                        overflow: visible;
+                    ">
+                        <svg width="200" height="80" viewBox="0 0 200 80" style="margin: 0 auto; overflow: visible;">
+                            <defs>
+                                <linearGradient id="drawGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            
+                            <!-- مسار الرسم -->
+                            <path id="tutorialPath" d="M30,60 Q70,0 120,20 T170,40" 
+                                fill="none" 
+                                stroke="url(#drawGrad)" 
+                                stroke-width="6" 
+                                stroke-linecap="round" 
+                                stroke-dasharray="300" 
+                                stroke-dashoffset="300"
+                                style="filter: url(#glow);">
+                                <animate attributeName="stroke-dashoffset" from="300" to="0" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="2s" repeatCount="indefinite" />
+                            </path>
+
+                            <!-- اليد التي ترسم -->
+                            <g>
+                                <animateMotion dur="2s" repeatCount="indefinite" rotate="0" calcMode="spline" keySplines="0.4 0 0.2 1">
+                                    <mpath href="#tutorialPath"/>
+                                </animateMotion>
+                                <text x="0" y="0" font-size="32" style="transform: translate(-5px, 20px);">✍️</text>
+                            </g>
+                        </svg>
+                    </div>
+                    
+                    <button onclick="closeSmartToolTutorial()" style="
+                        width: 100%;
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        color: white;
+                        border: none;
+                        padding: 14px;
+                        border-radius: 12px;
+                        font-weight: 700;
+                        font-size: 16px;
+                        cursor: pointer;
+                        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+                        transition: all 0.3s;
+                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                       فهمت، لنبدأ الإبداع! 🚀
+                    </button>
+                </div>
+            `;
             
             document.body.appendChild(modal);
             
-            // منع انتشار الحدث من النافذة
+            // منع انتشار الحدث
             modal.addEventListener('mousedown', (e) => { e.stopPropagation(); });
             modal.addEventListener('click', (e) => { e.stopPropagation(); });
-            
-            // إغلاق تلقائي بعد 3 ثواني
-            setTimeout(() => { closeSmartToolTutorial(); }, 3000);
+            modal.addEventListener('touchstart', (e) => { e.stopPropagation(); }, {passive: false});
         }
-        
         function closeSmartToolTutorial() {
             const modal = document.getElementById('smart-tool-tutorial-modal');
             if (modal) modal.remove();
