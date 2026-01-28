@@ -901,87 +901,106 @@
             </div>
 
             <!-- نافذة لوحة المصمم (Collapsible Designer Panel) -->
-            <div id="designer-panel" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
-                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 max-h-[70vh] overflow-y-auto" onclick="event.stopPropagation()">
-                    <!-- رأس النافذة -->
-                    <div class="sticky top-0 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white p-4 rounded-t-2xl flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-palette text-xl"></i>
-                            <h2 class="text-lg font-bold">لوحة المصمم</h2>
-                        </div>
-                        <button onclick="closeDesignerPanel()" class="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition">
-                            <i class="fas fa-times text-lg"></i>
-                        </button>
-                    </div>
+        <!-- نافذة لوحة المصمم (Collapsible Designer Panel) - تصميم جديد -->
+        <div id="designer-panel" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
+            <div class="relative w-full max-w-sm rounded-[24px] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100" 
+                 onclick="event.stopPropagation()"
+                 style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid rgba(99, 102, 241, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                 
+                <!-- زينة خلفية -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
 
-                    <!-- محتوى النافذة -->
-                    <div class="p-4 space-y-3">
-                        <!-- ملاحظات المصمم (أول شي) -->
-                        <div class="bg-[#fef3c7] p-3 rounded-lg border-l-4 border-[#f59e0b]">
-                            <h3 class="font-bold text-[#92400e] mb-2 flex items-center justify-between text-sm">
-                                <span class="flex items-center gap-2">
-                                    <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
+                <!-- Header -->
+                <div class="px-6 pt-6 pb-2 flex items-center justify-between relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/5" 
+                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                            <i class="fas fa-palette text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-white font-bold text-lg tracking-tight">لوحة المصمم</h2>
+                            <p class="text-slate-400 text-[11px] font-medium">مساحتك الإبداعية الخاصة</p>
+                        </div>
+                    </div>
+                    <button onclick="closeDesignerPanel()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition text-slate-400 hover:text-white hover:rotate-90">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-4 relative z-10">
+                    <!-- Notes (Yellow Box - Kept as requested but refined) -->
+                    <div class="bg-[#fef3c7] p-4 rounded-xl shadow-sm border-l-4 border-[#f59e0b] group relative overflow-hidden">
+                        <!-- دالة صفراء خفيفة -->
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-[#f59e0b]/5 rounded-bl-full pointer-events-none"></div>
+                        
+                        <h3 class="font-bold text-[#92400e] mb-3 flex items-center justify-between text-sm relative z-10">
+                            <span class="flex items-center gap-2">
+                                <span class="p-1.5 bg-[#f59e0b]/20 rounded-lg">
+                                    <i class="fas fa-sticky-note text-[#f59e0b]"></i>
                                 </span>
-                                <div class="flex flex-col items-end">
-                                    <span class="text-xs bg-[#f59e0b] text-white px-2 py-0.5 rounded" id="char-count">0/280</span>
-                                    <span class="text-[9px] text-[#92400e] mt-1 font-medium opactiy-80">البريميوم: 1000</span>
-                                </div>
-                            </h3>
-                            <textarea 
-                                id="designer-notes" 
-                                class="w-full h-20 p-2 bg-white/50 border-none rounded text-[#78350f] text-xs resize-none focus:outline-none focus:ring-0 placeholder:text-gray-500"
-                                placeholder="هنا مساحتك الخاصة.. دوّن أفكارك، تعليقاتك على التصميم، أو أي تفاصيل إبداعية تخطر ببالك لتذكرها لاحقاً"
-                                maxlength="280"
-                                onchange="updateDesignerNotes()"
-                                oninput="updateCharCount()"
-                                style="background-image: 
-                                    repeating-linear-gradient(
-                                        to bottom,
-                                        transparent,
-                                        transparent 18px,
-                                        #f59e0b20 18px,
-                                        #f59e0b20 19px
-                                    );
-                                background-size: 100% 19px;
-                                background-position: 0 8px;
-                                padding-top: 10px;"
-                            ></textarea>
-                        </div>
-
-                        <!-- إحصائيات التصميم الحالي (مصغرة) -->
-                        <div class="bg-[#f8fafc] p-3 rounded-lg border border-[#e2e8f0]">
-                            <h3 class="font-bold text-[#1e293b] mb-2 flex items-center gap-2 text-sm">
-                                <i class="fas fa-chart-pie text-[#6366f1]"></i> الإحصائيات
-                            </h3>
-                            <div class="grid grid-cols-2 gap-3 text-xs">
-                                <div>
-                                    <span class="text-[#64748b]">العناصر:</span>
-                                    <p class="font-bold text-[#1e293b]" id="element-count">0</p>
-                                </div>
-                                <div>
-                                    <span class="text-[#64748b]">المقاس:</span>
-                                    <p class="font-bold text-[#1e293b]" id="canvas-size">-</p>
-                                </div>
+                                ملاحظات التصميم
+                            </span>
+                            <div class="flex flex-col items-end">
+                                <span class="text-[10px] font-mono bg-[#f59e0b] text-white px-2 py-0.5 rounded-full shadow-sm" id="char-count">0/280</span>
                             </div>
-                            
-                            <!-- الألوان المستخدمة -->
-                            <div class="mt-3 pt-3 border-t border-[#e2e8f0]">
-                                <span class="text-[#64748b] text-[10px] block mb-2 font-bold">الألوان المستخدمة:</span>
-                                <div id="used-colors-palette" class="flex flex-wrap gap-1.5 min-h-[20px]">
-                                    <!-- سيتم إضافة الألوان هنا بواسطة JS -->
-                                </div>
-                            </div>
+                        </h3>
+                        <textarea 
+                            id="designer-notes" 
+                            class="w-full h-24 p-2 bg-white/60 border border-[#f59e0b]/10 rounded-lg text-[#78350f] text-xs resize-none focus:outline-none focus:bg-white/90 focus:border-[#f59e0b]/30 transition-all placeholder:text-[#92400e]/40"
+                            placeholder="اكتب أفكارك وملاحظاتك هنا..."
+                            maxlength="280"
+                            onchange="updateDesignerNotes()"
+                            oninput="updateCharCount()"
+                            style="background-image: repeating-linear-gradient(to bottom, transparent, transparent 19px, #f59e0b15 19px, #f59e0b15 20px); background-size: 100% 20px; line-height: 20px; padding-top: 4px;"
+                        ></textarea>
+                         <div class="flex justify-between items-center mt-2 border-t border-[#f59e0b]/10 pt-2">
+                            <span class="text-[9px] text-[#92400e]/70 flex items-center gap-1"><i class="fas fa-save text-[8px]"></i> حفظ تلقائي</span>
+                            <span class="text-[9px] text-[#b45309] font-bold bg-[#f59e0b]/10 px-1.5 py-0.5 rounded">PRO Only</span>
                         </div>
                     </div>
 
-                    <!-- تذييل النافذة -->
-                    <div class="bg-[#f8fafc] p-3 rounded-b-2xl border-t border-[#e2e8f0]">
-                        <button onclick="closeDesignerPanel()" class="w-full bg-[#6366f1] text-white px-4 py-2 rounded-lg font-bold hover:bg-[#4f46e5] transition text-sm">
-                            إغلاق
-                        </button>
+                    <!-- Statistics (Dark Mode Style) -->
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+                        <h3 class="font-bold text-slate-200 mb-3 flex items-center gap-2 text-sm">
+                            <i class="fas fa-chart-pie text-[#818cf8]"></i> الإحصائيات
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div class="bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/30 flex flex-col items-center">
+                                <span class="text-slate-400 text-[10px] mb-1">عدد العناصر</span>
+                                <p class="font-bold text-white text-base" id="element-count">0</p>
+                            </div>
+                            <div class="bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/30 flex flex-col items-center">
+                                <span class="text-slate-400 text-[10px] mb-1">حجم التصميم</span>
+                                <p class="font-mono font-bold text-white text-xs mt-1" id="canvas-size" dir="ltr">-</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Used Colors -->
+                         <div class="pt-3 border-t border-slate-700/50">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-slate-400 text-[10px] font-bold flex items-center gap-1.5">
+                                    <i class="fas fa-swatchbook text-[10px]"></i> الألوان المستخدمة
+                                </span>
+                            </div>
+                            <div id="used-colors-palette" class="flex flex-wrap gap-2 min-h-[24px] bg-slate-900/20 p-2 rounded-lg">
+                                <!-- سيتم إضافة الألوان هنا بواسطة JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Footer -->
+                <div class="p-4 bg-slate-900/30 border-t border-slate-800/50 flex justify-end relative z-10 backdrop-blur-md">
+                    <button onclick="closeDesignerPanel()" class="w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
+                        style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                        <span>إغلاق اللوحة</span>
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
             </div>
+        </div>
 
             <div class="preview-area" onclick="deselect(event)">
                 <div id="card-wrapper">
