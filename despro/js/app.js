@@ -1029,7 +1029,7 @@
                     const btn = document.getElementById('btn-grad');
                     if(btn) {
                         btn.classList.remove('bg-[#6366f1]', 'text-white');
-                        btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                        btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                     }
                     
                     // ضبط الزوم على 50% دائماً عند فتح ملف
@@ -1099,7 +1099,7 @@
             const btn = document.getElementById('btn-grad');
             if(btn) {
                 btn.classList.remove('bg-[#6366f1]', 'text-white');
-                btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
             }
             
             // إعادة تعيين متغير القالب المحمل
@@ -1168,7 +1168,7 @@
                 const btn = document.getElementById('btn-grad');
                 if(btn) {
                     btn.classList.remove('bg-[#6366f1]', 'text-white');
-                    btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                    btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 }
                 
                 // تسجيل القالب المحمل حالياً
@@ -2640,32 +2640,32 @@
                 if(btn) {
                     btn.classList.remove('bg-[#6366f1]', 'text-white');
                     btn.classList.remove('bg-white');
-                    btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                    btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             });
 
             if(eraserMode) {
                 if(eraserBtn) {
                     eraserBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    eraserBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                    eraserBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             }
             if(lassoMode) {
                 if(lassoBtn) {
                     lassoBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    lassoBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                    lassoBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             }
             if(smartFillMode) {
                 if(smartFillBtn) {
                     smartFillBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    smartFillBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                    smartFillBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             }
             if(magicMode && eraserMode) {
                 if(magicBtn) {
                     magicBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    magicBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                    magicBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             }
         }
@@ -3040,7 +3040,7 @@
                 
                 // Update button style
                 cropBtn.classList.add('bg-[#6366f1]', 'text-white');
-                cropBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                cropBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
             } else {
                 exitCropMode();
             }
@@ -3384,7 +3384,7 @@
             cropMode = false;
             const cropBtn = document.getElementById('btn-crop');
             cropBtn.classList.remove('bg-[#6366f1]', 'text-white');
-            cropBtn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+            cropBtn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
             
             const overlay = document.getElementById('crop-overlay');
             overlay.classList.add('hidden');
@@ -3406,7 +3406,7 @@
                 
                 // Update button style
                 handBtn.classList.add('bg-[#6366f1]', 'text-white');
-                handBtn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                handBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 
                 // Change cursor
                 previewArea.style.cursor = 'grab';
@@ -3478,7 +3478,7 @@
             const handBtn = document.getElementById('btn-hand');
             if (handBtn) {
                 handBtn.classList.remove('bg-[#6366f1]', 'text-white');
-                handBtn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                handBtn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
             }
             
             const previewArea = document.querySelector('.preview-area');
@@ -4419,7 +4419,7 @@
                 if(!hasGradient) {
                     gradControls.classList.remove('active');
                     btnGrad.classList.remove('bg-[#6366f1]', 'text-white');
-                    btnGrad.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                    btnGrad.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             }
         }
@@ -4480,7 +4480,7 @@
                 if(!hasGradient) {
                     gradControls.classList.remove('active');
                     btnGrad.classList.remove('bg-[#6366f1]', 'text-white');
-                    btnGrad.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                    btnGrad.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 }
             }
         }
@@ -4614,7 +4614,7 @@
                     settings.classList.add('hidden');
                     settings.style.display = 'none';
                     btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                    btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
+                    btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                     btn.innerHTML = '<i class="fas fa-fill-drip text-[8px]"></i> تدرج';
                 }
             }
@@ -5206,7 +5206,7 @@
                 // إيقاف التدرج
                 controls.classList.remove('active');
                 btn.classList.remove('bg-[#6366f1]', 'text-white');
-                btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 
                 // إزالة التدرج عند الإغلاق
                 removeTextGradient();
@@ -5219,7 +5219,7 @@
             } else {
                 // تشغيل التدرج
                 controls.classList.add('active');
-                btn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                btn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 btn.classList.add('bg-[#6366f1]', 'text-white');
                 
                 // التأكد من ظهور إعدادات العنصر وإخفاء إعدادات الخلفية (Global)
@@ -5278,7 +5278,7 @@
             const btn = document.getElementById('btn-transparent');
             if (btn) {
                 btn.classList.remove('bg-[#6366f1]', 'text-white');
-                btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
             }
             saveState();
         }
@@ -5292,7 +5292,7 @@
             const btn = document.getElementById('btn-transparent');
             if (btn) {
                 btn.classList.add('bg-[#6366f1]', 'text-white');
-                btn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                btn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
             }
             saveState();
         }
@@ -5947,7 +5947,7 @@
                 settings.classList.remove('hidden');
                 settings.style.display = 'flex';
                 btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                btn.classList.remove('bg-[#f8fafc]', 'text-[#334155]');
+                btn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 btn.innerHTML = '<i class="fas fa-fill-drip"></i> إلغاء تدرج النص';
                 
                 // تحديث ألوان التدرج من العنصر
@@ -5962,7 +5962,7 @@
                 settings.classList.add('hidden');
                 settings.style.display = 'none';
                 btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
+                btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 btn.innerHTML = '<i class="fas fa-fill-drip"></i> تدرج النص';
                 
                 // إعادة ألوان التدرج للقيم الافتراضية
@@ -5982,7 +5982,7 @@
                 settings.classList.remove('hidden');
                 settings.style.display = 'flex';
                 btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                btn.classList.remove('bg-[#f8fafc]', 'text-[#334155]');
+                btn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
                 btn.innerHTML = '<i class="fas fa-fill-drip"></i> إلغاء تدرج النص';
                 
                 // تطبيق تدرج افتراضي إذا لم يكن موجوداً
@@ -5992,7 +5992,7 @@
                 settings.classList.add('hidden');
                 settings.style.display = 'none';
                 btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
+                btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                 btn.innerHTML = '<i class="fas fa-fill-drip"></i> تدرج النص';
                 
                 removeTextGradient();
