@@ -2420,7 +2420,8 @@
 
             if (eraserMode) {
                 if (lassoMode) exitLassoMode();
-
+                if (smartFillMode) exitSmartFillMode();
+                if (typeof smartEraserMode !== 'undefined' && smartEraserMode) exitSmartEraserMode();
                 magicMode = false;
                 const magicControls = document.getElementById('magic-tolerance-control');
                 if (magicControls) {
