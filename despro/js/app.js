@@ -2622,7 +2622,16 @@
             }
             tCtx.closePath();
             tCtx.fill();
-            sourceImg.src = tempCanvas.toDataURL('image/png');
+            const newSrc = tempCanvas.toDataURL('image/png');
+            sourceImg.src = newSrc;
+            
+            // تحديث الـ mask إذا كان هناك تدرج على الصورة
+            const contentWrapper = targetEl.querySelector('.image-content-wrapper');
+            if(contentWrapper && targetEl.hasAttribute('data-has-gradient')) {
+                contentWrapper.style.webkitMaskImage = 'url(' + newSrc + ')';
+                contentWrapper.style.maskImage = 'url(' + newSrc + ')';
+            }
+            
             saveState();
             // إنهاء الممحاة الذكية تلقائياً بعد المسح
             window.exitSmartEraserMode();
@@ -3681,7 +3690,15 @@
                     }
 
                     imgCtx.putImageData(imageData, 0, 0);
-                    img.src = canvas.toDataURL();
+                    const newSrc = canvas.toDataURL();
+                    img.src = newSrc;
+                    
+                    // تحديث الـ mask إذا كان هناك تدرج على الصورة
+                    const contentWrapper = imgLayer.querySelector('.image-content-wrapper');
+                    if(contentWrapper && imgLayer.hasAttribute('data-has-gradient')) {
+                        contentWrapper.style.webkitMaskImage = 'url(' + newSrc + ')';
+                        contentWrapper.style.maskImage = 'url(' + newSrc + ')';
+                    }
                 }
             }
 
@@ -3728,7 +3745,15 @@
                             imgCtx.beginPath();
                             imgCtx.arc(scaledX, scaledY, scaledSize, 0, Math.PI * 2);
                             imgCtx.fill();
-                            img.src = imgLayer.canvas.toDataURL();
+                            const newSrc = imgLayer.canvas.toDataURL();
+                            img.src = newSrc;
+                            
+                            // تحديث الـ mask إذا كان هناك تدرج على الصورة
+                            const contentWrapper = imgLayer.querySelector('.image-content-wrapper');
+                            if(contentWrapper && imgLayer.hasAttribute('data-has-gradient')) {
+                                contentWrapper.style.webkitMaskImage = 'url(' + newSrc + ')';
+                                contentWrapper.style.maskImage = 'url(' + newSrc + ')';
+                            }
                         }
                     }
                 });
