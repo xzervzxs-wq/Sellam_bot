@@ -710,8 +710,8 @@
             document.getElementById('element-count').textContent = elementCount;
 
             // حساب مقاس المربع
-            const width = parseInt(card.style.width) / DPI_RATIO || 6;
-            const height = parseInt(card.style.height) / DPI_RATIO || 6;
+            const width = parseInt(card.style.width) / DPI_RATIO || 10;
+            const height = parseInt(card.style.height) / DPI_RATIO || 10;
             document.getElementById('canvas-size').textContent = `${width.toFixed(1)} × ${height.toFixed(1)} سم`;
 
             // === استخراج الألوان المستخدمة (Used Colors) ===
