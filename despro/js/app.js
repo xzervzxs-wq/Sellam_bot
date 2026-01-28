@@ -107,7 +107,7 @@
         let eraserSoftness = 0;
         let magicTolerance = 30;
         let isSnappingEnabled = false;
-        let currentZoom = 100; // متغير التحكم بـ zoom
+        let currentZoom = 50; // متغير التحكم بـ zoom (الافتراضي 50%)
 
         // Crop variables
         let cropStartX = 0, cropStartY = 0;
@@ -217,10 +217,13 @@
                 setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
             }, 800);
 
-            // تعيين المقاس الافتراضي 6 سم * 6 سم
-            const defaultSize = Math.round(6 * DPI_RATIO);
+            // تعيين المقاس الافتراضي 10 سم * 10 سم
+            const defaultSize = Math.round(10 * DPI_RATIO);
             setCardSize(defaultSize, defaultSize);
 
+            
+            // تعيين الزووم الافتراضي 50%
+            setCustomZoom(50);
             // إخفاء التدرج عند البدء
             hasGradient = false;
             const grad = document.getElementById('card-gradient');
