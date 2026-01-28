@@ -524,22 +524,15 @@
                 // حساب موقع في وسط البطاقة
                 const cardW = parseFloat(card.style.width) || card.offsetWidth;
                 const cardH = parseFloat(card.style.height) || card.offsetHeight;
-                const centerX = cardW / 2;
-                const centerY = cardH / 2;
+                const centerX = (cardW - w) / 2;
+                const centerY = (cardH - h) / 2;
 
-                // إنشاء العنصر مع اسم التصنيف
-                const wrapper = createWrapper(categoryName || 'image-layer');
+                // إنشاء العنصر
+                const wrapper = createWrapper('image-layer');
                 wrapper.style.width = w + 'px';
                 wrapper.style.height = h + 'px';
-                wrapper.style.left = centerX + 'px';
-                wrapper.style.top = centerY + 'px';
-                wrapper.style.transform = 'translate(-50%, -50%)';
-                
-                // إضافة اسم التصنيف والصورة المصغرة للعنصر
-                if (categoryName) {
-                    wrapper.setAttribute('data-category-name', categoryName);
-                }
-                wrapper.setAttribute('data-thumb', src);
+                wrapper.style.left = Math.max(10, centerX) + 'px';
+                wrapper.style.top = Math.max(10, centerY) + 'px';
 
                 const imgEl = document.createElement('img');
                 imgEl.src = src;
