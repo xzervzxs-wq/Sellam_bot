@@ -5070,6 +5070,10 @@
             el.remove();
             deselect();
             saveState();
+            // تحديث قائمة الطبقات فوراً بعد الحذف
+            if (typeof updateLayersList === 'function') {
+                updateLayersList();
+            }
         }
 
         function duplicateElement(el) {
