@@ -6722,10 +6722,9 @@ function updateFooterForUser(name) {
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="font-sans tracking-wide">Log out</span>
                 </button>
-                <div class="flex items-center gap-2 px-3 py-1.5 bg-[#fbbf24]/10 rounded-lg border border-[#fbbf24]/20 text-[#fbbf24] text-xs font-bold shadow-sm">
+                <div class="flex items-center justify-center gap-2 px-3 py-1.5 bg-[#fbbf24]/10 rounded-lg border border-[#fbbf24]/20 text-[#fbbf24] text-xs font-bold shadow-sm">
                     <i class="fas fa-crown text-[#fbbf24] text-[10px]"></i>
                     <span>${name}</span>
-                    <span class="text-[9px] text-[#fbbf24]/60 font-sans">#PRO</span>
                 </div>
             </div>
         `;
