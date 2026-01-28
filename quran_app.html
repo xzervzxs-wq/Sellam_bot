@@ -1782,40 +1782,46 @@
         let eraserCanvas = null;
 
         window.onload = async () => {
+            // Hide overlay first - don't wait for anything
+            setTimeout(() => {
+                const overlay = document.getElementById('startup-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 500);
+                }
+            }, 800);
+            
             await document.fonts.ready;
             await inlineStyles();
             resizeCardToFit();
             window.addEventListener('resize', resizeCardToFit);
             
-            // Load Quran Coordinates for Interactive Ayahs
-            try {
-                const coordRes = await fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/ayat_map?v=' + Date.now());
-                if (coordRes.ok) {
-                    quranCoordinates = await coordRes.json();
-                    console.log("✅ Ayah coordinates loaded successfully - 585 pages");
-                } else {
-                    console.error("❌ Failed to load ayah coordinates");
-                }
-            } catch (e) {
-                console.error("❌ Error fetching coordinates:", e);
-            }
+            // Load Quran Coordinates in background (non-blocking)
+            fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/ayat_map?v=' + Date.now())
+                .then(res => res.ok ? res.json() : Promise.reject())
+                .then(data => {
+                    quranCoordinates = data;
+                    console.log("✅ Ayah coordinates loaded - 585 pages interactive");
+                })
+                .catch(e => {
+                    console.warn("⚠️ Coordinates not loaded - pages will work without interactivity");
+                });
             
             // Initialize Mushaf if it's the active section
             if (document.getElementById('mushaf-section').classList.contains('active')) {
                 initMushaf();
             }
-            
-            setTimeout(() => {
-                document.getElementById('startup-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
-            }, 1000);
 
-            try {
-                const res = await fetch('https://api.alquran.cloud/v1/surah');
-                const data = await res.json();
-                const sel = document.getElementById('surah-select');
-                data.data.forEach(s => sel.innerHTML += `<option value="${s.number}">${s.number}. ${s.name}</option>`);
-            } catch(e) {}
+            // Load Surahs list in background
+            fetch('https://api.alquran.cloud/v1/surah')
+                .then(res => res.json())
+                .then(data => {
+                    const sel = document.getElementById('surah-select');
+                    if (sel) {
+                        data.data.forEach(s => sel.innerHTML += `<option value="${s.number}">${s.number}. ${s.name}</option>`);
+                    }
+                })
+                .catch(e => console.warn("Could not load surahs list"));
         };
 
         function resizeCardToFit() {
