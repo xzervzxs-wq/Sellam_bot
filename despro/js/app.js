@@ -497,14 +497,14 @@
                     };
                 } else {
                     // إذا كان مفتوح، أضفه للـ canvas
-                    div.onclick = () => addAssetToCanvas(item.src, item.colorable, category.name);
+                    div.onclick = () => addAssetToCanvas(item.src, item.colorable);
                 }
                 
                 grid.appendChild(div);
             });
         }
 
-        function addAssetToCanvas(src, colorable, categoryName) {
+        function addAssetToCanvas(src, colorable) {
             const img = new Image();
             img.onload = function() {
                 const card = document.getElementById('card');
@@ -527,18 +527,13 @@
                 const centerX = (cardW - w) / 2;
                 const centerY = (cardH - h) / 2;
                 
-                // إنشاء العنصر مع اسم التصنيف
-                const wrapper = createWrapper(categoryName || 'image-layer');
+                // إنشاء العنصر
+                const wrapper = createWrapper('image-layer');
                 wrapper.style.width = w + 'px';
                 wrapper.style.height = h + 'px';
                 wrapper.style.left = Math.max(10, centerX) + 'px';
                 wrapper.style.top = Math.max(10, centerY) + 'px';
                 
-                
-                // إضافة اسم التصنيف للعنصر
-                if (categoryName) {
-                    wrapper.setAttribute('data-category-name', categoryName);
-                }
                 const imgEl = document.createElement('img');
                 imgEl.src = src;
                 imgEl.style.width = '100%';
@@ -4722,16 +4717,6 @@
             // -----------------------------------------------------------------
 
             // تطبيق التغيير على العنصر الأساسي (الغلاف)
-            // إصلاح: تلوين صور العناصر (Stickers/Icons) باستخدام Mask بدلاً من خلفية الصندوق
-            if (prop === 'backgroundColor' && activeEl.classList.contains('image-layer') && activeEl.getAttribute('data-colorable') !== 'false') {
-                 if (activeEl.querySelector('img')) {
-                     updateColorableColor(val);
-                     // تحديث المدخلات المرتبطة
-                     if (document.getElementById('colorable-color')) document.getElementById('colorable-color').value = val;
-                     if (document.getElementById('bg-color')) document.getElementById('bg-color').value = val;
-                     return; 
-                 }
-            }
             activeEl.style[prop] = val;
 
             // إذا كنا نغير اللون ولم يكن هناك تحديد جزئي (أعلاه)، فهذا يعني أن المستخدم يريد تلوين النص بالكامل
@@ -4786,28 +4771,21 @@
             const img = activeEl.querySelector('img');
             if(!img) return;
             
-            const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
-            
-            // إزالة overflow و borderRadius مؤقتاً للسماح للـ mask بالعمل بشكل صحيح
+            // استخدام الصورة كـ mask والخلفية كلون
+            const contentWrapper = activeEl.querySelector('.content-wrapper');
             if(contentWrapper) {
-                contentWrapper.style.overflow = 'visible';
-                contentWrapper.style.borderRadius = '0';
+                contentWrapper.style.backgroundColor = color;
+                contentWrapper.style.backgroundImage = 'none';
+                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
+                contentWrapper.style.maskImage = `url(${img.src})`;
+                contentWrapper.style.webkitMaskSize = '100% 100%';
+                contentWrapper.style.maskSize = '100% 100%';
+                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
+                contentWrapper.style.maskRepeat = 'no-repeat';
+                contentWrapper.style.webkitMaskPosition = 'center';
+                contentWrapper.style.maskPosition = 'center';
+                img.style.opacity = '0';
             }
-            
-            // تطبيق اللون على الصورة مباشرة باستخدام mask
-            img.style.backgroundColor = color;
-            img.style.webkitMaskImage = `url(${img.src})`;
-            img.style.maskImage = `url(${img.src})`;
-            img.style.webkitMaskSize = '100% 100%';
-            img.style.maskSize = '100% 100%';
-            img.style.webkitMaskRepeat = 'no-repeat';
-            img.style.maskRepeat = 'no-repeat';
-            img.style.webkitMaskPosition = 'center';
-            img.style.maskPosition = 'center';
-            // إخفاء الصورة الأصلية وإظهار اللون فقط
-            img.style.objectFit = 'contain';
-            
-            activeEl.setAttribute('data-colored', 'true');
             saveState();
         }
         
@@ -4826,28 +4804,21 @@
             const startColor = document.getElementById('colorable-grad-start').value;
             const endColor = document.getElementById('colorable-grad-end').value;
             
-            const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
-            
-            // إزالة overflow و borderRadius مؤقتاً للسماح للـ mask بالعمل بشكل صحيح
+            // استخدام الصورة كـ mask والتدرج كخلفية
+            const contentWrapper = activeEl.querySelector('.content-wrapper');
             if(contentWrapper) {
-                contentWrapper.style.overflow = 'visible';
-                contentWrapper.style.borderRadius = '0';
+                contentWrapper.style.backgroundImage = `linear-gradient(to top, ${startColor}, ${endColor})`;
+                contentWrapper.style.backgroundColor = 'transparent';
+                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
+                contentWrapper.style.maskImage = `url(${img.src})`;
+                contentWrapper.style.webkitMaskSize = '100% 100%';
+                contentWrapper.style.maskSize = '100% 100%';
+                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
+                contentWrapper.style.maskRepeat = 'no-repeat';
+                contentWrapper.style.webkitMaskPosition = 'center';
+                contentWrapper.style.maskPosition = 'center';
+                img.style.opacity = '0';
             }
-            
-            // تطبيق التدرج على الصورة مباشرة باستخدام mask
-            img.style.backgroundImage = `linear-gradient(to top, ${startColor}, ${endColor})`;
-            img.style.backgroundColor = 'transparent';
-            img.style.webkitMaskImage = `url(${img.src})`;
-            img.style.maskImage = `url(${img.src})`;
-            img.style.webkitMaskSize = '100% 100%';
-            img.style.maskSize = '100% 100%';
-            img.style.webkitMaskRepeat = 'no-repeat';
-            img.style.maskRepeat = 'no-repeat';
-            img.style.webkitMaskPosition = 'center';
-            img.style.maskPosition = 'center';
-            img.style.objectFit = 'contain';
-            
-            activeEl.setAttribute('data-colored', 'true');
             saveState();
         }
         
@@ -4857,7 +4828,7 @@
             if(!activeEl.classList.contains('image-layer')) return;
             
             // إزالة اللون والتدرج وإعادة الصورة
-            const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
+            const contentWrapper = activeEl.querySelector('.content-wrapper');
             const img = activeEl.querySelector('img');
             
             if(contentWrapper) {
@@ -4897,7 +4868,6 @@
         function removeEl(el) {
             el.remove();
             deselect();
-            if (typeof updateLayersList === 'function') updateLayersList();
             saveState();
         }
         
@@ -5101,7 +5071,7 @@
                     activeEl.style.color = ''; 
                 }
             } else if(activeEl.classList.contains('image-layer') && activeEl.querySelector('img')) {
-                // تفعيل التدرج للصور باستخدام Mask على الصورة مباشرة
+                // تفعيل التدرج للصور باستخدام Mask
                 const img = activeEl.querySelector('img');
                 const contentWrapper = activeEl.querySelector('.content-wrapper') || activeEl;
                 
@@ -5110,23 +5080,23 @@
                      activeEl.setAttribute('data-prev-opacity', img.style.opacity || '1');
                 }
                 
-                // إزالة overflow و borderRadius للسماح للـ mask بالعمل
-                if(contentWrapper) {
-                    contentWrapper.style.overflow = 'visible';
-                    contentWrapper.style.borderRadius = '0';
-                }
+                // تطبيق التدرج كخلفية
+                contentWrapper.style.backgroundImage = gradient;
+                contentWrapper.style.backgroundColor = 'transparent';
                 
-                // تطبيق التدرج على الصورة مباشرة
-                img.style.backgroundImage = gradient;
-                img.style.backgroundColor = 'transparent';
-                img.style.webkitMaskImage = `url(${img.src})`;
-                img.style.maskImage = `url(${img.src})`;
-                img.style.webkitMaskSize = '100% 100%';
-                img.style.maskSize = '100% 100%';
-                img.style.webkitMaskRepeat = 'no-repeat';
-                img.style.maskRepeat = 'no-repeat';
-                img.style.webkitMaskPosition = 'center';
-                img.style.maskPosition = 'center';
+                // استخدام الصورة كـ Mask
+                contentWrapper.style.webkitMaskImage = `url(${img.src})`;
+                contentWrapper.style.maskImage = `url(${img.src})`;
+                
+                contentWrapper.style.webkitMaskSize = '100% 100%';
+                contentWrapper.style.maskSize = '100% 100%';
+                contentWrapper.style.webkitMaskRepeat = 'no-repeat';
+                contentWrapper.style.maskRepeat = 'no-repeat';
+                contentWrapper.style.webkitMaskPosition = 'center';
+                contentWrapper.style.maskPosition = 'center';
+                
+                // إخفاء الصورة الأصلية
+                img.style.opacity = '0';
 
             } else {
                 if (!activeEl.hasAttribute('data-has-gradient')) {
@@ -6707,13 +6677,7 @@ function updateLayersList() {
             elementType = 'شكل';
             icon = 'fa-shapes';
         } else {
-            // استخدام اسم التصنيف إذا كان موجود
-            const categoryName = element.getAttribute('data-category-name');
-            if (categoryName) {
-                elementType = categoryName;
-            } else {
-                elementType = 'عنصر';
-            }
+            elementType = 'عنصر';
         }
         
         const isSelected = element.classList.contains('selected');
