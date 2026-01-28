@@ -2363,11 +2363,18 @@
         }
 
         function toggleEraserMode() {
-            if(!eraserMode && (!activeEl || !activeEl.classList.contains("image-layer"))) {
+            // إذا كانت الممحاة مفعلة - أوقفها
+            if(eraserMode) {
+                exitEraserMode();
+                return;
+            }
+            
+            // التحقق من وجود طبقة صورة محددة
+            if(!activeEl || !activeEl.classList.contains("image-layer")) {
                 showInfoModal("يرجى تحديد طبقة صورة أولاً لاستخدام الممحاة", "تنبيه", "🖼️");
                 return;
             }
-            eraserMode = !eraserMode;
+            eraserMode = true;
 
             if (eraserMode) {
                 if (lassoMode) exitLassoMode();
@@ -2489,8 +2496,7 @@
             ctx.strokeStyle = '#6366f1';
             ctx.setLineDash([5, 5]);
             let isDrawing = false;
-            let canDraw = false;
-            setTimeout(() => { canDraw = true; }, 100);
+            let canDraw = true;
             let points = [];
             let drawStartTime = 0;
 
@@ -2624,11 +2630,18 @@
 
         // --- دوال القص الذكي (Lasso) ---
         function toggleLassoMode() {
-            if(!lassoMode && (!activeEl || !activeEl.classList.contains('image-layer'))) {
+            // إذا كان القص مفعل - أوقفه
+            if(lassoMode) {
+                exitLassoMode();
+                return;
+            }
+            
+            // التحقق من وجود طبقة صورة محددة
+            if(!activeEl || !activeEl.classList.contains('image-layer')) {
                 showInfoModal('يرجى تحديد طبقة صورة أولاً للقص منها', 'القص الذكي', '✂️');
                 return;
             }
-            lassoMode = !lassoMode;
+            lassoMode = true;
 
             if (lassoMode) {
                 if (eraserMode) exitEraserMode();
@@ -2701,8 +2714,7 @@
             ctx.setLineDash([5, 5]);
 
             let isDrawing = false;
-            let canDraw = false;
-            setTimeout(() => { canDraw = true; }, 100);
+            let canDraw = true;
             let points = [];
             let drawStartTime = 0;
 
@@ -2911,8 +2923,7 @@
             ctx.strokeStyle = smartFillColor;
             ctx.setLineDash([5, 5]);
             let isDrawing = false;
-            let canDraw = false;
-            setTimeout(() => { canDraw = true; }, 100);
+            let canDraw = true;
             let points = [];
             let drawStartTime = 0;
             function getMousePos(e) {
