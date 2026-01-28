@@ -93,6 +93,7 @@
         let eraserMode = false;
         let magicMode = false;
         let lassoMode = false; // متغير القص الذكي
+        let lassoTargetEl = null; // الطبقة المستهدفة للقص
         let smartEraserMode = false; // متغير الممحاة الذكية
         let smartEraserCanvas = null; // كانفاس الممحاة الذكية
         let cropMode = false; // متغير وضع القص
@@ -2625,9 +2626,9 @@
             const newSrc = tempCanvas.toDataURL('image/png');
             sourceImg.src = newSrc;
             
-            // تحديث الـ mask إذا كان هناك تدرج على الصورة
-            const contentWrapper = targetEl.querySelector('.image-content-wrapper');
-            if(contentWrapper && targetEl.hasAttribute('data-has-gradient')) {
+            // تحديث الـ mask إذا كان هناك تدرج أو تلوين على الصورة
+            const contentWrapper = targetEl.querySelector('.image-content-wrapper') || targetEl.querySelector('.content-wrapper');
+            if(contentWrapper && (targetEl.hasAttribute('data-has-gradient') || targetEl.hasAttribute('data-has-color'))) {
                 contentWrapper.style.webkitMaskImage = 'url(' + newSrc + ')';
                 contentWrapper.style.maskImage = 'url(' + newSrc + ')';
             }
@@ -2650,6 +2651,9 @@
                 showInfoModal('يرجى تحديد طبقة صورة أولاً للقص منها', 'القص الذكي', '✂️');
                 return;
             }
+            
+            // حفظ الطبقة المستهدفة قبل أي تغيير
+            lassoTargetEl = activeEl;
             lassoMode = true;
 
             if (lassoMode) {
@@ -2801,15 +2805,17 @@
         }
 
         function performLassoCut(points) {
-            if(!activeEl || points.length < 3) return;
-            const sourceImg = activeEl.querySelector('img');
+            // استخدام الطبقة المحفوظة أو المحددة حالياً
+            const targetEl = lassoTargetEl || activeEl;
+            if(!targetEl || points.length < 3) return;
+            const sourceImg = targetEl.querySelector('img');
             if(!sourceImg) return;
 
-            const oldEl = activeEl;
-            const imgLeft = activeEl.offsetLeft;
-            const imgTop = activeEl.offsetTop;
-            const imgWidth = activeEl.offsetWidth;
-            const imgHeight = activeEl.offsetHeight;
+            const oldEl = targetEl;
+            const imgLeft = targetEl.offsetLeft;
+            const imgTop = targetEl.offsetTop;
+            const imgWidth = targetEl.offsetWidth;
+            const imgHeight = targetEl.offsetHeight;
 
             const naturalWidth = sourceImg.naturalWidth || imgWidth;
             const naturalHeight = sourceImg.naturalHeight || imgHeight;
@@ -2892,6 +2898,7 @@
 
         function exitLassoMode() {
             lassoMode = false;
+            lassoTargetEl = null; // مسح الطبقة المستهدفة
             if(updateToolButtons) updateToolButtons();
             document.getElementById('card').style.cursor = 'default';
             if(lassoCanvas) {
@@ -3693,9 +3700,9 @@
                     const newSrc = canvas.toDataURL();
                     img.src = newSrc;
                     
-                    // تحديث الـ mask إذا كان هناك تدرج على الصورة
-                    const contentWrapper = imgLayer.querySelector('.image-content-wrapper');
-                    if(contentWrapper && imgLayer.hasAttribute('data-has-gradient')) {
+                    // تحديث الـ mask إذا كان هناك تدرج أو تلوين على الصورة
+                    const contentWrapper = imgLayer.querySelector('.image-content-wrapper') || imgLayer.querySelector('.content-wrapper');
+                    if(contentWrapper && (imgLayer.hasAttribute('data-has-gradient') || imgLayer.hasAttribute('data-has-color'))) {
                         contentWrapper.style.webkitMaskImage = 'url(' + newSrc + ')';
                         contentWrapper.style.maskImage = 'url(' + newSrc + ')';
                     }
@@ -3748,9 +3755,9 @@
                             const newSrc = imgLayer.canvas.toDataURL();
                             img.src = newSrc;
                             
-                            // تحديث الـ mask إذا كان هناك تدرج على الصورة
-                            const contentWrapper = imgLayer.querySelector('.image-content-wrapper');
-                            if(contentWrapper && imgLayer.hasAttribute('data-has-gradient')) {
+                            // تحديث الـ mask إذا كان هناك تدرج أو تلوين على الصورة
+                            const contentWrapper = imgLayer.querySelector('.image-content-wrapper') || imgLayer.querySelector('.content-wrapper');
+                            if(contentWrapper && (imgLayer.hasAttribute('data-has-gradient') || imgLayer.hasAttribute('data-has-color'))) {
                                 contentWrapper.style.webkitMaskImage = 'url(' + newSrc + ')';
                                 contentWrapper.style.maskImage = 'url(' + newSrc + ')';
                             }
@@ -4863,6 +4870,9 @@
                 contentWrapper.style.webkitMaskPosition = 'center';
                 contentWrapper.style.maskPosition = 'center';
                 img.style.opacity = '0';
+                
+                // تحديد أن الطبقة ملونة (للممحاة)
+                activeEl.setAttribute('data-has-color', 'true');
             }
             saveState();
         }
