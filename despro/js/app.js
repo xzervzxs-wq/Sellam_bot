@@ -2625,7 +2625,7 @@
         // --- دوال القص الذكي (Lasso) ---
         function toggleLassoMode() {
             if(!lassoMode && (!activeEl || !activeEl.classList.contains('image-layer'))) {
-                alert('يرجى تحديد طبقة صورة أولاً للقص منها.');
+                showInfoModal('يرجى تحديد طبقة صورة أولاً للقص منها', 'القص الذكي', '✂️');
                 return;
             }
             lassoMode = !lassoMode;
@@ -4411,7 +4411,7 @@
         });
 
         function deselect(e) {
-            if(e && (e.target.closest(".draggable-el") || e.target.closest("#style-panel") || e.target.closest("#floating-context-toolbar") || e.target.closest("select") || e.target.closest("input") || e.target.closest(".controls-row") || e.target.closest("button") || e.target.closest("#eraser-controls") || e.target.closest("#smart-tool-tutorial-modal"))) return;
+            if(e && (e.target.closest(".draggable-el") || e.target.closest("#style-panel") || e.target.closest("#floating-context-toolbar") || e.target.closest("select") || e.target.closest("input") || e.target.closest(".controls-row") || e.target.closest("button") || e.target.closest("#eraser-controls") || e.target.closest("#smart-tool-tutorial-modal") || e.target.closest("#confirm-modal") || e.target.closest("#info-modal"))) return;
 
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
@@ -4905,6 +4905,32 @@
         // دالة إغلاق النافذة الجميلة
         function closeInfoModal() {
             document.getElementById('info-modal').style.display = 'none';
+        }
+        
+        // متغير لحفظ callback التأكيد
+        let confirmCallback = null;
+        
+        // دالة عرض نافذة التأكيد الاحترافية
+        function showConfirmModal(message, title = 'تأكيد', icon = '⚠️', onConfirm = null) {
+            document.getElementById('confirm-modal-icon').textContent = icon;
+            document.getElementById('confirm-modal-title').textContent = title;
+            document.getElementById('confirm-modal-message').textContent = message;
+            document.getElementById('confirm-modal').style.display = 'flex';
+            confirmCallback = onConfirm;
+            
+            // إعداد زر التأكيد
+            document.getElementById('confirm-modal-yes').onclick = function() {
+                closeConfirmModal(true);
+            };
+        }
+        
+        // دالة إغلاق نافذة التأكيد
+        function closeConfirmModal(confirmed) {
+            document.getElementById('confirm-modal').style.display = 'none';
+            if (confirmed && confirmCallback) {
+                confirmCallback();
+            }
+            confirmCallback = null;
         }
         // دالة عرض نافذة تعليمية للأدوات الذكية عند الضغطة الواحدة
         function showSmartToolTutorial(toolType) {
@@ -6621,8 +6647,10 @@ function deleteElement(elementId) {
     const card = document.getElementById('card');
     const element = card?.querySelector(`[data-element-id="${elementId}"]`);
 
-    if (element && confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
-        removeEl(element);
+    if (element) {
+        showConfirmModal('هل أنت متأكد من حذف هذا العنصر؟', 'حذف العنصر', '🗑️', function() {
+            removeEl(element);
+        });
     }
 }
 
