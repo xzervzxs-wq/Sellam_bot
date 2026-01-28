@@ -5946,38 +5946,58 @@
                     const widthCm = (origW / 72) * 2.54;
                     const heightCm = (origH / 72) * 2.54;
 
-                    document.getElementById('custom-width').value = widthCm.toFixed(2);
-                    document.getElementById('custom-height').value = heightCm.toFixed(2);
-
-                    const newAppW = Math.round(widthCm * DPI_RATIO);
-                    const newAppH = Math.round(heightCm * DPI_RATIO);
-                    setCardSize(newAppW, newAppH);
-
+                    // إضافة كطبقة صورة عادية قابلة للتحكم (بدون تغيير حجم البطاقة)
                     const card = document.getElementById('card');
-                    // تنظيف البطاقة لبدء مشروع جديد
-                    card.innerHTML = '<div id="card-gradient"></div>';
-
-                    // إضافة الصورة كطبقة خلفية مقفلة
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'draggable-el image-layer bg-image is-locked';
+                    const cardW = card.offsetWidth;
+                    const cardH = card.offsetHeight;
+                    
+                    // حساب الحجم المناسب للصورة داخل البطاقة
+                    const imgRatio = origW / origH;
+                    const cardRatio = cardW / cardH;
+                    let displayW, displayH;
+                    
+                    if (imgRatio > cardRatio) {
+                        displayW = cardW * 0.9;
+                        displayH = displayW / imgRatio;
+                    } else {
+                        displayH = cardH * 0.9;
+                        displayW = displayH * imgRatio;
+                    }
+                    
+                    // إنشاء طبقة صورة عادية قابلة للتحكم
+                    const wrapper = createWrapper('image-layer');
+                    wrapper.setAttribute('data-colorable', 'false');
+                    wrapper.setAttribute('data-high-res', 'true');
+                    
+                    const contentWrapper = wrapper.querySelector('.content-wrapper');
+                    contentWrapper.style.width = '100%';
+                    contentWrapper.style.height = '100%';
+                    contentWrapper.style.display = 'flex';
+                    
                     const img = document.createElement('img');
                     img.src = dataUrl;
                     img.style.width = '100%';
                     img.style.height = '100%';
-                    img.style.objectFit = 'fill';
+                    img.style.objectFit = 'contain';
                     img.style.pointerEvents = 'none';
-                    wrapper.appendChild(img);
-
+                    
+                    contentWrapper.appendChild(img);
+                    
+                    wrapper.style.width = displayW + 'px';
+                    wrapper.style.height = displayH + 'px';
+                    wrapper.style.left = (cardW / 2) + 'px';
+                    wrapper.style.top = (cardH / 2) + 'px';
+                    wrapper.style.transform = 'translate(-50%, -50%)';
+                    
                     card.appendChild(wrapper);
-                    setupInteract(wrapper, 'box');
-
-                    // إخفاء التدرج عند تحميل ملف جديد
-                    hasGradient = false;
-                    const grad = document.getElementById('card-gradient');
-                    if(grad) grad.style.display = 'none';
-
-                    saveState();
-                    alert('✅ تم فتح الملف بنجاح بجودة عالية!');
+                    
+                    setTimeout(() => {
+                        selectEl(wrapper);
+                        setupInteract(wrapper, 'box');
+                        saveState();
+                    }, 50);
+                    
+                    alert('✅ تم فتح الملف كطبقة عالية الدقة!');
                 });
             });
         }
@@ -6044,26 +6064,58 @@
 
                     const dataUrl = cnv.toDataURL();
 
+                    // إضافة كطبقة صورة عادية قابلة للتحكم
                     const card = document.getElementById('card');
-                    card.innerHTML = '<div id="card-gradient"></div>';
-
-                    // إخفاء التدرج
-                    hasGradient = false;
-
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'draggable-el image-layer bg-image is-locked';
+                    const cardW = card.offsetWidth;
+                    const cardH = card.offsetHeight;
+                    
+                    // حساب الحجم المناسب للصورة داخل البطاقة
+                    const imgRatio = widthPx / heightPx;
+                    const cardRatio = cardW / cardH;
+                    let displayW, displayH;
+                    
+                    if (imgRatio > cardRatio) {
+                        displayW = cardW * 0.9;
+                        displayH = displayW / imgRatio;
+                    } else {
+                        displayH = cardH * 0.9;
+                        displayW = displayH * imgRatio;
+                    }
+                    
+                    // إنشاء طبقة صورة عادية قابلة للتحكم
+                    const wrapper = createWrapper('image-layer');
+                    wrapper.setAttribute('data-colorable', 'false');
+                    wrapper.setAttribute('data-high-res', 'true');
+                    
+                    const contentWrapper = wrapper.querySelector('.content-wrapper');
+                    contentWrapper.style.width = '100%';
+                    contentWrapper.style.height = '100%';
+                    contentWrapper.style.display = 'flex';
+                    
                     const img = document.createElement('img');
                     img.src = dataUrl;
                     img.style.width = '100%';
                     img.style.height = '100%';
-                    img.style.objectFit = 'fill';
+                    img.style.objectFit = 'contain';
                     img.style.pointerEvents = 'none';
-                    wrapper.appendChild(img);
-
+                    
+                    contentWrapper.appendChild(img);
+                    
+                    wrapper.style.width = displayW + 'px';
+                    wrapper.style.height = displayH + 'px';
+                    wrapper.style.left = (cardW / 2) + 'px';
+                    wrapper.style.top = (cardH / 2) + 'px';
+                    wrapper.style.transform = 'translate(-50%, -50%)';
+                    
                     card.appendChild(wrapper);
-                    setupInteract(wrapper, 'box');
-                    saveState();
-                    alert('✅ تم فتح ملف TIF بنجاح!');
+                    
+                    setTimeout(() => {
+                        selectEl(wrapper);
+                        setupInteract(wrapper, 'box');
+                        saveState();
+                    }, 50);
+                    
+                    alert('✅ تم فتح ملف TIF كطبقة عالية الدقة!');
                 } catch(err) {
                     alert('❌ خطأ في فتح ملف TIF: ' + err.message);
                 }
