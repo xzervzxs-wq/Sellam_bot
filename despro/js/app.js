@@ -4411,7 +4411,7 @@
         });
 
         function deselect(e) {
-            if(e && (e.target.closest(".draggable-el") || e.target.closest("#style-panel") || e.target.closest("#floating-context-toolbar") || e.target.closest("select") || e.target.closest("input") || e.target.closest(".controls-row") || e.target.closest("button") || e.target.closest("#eraser-controls"))) return;
+            if(e && (e.target.closest(".draggable-el") || e.target.closest("#style-panel") || e.target.closest("#floating-context-toolbar") || e.target.closest("select") || e.target.closest("input") || e.target.closest(".controls-row") || e.target.closest("button") || e.target.closest("#eraser-controls") || e.target.closest("#smart-tool-tutorial-modal"))) return;
 
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
@@ -4931,9 +4931,13 @@
             modal.id = 'smart-tool-tutorial-modal';
             modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100002;';
             
-            modal.innerHTML = '<div style="background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:16px;padding:16px 24px;box-shadow:0 15px 40px rgba(0,0,0,0.5);text-align:center;min-width:220px;"><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;"><span style="font-size:24px;">' + icon + '</span><span style="color:white;font-size:14px;font-weight:600;">' + title + '</span></div><p style="color:#94a3b8;font-size:12px;margin:0 0 12px 0;">' + tip + '</p><button onclick="closeSmartToolTutorial()" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;">فهمت ✓</button></div>';
+            modal.innerHTML = '<div style="background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:16px;padding:16px 24px;box-shadow:0 15px 40px rgba(0,0,0,0.5);text-align:center;min-width:220px;"><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;"><span style="font-size:24px;">' + icon + '</span><span style="color:white;font-size:14px;font-weight:600;">' + title + '</span></div><p style="color:#94a3b8;font-size:12px;margin:0 0 12px 0;">' + tip + '</p><button onclick="event.stopPropagation();closeSmartToolTutorial()" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;">فهمت ✓</button></div>';
             
             document.body.appendChild(modal);
+            
+            // منع انتشار الحدث من النافذة
+            modal.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            modal.addEventListener('click', (e) => { e.stopPropagation(); });
             
             // إغلاق تلقائي بعد 3 ثواني
             setTimeout(() => { closeSmartToolTutorial(); }, 3000);
