@@ -2435,41 +2435,48 @@
         }
 
         // --- دوال الممحاة الذكية (Smart Eraser) ---
+        let smartEraserTargetEl = null; // حفظ الطبقة المستهدفة
+        
         window.toggleSmartEraserMode = function() {
-            console.log('Smart Eraser clicked!');
-            console.log('activeEl:', activeEl);
+            const btn = document.getElementById('btn-smart-eraser');
+            const btnTop = document.getElementById('btn-smart-eraser-top');
+            
+            // إذا كانت الممحاة مفعلة - أوقفها مباشرة بدون تحقق
+            if(smartEraserMode) {
+                smartEraserMode = false;
+                smartEraserTargetEl = null;
+                if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
+                if(btnTop) btnTop.classList.remove('ring-2', 'ring-indigo-400');
+                window.exitSmartEraserMode();
+                updateToolButtons();
+                return;
+            }
 
-            // التحقق من تحديد طبقة صورة أولاً
+            // التحقق من تحديد طبقة صورة أولاً عند التفعيل فقط
             if(!activeEl || !activeEl.classList.contains('image-layer')) {
-                console.log('No image layer selected - showing modal');
                 showInfoModal('يرجى تحديد طبقة صورة أولاً لاستخدام الممحاة الذكية', 'الممحاة الذكية', '🧹');
                 return;
             }
 
-            smartEraserMode = !smartEraserMode;
-            const btn = document.getElementById('btn-smart-eraser');
-            const btnTop = document.getElementById('btn-smart-eraser-top');
-
-            if(smartEraserMode) {
-                if(magicMode) {
-                    magicMode = false;
-                    const mtc = document.getElementById('magic-tolerance-control');
-                    if(mtc) { mtc.classList.remove('flex'); mtc.classList.add('hidden'); }
-                }
-                if(btn) btn.classList.add('ring-2', 'ring-indigo-400');
-                if(btnTop) btnTop.classList.add('ring-2', 'ring-indigo-400');
-                window.initSmartEraserCanvas();
-                document.getElementById('card').style.cursor = 'crosshair';
-            } else {
-                if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
-                if(btnTop) btnTop.classList.remove('ring-2', 'ring-indigo-400');
-                window.exitSmartEraserMode();
+            // حفظ الطبقة المستهدفة وتفعيل الممحاة
+            smartEraserTargetEl = activeEl;
+            smartEraserMode = true;
+            
+            if(magicMode) {
+                magicMode = false;
+                const mtc = document.getElementById('magic-tolerance-control');
+                if(mtc) { mtc.classList.remove('flex'); mtc.classList.add('hidden'); }
             }
+            if(btn) btn.classList.add('ring-2', 'ring-indigo-400');
+            if(btnTop) btnTop.classList.add('ring-2', 'ring-indigo-400');
+            window.initSmartEraserCanvas();
+            document.getElementById('card').style.cursor = 'crosshair';
             updateToolButtons();
         }
 
         window.exitSmartEraserMode = function() {
             smartEraserMode = false;
+            smartEraserTargetEl = null; // مسح الطبقة المحفوظة
             const btn = document.getElementById('btn-smart-eraser');
             const btnTop = document.getElementById('btn-smart-eraser-top');
             if(btn) btn.classList.remove('ring-2', 'ring-indigo-400');
@@ -2572,8 +2579,8 @@
             const card = document.getElementById('card');
             const cardRect = card.getBoundingClientRect();
 
-            // استخدام العنصر المحدد أولاً
-            let targetEl = activeEl;
+            // استخدام الطبقة المحفوظة أو المحددة حالياً
+            let targetEl = smartEraserTargetEl || activeEl;
 
             // إذا لم يكن محدداً، ابحث تحت نقطة البداية
             if(!targetEl || !targetEl.classList.contains('image-layer')) {
