@@ -1758,20 +1758,22 @@
                 ctx.font = 'bold 180px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+                
+                // نقل نقطة المركز إلى منتصف الكانفس ثم الدوران
+                ctx.translate(canvas.width / 2, canvas.height / 2);
                 ctx.rotate(-Math.PI / 4); // دوران 45 درجة
 
                 // رسم النص على كامل الصفحة بمسافات أكبر (بدون تداخل)
                 const diagonalLength = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
-                const startPosX = -diagonalLength / 2;
-                const startPosY = -diagonalLength / 2;
 
-                for (let x = startPosX; x < diagonalLength; x += 1000) {
-                    for (let y = startPosY; y < diagonalLength; y += 800) {
+                for (let x = -diagonalLength; x < diagonalLength; x += 1000) {
+                    for (let y = -diagonalLength; y < diagonalLength; y += 800) {
                         ctx.fillText('despro.net', x, y);
                     }
                 }
 
                 ctx.restore();
+            }
             }
 
             const saveImg = document.getElementById('save-img');
