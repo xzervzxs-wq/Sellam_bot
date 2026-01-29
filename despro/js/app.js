@@ -6846,14 +6846,14 @@ function checkSession() {
                 // تحديث العبارة في الهيدر للبريميوم
                 const subtitleEl = document.getElementById('studio-subtitle-display');
                 if(subtitleEl) {
-                    subtitleEl.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>تتسع لكل ما تتخيّل ✨</span>';
+                    subtitleEl.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>تتسع لكل ما تتخيّل</span>';
                     subtitleEl.classList.remove('text-slate-600');
                     subtitleEl.classList.add('text-[#555555]');
                 }
                 setTimeout(function() {
                     const el = document.getElementById('studio-subtitle-display');
                     if(el) {
-                        el.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>تتسع لكل ما تتخيّل ✨</span>';
+                        el.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>تتسع لكل ما تتخيّل</span>';
                         el.classList.remove('text-slate-600');
                         el.classList.add('text-[#555555]');
                     }
@@ -6861,7 +6861,7 @@ function checkSession() {
                 setTimeout(function() {
                     const el = document.getElementById('studio-subtitle-display');
                     if(el) {
-                        el.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>تتسع لكل ما تتخيّل ✨</span>';
+                        el.innerHTML = '<span>مساحة مخصصة</span><span style="color: #cccccc; margin: 0 8px; font-weight: 300;">|</span><span>تتسع لكل ما تتخيّل</span>';
                         el.classList.remove('text-slate-600');
                         el.classList.add('text-[#555555]');
                     }
