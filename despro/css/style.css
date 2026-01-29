@@ -583,17 +583,17 @@
         .resize-sw { bottom: -13px; left: -13px; cursor: sw-resize; }
         .resize-se { bottom: -13px; right: -13px; cursor: se-resize; }
         .resize-n { top: -13px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
-        .resize-e { top: 50%; right: -13px; transform: translateY(-50%); cursor: e-resize; }
+        .resize-e { top: 50%; right: -8px; transform: translateY(-50%); cursor: e-resize; width: 10px; height: 40px; border-radius: 5px; }
         .resize-s { bottom: -13px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
-        .resize-w { top: 50%; left: -13px; transform: translateY(-50%); cursor: w-resize; }
+        .resize-w { top: 50%; left: -8px; transform: translateY(-50%); cursor: w-resize; width: 10px; height: 40px; border-radius: 5px; }
         
         .control-btn { position: absolute; width: 24px; height: 24px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 102; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
         .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .delete-btn { top: -35px; left: 0px; background: #ef4444; }
-        .duplicate-btn { top: -35px; left: 26px; background: #3b82f6; }
-        .rotate-btn { top: -35px; left: 52px; background: #8b5cf6; }
-        .layer-up-btn { top: -35px; left: 78px; background: #64748b; }
-        .layer-down-btn { top: -35px; left: 104px; background: #64748b; }
+        .duplicate-btn { top: -35px; left: 22px; background: #3b82f6; }
+        .rotate-btn { top: -35px; left: 44px; background: #8b5cf6; }
+        .layer-up-btn { top: -35px; left: 66px; background: #64748b; }
+        .layer-down-btn { top: -35px; left: 88px; background: #64748b; }
         .move-handle { position: absolute; top: -35px; left: auto !important; right: 0 !important; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 36px; height: 24px; background: var(--primary-color); border-radius: 6px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 11px; }
         .move-handle:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
