@@ -6889,8 +6889,23 @@ function checkSession() {
             }
         } catch (e) {
             console.error('Session error', e);
-            logoutUser();
+            showLogoForGuests();
         }
+    } else {
+        // لا توجد جلسة - إظهار الشعار لغير المشتركين
+        showLogoForGuests();
+    }
+}
+
+// دالة إظهار الشعار لغير المشتركين
+function showLogoForGuests() {
+    const studioLogo = document.getElementById('studio-logo-display');
+    const studioName = document.getElementById('studio-name-display');
+    if(studioLogo) {
+        studioLogo.style.display = 'block';
+    }
+    if(studioName) {
+        studioName.style.display = 'none';
     }
 }
 
