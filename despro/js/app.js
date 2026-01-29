@@ -3905,6 +3905,21 @@
                 if(e.target.closest('.control-btn')) return;
 
                 if(el.classList.contains('is-locked')) return;
+                
+                // === إصلاح مشكلة اللمس على iPad ===
+                // التحقق الصارم: هل اللمسة فعلاً على هذا العنصر؟
+                const isTouch = e.type === 'touchstart';
+                if (isTouch) {
+                    const touchX = e.touches[0].clientX;
+                    const touchY = e.touches[0].clientY;
+                    const elementAtTouch = document.elementFromPoint(touchX, touchY);
+                    
+                    // إذا اللمسة ليست على هذا العنصر أو أحد أبنائه، تجاهل
+                    if (!elementAtTouch || (!el.contains(elementAtTouch) && elementAtTouch !== el)) {
+                        return;
+                    }
+                }
+                // ============================================
 
                 // === تعديل: التحقق من مقبض التحريك أولاً ===
                 const isMoveHandle = e.target.classList.contains('move-handle') || e.target.closest('.move-handle');
@@ -3913,23 +3928,22 @@
                     // Content editable check - simple return allows focus
                     if(e.target.isContentEditable || e.target.closest('.user-text')) {
                         selectEl(el);
-                        if (e.type === 'touchstart') {
-                            e.target.focus();
+                        if (isTouch) {
+                            e.target.focus(); 
                         }
                         return;
                     }
                 }
                 // ============================================
-
-                const isTouch = e.type === 'touchstart';
+                
                 const startX = isTouch ? e.touches[0].clientX : e.clientX;
                 const startY = isTouch ? e.touches[0].clientY : e.clientY;
-
+                
                 if(e.target.classList.contains('handle')) {
                     handleResize(e, el, e.target, startX, startY);
                     return;
                 }
-
+                
                 if(el.classList.contains('frame-layer') && e.target === el) {
                     selectEl(el);
                     return;
@@ -3945,9 +3959,10 @@
                 // أما إذا كان محدداً، فسيتم تجاوز هذا الشرط والسماح بالسحب من أي مكان (حل لمشكلة اختفاء المقبض)
                 // ============================================
 
-                e.preventDefault();
+                e.preventDefault(); 
                 e.stopPropagation();
-
+                
+                selectEl(el);
                 selectEl(el);
 
                 const startLeft = el.offsetLeft;
