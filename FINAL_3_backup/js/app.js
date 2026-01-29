@@ -785,7 +785,7 @@
                 } else {
                     Array.from(usedColors).slice(0, 18).forEach(color => {
                         const dot = document.createElement('div');
-                        dot.className = 'w-4 h-4 rounded-full border border-gray-200 cursor-help transition hover:scale-110';
+                        dot.className = 'w-4 h-4 rounded-full cursor-help transition hover:scale-110';
                         dot.style.backgroundColor = color;
                         dot.title = color; // ظهر كود اللون عند التمرير
                         paletteDiv.appendChild(dot);
@@ -800,7 +800,7 @@
 
         // === دوال ملاحظات المصمم ===
         function getMaxCharLimit() {
-            return userTier === 'premium' ? 1000 : 280;
+            return userTier === 'premium' ? 1000 : 140;
         }
 
         function updateCharCount() {
@@ -2420,7 +2420,8 @@
 
             if (eraserMode) {
                 if (lassoMode) exitLassoMode();
-
+                if (smartFillMode) exitSmartFillMode();
+                if (typeof smartEraserMode !== 'undefined' && smartEraserMode) exitSmartEraserMode();
                 magicMode = false;
                 const magicControls = document.getElementById('magic-tolerance-control');
                 if (magicControls) {
@@ -2502,6 +2503,10 @@
             // حفظ الطبقة المستهدفة وتفعيل الممحاة
             smartEraserTargetEl = activeEl;
             smartEraserMode = true;
+            // إغلاق الأدوات الأخرى
+            if(eraserMode) exitEraserMode();
+            if(lassoMode) exitLassoMode();
+            if(smartFillMode) exitSmartFillMode();
             
             if(magicMode) {
                 magicMode = false;
@@ -2706,6 +2711,8 @@
 
             if (lassoMode) {
                 if (eraserMode) exitEraserMode();
+                if (smartFillMode) exitSmartFillMode();
+                if (smartEraserMode) window.exitSmartEraserMode();
 
                 magicMode = false;
                 document.getElementById('card').style.cursor = 'crosshair';
@@ -2720,42 +2727,41 @@
             const eraserBtn = document.getElementById('btn-eraser');
             const lassoBtn = document.getElementById('btn-lasso');
             const magicBtn = document.getElementById('btn-magic');
+            const smartEraserBtn = document.getElementById('btn-smart-eraser');
+            const smartEraserTopBtn = document.getElementById('btn-smart-eraser-top');
             const smartFillBtn = document.getElementById('btn-smart-fill');
+            
+            // قائمة بجميع الأزرار لإعادة تعيينها
+            const allButtons = [eraserBtn, lassoBtn, magicBtn, smartEraserBtn, smartEraserTopBtn, smartFillBtn];
 
-            [eraserBtn, lassoBtn, magicBtn, smartFillBtn].forEach(btn => {
+            allButtons.forEach(btn => {
                 if(btn) {
                     btn.classList.remove('bg-[#6366f1]', 'text-white');
-                    btn.classList.remove('bg-white');
-                    btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
+                    // إزالة ألوان الخلفية الفاتحة المستخدمة سابقاً
+                    btn.classList.remove('bg-white'); 
+                    // إعادة تعيين إلى الوضع الافتراضي الموحد
+                    btn.classList.add('bg-[#f8fafc]', 'text-[#1e293b]'); 
                 }
             });
 
-            if(eraserMode) {
-                if(eraserBtn) {
-                    eraserBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    eraserBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
+            // دالة مساعدة لتفعيل الزر بلون موحد (أزرق ونص أبيض)
+            const activate = (btn) => {
+                if(btn) {
+                    btn.classList.remove('bg-[#f8fafc]', 'text-[#1e293b]');
+                    btn.classList.remove('bg-white');
+                    btn.classList.add('bg-[#6366f1]', 'text-white');
                 }
-            }
-            if(lassoMode) {
-                if(lassoBtn) {
-                    lassoBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    lassoBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
-                }
-            }
-            if(smartFillMode) {
-                if(smartFillBtn) {
-                    smartFillBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    smartFillBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
-                }
-            }
-            if(magicMode && eraserMode) {
-                if(magicBtn) {
-                    magicBtn.classList.add('bg-[#6366f1]', 'text-white');
-                    magicBtn.classList.remove('bg-[#f1f5f9]', 'text-[#475569]');
-                }
-            }
-        }
+            };
+            
+            if(eraserMode) activate(eraserBtn);
+            if(lassoMode) activate(lassoBtn);
+            if(smartFillMode) activate(smartFillBtn);
+            if(smartEraserMode) activate(smartEraserTopBtn);
 
+            // الأزرار الفرعية (تظهر نشطة أيضاً إذا كان الوضع مفعلاً)
+            if(magicMode && eraserMode) activate(magicBtn);
+            if(smartEraserMode && eraserMode) activate(smartEraserBtn);
+        }
         function initLassoCanvas() {
             if(lassoCanvas) lassoCanvas.remove();
             const card = document.getElementById('card');
@@ -2962,6 +2968,7 @@
             if (smartFillMode) {
                 if (eraserMode) exitEraserMode();
                 if (lassoMode) exitLassoMode();
+                if (smartEraserMode) window.exitSmartEraserMode();
                 magicMode = false;
                 document.getElementById('card').style.cursor = 'crosshair';
                 initSmartFillCanvas();
@@ -5028,41 +5035,186 @@
         }
         // دالة عرض نافذة تعليمية للأدوات الذكية عند الضغطة الواحدة
         function showSmartToolTutorial(toolType) {
-            let title, icon, tip;
+            let title, icon, steps = [];
             
             if (toolType === 'lasso') {
-                title = 'القص الذكي';
+                title = 'القص الذكي ✂️';
                 icon = '✂️';
-                tip = 'اضغط مستمر + ارسم شكل حول المنطقة';
+                steps = [
+                    '1️⃣ اضغط مع الاستمرار على الماوس',
+                    '2️⃣ ارسم شكلاً حول المنطقة المراد قصها',
+                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
+                    '🎯 سيتم قص المنطقة المحددة تلقائياً!'
+                ];
             } else if (toolType === 'smartFill') {
-                title = 'التلوين الذكي';
+                title = 'التلوين الذكي 🎨';
                 icon = '🎨';
-                tip = 'اضغط مستمر + ارسم شكل للتلوين';
+                steps = [
+                    '1️⃣ اضغط مع الاستمرار على الماوس',
+                    '2️⃣ ارسم شكلاً بالمنطقة المراد تلوينها',
+                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
+                    '🎯 سيتم تعبئة الشكل باللون المحدد!'
+                ];
             } else if (toolType === 'smartEraser') {
-                title = 'الممحاة الذكية';
+                title = 'الممحاة الذكية 🧹';
                 icon = '🧹';
-                tip = 'اضغط مستمر + ارسم شكل للمسح';
+                steps = [
+                    '1️⃣ اضغط مع الاستمرار على الماوس',
+                    '2️⃣ ارسم شكلاً حول المنطقة المراد مسحها',
+                    '3️⃣ أكمل الشكل ثم ارفع إصبعك',
+                    '🎯 سيتم مسح المنطقة المحددة تلقائياً!'
+                ];
             }
             
+            // إنشاء النافذة التعليمية الاحترافية
             const existingModal = document.getElementById('smart-tool-tutorial-modal');
             if (existingModal) existingModal.remove();
             
             const modal = document.createElement('div');
             modal.id = 'smart-tool-tutorial-modal';
-            modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100002;';
+            modal.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 100002;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                pointer-events: none;
+                animation: slideUp 0.4s ease;
+            `;
             
-            modal.innerHTML = '<div style="background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:16px;padding:16px 24px;box-shadow:0 15px 40px rgba(0,0,0,0.5);text-align:center;min-width:220px;"><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;"><span style="font-size:24px;">' + icon + '</span><span style="color:white;font-size:14px;font-weight:600;">' + title + '</span></div><p style="color:#94a3b8;font-size:12px;margin:0 0 12px 0;">' + tip + '</p><button onclick="event.stopPropagation();closeSmartToolTutorial()" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;">فهمت ✓</button></div>';
-            
+            modal.innerHTML = `
+                <style>
+                    @keyframes slideUp { from { transform: translate(-50%, 50px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+                </style>
+                <div style="
+                    background: linear-gradient(145deg, #1e293b, #0f172a);
+                    border-radius: 16px;
+                    padding: 16px;
+                    width: 280px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.2);
+                    position: relative;
+                    overflow: hidden;
+                    pointer-events: auto;
+                ">
+                    <!-- خلفية زخرفية -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
+                    
+                    <!-- الأيقونة والعنوان -->
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="
+                            width: 36px;
+                            height: 36px;
+                            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 18px;
+                            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                        ">${icon}</div>
+                        <div>
+                            <h3 style="
+                                color: white;
+                                font-size: 15px;
+                                font-weight: 700;
+                                margin: 0;
+                            ">${title}</h3>
+                            <p style="color: #94a3b8; font-size: 11px; margin: 2px 0 0 0;">تابع الخطوات التالية للبدء</p>
+                        </div>
+                    </div>
+                    
+                    <!-- رسم توضيحي متحرك (منقط) -->
+                    <div style="
+                        background: rgba(99, 102, 241, 0.05);
+                        border: 1px dashed rgba(99, 102, 241, 0.2);
+                        border-radius: 8px;
+                        padding: 8px;
+                        text-align: center;
+                        margin-bottom: 12px;
+                        height: 50px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <svg width="150" height="40" viewBox="0 0 200 80" style="overflow: visible;">
+                            <defs>
+                                <linearGradient id="drawGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                                </linearGradient>
+                                <mask id="dashedMask">
+                                    <path d="M30,60 Q70,0 120,20 T170,40" 
+                                          fill="none" 
+                                          stroke="white" 
+                                          stroke-width="8" 
+                                          stroke-dasharray="300"
+                                          stroke-dashoffset="300">
+                                        <animate attributeName="stroke-dashoffset" from="300" to="0" dur="2s" repeatCount="indefinite" />
+                                    </path>
+                                </mask>
+                            </defs>
+                            
+                            <!-- دائرة البداية المجوفة -->
+                            <circle cx="30" cy="60" r="5" fill="#1e293b" stroke="#6366f1" stroke-width="2" />
+                            
+                            <!-- الخط المنقط (يظهر باستخدام القناع) -->
+                            <path d="M30,60 Q70,0 120,20 T170,40" 
+                                fill="none" 
+                                stroke="url(#drawGrad)" 
+                                stroke-width="4" 
+                                stroke-linecap="round" 
+                                stroke-dasharray="8 8" 
+                                mask="url(#dashedMask)"
+                            />
+                        </svg>
+                    </div>
+                    
+                    <!-- الخطوات -->
+                    <div style="background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+                        ${steps.map((step, i) => `
+                            <div style="
+                                display: flex;
+                                align-items: flex-start;
+                                gap: 8px;
+                                margin-bottom: ${i < steps.length - 1 ? '6px' : '0'};
+                            ">
+                                <span style="
+                                    color: ${i === steps.length - 1 ? '#10b981' : '#cbd5e1'};
+                                    font-size: 11px;
+                                    line-height: 1.4;
+                                    ${i === steps.length - 1 ? 'font-weight: 600;' : ''}
+                                ">${step}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- زر إغلاق صغير في الزاوية -->
+                    <button onclick="closeSmartToolTutorial()" style="
+                        position: absolute;
+                        top: 8px;
+                        right: 8px;
+                        background: transparent;
+                        border: none;
+                        color: #64748b;
+                        cursor: pointer;
+                        padding: 4px;
+                        border-radius: 50%;
+                        font-size: 14px;
+                    " onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)';this.style.color='#ef4444'" onmouseout="this.style.backgroundColor='transparent';this.style.color='#64748b'">
+                        ✕
+                    </button>
+                </div>
+            `;
             document.body.appendChild(modal);
-            
-            // منع انتشار الحدث من النافذة
             modal.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-            modal.addEventListener('click', (e) => { e.stopPropagation(); });
-            
             // إغلاق تلقائي بعد 3 ثواني
-            setTimeout(() => { closeSmartToolTutorial(); }, 3000);
+            setTimeout(() => closeSmartToolTutorial(), 3000);
+            modal.addEventListener('click', (e) => { e.stopPropagation(); });
+            modal.addEventListener('touchstart', (e) => { e.stopPropagation(); }, {passive: false});
         }
-        
         function closeSmartToolTutorial() {
             const modal = document.getElementById('smart-tool-tutorial-modal');
             if (modal) modal.remove();
@@ -6565,7 +6717,7 @@
                         </h2>
 
                         <p style="color: #64748b; font-size: 12px; margin-bottom: 20px; line-height: 1.6; font-weight: 600;">
-                            هذا العنصر متاح فقط للمشتركين.<br>امتلك هذا العنصر وآلاف العناصر الأخرى الآن!
+                            هذا العنصر متاح فقط للمشتركين.<br>استمتع بهذا العنصر والعديد من الميزات الحصرية!
                         </p>
 
                         <button onclick="window.location.href = 'subscriptions.html'" style="
