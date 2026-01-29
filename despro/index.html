@@ -506,20 +506,21 @@
     <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
         
         <!-- اللوحة الجانبية -->
-        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between border-b border-[#e2e8f0] pb-3">
-                <div class="flex-1 text-center">
+        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit relative" onclick="event.stopPropagation()">
+            <!-- زر تبديل الوضع الليلي والنهاري - في الزاوية اليسرى -->
+            <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn absolute top-3 left-3" title="تبديل الوضع الليلي">
+                <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-moon" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
+                <i class="fas fa-moon theme-moon"></i>
+            </button>
+            
+            <div class="flex items-center justify-center border-b border-[#e2e8f0] pb-3">
+                <div class="text-center">
                     <div style="display: inline-block;">
                         <img id="studio-logo-display" src="logo.png" alt="Despro Logo" style="width: 100%; height: auto;">
                         <!-- تعديل لون النص إلى رمادي غامق وإزالة كلمة صغيره -->
                         <p class="text-[10px] text-slate-600 font-bold" id="studio-subtitle-display" style="margin-top: 6px;">خيال واسع <span style="margin: 0 4px;">|</span> مساحة مخصصة <span style="margin: 0 4px;">|</span>مشاريع منزلية <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-right: 4px; color: #a855f7;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 12l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h6" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2c.39 0 .754 .112 1.061 .304" /><path d="M19 21.5l2.518 -2.58a1.74 1.74 0 0 0 0 -2.413a1.627 1.627 0 0 0 -2.346 0l-.168 .172l-.168 -.172a1.627 1.627 0 0 0 -2.346 0a1.74 1.74 0 0 0 0 2.412l2.51 2.59l0 -.009" /></svg></p>
                     </div>
                 </div>
-                <!-- زر تبديل الوضع الليلي والنهاري -->
-                <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn" title="تبديل الوضع الليلي">
-                    <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-moon" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
-                    <i class="fas fa-moon theme-moon"></i>
-                </button>
             </div>
 
             <!-- إضافة النصوص -->
