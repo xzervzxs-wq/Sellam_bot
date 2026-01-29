@@ -4514,7 +4514,7 @@
             const studioNameDisplay = document.getElementById('studio-name-display');
             const studioLogoDisplay = document.getElementById('studio-logo-display');
             if (studioNameDisplay) {
-                studioNameDisplay.innerHTML = `أستوديو ${name} <span class="mr-1">✨</span>`;
+                const nameText = studioNameDisplay.querySelector('#studio-name-text'); if(nameText) nameText.textContent = `أستوديو ${name}`;
                 studioNameDisplay.classList.remove('hidden');
                 studioNameDisplay.style.display = 'block';
             }
@@ -6936,7 +6936,7 @@ function updateFooterForUser(name) {
 
     const studioTitle = document.getElementById('studio-name-display');
     if(studioTitle) {
-        studioTitle.innerHTML = `أستوديو ${name} <span class="mr-1">✨</span>`;
+        const titleText = studioTitle.querySelector('#studio-name-text'); if(titleText) titleText.textContent = `أستوديو ${name}`;
         studioTitle.classList.remove("hidden");
         studioTitle.style.display = "block";
         const studioLogo = document.getElementById("studio-logo-display");

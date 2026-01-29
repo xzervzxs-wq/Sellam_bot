@@ -513,11 +513,16 @@
                     <div style="display: inline-block; max-width: 280px;">
                         <!-- الشعار - يظهر لغير المشتركين فقط - مخفي افتراضياً حتى يتم التحقق -->
                         <img id="studio-logo-display" src="logo.png" alt="Despro Logo" style="width: 100%; height: auto; display: none;">
-                        <!-- اسم العضو والنجوم - يظهر للمشتركين فقط -->
-                        <h2 id="studio-name-display" class="text-2xl font-bold text-[#1e293b]" style="display: none;">
-                            أستوديو ياسر
-                            <span class="mr-1">✨</span>
-                        </h2>
+                        <!-- اسم العضو مع الأيقونة - يظهر للمشتركين فقط -->
+                        <div id="studio-name-display" class="flex items-center justify-center gap-3" style="display: none;">
+                            <div class="w-12 h-12 bg-[#6366f1] rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-palette text-white text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-[#1e293b]">
+                                <span id="studio-name-text">أستوديو ياسر</span>
+                                <span class="mr-1">✨</span>
+                            </h2>
+                        </div>
                         <!-- الوصف -->
                         <p class="text-[10px] text-slate-600 font-bold" id="studio-subtitle-display" style="margin-top: 6px;">مساحة مخصصة <span style="margin: 0 4px; color: #a855f7;">|</span>مشاريع منزلية <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-right: 4px; color: #a855f7;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 12l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h6" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2c.39 0 .754 .112 1.061 .304" /><path d="M19 21.5l2.518 -2.58a1.74 1.74 0 0 0 0 -2.413a1.627 1.627 0 0 0 -2.346 0l-.168 .172l-.168 -.172a1.627 1.627 0 0 0 -2.346 0a1.74 1.74 0 0 0 0 2.412l2.51 2.59l0 -.009" /></svg></p>
                     </div>
