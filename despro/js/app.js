@@ -3901,25 +3901,34 @@
             el.addEventListener('touchstart', startDrag, {passive: false});
 
             function startDrag(e) {
-                // Fix for iOS delete button tap
+                // === أول شي: التحقق الأساسي ===
                 if(e.target.closest('.control-btn')) return;
                 if(el.classList.contains('is-locked')) return;
 
                 const isTouch = e.type === 'touchstart';
                 const isSelected = el.classList.contains('selected');
                 
-                // === إصلاح مشكلة اللمس ===
-                // التحقق من أن اللمسة فعلاً داخل حدود هذا العنصر
+                // === إصلاح مشكلة اللمس الرئيسية ===
+                // إذا كان touch ولم يكن العنصر محدد، نتحقق أولاً
                 if (isTouch) {
                     const touch = e.touches[0];
                     const rect = el.getBoundingClientRect();
                     const touchX = touch.clientX;
                     const touchY = touch.clientY;
                     
-                    // إذا اللمسة خارج حدود العنصر، تجاهل تماماً
+                    // إذا اللمسة خارج حدود العنصر تماماً، تجاهل
                     if (touchX < rect.left || touchX > rect.right || 
                         touchY < rect.top || touchY > rect.bottom) {
                         return;
+                    }
+                    
+                    // === مهم جداً: إذا العنصر غير محدد ===
+                    // فقط نحدده ولا نسمح بأي تفاعل آخر
+                    if (!isSelected) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        selectEl(el);
+                        return; // خلاص، بس نحدده ونوقف
                     }
                 }
 
@@ -3938,11 +3947,11 @@
                 const startX = isTouch ? e.touches[0].clientX : e.clientX;
                 const startY = isTouch ? e.touches[0].clientY : e.clientY;
 
-                // === مهم: التكبير/التصغير فقط إذا العنصر محدد ===
+                // التكبير/التصغير - فقط إذا محدد
                 if(e.target.classList.contains('handle')) {
                     if (!isSelected) {
                         selectEl(el);
-                        return; // لا تكبير/تصغير إلا بعد التحديد
+                        return;
                     }
                     handleResize(e, el, e.target, startX, startY);
                     return;
@@ -3953,7 +3962,7 @@
                     return;
                 }
 
-                // === السحب فقط إذا محدد أو على المقبض ===
+                // السحب - فقط إذا محدد أو على المقبض
                 if (!isMoveHandle && !isSelected) {
                     selectEl(el);
                     return;
