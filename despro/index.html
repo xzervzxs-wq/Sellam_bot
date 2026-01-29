@@ -711,7 +711,7 @@
                 <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
                     
                     <!-- أزرار التراجع والإعادة -->
-                    <div class="flex items-center gap-1 bg-[#f8fafc] px-2 py-1 rounded-lg border border-[#e2e8f0]">
+                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
                         <button onclick="undoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
                         <div class="w-px h-4 bg-[#e2e8f0]"></div>
                         <button onclick="redoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
@@ -755,17 +755,17 @@
                     </div>
                     
                     <!-- أدوات التحرير الأساسية -->
-                    <div class="flex items-center gap-1 px-2 py-1 bg-[#f8fafc] rounded-lg border border-[#e2e8f0]">
-                        <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] text-[#475569] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1]">
+                    <div class="flex items-center gap-1 px-2 py-1 bg-[#f8fafc] dark:bg-slate-700 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
+                        <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
                             <i class="fas fa-adjust"></i> التدرج
                         </button>
-                        <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] text-[#475569] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1]">
+                        <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
                             <i class="fas fa-eraser"></i> الممحاة
                         </button>
-                        <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] text-[#475569] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1]" title="قص الصورة">
+                        <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="قص الصورة">
                             <i class="fas fa-crop"></i> Crop
                         </button>
-                        <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] text-[#475569] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1]" title="أداة اليد">
+                        <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="أداة اليد">
                             <i class="fa-regular fa-hand"></i> تحريك
                         </button>
                     </div>
