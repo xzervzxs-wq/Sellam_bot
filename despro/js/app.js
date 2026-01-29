@@ -3906,35 +3906,30 @@
 
                 if(el.classList.contains('is-locked')) return;
                 
-                // === إصلاح مشكلة اللمس على iPad ===
-                // التحقق الصارم: هل اللمسة فعلاً على هذا العنصر؟
+                // === إصلاح مشكلة اللمس: تحقق صارم ===
                 const isTouch = e.type === 'touchstart';
                 if (isTouch) {
                     const touchX = e.touches[0].clientX;
                     const touchY = e.touches[0].clientY;
                     const elementAtTouch = document.elementFromPoint(touchX, touchY);
                     
-                    // إذا اللمسة ليست على هذا العنصر أو أحد أبنائه، تجاهل
+                    // إذا اللمسة ليست على هذا العنصر أو أحد أبنائه، تجاهل تماماً
                     if (!elementAtTouch || (!el.contains(elementAtTouch) && elementAtTouch !== el)) {
                         return;
                     }
                 }
-                // ============================================
-
-                // === تعديل: التحقق من مقبض التحريك أولاً ===
+                
+                // === التحقق من مقبض التحريك ===
                 const isMoveHandle = e.target.classList.contains('move-handle') || e.target.closest('.move-handle');
 
+                // إذا كانت اللمسة على النص
                 if (!isMoveHandle) {
-                    // Content editable check - simple return allows focus
                     if(e.target.isContentEditable || e.target.closest('.user-text')) {
                         selectEl(el);
-                        if (isTouch) {
-                            e.target.focus(); 
-                        }
+                        if (isTouch) e.target.focus();
                         return;
                     }
                 }
-                // ============================================
                 
                 const startX = isTouch ? e.touches[0].clientX : e.clientX;
                 const startY = isTouch ? e.touches[0].clientY : e.clientY;
@@ -3949,20 +3944,17 @@
                     return;
                 }
 
-
-                // === تعديل جديد: السماح بالتحريك إذا كان العنصر محدداً مسبقاً ===
-                // إذا لم يكن الضغط على المقبض ولم يكن العنصر محدداً، نكتفي بالتحديد (للسماح باختياره أولاً)
-                if (!isMoveHandle && !el.classList.contains('selected')) {
+                // === شرط السحب: فقط على المقبض أو العنصر نفسه إذا محدد ===
+                const canDrag = isMoveHandle || (el.contains(e.target) && el.classList.contains('selected'));
+                
+                if (!canDrag) {
                     selectEl(el);
                     return;
                 }
-                // أما إذا كان محدداً، فسيتم تجاوز هذا الشرط والسماح بالسحب من أي مكان (حل لمشكلة اختفاء المقبض)
-                // ============================================
 
                 e.preventDefault(); 
                 e.stopPropagation();
                 
-                selectEl(el);
                 selectEl(el);
 
                 const startLeft = el.offsetLeft;
@@ -3970,27 +3962,34 @@
 
                 function onMove(ev) {
                     ev.preventDefault();
-
-                    // حساب الزووم لضمان حركة متطابقة
+                    
                     const zoomFactor = (window.currentZoom || 100) / 100;
-
+                    
                     const cx = isTouch ? ev.touches[0].clientX : ev.clientX;
                     const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
 
-                    // تقسيم الإزاحة على معامل الزووم
                     const dx = (cx - startX) / zoomFactor;
                     const dy = (cy - startY) / zoomFactor;
 
                     let newLeft = startLeft + dx;
                     let newTop = startTop + dy;
 
-                    el.style.left = `${newLeft}px`;
-                    el.style.top = `${newTop}px`;
-
+                    el.style.left = newLeft + 'px';
+                    el.style.top = newTop + 'px';
+                    
                     const currentRotate = parseFloat(el.getAttribute('data-rotate')) || 0;
-                    el.style.transform = `translate(-50%, -50%) rotate(${currentRotate}deg)`;
+                    el.style.transform = 'translate(-50%, -50%) rotate(' + currentRotate + 'deg)';
                 }
 
+                function onUp() {
+                    document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+                    document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+                    saveState();
+                }
+
+                document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove, {passive: false});
+                document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+            }
                 function onUp() {
                     document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
                     document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
