@@ -4512,8 +4512,15 @@
         function updateStudioName(name) {
             document.title = `أستوديو ${name} | Studio`;
             const studioNameDisplay = document.getElementById('studio-name-display');
+            const studioLogoDisplay = document.getElementById('studio-logo-display');
             if (studioNameDisplay) {
-                studioNameDisplay.textContent = `أستوديو ${name}`;
+                studioNameDisplay.innerHTML = `أستوديو ${name} <span class="mr-1">✨</span>`;
+                studioNameDisplay.classList.remove('hidden');
+                studioNameDisplay.style.display = 'block';
+            }
+            if (studioLogoDisplay) {
+                studioLogoDisplay.classList.add('hidden');
+                studioLogoDisplay.style.display = 'none';
             }
         }
 
@@ -6914,7 +6921,11 @@ function updateFooterForUser(name) {
 
     const studioTitle = document.getElementById('studio-name-display');
     if(studioTitle) {
-        studioTitle.innerHTML = `استوديو ${name} ✨`;
+        studioTitle.innerHTML = `أستوديو ${name} <span class="mr-1">✨</span>`;
+        studioTitle.classList.remove("hidden");
+        studioTitle.style.display = "block";
+        const studioLogo = document.getElementById("studio-logo-display");
+        if(studioLogo) { studioLogo.style.display = "none"; studioLogo.classList.add("hidden"); }
     }
 }
 
