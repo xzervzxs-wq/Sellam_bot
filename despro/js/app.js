@@ -1388,11 +1388,7 @@
                 const actualWidth = parseInt(card.getAttribute('data-card-width')) || card.offsetWidth;
                 const actualHeight = parseInt(card.getAttribute('data-card-height')) || card.offsetHeight;
                 
-                // حساب pixelRatio ديناميكياً حسب حجم العنصر (لمنع التعليق مع الصور الكبيرة)
-                const maxDimension = Math.max(actualWidth, actualHeight);
-                let pixelRatio = 2;
-                if (maxDimension > 1000) pixelRatio = 1.5;
-                if (maxDimension > 2000) pixelRatio = 1;
+                const pixelRatio = 4; // جودة عالية
                 
                 // إعدادات التصدير
                 const options = {
