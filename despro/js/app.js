@@ -800,7 +800,7 @@
 
         // === دوال ملاحظات المصمم ===
         function getMaxCharLimit() {
-            return userTier === 'premium' ? 1000 : 280;
+            return userTier === 'premium' ? 1000 : 140;
         }
 
         function updateCharCount() {
