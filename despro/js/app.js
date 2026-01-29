@@ -1774,10 +1774,8 @@
 
                 ctx.restore();
             }
-            }
 
             const saveImg = document.getElementById('save-img');
-            // إذا كان التصميم شفاف، استخدم PNG. وإلا استخدم JPEG بجودة 85% لتقليل الحجم
             const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.85);
             saveImg.src = imgData;
         }
