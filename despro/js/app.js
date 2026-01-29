@@ -3907,12 +3907,17 @@
 
                 const isTouch = e.type === 'touchstart';
                 
-                // === إصلاح اللمس: تأكد أن اللمسة على العنصر فعلاً ===
+                // === إصلاح مشكلة اللمس ===
+                // التحقق من أن اللمسة فعلاً داخل حدود هذا العنصر
                 if (isTouch) {
-                    const touchX = e.touches[0].clientX;
-                    const touchY = e.touches[0].clientY;
-                    const elementAtTouch = document.elementFromPoint(touchX, touchY);
-                    if (!elementAtTouch || (!el.contains(elementAtTouch) && elementAtTouch !== el)) {
+                    const touch = e.touches[0];
+                    const rect = el.getBoundingClientRect();
+                    const touchX = touch.clientX;
+                    const touchY = touch.clientY;
+                    
+                    // إذا اللمسة خارج حدود العنصر، تجاهل تماماً
+                    if (touchX < rect.left || touchX > rect.right || 
+                        touchY < rect.top || touchY > rect.bottom) {
                         return;
                     }
                 }
@@ -3978,7 +3983,6 @@
                 document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
             }
         }
-
         function handleResize(e, el, handle, startX, startY) {
             const isTouch = e.type === 'touchstart';
             const startW = el.offsetWidth;
