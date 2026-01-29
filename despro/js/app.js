@@ -6717,7 +6717,7 @@
                         </h2>
 
                         <p style="color: #64748b; font-size: 12px; margin-bottom: 20px; line-height: 1.6; font-weight: 600;">
-                            هذا العنصر متاح فقط للمشتركين.<br>امتلك هذا العنصر وآلاف العناصر الأخرى الآن!
+                            هذا العنصر متاح فقط للمشتركين.<br>استمتع بهذا العنصر والعديد من الميزات الحصرية!
                         </p>
 
                         <button onclick="window.location.href = 'subscriptions.html'" style="
