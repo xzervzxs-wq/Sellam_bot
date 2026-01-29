@@ -3906,6 +3906,7 @@
                 if(el.classList.contains('is-locked')) return;
 
                 const isTouch = e.type === 'touchstart';
+                const isSelected = el.classList.contains('selected');
                 
                 // === إصلاح مشكلة اللمس ===
                 // التحقق من أن اللمسة فعلاً داخل حدود هذا العنصر
@@ -3937,7 +3938,12 @@
                 const startX = isTouch ? e.touches[0].clientX : e.clientX;
                 const startY = isTouch ? e.touches[0].clientY : e.clientY;
 
+                // === مهم: التكبير/التصغير فقط إذا العنصر محدد ===
                 if(e.target.classList.contains('handle')) {
+                    if (!isSelected) {
+                        selectEl(el);
+                        return; // لا تكبير/تصغير إلا بعد التحديد
+                    }
                     handleResize(e, el, e.target, startX, startY);
                     return;
                 }
@@ -3947,8 +3953,8 @@
                     return;
                 }
 
-                // السماح بالتحريك فقط إذا محدد أو على المقبض
-                if (!isMoveHandle && !el.classList.contains('selected')) {
+                // === السحب فقط إذا محدد أو على المقبض ===
+                if (!isMoveHandle && !isSelected) {
                     selectEl(el);
                     return;
                 }
@@ -3983,6 +3989,7 @@
                 document.addEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
             }
         }
+
         function handleResize(e, el, handle, startX, startY) {
             const isTouch = e.type === 'touchstart';
             const startW = el.offsetWidth;
