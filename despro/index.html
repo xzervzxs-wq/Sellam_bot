@@ -471,8 +471,11 @@
 
             <!-- ملاحظة صغيرة مع أيقونة -->
             <div class="bg-[#f0f9ff] border border-[#bfdbfe] rounded-lg p-2.5 text-center">
-                <p class="text-xs text-[#1e40af] font-medium">
-                    <i class="fas fa-check-circle ml-1"></i> سيتم حفظ العمل في جهازك محلياً
+                <p class="text-xs text-[#1e40af] font-medium flex flex-col items-center gap-1">
+                    <span>يمكنك فتحه لاحقاً عبر:</span>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[#6366f1] text-[10px] font-bold">
+                        <i class="fas fa-folder-open"></i> فتح ملف
+                    </span>
                 </p>
             </div>
             <input type="hidden" id="save-as-callback">
