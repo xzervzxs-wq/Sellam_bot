@@ -1367,8 +1367,14 @@
              overlay.style.display = 'flex';
 
              try {
-                // لا نلغي التحديد - نحتاج الصورة محددة للممحاة
+                deselect();
                 const card = document.getElementById('card');
+                
+                // تحويل الصور إلى Base64 (مهم للصور الخارجية)
+                if (typeof convertAllImagesToDataURL === 'function') {
+                    await convertAllImagesToDataURL(card);
+                }
+                
                 await new Promise(r => setTimeout(r, 200));
 
                 // إزالة نمط الشطرنج مؤقتاً إذا كان موجوداً
@@ -1379,15 +1385,20 @@
                     card.style.backgroundColor = 'transparent';
                 }
 
-                // الحفظ بالحجم الفعلي بدقة 300 DPI
-                const pixelRatio = 4; // للحفاظ على جودة عالية
                 const actualWidth = parseInt(card.getAttribute('data-card-width')) || card.offsetWidth;
                 const actualHeight = parseInt(card.getAttribute('data-card-height')) || card.offsetHeight;
-
+                
+                // حساب pixelRatio ديناميكياً حسب حجم العنصر (لمنع التعليق مع الصور الكبيرة)
+                const maxDimension = Math.max(actualWidth, actualHeight);
+                let pixelRatio = 2;
+                if (maxDimension > 1000) pixelRatio = 1.5;
+                if (maxDimension > 2000) pixelRatio = 1;
+                
                 // إعدادات التصدير
                 const options = {
                     pixelRatio: pixelRatio,
-                    cacheBust: true,
+                    cacheBust: false,
+                    skipAutoScale: true,
                     width: actualWidth,
                     height: actualHeight,
                     style: {
@@ -1427,7 +1438,6 @@
                  overlay.style.display = 'none';
              }
         }
-
         // دالة إغلاق مودال الطباعة A4 مع استعادة الزوم
         function closeA4Modal() {
             document.getElementById('save-modal').style.display = 'none';
