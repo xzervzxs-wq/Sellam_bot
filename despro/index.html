@@ -670,17 +670,21 @@
 
             <!-- قسم الخصائص والحفظ -->
             <div id="style-panel" class="bg-white p-4 rounded-2xl shadow-lg border border-[#cbd5e1] transition-all" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-4 border-b border-[#e2e8f0] pb-2 flex-wrap gap-2">
+                <div class="flex flex-col gap-3 mb-4 border-b border-[#e2e8f0] pb-3">
                     <span class="text-xs font-black text-[#6366f1] uppercase tracking-wider" id="panel-title">التصدير</span>
                     <!-- أزرار الحفظ -->
-                    <div class="flex gap-2 flex-wrap">
-                        <button onclick="saveWorkDirectly()" class="bg-[#6366f1] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#4f46e5] flex items-center gap-1 shadow-md transition">
-                            <i class="fas fa-image"></i> حفظ صورة
-                        </button>
-                        <button onclick="openSaveAsModal()" class="bg-[#6366f1] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#4f46e5] flex items-center gap-1 shadow-md transition">
-                            <i class="fas fa-download"></i> حفظ كملف
-                        </button>
-                        <button onclick="generateA4Sheet()" class="bg-[#ec4899] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#db2777] flex items-center gap-1 shadow-md transition">
+                    <div class="flex flex-col gap-2">
+                        <!-- صف الأزرار العلوي: حفظ صورة + حفظ كملف -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="saveWorkDirectly()" class="bg-[#6366f1] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#4f46e5] flex items-center justify-center gap-2 shadow-md transition">
+                                <i class="fas fa-image"></i> حفظ صورة
+                            </button>
+                            <button onclick="openSaveAsModal()" class="bg-[#6366f1] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#4f46e5] flex items-center justify-center gap-2 shadow-md transition">
+                                <i class="fas fa-download"></i> حفظ كملف
+                            </button>
+                        </div>
+                        <!-- زر طباعة A4 كامل العرض -->
+                        <button onclick="generateA4Sheet()" class="w-full bg-[#ec4899] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#db2777] flex items-center justify-center gap-2 shadow-md transition">
                             <i class="fas fa-print"></i> طباعة A4
                         </button>
                     </div>
