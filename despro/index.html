@@ -704,7 +704,13 @@
         <div class="lg:col-span-8 flex flex-col gap-1">
             
             <!-- شريط الأدوات العلوي -->
-            <div class="flex flex-wrap items-center bg-white p-2 rounded-xl border border-[#cbd5e1] shadow-sm justify-between gap-y-2" onclick="event.stopPropagation()">
+            <div class="flex flex-wrap items-center bg-white p-2 rounded-xl border border-[#cbd5e1] shadow-sm justify-between gap-y-2 relative" onclick="event.stopPropagation()">
+                
+                <!-- زر الدارك مود - في الزاوية اليسرى -->
+                <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn absolute top-2 left-2 z-10" title="تبديل الوضع الليلي">
+                    <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
+                    <i class="fas fa-moon theme-moon"></i>
+                </button>
                 
                 <!-- الصف الأول: الأدوات مرتبة في أقسام -->
                 <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
@@ -736,11 +742,6 @@
                     
                     <!-- قسم الأدوات الذكية - SMART TOOLS -->
                     <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
-                        <!-- زر الدارك مود -->
-                        <button id="theme-toggle-btn-toolbar" onclick="toggleDarkMode()" class="absolute top-1 left-1 w-6 h-6 flex items-center justify-center" title="تبديل الوضع الليلي">
-                            <svg class="theme-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color: #6366f1; border-radius: 50%; padding: 3px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
-                            <i class="fas fa-moon theme-moon text-xs"></i>
-                        </button>
                         <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
                             SMART TOOLS
                         </span>

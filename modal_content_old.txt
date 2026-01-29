@@ -1,0 +1,131 @@
+                background: rgba(15, 23, 42, 0.85);
+                z-index: 100002;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(8px);
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            modal.innerHTML = `
+                <style>
+                    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+                </style>
+                <div style="
+                    background: linear-gradient(145deg, #1e293b, #0f172a);
+                    border-radius: 20px;
+                    padding: 24px;
+                    max-width: 340px;
+                    width: 90%;
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.2);
+                    animation: slideUp 0.4s ease;
+                    position: relative;
+                    overflow: hidden;
+                ">
+                    <!-- خلفية زخرفية -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
+                    
+                    <!-- الأيقونة والعنوان -->
+                    <div style="text-align: center; margin-bottom: 20px; position: relative;">
+                        <div style="
+                            width: 64px;
+                            height: 64px;
+                            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 28px;
+                            margin: 0 auto 12px;
+                            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                            animation: pulse 2s infinite;
+                        ">${icon}</div>
+                        <h3 style="
+                            color: white;
+                            font-size: 20px;
+                            font-weight: 700;
+                            margin: 0;
+                            background: linear-gradient(90deg, #6366f1, #a78bfa);
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                        ">${title}</h3>
+                        <p style="color: #94a3b8; font-size: 13px; margin-top: 6px;">كيفية استخدام هذه الأداة</p>
+                    </div>
+                    
+                    <!-- الخطوات -->
+                    <div style="background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px; position: relative;">
+                        ${steps.map((step, i) => `
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 10px 0;
+                                ${i < steps.length - 1 ? 'border-bottom: 1px solid rgba(99, 102, 241, 0.1);' : ''}
+                            ">
+                                <span style="
+                                    color: ${i === steps.length - 1 ? '#10b981' : '#e2e8f0'};
+                                    font-size: 13px;
+                                    line-height: 1.5;
+                                    ${i === steps.length - 1 ? 'font-weight: 600;' : ''}
+                                ">${step}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- رسم توضيحي متحرك (محسن) -->
+                    <div style="
+                        background: rgba(99, 102, 241, 0.05);
+                        border: 2px dashed rgba(99, 102, 241, 0.2);
+                        border-radius: 12px;
+                        padding: 16px;
+                        text-align: center;
+                        margin-bottom: 20px;
+                        position: relative;
+                        overflow: visible;
+                    ">
+                        <svg width="200" height="80" viewBox="0 0 200 80" style="margin: 0 auto; overflow: visible;">
+                            <defs>
+                                <linearGradient id="drawGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            
+                            <!-- مسار الرسم -->
+                            <path id="tutorialPath" d="M30,60 Q70,0 120,20 T170,40" 
+                                fill="none" 
+                                stroke="url(#drawGrad)" 
+                                stroke-width="6" 
+                                stroke-linecap="round" 
+                                stroke-dasharray="300" 
+                                stroke-dashoffset="300"
+                                style="filter: url(#glow);">
+                                <animate attributeName="stroke-dashoffset" from="300" to="0" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="1;1;1;0" keyTimes="0;0.7;0.9;1" dur="2s" repeatCount="indefinite" />
+                            </path>
+
+                            <!-- اليد التي ترسم -->
+                            <g>
+                                <animateMotion dur="2s" repeatCount="indefinite" rotate="0" calcMode="spline" keySplines="0.4 0 0.2 1">
+                                    <mpath href="#tutorialPath"/>
+                                </animateMotion>
+                                <text x="0" y="0" font-size="32" style="transform: translate(-5px, 20px);">✍️</text>
+                            </g>
+                        </svg>
+                    </div>
+                    
+                    <button onclick="closeSmartToolTutorial()" style="
+                        width: 100%;
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        color: white;
+                        border: none;
+                        padding: 14px;
