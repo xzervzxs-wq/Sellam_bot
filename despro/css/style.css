@@ -559,17 +559,29 @@
         .frame-layer { width: 80%; height: 80%; background: transparent; border-style: solid; border-width: 2px; border-color: #334155; pointer-events: auto; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s; }
         
         /* النصوص */
-        .text-layer { width: auto; min-width: 100px; text-align: center; padding: 5px; cursor: text; }
+        .text-layer { width: auto; min-width: 100px; text-align: center; padding: 5px; cursor: text; user-select: text; -webkit-user-select: text; }
+        .text-layer.selected { cursor: text; }
         .user-text { 
             line-height: 1.6; display: block; white-space: pre-wrap; outline: none;
             background: transparent; border: none; text-align: inherit; width: 100%;
             resize: none; overflow: visible; 
             user-select: text !important;
             -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
             cursor: text;
             touch-action: manipulation; 
             pointer-events: auto;
-            -webkit-touch-callout: none;
+            -webkit-touch-callout: default;
+            caret-color: auto;
+        }
+        .user-text:focus {
+            outline: none;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 4px;
+        }
+        .text-layer.selected .user-text {
+            cursor: text;
         }
         
         /* أدوات التحكم (المقابض) */
