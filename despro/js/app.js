@@ -4527,6 +4527,7 @@
                 studioNameText.textContent = `أستوديو ${name}`;
             }
         }
+        function showWelcomeNotification(name) {
             console.log(`مرحباً بك في أستوديو ${name}`);
         }
 
