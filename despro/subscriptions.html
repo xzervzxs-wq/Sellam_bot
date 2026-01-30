@@ -208,13 +208,19 @@
 
     <script>
         function subscribe(plan) {
-            let message = "مرحباً، أرغب في الاشتراك في باقة ";
-            if(plan === 'basic') message += "3 أشهر بـ 99 ريال";
-            else if(plan === 'premium') message += "6 أشهر بـ 180 ريال";
-            else if(plan === 'yearly') message += "سنة كاملة بـ 300 ريال";
+            let url = "";
+            if(plan === 'basic') {
+                // 3 months
+                url = "https://salla.sa/miniplant/EXedzKQ";
+            } else if(plan === 'premium') {
+                // 6 months
+                url = "https://salla.sa/miniplant/ZqXAgVb";
+            } else if(plan === 'yearly') {
+                // 1 year
+                url = "https://salla.sa/miniplant/EXedznG";
+            }
             
-            const url = `https://wa.me/966531333714?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+            if(url) window.open(url, '_blank');
         }
     </script>
 </body>
