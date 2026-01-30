@@ -31,26 +31,6 @@
         // إعداد PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     </script>
-    
-    <!-- التحقق السريع من الجلسة - يعمل قبل عرض أي شيء -->
-    <script>
-        (function() {
-            try {
-                var s = JSON.parse(localStorage.getItem('despro_session'));
-                if (s && s.name && s.expiryDate) {
-                    var today = new Date(); today.setHours(0,0,0,0);
-                    var d = s.expiryDate.trim();
-                    var exp = d.match(/^\d{2}-\d{2}-\d{4}$/) ? new Date(d.split('-').reverse().join('-')) : new Date(d);
-                    exp.setHours(0,0,0,0);
-                    if (exp >= today) {
-                        // المستخدم مسجل - إخفاء الافتراضي فوراً
-                        document.write('<style>#studio-default-display{display:none!important}#studio-name-display{display:block!important}#studio-subtitle-display{visibility:hidden}</style>');
-                        window._userName = s.name;
-                    }
-                }
-            } catch(e) {}
-        })();
-    </script>
 
     <!-- Stylesheet خارجي -->
     <link rel="stylesheet" href="css/style.css?v=20260128_01">
@@ -548,7 +528,7 @@
                                 <div style="width: 32px; height: 32px; background: #6366f1; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                     <i class="fas fa-palette text-white" style="font-size: 14px;"></i>
                                 </div>
-                                <span id="studio-name-text" style="font-size: 24px; font-weight: bold; color: #1e293b;"><script>try{var u=JSON.parse(localStorage.getItem('despro_session'));document.write(u&&u.name?'أستوديو '+u.name:'أستوديو');}catch(e){document.write('أستوديو');}</script></span>
+                                <span id="studio-name-text" style="font-size: 24px; font-weight: bold; color: #1e293b;">أستوديو</span>
                                 <span style="margin-right: 4px;">✨</span>
                             </div>
                         </div>
