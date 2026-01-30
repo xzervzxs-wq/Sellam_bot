@@ -4189,6 +4189,10 @@
             // إخفاء قسم لون النص افتراضياً
             document.getElementById('text-color-section').classList.add('hidden');
 
+            // إخفاء قسم تحرير النص افتراضياً
+            if(document.getElementById('edit-text-section')) document.getElementById('edit-text-section').classList.add('hidden');
+            if(document.getElementById('text-editor-panel')) document.getElementById('text-editor-panel').classList.add('hidden');
+
             // التحقق من العناصر القابلة للتلوين - جميع الصور ما عدا colorable = false
             if(el.classList.contains('image-layer') && el.getAttribute('data-colorable') !== 'false') {
 
@@ -4221,6 +4225,9 @@
                 // إظهار قسم لون النص فقط مع النصوص
                 document.getElementById('text-color-section').classList.remove('hidden');
 
+                // إظهار قسم تحرير النص
+                if(document.getElementById('edit-text-section')) document.getElementById('edit-text-section').classList.remove('hidden');
+
                 const fSize = parseInt(window.getComputedStyle(el).fontSize); // Use computed style for accuracy
                 document.getElementById('font-size').value = fSize;
                 document.getElementById('font-size-input').value = fSize;
@@ -4237,6 +4244,9 @@
                 if (textDiv) {
                     const textColor = textDiv.style.color || el.style.color || '#1e293b';
                     document.getElementById('top-text-color').value = rgbToHex(textColor);
+
+                    // تعبئة محرر النص بالمحتوى الحالي
+                    if(document.getElementById('direct-text-editor')) document.getElementById('direct-text-editor').value = textDiv.innerText || '';
                 }
 
                 updateBoldButtonState();
@@ -6365,6 +6375,70 @@
 
         // دالة تحديث حالة واجهة التدرج بناءً على العنصر المحدد
         function updateGradientUIState(el) {
+
+        // ==========================================
+        //  وظائف محرر النص المباشر
+        // ==========================================
+        
+        // فتح/إغلاق لوحة محرر النص
+        function toggleTextEditor() {
+            const panel = document.getElementById('text-editor-panel');
+            const arrow = document.getElementById('edit-text-arrow');
+            const editor = document.getElementById('direct-text-editor');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+                
+                // تعبئة المحرر بالنص الحالي
+                if (activeEl && activeEl.classList.contains('text-layer')) {
+                    const textDiv = activeEl.querySelector('.user-text');
+                    if (textDiv) {
+                        editor.value = textDiv.innerText || '';
+                        editor.focus();
+                        editor.select();
+                    }
+                }
+            } else {
+                panel.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // تحديث النص فوراً أثناء الكتابة
+        function updateTextFromEditor(value) {
+            if (!activeEl || !activeEl.classList.contains('text-layer')) return;
+            
+            const textDiv = activeEl.querySelector('.user-text');
+            if (textDiv) {
+                textDiv.innerText = value || 'نص...';
+            }
+        }
+        
+        // تطبيق النص وإغلاق المحرر
+        function applyTextFromEditor() {
+            const editor = document.getElementById('direct-text-editor');
+            if (!activeEl || !activeEl.classList.contains('text-layer')) return;
+            
+            const textDiv = activeEl.querySelector('.user-text');
+            if (textDiv) {
+                textDiv.innerText = editor.value.trim() || 'نص...';
+                saveState();
+            }
+            
+            // إغلاق المحرر
+            closeTextEditor();
+        }
+        
+        // إغلاق محرر النص
+        function closeTextEditor() {
+            const panel = document.getElementById('text-editor-panel');
+            const arrow = document.getElementById('edit-text-arrow');
+            
+            if (panel) panel.classList.add('hidden');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        }
+
             const settings = document.getElementById('floating-grad-settings');
             const btn = document.getElementById('btn-toggle-gradient');
             if (!settings || !btn) return;
