@@ -1463,6 +1463,26 @@
                 // 2. انتظار تحميل الخطوط (حل لمشكلة الخطوط في الآيفون)
                 if (document.fonts) {
                     await document.fonts.ready;
+        async function generateA4Sheet() {
+            const loadingText = document.querySelector('#export-overlay .text-white');
+            if(loadingText) loadingText.innerText = "جاري معالجة الصور والخطوط...";
+
+            const overlay = document.getElementById('export-overlay');
+            overlay.style.display = 'flex';
+
+            deselect();
+
+            // حفظ مستوى الزوم الحالي
+            savedZoomBeforeA4 = window.currentZoom || 100;
+            const card = document.getElementById('card');
+
+            try {
+                // 1. إعادة تعيين الزوم (مهم جداً للدقة)
+                setCustomZoom(100);
+
+                // 2. انتظار تحميل الخطوط (حل لمشكلة الخطوط في الآيفون)
+                if (document.fonts) {
+                    await document.fonts.ready;
                 }
 
                 // 3. تحويل جميع الصور إلى Base64 (حل لمشكلة اختفاء الصور في الآيفون)
@@ -1784,30 +1804,6 @@
             const saveImg = document.getElementById('save-img');
             const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.85);
             saveImg.src = imgData;
-        }
-
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const imgData = document.getElementById('save-img').src;
-            // A4 size in mm: 210 x 297
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const width = pdf.internal.pageSize.getWidth();
-            const height = pdf.internal.pageSize.getHeight();
-
-            // حساب النسبة الصحيحة بناءً على حجم الصورة الفعلي
-            const img = new Image();
-            img.onload = function() {
-                const imgWidth = img.width;
-                const imgHeight = img.height;
-                const imgAspectRatio = imgWidth / imgHeight;
-                const pageAspectRatio = width / height;
-
-                let finalWidth = width;
-                let finalHeight = height;
-
-                if(imgAspectRatio > pageAspectRatio) {
-                    // الصورة أعرض
-                    finalHeight = width / imgAspectRatio;
                 } else {
                     // الصورة أطول
                     finalWidth = height * imgAspectRatio;
