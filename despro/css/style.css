@@ -1151,8 +1151,8 @@
     right: 0;
     top: 50%;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #ec4899 10%, #ec4899 90%, transparent 100%);
-    box-shadow: 0 0 3px rgba(236, 72, 153, 0.5);
+    background: linear-gradient(90deg, transparent 0%, #94a3b8 10%, #94a3b8 90%, transparent 100%);
+    box-shadow: 0 0 2px rgba(148, 163, 184, 0.5);
 }
 
 /* الخط العمودي - منتصف العرض */
@@ -1161,6 +1161,6 @@
     bottom: 0;
     left: 50%;
     width: 1px;
-    background: linear-gradient(180deg, transparent 0%, #ec4899 10%, #ec4899 90%, transparent 100%);
-    box-shadow: 0 0 3px rgba(236, 72, 153, 0.5);
+    background: linear-gradient(180deg, transparent 0%, #94a3b8 10%, #94a3b8 90%, transparent 100%);
+    box-shadow: 0 0 2px rgba(148, 163, 184, 0.5);
 }
