@@ -799,6 +799,9 @@
                         <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="أداة اليد">
                             <i class="fa-regular fa-hand"></i> تحريك
                         </button>
+                        <button onclick="openQRModal()" id="btn-qr" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="توليد QR Code">
+                            <i class="fas fa-qrcode"></i> QR
+                        </button>
                     </div>
                     
                     <!-- Universal File Input: Supports All Formats -->
@@ -1105,10 +1108,6 @@
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
             <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
             <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
-            <div class="w-px h-4 bg-[#e2e8f0]"></div>
-            <button id="btn-qr-code" onclick="openQRModal()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
-                <i class="fas fa-qrcode text-[9px]"></i> QR
-            </button>
         </div>
         <!-- لوحة تحرير النص -->
         <div id="text-editor-panel" style="display:none;" class="flex-col gap-1 p-2 bg-slate-50 rounded border border-slate-200 mx-2 mt-1">
