@@ -3913,75 +3913,65 @@
 
                 const isTouch = e.type === 'touchstart';
                 const isSelected = el.classList.contains('selected');
-                
-                // === إصلاح مشكلة اللمس الرئيسية ===
-                // إذا كان touch ولم يكن العنصر محدد، نتحقق أولاً
-                if (isTouch) {
-                    const touch = e.touches[0];
-                    const rect = el.getBoundingClientRect();
-                    const touchX = touch.clientX;
-                    const touchY = touch.clientY;
-                    
-                    // إذا اللمسة خارج حدود العنصر تماماً، تجاهل
-                    if (touchX < rect.left || touchX > rect.right || 
-                        touchY < rect.top || touchY > rect.bottom) {
-                        return;
-                    }
-                    
-                    // === مهم جداً: إذا العنصر غير محدد ===
-                    // فقط نحدده ولا نسمح بأي تفاعل آخر
-                    if (!isSelected) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        selectEl(el);
-                        return; // خلاص، بس نحدده ونوقف
-                    }
-                }
-
-                // التحقق من مقبض التحريك
                 const isMoveHandle = e.target.classList.contains('move-handle') || e.target.closest('.move-handle');
-                
-                // === إصلاح: النصوص - إذا محدد يسمح بالسحب، إذا غير محدد يختاره فقط ===
+                const isHandle = e.target.classList.contains('handle');
                 const isTextContent = e.target.isContentEditable || e.target.closest('.user-text');
-                const isTextLayer = el.classList.contains('text-layer');
                 
-                if (!isMoveHandle && isTextContent) {
-                    // إذا النص غير محدد - نختاره فقط
-                    if (!isSelected) {
-                        selectEl(el);
-                        return;
-                    }
-                    // إذا النص محدد - نسمح بالسحب (لا نعمل return)
-                    // المستخدم يحتاج ضغطة طويلة أو double tap للتعديل
-                }
-
                 const startX = isTouch ? e.touches[0].clientX : e.clientX;
                 const startY = isTouch ? e.touches[0].clientY : e.clientY;
 
-                // التكبير/التصغير - فقط إذا محدد
-                if(e.target.classList.contains('handle')) {
-                    if (!isSelected) {
-                        selectEl(el);
-                        return;
-                    }
+                // === 1. المقابض (handles) - للتكبير/التصغير ===
+                if (isHandle) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!isSelected) selectEl(el);
                     handleResize(e, el, e.target, startX, startY);
                     return;
                 }
 
-                if(el.classList.contains('frame-layer') && e.target === el) {
+                // === 2. مقبض التحريك (move-handle) ===
+                if (isMoveHandle) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!isSelected) selectEl(el);
+                    // نكمل للسحب
+                }
+                // === 3. النص (user-text) ===
+                else if (isTextContent) {
+                    if (!isSelected) {
+                        // أول لمسة - اختياره فقط
+                        e.preventDefault();
+                        selectEl(el);
+                        return;
+                    }
+                    // محدد مسبقاً - السماح بالسحب
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                // === 4. الإطارات ===
+                else if (el.classList.contains('frame-layer') && e.target === el) {
                     selectEl(el);
                     return;
                 }
-
-                // السحب - فقط إذا محدد أو على المقبض
-                if (!isMoveHandle && !isSelected) {
-                    selectEl(el);
-                    return;
+                // === 5. باقي العناصر (صور، إلخ) ===
+                else {
+                    if (!isSelected) {
+                        // أول لمسة - اختياره فقط
+                        if (isTouch) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        selectEl(el);
+                        return;
+                    }
+                    // محدد مسبقاً - السماح بالسحب
+                    e.preventDefault();
+                    e.stopPropagation();
                 }
 
-                e.preventDefault();
-                e.stopPropagation();
+                // === منطق السحب ===
                 selectEl(el);
+                el.style.touchAction = 'none';
 
                 const startLeft = el.offsetLeft;
                 const startTop = el.offsetTop;
@@ -3993,15 +3983,18 @@
                     const cy = isTouch ? ev.touches[0].clientY : ev.clientY;
                     const dx = (cx - startX) / zoomFactor;
                     const dy = (cy - startY) / zoomFactor;
+
                     el.style.left = (startLeft + dx) + 'px';
                     el.style.top = (startTop + dy) + 'px';
+                    
                     const currentRotate = parseFloat(el.getAttribute('data-rotate')) || 0;
-                    el.style.transform = 'translate(-50%, -50%) rotate(' + currentRotate + 'deg)';
+                    el.style.transform = `translate(-50%, -50%) rotate(${currentRotate}deg)`;
                 }
 
                 function onUp() {
                     document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
                     document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onUp);
+                    el.style.touchAction = 'auto';
                     saveState();
                 }
 
