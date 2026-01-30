@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>أستوديو Despro</title>
     
+    <!-- تحقق سريع من الجلسة - سطر واحد فقط -->
+    <script>try{if(JSON.parse(localStorage.getItem('despro_session')))document.documentElement.classList.add('logged-in');}catch(e){}</script>
+    <style>.logged-in #studio-default-display{display:none!important}.logged-in #studio-name-display{display:block!important}</style>
+    
     <!-- مكتبات التنسيق والخطوط -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -30,27 +34,6 @@
     <script>
         // إعداد PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-    </script>
-    
-    <!-- التحقق السريع من الجلسة - بدون document.write -->
-    <script>
-    (function(){
-        var style = document.createElement('style');
-        try {
-            var s = JSON.parse(localStorage.getItem('despro_session'));
-            if (s && s.name && s.expiryDate) {
-                var today = new Date(); today.setHours(0,0,0,0);
-                var d = s.expiryDate.trim();
-                var exp = d.match(/^\d{2}-\d{2}-\d{4}$/) ? new Date(d.split('-').reverse().join('-')) : new Date(d);
-                exp.setHours(0,0,0,0);
-                if (exp >= today) {
-                    style.textContent = '#studio-default-display{display:none!important}#studio-name-display{display:block!important}';
-                    window._userName = s.name;
-                }
-            }
-        } catch(e) {}
-        document.head.appendChild(style);
-    })();
     </script>
 
     <!-- Stylesheet خارجي -->
@@ -550,7 +533,6 @@
                                     <i class="fas fa-palette text-white" style="font-size: 14px;"></i>
                                 </div>
                                 <span id="studio-name-text" style="font-size: 24px; font-weight: bold; color: #1e293b;">أستوديو</span>
-                                <script>if(window._userName)document.getElementById('studio-name-text').textContent='أستوديو '+window._userName;</script>
                                 <span style="margin-right: 4px;">✨</span>
                             </div>
                         </div>
