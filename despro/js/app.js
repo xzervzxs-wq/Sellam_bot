@@ -4511,20 +4511,22 @@
 
         function updateStudioName(name) {
             document.title = `أستوديو ${name} | Studio`;
+            
+            // إخفاء الستايل الافتراضي وإظهار اسم المشترك
+            const studioDefaultDisplay = document.getElementById('studio-default-display');
             const studioNameDisplay = document.getElementById('studio-name-display');
-            const studioLogoDisplay = document.getElementById('studio-logo-display');
+            const studioNameText = document.getElementById('studio-name-text');
+            
+            if (studioDefaultDisplay) {
+                studioDefaultDisplay.style.display = 'none';
+            }
             if (studioNameDisplay) {
-                const nameText = studioNameDisplay.querySelector('#studio-name-text'); if(nameText) nameText.textContent = `أستوديو ${name}`;
-                studioNameDisplay.classList.remove('hidden');
                 studioNameDisplay.style.display = 'block';
             }
-            if (studioLogoDisplay) {
-                studioLogoDisplay.classList.add('hidden');
-                studioLogoDisplay.style.display = 'none';
+            if (studioNameText) {
+                studioNameText.textContent = `أستوديو ${name}`;
             }
         }
-
-        function showWelcomeNotification(name) {
             console.log(`مرحباً بك في أستوديو ${name}`);
         }
 
@@ -6899,7 +6901,7 @@ function checkSession() {
 
 // دالة إظهار الشعار لغير المشتركين
 function showLogoForGuests() {
-    const studioLogo = document.getElementById('studio-logo-display');
+    const studioLogo = document.getElementById('studio-default-display');
     const studioName = document.getElementById('studio-name-display');
     if(studioLogo) {
         studioLogo.style.display = 'block';
@@ -6939,7 +6941,7 @@ function updateFooterForUser(name) {
         const titleText = studioTitle.querySelector('#studio-name-text'); if(titleText) titleText.textContent = `أستوديو ${name}`;
         studioTitle.classList.remove("hidden");
         studioTitle.style.display = "block";
-        const studioLogo = document.getElementById("studio-logo-display");
+        const studioLogo = document.getElementById("studio-default-display");
         if(studioLogo) { studioLogo.style.display = "none"; studioLogo.classList.add("hidden"); }
     }
 }
