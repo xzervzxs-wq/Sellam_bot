@@ -1090,15 +1090,6 @@
                 <i class="fas fa-edit text-[8px]"></i> تحرير
             </button>
             <div class="w-px h-4 bg-[#e2e8f0]"></div>
-            
-            <!-- Partial Color Hint Tooltip Wrapper -->
-            <div class="relative group flex items-center gap-1">
-                <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">لون النص:</span>
-                <input type="color" id="top-text-color" value="#1e293b" onchange="applyTextColor(this.value)" oninput="applyTextColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#cbd5e1] bg-transparent" title="لون النص (حدد جزء لتلوينه)">
-                <!-- Tooltip -->
-                <span class="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-[8px] px-2 py-1 rounded pointer-events-none whitespace-nowrap z-50">ظلل نصاً لتلوينه منفرداً</span>
-            </div>
-
             <div class="w-px h-4 bg-[#e2e8f0]"></div>
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
             <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
