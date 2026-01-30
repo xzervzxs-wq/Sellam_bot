@@ -3941,13 +3941,18 @@
                 // التحقق من مقبض التحريك
                 const isMoveHandle = e.target.classList.contains('move-handle') || e.target.closest('.move-handle');
                 
-                // Content editable check
-                if (!isMoveHandle) {
-                    if(e.target.isContentEditable || e.target.closest('.user-text')) {
+                // === إصلاح: النصوص - إذا محدد يسمح بالسحب، إذا غير محدد يختاره فقط ===
+                const isTextContent = e.target.isContentEditable || e.target.closest('.user-text');
+                const isTextLayer = el.classList.contains('text-layer');
+                
+                if (!isMoveHandle && isTextContent) {
+                    // إذا النص غير محدد - نختاره فقط
+                    if (!isSelected) {
                         selectEl(el);
-                        if (isTouch) e.target.focus();
                         return;
                     }
+                    // إذا النص محدد - نسمح بالسحب (لا نعمل return)
+                    // المستخدم يحتاج ضغطة طويلة أو double tap للتعديل
                 }
 
                 const startX = isTouch ? e.touches[0].clientX : e.clientX;
