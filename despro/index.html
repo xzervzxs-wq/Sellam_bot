@@ -1230,6 +1230,32 @@
 
         <!-- إعدادات الإطار - تم نقلها للشريط العلوي -->
         
+        <!-- قسم تحرير النص المباشر -->
+        <div id="edit-text-section" class="hidden px-2 py-1">
+            <button onclick="toggleTextEditor()" class="w-full flex items-center justify-between px-2 py-1.5 rounded bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-bold hover:from-indigo-600 hover:to-purple-600 transition shadow-sm">
+                <span class="flex items-center gap-1.5">
+                    <i class="fas fa-edit text-[9px]"></i>
+                    تحرير النص
+                </span>
+                <i id="edit-text-arrow" class="fas fa-chevron-down text-[8px] transition-transform"></i>
+            </button>
+            <div id="text-editor-panel" class="hidden mt-2 p-2 bg-slate-50 rounded border border-slate-200">
+                <textarea id="direct-text-editor" 
+                    class="w-full min-h-[80px] p-2 border border-slate-300 rounded text-[12px] font-medium text-slate-800 resize-y outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 transition"
+                    placeholder="اكتب النص هنا..."
+                    oninput="updateTextFromEditor(this.value)"
+                    dir="rtl"></textarea>
+                <div class="flex items-center justify-between mt-2 gap-2">
+                    <button onclick="applyTextFromEditor()" class="flex-1 px-2 py-1 bg-indigo-500 text-white text-[9px] font-bold rounded hover:bg-indigo-600 transition">
+                        <i class="fas fa-check text-[8px] ml-1"></i> تطبيق
+                    </button>
+                    <button onclick="closeTextEditor()" class="px-2 py-1 bg-slate-200 text-slate-700 text-[9px] font-bold rounded hover:bg-slate-300 transition">
+                        إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+        
     </div>
 
     <!-- زر للإغلاق اليدوي للنافذة العائمة - تمت إزالته لدمجه في النافذة -->
