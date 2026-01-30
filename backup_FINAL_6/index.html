@@ -511,8 +511,17 @@
             <div class="flex items-center justify-center border-b border-[#e2e8f0] pb-3">
                 <div class="text-center">
                     <div style="display: inline-block;">
-                        <!-- الشعار - يظهر لغير المشتركين فقط - مخفي افتراضياً حتى يتم التحقق -->
-                        <img id="studio-logo-display" src="logo.png" alt="Despro Logo" style="width: 100%; max-width: 280px; height: auto; display: none;">
+                        <!-- الشعار القديم - تم استبداله بالستايل الجديد -->
+                        <!-- اسم الاستوديو - يظهر لغير المشتركين (افتراضي) -->
+                        <div id="studio-default-display" style="display: block; white-space: nowrap;">
+                            <div style="display: inline-flex; align-items: center; gap: 8px;">
+                                <div style="width: 32px; height: 32px; background: #6366f1; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-palette text-white" style="font-size: 14px;"></i>
+                                </div>
+                                <span style="font-size: 24px; font-weight: bold; color: #1e293b;">استوديو المصمم</span>
+                                <span style="margin-right: 4px;">✨</span>
+                            </div>
+                        </div>
                         <!-- اسم العضو مع الأيقونة - يظهر للمشتركين فقط -->
                         <div id="studio-name-display" style="display: none; white-space: nowrap;">
                             <div style="display: inline-flex; align-items: center; gap: 8px;">

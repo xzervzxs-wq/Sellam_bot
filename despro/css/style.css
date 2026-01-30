@@ -435,6 +435,8 @@
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             padding: 50px; position: relative; /* increased padding for rulers */
+            touch-action: auto; /* السماح بالتمرير في منطقة العمل */
+            -webkit-overflow-scrolling: touch; /* تمرير سلس على iOS */
         }
 
         /* حاوي البطاقة والمسطرة */
@@ -574,7 +576,7 @@
         .draggable-el.selected { border: 1px dashed var(--primary-color); z-index: 100; }
         .draggable-el.selected.is-locked { border-color: #ef4444; border-style: dotted; }
         
-        .handle { position: absolute; background: white; border: 2.5px solid var(--primary-color); width: 26px; height: 26px; border-radius: 50%; z-index: 101; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .handle { position: absolute; background: white; border: 2.5px solid var(--primary-color); width: 26px; height: 26px; border-radius: 50%; z-index: 101; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3); touch-action: none; }
         .draggable-el.selected .handle { display: block; }
         
         /* اتجاهات المقابض */
@@ -591,14 +593,14 @@
         .text-layer .resize-e { right: -5px; width: 8px; height: 30%; min-height: 20px; max-height: 60px; border-radius: 4px; }
         .text-layer .resize-w { left: -5px; width: 8px; height: 30%; min-height: 20px; max-height: 60px; border-radius: 4px; }
         
-        .control-btn { position: absolute; width: 24px; height: 24px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 102; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
+        .control-btn { position: absolute; width: 24px; height: 24px; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 102; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; touch-action: manipulation; }
         .control-btn:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .delete-btn { top: -35px; left: 0px; background: #ef4444; }
         .duplicate-btn { top: -35px; left: 22px; background: #3b82f6; }
         .rotate-btn { top: -35px; left: 44px; background: #8b5cf6; }
         .layer-up-btn { top: -35px; left: 66px; background: #64748b; }
         .layer-down-btn { top: -35px; left: 88px; background: #64748b; }
-        .move-handle { position: absolute; top: 50%; left: 50% !important; right: auto !important; transform: translate(-50%, -50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 36px; height: 24px; background: var(--primary-color); border-radius: 6px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 11px; }
+        .move-handle { position: absolute; top: 50%; left: 50% !important; right: auto !important; transform: translate(-50%, -50%) scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; width: 36px; height: 24px; background: var(--primary-color); border-radius: 6px; cursor: move; display: none; align-items: center; justify-content: center; z-index: 102; color: white; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: transform 0.2s; font-size: 11px; touch-action: none; }
         .move-handle:hover { transform: scale(max(0.55, min(1.65, calc(1.1 / var(--card-zoom, 1))))); }
         .handle { transform: scale(max(0.5, min(1.5, calc(1 / var(--card-zoom, 1))))); transform-origin: center center; }
 
@@ -943,7 +945,6 @@
         .locked-item:hover::after {
             opacity: 0.9;
             color: #4f46e5;
-        }
             background: rgba(99, 102, 241, 0.15);
         }
         /* تنسيق الخيارات المعطلة في الـ Select */
