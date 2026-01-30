@@ -1086,7 +1086,7 @@
             <button id="btn-toggle-gradient" onclick="toggleGradientMode()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
                 <i class="fas fa-fill-drip text-[8px]"></i> تدرج
             </button>
-            <button id="btn-edit-text" onclick="toggleTextEditor()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
+            <button id="btn-edit-text" onclick="window.toggleTextEditor()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
                 <i class="fas fa-edit text-[8px]"></i> تحرير
             </button>
             <div class="w-px h-4 bg-[#e2e8f0]"></div>
@@ -1103,6 +1103,14 @@
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
             <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
             <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
+        </div>
+        <!-- لوحة تحرير النص -->
+        <div id="text-editor-panel" style="display:none;" class="flex-col gap-1 p-2 bg-slate-50 rounded border border-slate-200 mx-2 mt-1">
+            <textarea id="direct-text-editor" class="w-full p-1 border border-slate-300 rounded text-[10px] resize-none" rows="2" dir="rtl" placeholder="النص..."></textarea>
+            <div class="flex gap-1">
+                <button onclick="window.applyTextFromEditor()" class="flex-1 px-2 py-1 bg-indigo-500 text-white text-[9px] rounded">تطبيق</button>
+                <button onclick="window.closeTextEditor()" class="px-2 py-1 bg-slate-200 text-[9px] rounded">×</button>
+            </div>
         </div>
 
         <!-- الصف الثاني: نوع الخط + قائمة الخطوط + نجمة المفضلة + B + المحاذاة -->
@@ -1231,14 +1239,7 @@
             </div>
         </div>
 
-        <!-- لوحة تحرير النص -->
-        <div id="text-editor-panel" style="display:none;" class="flex-col gap-1 p-2 bg-slate-50 rounded border border-slate-200 mx-2 mt-1">
-            <textarea id="direct-text-editor" class="w-full p-1 border border-slate-300 rounded text-[10px] resize-none" rows="2" dir="rtl" placeholder="النص..."></textarea>
-            <div class="flex gap-1">
-                <button onclick="window.applyTextFromEditor()" class="flex-1 px-2 py-1 bg-indigo-500 text-white text-[9px] rounded">تطبيق</button>
-                <button onclick="window.closeTextEditor()" class="px-2 py-1 bg-slate-200 text-[9px] rounded">×</button>
-            </div>
-        </div>
+        <!-- (تم حذف لوحة تحرير النص من هنا لنقلها) -->
     </div>
 
     <!-- زر للإغلاق اليدوي للنافذة العائمة - تمت إزالته لدمجه في النافذة -->
