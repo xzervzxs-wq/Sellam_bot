@@ -1536,20 +1536,21 @@
                 ctx.putImageData(imageData, 0, 0);
             }
             
-            // علامة مائية لغير البريميوم
+            // علامة مائية واضحة لغير البريميوم
             if (!isPremium) {
                 ctx.save();
-                ctx.globalAlpha = 0.15;
-                ctx.fillStyle = color || '#6366f1';
-                ctx.font = 'bold 35px Arial';
+                ctx.globalAlpha = 0.35; // أعلى شفافية لتكون واضحة
+                ctx.fillStyle = '#ff6b6b'; // لون أحمر واضح
+                ctx.font = 'bold 50px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 ctx.translate(canvas.width / 2, canvas.height / 2);
-                ctx.rotate(-30 * Math.PI / 180);
+                ctx.rotate(-35 * Math.PI / 180);
                 
-                for (let y = -200; y < 200; y += 60) {
-                    for (let x = -250; x < 250; x += 150) {
-                        ctx.fillText('Despro', x, y);
-                    }
-                }
+                // نص كبير في المنتصف
+                ctx.fillText('Despro', 0, 0);
+                ctx.fillText('Despro', -180, -120);
+                ctx.fillText('Despro', 180, 120);
                 ctx.restore();
             }
             
@@ -1563,15 +1564,40 @@
         const card = document.getElementById('card');
         
         // حساب موقع المنتصف
-        const cardRect = card.getBoundingClientRect();
         const qrSize = 280; // حجم كبير
         const centerX = (card.offsetWidth - qrSize) / 2;
         const centerY = (card.offsetHeight - qrSize) / 2;
         
+        // حساب أعلى z-index
+        const layers = card.querySelectorAll('.draggable-el:not(.bg-image)');
+        let maxZ = 10;
+        layers.forEach(layer => {
+            const z = parseInt(layer.style.zIndex) || 10;
+            if (z > maxZ) maxZ = z;
+        });
+        
         const wrapper = document.createElement('div');
         wrapper.className = 'draggable-el image-layer';
-        wrapper.style.cssText = `position:absolute; left:${centerX}px; top:${centerY}px; width:${qrSize}px; height:${qrSize}px; cursor:move; z-index:10;`;
+        wrapper.style.cssText = `position:absolute; left:${centerX}px; top:${centerY}px; width:${qrSize}px; height:${qrSize}px; cursor:move; z-index:${maxZ + 1};`;
         wrapper.setAttribute('data-colorable', 'true'); // قابل للتلوين
+        
+        // إضافة المقابض والأزرار مثل الصور العادية
+        wrapper.innerHTML = `
+            <div class="control-btn delete-btn" onclick="removeEl(this.parentNode)" ontouchend="removeEl(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-times"></i></div>
+            <div class="control-btn duplicate-btn" onclick="duplicateElement(this.parentNode)" ontouchend="duplicateElement(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-clone"></i></div>
+            <div class="control-btn rotate-btn" onclick="rotateElement(this.parentNode)" ontouchend="rotateElement(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-redo"></i></div>
+            <div class="control-btn layer-up-btn" onclick="bringToFront(this.parentNode)" ontouchend="bringToFront(this.parentNode); event.preventDefault(); event.stopPropagation();" title="للأمام"><i class="fas fa-arrow-up"></i></div>
+            <div class="control-btn layer-down-btn" onclick="sendToBack(this.parentNode)" ontouchend="sendToBack(this.parentNode); event.preventDefault(); event.stopPropagation();" title="للخلف"><i class="fas fa-arrow-down"></i></div>
+            <div class="move-handle" title="اسحب للتحريك"><i class="fas fa-arrows-alt"></i></div>
+            <div class="handle resize-nw"></div>
+            <div class="handle resize-ne"></div>
+            <div class="handle resize-sw"></div>
+            <div class="handle resize-se"></div>
+            <div class="handle resize-n"></div>
+            <div class="handle resize-e"></div>
+            <div class="handle resize-s"></div>
+            <div class="handle resize-w"></div>
+        `;
         
         const contentWrapper = document.createElement('div');
         contentWrapper.className = 'content-wrapper';
