@@ -6382,7 +6382,7 @@
         
         // فتح/إغلاق لوحة محرر النص
         window.toggleTextEditor = function() {
-            alert("زر التحرير يعمل!");
+            
             const panel = document.getElementById('text-editor-panel');
             const editor = document.getElementById('direct-text-editor');
             const btn = document.getElementById('btn-edit-text');
@@ -6439,7 +6439,7 @@
             }
             
             // إغلاق المحرر
-            closeTextEditor();
+            window.closeTextEditor();
         }
         
         // إغلاق محرر النص
