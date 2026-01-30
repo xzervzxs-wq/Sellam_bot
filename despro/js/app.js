@@ -2139,7 +2139,7 @@
                 <div class="control-btn rotate-btn" onclick="rotateElement(this.parentNode)" ontouchend="rotateElement(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-redo"></i></div>
                 <div class="control-btn layer-up-btn" onclick="bringToFront(this.parentNode)" ontouchend="bringToFront(this.parentNode); event.preventDefault(); event.stopPropagation();" title="للأمام"><i class="fas fa-arrow-up"></i></div>
                 <div class="control-btn layer-down-btn" onclick="sendToBack(this.parentNode)" ontouchend="sendToBack(this.parentNode); event.preventDefault(); event.stopPropagation();" title="للخلف"><i class="fas fa-arrow-down"></i></div>
-                <div class="move-handle" title="اسحب للتحريك"><i class="fas fa-arrows-alt"></i></div>
+                <div class="move-handle" style="top: 50%; left: 50%; transform: translate(-50%, -50%);" title="اسحب للتحريك"><i class="fas fa-arrows-alt"></i></div>
                 <div class="handle resize-nw"></div>
                 <div class="handle resize-ne"></div>
                 <div class="handle resize-sw"></div>
