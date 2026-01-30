@@ -6382,7 +6382,7 @@
         
         // فتح/إغلاق لوحة محرر النص
         function toggleTextEditor() {
-            console.log("toggleTextEditor called");
+            alert("زر التحرير يعمل!");
             const panel = document.getElementById('text-editor-panel');
             const editor = document.getElementById('direct-text-editor');
             const btn = document.getElementById('btn-edit-text');
