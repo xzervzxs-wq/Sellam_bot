@@ -1328,66 +1328,120 @@
     </footer>
 
     <!-- نافذة QR Code -->
-    <div id="qr-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 100001; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
-        <div class="bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-indigo-100 p-4 max-w-[300px] mx-4 text-center transform animate-bounce-in relative">
-            <div class="flex items-center gap-2 justify-center mb-3 border-b border-gray-100 pb-2">
-                <i class="fas fa-qrcode text-xl text-indigo-500"></i>
-                <h3 class="text-sm font-bold text-slate-800">توليد QR Code</h3>
-                <span id="qr-premium-badge" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">⭐ PRO</span>
+    <!-- النافذة الاحترافية لمولد الباركود -->
+    <div id="qrModal" class="fixed inset-0 z-[100002] hidden items-center justify-center bg-black/40 backdrop-blur-md p-4 text-right">
+        <div class="bg-white rounded-[2.2rem] p-6 w-full max-w-[380px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] qr-modal-animate relative border border-gray-100">
+            
+            <!-- زر الإغلاق -->
+            <button onclick="this.closest('#qrModal').style.display='none'" class="absolute left-5 top-5 text-gray-300 hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+
+            <!-- الهيدر -->
+            <div class="mb-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-black text-gray-800 tracking-tight">مولد الباركود الذكي</h3>
+                    <span id="qr-pro-badge" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] px-2 py-0.5 rounded-full font-bold shadow">⭐ PRO</span>
+                </div>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">أدخل الرابط واختر لونك المفضل</p>
             </div>
             
-            <input type="text" id="qr-input" placeholder="أدخل الرابط أو النص..." class="w-full p-2 border border-slate-300 rounded-lg text-[11px] outline-none focus:border-indigo-500 mb-3" dir="rtl">
-            
-            <div id="qr-preview" class="hidden mb-3 flex justify-center p-2 bg-white rounded-lg border">
-                <div id="qr-output"></div>
+            <div class="space-y-4">
+                <!-- حقل الإدخال ولون الباركود -->
+                <div class="flex items-center gap-2">
+                    <div class="flex-1">
+                        <input type="text" id="qrInput" placeholder="ضع الرابط هنا..." 
+                               class="w-full border-2 border-gray-50 rounded-2xl px-4 py-3 text-xs outline-none focus:border-purple-400 bg-gray-50/50 transition-all font-bold text-left" dir="ltr">
+                    </div>
+                    <div class="flex flex-col items-center gap-1 shrink-0">
+                        <input type="color" id="qrColorPicker" value="#581c87" 
+                               class="w-10 h-10 cursor-pointer bg-transparent border-none rounded-full">
+                        <span class="text-[7px] font-black text-gray-400 uppercase">Color</span>
+                    </div>
+                </div>
+                
+                <!-- أيقونات المنصات -->
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setFastLink('https://wa.me/966')" class="bg-green-50 text-green-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-green-100 transition-all border border-green-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">WhatsApp</span>
+                    </button>
+                    <button onclick="setFastLink('https://instagram.com/')" class="bg-pink-50 text-pink-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-pink-100 transition-all border border-pink-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">Instagram</span>
+                    </button>
+                    <button onclick="setFastLink('https://www.tiktok.com/@')" class="bg-slate-50 text-slate-800 p-2.5 rounded-xl flex flex-col items-center hover:bg-slate-200 transition-all border border-slate-100 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">TikTok</span>
+                    </button>
+                    <button onclick="setFastLink('https://')" class="bg-blue-50 text-blue-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-blue-100 transition-all border border-blue-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">Website</span>
+                    </button>
+                </div>
+
+                <!-- منطقة المعاينة والزر -->
+                <div class="flex items-center gap-4 pt-4 border-t border-gray-50 mt-2">
+                    <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-100 flex-shrink-0">
+                        <div id="qrPreviewArea">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[9px] text-gray-400 font-bold leading-tight mb-3">اختر لون الباركود من الدائرة العلوية ليناسب تصميمك.</p>
+                        <button onclick="addQRToDesign()" class="w-full bg-purple-600 text-white py-3.5 rounded-xl font-black text-xs shadow-lg shadow-purple-100 hover:bg-purple-700 active:scale-95 transition-all">إضافة للتصميم</button>
+                    </div>
+                </div>
             </div>
             
-            <div class="flex gap-2">
-                <button onclick="generateQR()" class="flex-1 bg-[#6366f1] text-white hover:bg-[#4f46e5] px-4 py-2 rounded-lg text-xs font-bold transition shadow-md">
-                    <i class="fas fa-magic ml-1"></i> توليد
-                </button>
-                <button onclick="closeQRModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold transition">
-                    إغلاق
-                </button>
-            </div>
+            <!-- حاوية مؤقتة -->
+            <div id="hiddenBuffer" class="hidden"></div>
         </div>
     </div>
+    
+    <style>
+        .qr-modal-animate {
+            animation: qrIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes qrIn {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+    </style>
 
-    <script src="js/app.js?v=20260130_04"></script>
+    <script src="js/app.js?v=20260130_05"></script>
     <script>
     // QR Code Functions
-    let qrCodeInstance = null;
-    
     function openQRModal() {
-        const modal = document.getElementById('qr-modal');
-        const badge = document.getElementById('qr-premium-badge');
-        const preview = document.getElementById('qr-preview');
-        const qrOutput = document.getElementById('qr-output');
+        const modal = document.getElementById('qrModal');
+        const badge = document.getElementById('qr-pro-badge');
         
-        // إظهار شارة PRO لغير المشتركين
+        // إظهار/إخفاء شارة PRO
         const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
-        if (!isPremium) {
-            badge.classList.remove('hidden');
-        } else {
+        if (isPremium) {
             badge.classList.add('hidden');
+        } else {
+            badge.classList.remove('hidden');
         }
         
         // تنظيف
-        preview.classList.add('hidden');
-        qrOutput.innerHTML = '';
-        document.getElementById('qr-input').value = '';
-        qrCodeInstance = null;
+        document.getElementById('qrInput').value = '';
+        document.getElementById('qrPreviewArea').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>';
         
         modal.style.display = 'flex';
     }
     
-    function closeQRModal() {
-        document.getElementById('qr-modal').style.display = 'none';
+    function setFastLink(url) {
+        const input = document.getElementById('qrInput');
+        input.value = url;
+        input.focus();
     }
-    
-    function generateQR() {
-        const input = document.getElementById('qr-input').value.trim();
-        if (!input) {
+
+    function addQRToDesign() {
+        const val = document.getElementById('qrInput').value.trim();
+        if (!val) {
             if (typeof showInfoModal === 'function') {
                 showInfoModal('الرجاء إدخال رابط أو نص', 'تنبيه', '⚠️');
             } else {
@@ -1396,45 +1450,40 @@
             return;
         }
         
-        const preview = document.getElementById('qr-preview');
-        const qrOutput = document.getElementById('qr-output');
+        const selectedColor = document.getElementById('qrColorPicker').value;
+        const buffer = document.getElementById('hiddenBuffer');
+        buffer.innerHTML = "";
         
-        try {
-            // تنظيف القديم
-            qrOutput.innerHTML = '';
+        // توليد الباركود باللون المختار
+        new QRCode(buffer, {
+            text: val,
+            width: 500,
+            height: 500,
+            colorDark: selectedColor, 
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        setTimeout(() => {
+            const canvas = buffer.querySelector('canvas');
+            const imgTag = buffer.querySelector('img');
+            const finalSrc = canvas ? canvas.toDataURL("image/png") : (imgTag ? imgTag.src : "");
             
-            // توليد QR جديد
-            qrCodeInstance = new QRCode(qrOutput, {
-                text: input,
-                width: 150,
-                height: 150,
-                colorDark: '#1e293b',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            preview.classList.remove('hidden');
-            
-            // انتظار توليد الصورة ثم إضافتها للتصميم
-            setTimeout(function() {
-                const qrImg = qrOutput.querySelector('img');
-                if (qrImg && qrImg.src) {
-                    addQRWithWatermark(qrImg.src);
-                    closeQRModal();
-                }
-            }, 300);
-            
-        } catch (error) {
-            console.error('QR Error:', error);
-            if (typeof showInfoModal === 'function') {
-                showInfoModal('حدث خطأ في توليد الـ QR', 'خطأ', '❌');
-            } else {
-                alert('حدث خطأ في توليد الـ QR');
+            if (finalSrc) {
+                // تحديث المعاينة
+                document.getElementById('qrPreviewArea').innerHTML = `<img src="${finalSrc}" class="w-full h-full object-contain p-1">`;
+                
+                // إضافة للتصميم مع علامة مائية لغير البريميوم
+                addQRWithWatermark(finalSrc, selectedColor);
+                
+                setTimeout(() => {
+                    document.getElementById('qrModal').style.display = 'none';
+                }, 500);
             }
-        }
+        }, 300);
     }
     
-    function addQRWithWatermark(qrSrc) {
+    function addQRWithWatermark(qrSrc, color) {
         const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
         
         const img = new Image();
@@ -1443,9 +1492,9 @@
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            const qrSize = 150;
-            const padding = 10;
-            const watermarkHeight = isPremium ? 0 : 25;
+            const qrSize = 500;
+            const padding = 20;
+            const watermarkHeight = isPremium ? 0 : 40;
             
             canvas.width = qrSize + (padding * 2);
             canvas.height = qrSize + (padding * 2) + watermarkHeight;
@@ -1461,14 +1510,14 @@
             if (!isPremium) {
                 // نص مكرر مائل شفاف
                 ctx.save();
-                ctx.globalAlpha = 0.12;
-                ctx.fillStyle = '#6366f1';
-                ctx.font = 'bold 12px Arial';
+                ctx.globalAlpha = 0.10;
+                ctx.fillStyle = color || '#6366f1';
+                ctx.font = 'bold 40px Arial';
                 ctx.translate(canvas.width / 2, qrSize / 2 + padding);
                 ctx.rotate(-30 * Math.PI / 180);
                 
-                for (let y = -60; y < 60; y += 20) {
-                    for (let x = -80; x < 80; x += 60) {
+                for (let y = -250; y < 250; y += 70) {
+                    for (let x = -300; x < 300; x += 180) {
                         ctx.fillText('Despro', x, y);
                     }
                 }
@@ -1476,9 +1525,9 @@
                 
                 // نص تحت
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = 'bold 8px Arial';
+                ctx.font = 'bold 18px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('صُمم بواسطة Despro', canvas.width / 2, canvas.height - 8);
+                ctx.fillText('صُمم بواسطة Despro', canvas.width / 2, canvas.height - 12);
             }
             
             // إضافة للتصميم
@@ -1492,7 +1541,7 @@
         
         const wrapper = document.createElement('div');
         wrapper.className = 'draggable-el image-layer';
-        wrapper.style.cssText = 'position:absolute; left:50px; top:50px; width:120px; height:auto; cursor:move; z-index:10;';
+        wrapper.style.cssText = 'position:absolute; left:50px; top:50px; width:150px; height:auto; cursor:move; z-index:10;';
         wrapper.setAttribute('data-colorable', 'false');
         
         const contentWrapper = document.createElement('div');
