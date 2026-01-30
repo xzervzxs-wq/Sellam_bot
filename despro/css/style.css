@@ -1128,3 +1128,366 @@
             color: #e2e8f0 !important;
         }
 /* Updated: Thu Jan 29 18:52:39 UTC 2026 */
+
+/* ============================================ */
+/* === تصميم الجوال - Mobile Layout === */
+/* ============================================ */
+
+@media (max-width: 768px) {
+    /* إخفاء العناصر على الجوال */
+    .mobile-hidden {
+        display: none !important;
+    }
+    
+    /* الحاوي الرئيسي - بدون padding */
+    .max-w-7xl {
+        padding: 0 !important;
+        gap: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+    }
+    
+    /* إخفاء اللوحة الجانبية */
+    .lg\:col-span-4 {
+        display: none !important;
+    }
+    
+    /* منطقة العمل تأخذ كل الشاشة */
+    .lg\:col-span-8 {
+        flex: 1 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: calc(100vh - 120px) !important;
+        height: calc(100dvh - 120px) !important;
+    }
+    
+    /* منطقة المعاينة */
+    .preview-area {
+        flex: 1 !important;
+        border-radius: 0 !important;
+        padding: 10px !important;
+        min-height: auto !important;
+        border: none !important;
+    }
+    
+    /* شريط أدوات العنصر المحدد */
+    #style-panel {
+        position: fixed !important;
+        bottom: 70px !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-height: 50vh !important;
+        overflow-y: auto !important;
+        border-radius: 20px 20px 0 0 !important;
+        z-index: 1000 !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.3s ease !important;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
+    }
+    
+    #style-panel.mobile-show {
+        transform: translateY(0) !important;
+    }
+    
+    /* إخفاء style-panel افتراضياً على الجوال */
+    #style-panel:not(.mobile-show) {
+        display: none !important;
+    }
+}
+
+/* === Toolbar السفلي === */
+#mobile-toolbar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 9999;
+    padding: 8px 0;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 768px) {
+    #mobile-toolbar {
+        display: flex !important;
+        justify-content: space-around;
+        align-items: center;
+    }
+}
+
+.mobile-tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 12px;
+    min-width: 55px;
+}
+
+.mobile-tool-btn i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.mobile-tool-btn.active,
+.mobile-tool-btn:active {
+    color: #6366f1;
+    background: #f0f4ff;
+}
+
+/* === Bottom Sheet === */
+#mobile-sheet {
+    display: none;
+    position: fixed;
+    bottom: 65px;
+    left: 0;
+    right: 0;
+    max-height: 60vh;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    z-index: 9998;
+    overflow: hidden;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+#mobile-sheet.show {
+    display: block !important;
+    transform: translateY(0);
+}
+
+#mobile-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+#mobile-sheet-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+#mobile-sheet-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #e2e8f0;
+    border-radius: 50%;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#mobile-sheet-content {
+    padding: 16px;
+    overflow-y: auto;
+    max-height: calc(60vh - 50px);
+}
+
+/* === الهيدر على الجوال === */
+#mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    z-index: 9999;
+    padding: 0 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    #mobile-header {
+        display: flex !important;
+    }
+    
+    /* إضافة مسافة للمحتوى */
+    body {
+        padding-top: 50px !important;
+        padding-bottom: 65px !important;
+    }
+}
+
+#mobile-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+#mobile-header .logo i {
+    color: #6366f1;
+}
+
+#mobile-header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+#mobile-header-actions button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 10px;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+#mobile-header-actions button:active {
+    background: #6366f1;
+    color: white;
+}
+
+/* === Overlay للخلفية === */
+#mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 9997;
+}
+
+#mobile-overlay.show {
+    display: block;
+}
+
+/* Dark Mode للجوال */
+:root.dark-mode #mobile-toolbar {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+:root.dark-mode .mobile-tool-btn {
+    color: #94a3b8;
+}
+
+:root.dark-mode .mobile-tool-btn.active {
+    background: #334155;
+    color: #818cf8;
+}
+
+:root.dark-mode #mobile-sheet {
+    background: #1e293b;
+}
+
+:root.dark-mode #mobile-sheet-header {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+:root.dark-mode #mobile-sheet-header h3 {
+    color: #f1f5f9;
+}
+
+:root.dark-mode #mobile-header {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+:root.dark-mode #mobile-header .logo {
+    color: #f1f5f9;
+}
+
+/* ============================================ */
+/* === Utility Classes for Mobile Sheets === */
+/* ============================================ */
+
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.flex-1 { flex: 1; }
+.w-full { width: 100%; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.ml-2 { margin-left: 0.5rem; }
+.text-center { text-align: center; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.font-bold { font-weight: 700; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.border { border-width: 1px; }
+.border-2 { border-width: 2px; }
+.border-dashed { border-style: dashed; }
+.outline-none { outline: none; }
+.resize-none { resize: none; }
+.cursor-pointer { cursor: pointer; }
+.hidden { display: none; }
+.overflow-y-auto { overflow-y: auto; }
+.max-h-\[40vh\] { max-height: 40vh; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.\!text-\[10px\], .text-\[10px\] { font-size: 10px; }
+
+/* Colors */
+.bg-white { background-color: white; }
+.text-white { background-color: inherit; color: white; }
+.bg-\[\#f8fafc\] { background-color: #f8fafc; }
+.bg-\[\#6366f1\] { background-color: #6366f1; }
+.bg-\[\#10b981\] { background-color: #10b981; }
+.bg-\[\#f59e0b\] { background-color: #f59e0b; }
+.bg-\[\#8b5cf6\] { background-color: #8b5cf6; }
+.text-\[\#1e293b\] { color: #1e293b; }
+.text-\[\#64748b\] { color: #64748b; }
+.text-\[\#6366f1\] { color: #6366f1; }
+.text-\[\#10b981\] { color: #10b981; }
+.text-\[\#f59e0b\] { color: #f59e0b; }
+.text-\[\#8b5cf6\] { color: #8b5cf6; }
+.border-\[\#cbd5e1\] { border-color: #cbd5e1; }
+.border-\[\#6366f1\] { border-color: #6366f1; }
+.border-\[\#10b981\] { border-color: #10b981; }
+.focus\:border-\[\#6366f1\]:focus { border-color: #6366f1; }
