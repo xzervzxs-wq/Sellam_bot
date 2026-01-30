@@ -7371,3 +7371,8 @@ function updateLayersList() {
             saveState();
         }
         // ==================== End QR Code Functions ====================
+
+        // Make QR functions globally accessible
+        window.openQRModal = openQRModal;
+        window.closeQRModal = closeQRModal;
+        window.generateQR = generateQR;
