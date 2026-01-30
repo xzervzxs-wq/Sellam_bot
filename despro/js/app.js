@@ -6383,12 +6383,18 @@
         // فتح/إغلاق لوحة محرر النص
         function toggleTextEditor() {
             const panel = document.getElementById('text-editor-panel');
-            const arrow = document.getElementById('edit-text-arrow');
             const editor = document.getElementById('direct-text-editor');
+            const btn = document.getElementById('btn-edit-text');
             
             if (panel.classList.contains('hidden')) {
                 panel.classList.remove('hidden');
-                arrow.style.transform = 'rotate(180deg)';
+                panel.style.display = 'flex';
+                
+                // تغيير لون الزر للإشارة أنه مفعل
+                if (btn) {
+                    btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
+                    btn.classList.remove('bg-[#f8fafc]', 'text-[#334155]');
+                }
                 
                 // تعبئة المحرر بالنص الحالي
                 if (activeEl && activeEl.classList.contains('text-layer')) {
@@ -6401,10 +6407,15 @@
                 }
             } else {
                 panel.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
+                panel.style.display = 'none';
+                
+                // إعادة لون الزر الأصلي
+                if (btn) {
+                    btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
+                    btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
+                }
             }
         }
-        
         // تحديث النص فوراً أثناء الكتابة
         function updateTextFromEditor(value) {
             if (!activeEl || !activeEl.classList.contains('text-layer')) return;
@@ -6433,11 +6444,20 @@
         // إغلاق محرر النص
         function closeTextEditor() {
             const panel = document.getElementById('text-editor-panel');
-            const arrow = document.getElementById('edit-text-arrow');
+            const btn = document.getElementById('btn-edit-text');
             
-            if (panel) panel.classList.add('hidden');
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
+            if (panel) {
+                panel.classList.add('hidden');
+                panel.style.display = 'none';
+            }
+            
+            // إعادة لون الزر الأصلي
+            if (btn) {
+                btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
+                btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
+            }
         }
+
 
             const settings = document.getElementById('floating-grad-settings');
             const btn = document.getElementById('btn-toggle-gradient');
