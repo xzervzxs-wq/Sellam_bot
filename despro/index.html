@@ -84,6 +84,8 @@
             background-color: #334155 !important;
         }
     </style>
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body class="min-h-screen flex flex-col" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
 
@@ -1103,6 +1105,10 @@
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
             <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
             <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
+            <div class="w-px h-4 bg-[#e2e8f0]"></div>
+            <button id="btn-qr-code" onclick="openQRModal()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
+                <i class="fas fa-qrcode text-[9px]"></i> QR
+            </button>
         </div>
         <!-- لوحة تحرير النص -->
         <div id="text-editor-panel" style="display:none;" class="flex-col gap-1 p-2 bg-slate-50 rounded border border-slate-200 mx-2 mt-1">
@@ -1321,6 +1327,32 @@
             </div>
         </div>
     </footer>
+
+    <!-- نافذة QR Code -->
+    <div id="qr-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 100001; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+        <div class="bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-indigo-100 p-4 max-w-[300px] mx-4 text-center transform animate-bounce-in relative">
+            <div class="flex items-center gap-2 justify-center mb-3 border-b border-gray-100 pb-2">
+                <i class="fas fa-qrcode text-xl text-indigo-500"></i>
+                <h3 class="text-sm font-bold text-slate-800">توليد QR Code</h3>
+                <span id="qr-premium-badge" class="hidden bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">⭐ PRO</span>
+            </div>
+            
+            <input type="text" id="qr-input" placeholder="أدخل الرابط أو النص..." class="w-full p-2 border border-slate-300 rounded-lg text-[11px] outline-none focus:border-indigo-500 mb-3" dir="rtl">
+            
+            <div id="qr-preview" class="hidden mb-3 flex justify-center">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="generateQR()" class="flex-1 bg-[#6366f1] text-white hover:bg-[#4f46e5] px-4 py-2 rounded-lg text-xs font-bold transition shadow-md">
+                    <i class="fas fa-magic ml-1"></i> توليد
+                </button>
+                <button onclick="closeQRModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold transition">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="js/app.js?v=20260130_02"></script>
 </body>

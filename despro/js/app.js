@@ -7240,3 +7240,134 @@ function updateLayersList() {
  
 // Updated Fri Jan 30 20:09:08 UTC 2026
 /* Updated: Fri Jan 30 21:16:48 UTC 2026 */
+
+        // ==================== QR Code Functions ====================
+        function openQRModal() {
+            const modal = document.getElementById('qr-modal');
+            const badge = document.getElementById('qr-premium-badge');
+            const preview = document.getElementById('qr-preview');
+            
+            // إظهار شارة PRO لغير المشتركين
+            if (!isPremiumUser()) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            
+            // إخفاء المعاينة وتفريغ الحقل
+            preview.classList.add('hidden');
+            document.getElementById('qr-input').value = '';
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeQRModal() {
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+        
+        async function generateQR() {
+            const input = document.getElementById('qr-input').value.trim();
+            if (!input) {
+                showInfoModal('الرجاء إدخال رابط أو نص', 'تنبيه', '⚠️');
+                return;
+            }
+            
+            const canvas = document.getElementById('qr-canvas');
+            const preview = document.getElementById('qr-preview');
+            
+            try {
+                // توليد QR Code
+                await QRCode.toCanvas(canvas, input, {
+                    width: 150,
+                    margin: 2,
+                    color: {
+                        dark: '#1e293b',
+                        light: '#ffffff'
+                    }
+                });
+                
+                // إظهار المعاينة
+                preview.classList.remove('hidden');
+                
+                // إنشاء صورة نهائية
+                let finalCanvas = document.createElement('canvas');
+                let ctx = finalCanvas.getContext('2d');
+                
+                const qrSize = 150;
+                const padding = 10;
+                const watermarkHeight = isPremiumUser() ? 0 : 25;
+                
+                finalCanvas.width = qrSize + (padding * 2);
+                finalCanvas.height = qrSize + (padding * 2) + watermarkHeight;
+                
+                // خلفية بيضاء
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // رسم QR Code
+                ctx.drawImage(canvas, padding, padding);
+                
+                // إضافة علامة مائية لغير المشتركين
+                if (!isPremiumUser()) {
+                    // خلفية شفافة للعلامة المائية فوق الـ QR
+                    ctx.save();
+                    ctx.globalAlpha = 0.15;
+                    ctx.fillStyle = '#6366f1';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.translate(finalCanvas.width / 2, qrSize / 2 + padding);
+                    ctx.rotate(-30 * Math.PI / 180);
+                    
+                    // نص مكرر مائل
+                    for (let y = -80; y < 80; y += 25) {
+                        for (let x = -100; x < 100; x += 80) {
+                            ctx.fillText('Despro', x, y);
+                        }
+                    }
+                    ctx.restore();
+                    
+                    // نص تحت الـ QR
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = 'bold 9px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('صُمم بواسطة Despro', finalCanvas.width / 2, finalCanvas.height - 8);
+                }
+                
+                // تحويل إلى صورة وإضافتها للتصميم
+                const imgData = finalCanvas.toDataURL('image/png');
+                addQRToCanvas(imgData);
+                
+                // إغلاق النافذة
+                closeQRModal();
+                
+            } catch (error) {
+                console.error('QR Error:', error);
+                showInfoModal('حدث خطأ في توليد الـ QR', 'خطأ', '❌');
+            }
+        }
+        
+        function addQRToCanvas(imgData) {
+            const card = document.getElementById('card');
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'draggable-el image-layer';
+            wrapper.style.cssText = 'position:absolute; left:50px; top:50px; width:120px; height:auto; cursor:move; z-index:10;';
+            wrapper.setAttribute('data-colorable', 'false');
+            
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'content-wrapper';
+            contentWrapper.style.cssText = 'width:100%; height:100%; display:flex; align-items:center; justify-content:center;';
+            
+            const img = document.createElement('img');
+            img.src = imgData;
+            img.style.cssText = 'width:100%; height:auto; pointer-events:none; user-select:none;';
+            img.draggable = false;
+            
+            contentWrapper.appendChild(img);
+            wrapper.appendChild(contentWrapper);
+            card.appendChild(wrapper);
+            
+            // تحديد العنصر الجديد
+            selectEl(wrapper);
+            saveState();
+        }
+        // ==================== End QR Code Functions ====================
