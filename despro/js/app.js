@@ -6376,88 +6376,33 @@
         // دالة تحديث حالة واجهة التدرج بناءً على العنصر المحدد
         function updateGradientUIState(el) {
 
-        // ==========================================
-        //  وظائف محرر النص المباشر
-        // ==========================================
-        
-        // فتح/إغلاق لوحة محرر النص
+        // === وظائف تحرير النص ===
         window.toggleTextEditor = function() {
-            
-            const panel = document.getElementById('text-editor-panel');
-            const editor = document.getElementById('direct-text-editor');
-            const btn = document.getElementById('btn-edit-text');
-            
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                panel.style.display = 'flex';
-                
-                // تغيير لون الزر للإشارة أنه مفعل
-                if (btn) {
-                    btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                    btn.classList.remove('bg-[#f8fafc]', 'text-[#334155]');
-                }
-                
-                // تعبئة المحرر بالنص الحالي
-                if (activeEl && activeEl.classList.contains('text-layer')) {
-                    const textDiv = activeEl.querySelector('.user-text');
-                    if (textDiv) {
-                        editor.value = textDiv.innerText || '';
-                        editor.focus();
-                        editor.select();
-                    }
-                }
+            const p = document.getElementById('text-editor-panel');
+            const e = document.getElementById('direct-text-editor');
+            if (!p) return;
+            if (p.style.display === 'flex') {
+                p.style.display = 'none';
             } else {
-                panel.classList.add('hidden');
-                panel.style.display = 'none';
-                
-                // إعادة لون الزر الأصلي
-                if (btn) {
-                    btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                    btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
+                p.style.display = 'flex';
+                if (activeEl && activeEl.querySelector('.user-text')) {
+                    e.value = activeEl.querySelector('.user-text').innerText || '';
+                    e.focus();
                 }
             }
         }
-        // تحديث النص فوراً أثناء الكتابة
-        window.updateTextFromEditor = function(value) {
-            if (!activeEl || !activeEl.classList.contains('text-layer')) return;
-            
-            const textDiv = activeEl.querySelector('.user-text');
-            if (textDiv) {
-                textDiv.innerText = value || 'نص...';
-            }
-        }
-        
-        // تطبيق النص وإغلاق المحرر
         window.applyTextFromEditor = function() {
-            const editor = document.getElementById('direct-text-editor');
-            if (!activeEl || !activeEl.classList.contains('text-layer')) return;
-            
-            const textDiv = activeEl.querySelector('.user-text');
-            if (textDiv) {
-                textDiv.innerText = editor.value.trim() || 'نص...';
+            const e = document.getElementById('direct-text-editor');
+            if (activeEl && activeEl.querySelector('.user-text')) {
+                activeEl.querySelector('.user-text').innerText = e.value || 'نص';
                 saveState();
             }
-            
-            // إغلاق المحرر
-            window.closeTextEditor();
+            document.getElementById('text-editor-panel').style.display = 'none';
         }
-        
-        // إغلاق محرر النص
         window.closeTextEditor = function() {
-            const panel = document.getElementById('text-editor-panel');
-            const btn = document.getElementById('btn-edit-text');
-            
-            if (panel) {
-                panel.classList.add('hidden');
-                panel.style.display = 'none';
-            }
-            
-            // إعادة لون الزر الأصلي
-            if (btn) {
-                btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-300');
-                btn.classList.add('bg-[#f8fafc]', 'text-[#334155]');
-            }
+            document.getElementById('text-editor-panel').style.display = 'none';
         }
+
 
 
             const settings = document.getElementById('floating-grad-settings');
