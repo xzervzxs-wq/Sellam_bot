@@ -1561,55 +1561,35 @@
     }
     
     function addQRToCanvas(imgData) {
+        // استخدام createWrapper من app.js للحصول على كل الوظائف
+        if (typeof createWrapper !== 'function') {
+            console.error('createWrapper غير موجودة');
+            return;
+        }
+        
         const card = document.getElementById('card');
         
         // حساب موقع المنتصف
-        const qrSize = 280; // حجم كبير
+        const qrSize = 280;
         const centerX = (card.offsetWidth - qrSize) / 2;
         const centerY = (card.offsetHeight - qrSize) / 2;
         
-        // حساب أعلى z-index
-        const layers = card.querySelectorAll('.draggable-el:not(.bg-image)');
-        let maxZ = 10;
-        layers.forEach(layer => {
-            const z = parseInt(layer.style.zIndex) || 10;
-            if (z > maxZ) maxZ = z;
-        });
+        // إنشاء wrapper باستخدام الدالة الأصلية
+        const wrapper = createWrapper('image-layer');
+        wrapper.style.left = centerX + 'px';
+        wrapper.style.top = centerY + 'px';
+        wrapper.style.width = qrSize + 'px';
+        wrapper.style.height = qrSize + 'px';
+        wrapper.setAttribute('data-colorable', 'true');
         
-        const wrapper = document.createElement('div');
-        wrapper.className = 'draggable-el image-layer';
-        wrapper.style.cssText = `position:absolute; left:${centerX}px; top:${centerY}px; width:${qrSize}px; height:${qrSize}px; cursor:move; z-index:${maxZ + 1};`;
-        wrapper.setAttribute('data-colorable', 'true'); // قابل للتلوين
-        
-        // إضافة المقابض والأزرار مثل الصور العادية
-        wrapper.innerHTML = `
-            <div class="control-btn delete-btn" onclick="removeEl(this.parentNode)" ontouchend="removeEl(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-times"></i></div>
-            <div class="control-btn duplicate-btn" onclick="duplicateElement(this.parentNode)" ontouchend="duplicateElement(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-clone"></i></div>
-            <div class="control-btn rotate-btn" onclick="rotateElement(this.parentNode)" ontouchend="rotateElement(this.parentNode); event.preventDefault(); event.stopPropagation();"><i class="fas fa-redo"></i></div>
-            <div class="control-btn layer-up-btn" onclick="bringToFront(this.parentNode)" ontouchend="bringToFront(this.parentNode); event.preventDefault(); event.stopPropagation();" title="للأمام"><i class="fas fa-arrow-up"></i></div>
-            <div class="control-btn layer-down-btn" onclick="sendToBack(this.parentNode)" ontouchend="sendToBack(this.parentNode); event.preventDefault(); event.stopPropagation();" title="للخلف"><i class="fas fa-arrow-down"></i></div>
-            <div class="move-handle" title="اسحب للتحريك"><i class="fas fa-arrows-alt"></i></div>
-            <div class="handle resize-nw"></div>
-            <div class="handle resize-ne"></div>
-            <div class="handle resize-sw"></div>
-            <div class="handle resize-se"></div>
-            <div class="handle resize-n"></div>
-            <div class="handle resize-e"></div>
-            <div class="handle resize-s"></div>
-            <div class="handle resize-w"></div>
-        `;
-        
-        const contentWrapper = document.createElement('div');
-        contentWrapper.className = 'content-wrapper';
-        contentWrapper.style.cssText = 'width:100%; height:100%; display:flex; align-items:center; justify-content:center;';
-        
+        // إضافة الصورة
+        const contentWrapper = wrapper.querySelector('.content-wrapper');
         const img = document.createElement('img');
         img.src = imgData;
         img.style.cssText = 'width:100%; height:100%; pointer-events:none; user-select:none; object-fit:contain;';
         img.draggable = false;
         
         contentWrapper.appendChild(img);
-        wrapper.appendChild(contentWrapper);
         card.appendChild(wrapper);
         
         if (typeof selectEl === 'function') selectEl(wrapper);
