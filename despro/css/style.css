@@ -1128,3 +1128,39 @@
             color: #e2e8f0 !important;
         }
 /* Updated: Thu Jan 29 18:52:39 UTC 2026 */
+
+/* ============================================ */
+/* === خطوط الإرشاد للمنتصف (Center Guides) === */
+/* ============================================ */
+
+.guide-line {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 9999;
+}
+
+.guide-line.visible {
+    opacity: 1;
+}
+
+/* الخط الأفقي - منتصف الارتفاع */
+.guide-h {
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #ec4899 10%, #ec4899 90%, transparent 100%);
+    box-shadow: 0 0 3px rgba(236, 72, 153, 0.5);
+}
+
+/* الخط العمودي - منتصف العرض */
+.guide-v {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent 0%, #ec4899 10%, #ec4899 90%, transparent 100%);
+    box-shadow: 0 0 3px rgba(236, 72, 153, 0.5);
+}
