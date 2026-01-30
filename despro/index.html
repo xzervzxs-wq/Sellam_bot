@@ -85,7 +85,7 @@
         }
     </style>
     <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body class="min-h-screen flex flex-col" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
 
@@ -1333,13 +1333,13 @@
             <div class="flex items-center gap-2 justify-center mb-3 border-b border-gray-100 pb-2">
                 <i class="fas fa-qrcode text-xl text-indigo-500"></i>
                 <h3 class="text-sm font-bold text-slate-800">توليد QR Code</h3>
-                <span id="qr-premium-badge" class="hidden bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">⭐ PRO</span>
+                <span id="qr-premium-badge" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">⭐ PRO</span>
             </div>
             
             <input type="text" id="qr-input" placeholder="أدخل الرابط أو النص..." class="w-full p-2 border border-slate-300 rounded-lg text-[11px] outline-none focus:border-indigo-500 mb-3" dir="rtl">
             
-            <div id="qr-preview" class="hidden mb-3 flex justify-center">
-                <canvas id="qr-canvas"></canvas>
+            <div id="qr-preview" class="hidden mb-3 flex justify-center p-2 bg-white rounded-lg border">
+                <div id="qr-output"></div>
             </div>
             
             <div class="flex gap-2">
@@ -1353,22 +1353,31 @@
         </div>
     </div>
 
-    <script src="js/app.js?v=20260130_03"></script>
+    <script src="js/app.js?v=20260130_04"></script>
     <script>
     // QR Code Functions
+    let qrCodeInstance = null;
+    
     function openQRModal() {
         const modal = document.getElementById('qr-modal');
         const badge = document.getElementById('qr-premium-badge');
         const preview = document.getElementById('qr-preview');
+        const qrOutput = document.getElementById('qr-output');
         
-        if (typeof isPremiumUser === 'function' && !isPremiumUser()) {
+        // إظهار شارة PRO لغير المشتركين
+        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
+        if (!isPremium) {
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
         }
         
+        // تنظيف
         preview.classList.add('hidden');
+        qrOutput.innerHTML = '';
         document.getElementById('qr-input').value = '';
+        qrCodeInstance = null;
+        
         modal.style.display = 'flex';
     }
     
@@ -1376,69 +1385,106 @@
         document.getElementById('qr-modal').style.display = 'none';
     }
     
-    async function generateQR() {
+    function generateQR() {
         const input = document.getElementById('qr-input').value.trim();
         if (!input) {
-            alert('الرجاء إدخال رابط أو نص');
+            if (typeof showInfoModal === 'function') {
+                showInfoModal('الرجاء إدخال رابط أو نص', 'تنبيه', '⚠️');
+            } else {
+                alert('الرجاء إدخال رابط أو نص');
+            }
             return;
         }
         
-        const canvas = document.getElementById('qr-canvas');
         const preview = document.getElementById('qr-preview');
+        const qrOutput = document.getElementById('qr-output');
         
         try {
-            await QRCode.toCanvas(canvas, input, {
+            // تنظيف القديم
+            qrOutput.innerHTML = '';
+            
+            // توليد QR جديد
+            qrCodeInstance = new QRCode(qrOutput, {
+                text: input,
                 width: 150,
-                margin: 2,
-                color: { dark: '#1e293b', light: '#ffffff' }
+                height: 150,
+                colorDark: '#1e293b',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
             });
             
             preview.classList.remove('hidden');
             
-            let finalCanvas = document.createElement('canvas');
-            let ctx = finalCanvas.getContext('2d');
+            // انتظار توليد الصورة ثم إضافتها للتصميم
+            setTimeout(function() {
+                const qrImg = qrOutput.querySelector('img');
+                if (qrImg && qrImg.src) {
+                    addQRWithWatermark(qrImg.src);
+                    closeQRModal();
+                }
+            }, 300);
+            
+        } catch (error) {
+            console.error('QR Error:', error);
+            if (typeof showInfoModal === 'function') {
+                showInfoModal('حدث خطأ في توليد الـ QR', 'خطأ', '❌');
+            } else {
+                alert('حدث خطأ في توليد الـ QR');
+            }
+        }
+    }
+    
+    function addQRWithWatermark(qrSrc) {
+        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
+        
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
             
             const qrSize = 150;
             const padding = 10;
-            const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
             const watermarkHeight = isPremium ? 0 : 25;
             
-            finalCanvas.width = qrSize + (padding * 2);
-            finalCanvas.height = qrSize + (padding * 2) + watermarkHeight;
+            canvas.width = qrSize + (padding * 2);
+            canvas.height = qrSize + (padding * 2) + watermarkHeight;
             
+            // خلفية بيضاء
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-            ctx.drawImage(canvas, padding, padding);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
+            // رسم QR
+            ctx.drawImage(img, padding, padding, qrSize, qrSize);
+            
+            // علامة مائية لغير البريميوم
             if (!isPremium) {
+                // نص مكرر مائل شفاف
                 ctx.save();
-                ctx.globalAlpha = 0.15;
+                ctx.globalAlpha = 0.12;
                 ctx.fillStyle = '#6366f1';
-                ctx.font = 'bold 14px Arial';
-                ctx.translate(finalCanvas.width / 2, qrSize / 2 + padding);
+                ctx.font = 'bold 12px Arial';
+                ctx.translate(canvas.width / 2, qrSize / 2 + padding);
                 ctx.rotate(-30 * Math.PI / 180);
                 
-                for (let y = -80; y < 80; y += 25) {
-                    for (let x = -100; x < 100; x += 80) {
+                for (let y = -60; y < 60; y += 20) {
+                    for (let x = -80; x < 80; x += 60) {
                         ctx.fillText('Despro', x, y);
                     }
                 }
                 ctx.restore();
                 
+                // نص تحت
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = 'bold 9px Arial';
+                ctx.font = 'bold 8px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('صُمم بواسطة Despro', finalCanvas.width / 2, finalCanvas.height - 8);
+                ctx.fillText('صُمم بواسطة Despro', canvas.width / 2, canvas.height - 8);
             }
             
-            const imgData = finalCanvas.toDataURL('image/png');
-            addQRToCanvas(imgData);
-            closeQRModal();
-            
-        } catch (error) {
-            console.error('QR Error:', error);
-            alert('حدث خطأ في توليد الـ QR');
-        }
+            // إضافة للتصميم
+            addQRToCanvas(canvas.toDataURL('image/png'));
+        };
+        img.src = qrSrc;
     }
     
     function addQRToCanvas(imgData) {
