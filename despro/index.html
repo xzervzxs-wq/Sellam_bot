@@ -1086,19 +1086,9 @@
             <button id="btn-toggle-gradient" onclick="toggleGradientMode()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
                 <i class="fas fa-fill-drip text-[8px]"></i> تدرج
             </button>
-            <button id="btn-edit-text" onclick="window.toggleTextEditor()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
-                <i class="fas fa-edit text-[8px]"></i> تحرير
+            <button id="btn-edit-text" onclick="window.toggleTextEditor()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#6366f1] text-white hover:bg-[#4f46e5] transition flex items-center gap-1 border border-[#4f46e5] shadow-sm">
+                <i class="fas fa-edit text-[9px]"></i> تحرير النص
             </button>
-            <div class="w-px h-4 bg-[#e2e8f0]"></div>
-            
-            <!-- Partial Color Hint Tooltip Wrapper -->
-            <div class="relative group flex items-center gap-1">
-                <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">لون النص:</span>
-                <input type="color" id="top-text-color" value="#1e293b" onchange="applyTextColor(this.value)" oninput="applyTextColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#cbd5e1] bg-transparent" title="لون النص (حدد جزء لتلوينه)">
-                <!-- Tooltip -->
-                <span class="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-[8px] px-2 py-1 rounded pointer-events-none whitespace-nowrap z-50">ظلل نصاً لتلوينه منفرداً</span>
-            </div>
-
             <div class="w-px h-4 bg-[#e2e8f0]"></div>
             <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
             <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
@@ -1108,8 +1098,8 @@
         <div id="text-editor-panel" style="display:none;" class="flex-col gap-1 p-2 bg-slate-50 rounded border border-slate-200 mx-2 mt-1">
             <textarea id="direct-text-editor" class="w-full p-1 border border-slate-300 rounded text-[10px] resize-none" rows="2" dir="rtl" placeholder="النص..."></textarea>
             <div class="flex gap-1">
-                <button onclick="window.applyTextFromEditor()" class="flex-1 px-2 py-1 bg-indigo-500 text-white text-[9px] rounded">تطبيق</button>
-                <button onclick="window.closeTextEditor()" class="px-2 py-1 bg-slate-200 text-[9px] rounded">×</button>
+                <button onclick="window.applyTextFromEditor()" class="flex-1 px-2 py-1 bg-indigo-500 text-white text-[11px] font-bold rounded">تطبيق</button>
+                <button onclick="window.closeTextEditor()" class="px-2 py-1 bg-slate-200 text-[11px] font-bold rounded">إغلاق</button>
             </div>
         </div>
 
