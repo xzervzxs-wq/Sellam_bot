@@ -6381,7 +6381,7 @@
         // ==========================================
         
         // فتح/إغلاق لوحة محرر النص
-        function toggleTextEditor() {
+        window.toggleTextEditor = function() {
             alert("زر التحرير يعمل!");
             const panel = document.getElementById('text-editor-panel');
             const editor = document.getElementById('direct-text-editor');
@@ -6418,7 +6418,7 @@
             }
         }
         // تحديث النص فوراً أثناء الكتابة
-        function updateTextFromEditor(value) {
+        window.updateTextFromEditor = function(value) {
             if (!activeEl || !activeEl.classList.contains('text-layer')) return;
             
             const textDiv = activeEl.querySelector('.user-text');
@@ -6428,7 +6428,7 @@
         }
         
         // تطبيق النص وإغلاق المحرر
-        function applyTextFromEditor() {
+        window.applyTextFromEditor = function() {
             const editor = document.getElementById('direct-text-editor');
             if (!activeEl || !activeEl.classList.contains('text-layer')) return;
             
@@ -6443,7 +6443,7 @@
         }
         
         // إغلاق محرر النص
-        function closeTextEditor() {
+        window.closeTextEditor = function() {
             const panel = document.getElementById('text-editor-panel');
             const btn = document.getElementById('btn-edit-text');
             
