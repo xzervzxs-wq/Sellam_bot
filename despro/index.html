@@ -1026,7 +1026,7 @@
                 <div id="card-wrapper">
                     <div id="ruler-h" class="ruler ruler-h"></div>
                     <div id="ruler-v" class="ruler ruler-v"></div>
-                    <div id="card" onmousedown="deselectOnCard(event)" ontouchstart="deselectOnCard(event); event.preventDefault(); event.stopPropagation();" ontouchend="event.preventDefault(); event.stopPropagation();">
+                    <div id="card" onmousedown="deselectOnCard(event)" ontouchstart="handleCardTouch(event)">
                         <div id="card-gradient"></div>
                     </div>
                     <!-- Crop Overlay -->

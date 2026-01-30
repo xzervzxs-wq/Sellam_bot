@@ -523,7 +523,7 @@
         /* العناصر القابلة للسحب */
         .draggable-el { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            cursor: grab; touch-action: none; 
+            cursor: grab; touch-action: auto; 
             border: 1px solid transparent;
         }
         .draggable-el:active { cursor: grabbing; }
