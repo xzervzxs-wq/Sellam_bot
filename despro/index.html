@@ -360,10 +360,10 @@
                      </button>
                      
                      <!-- زر Premium لغير المشتركين -->
-                     <div id="premium-upgrade-btn" class="mt-1">
-                         <a href="subscriptions.html" class="flex items-center justify-center gap-1.5 bg-transparent px-4 py-1 rounded-lg transition-all hover:bg-amber-500/5">
-                             <span class="text-[9px] font-bold tracking-[0.2em] text-amber-500/70 hover:text-amber-400 transition-colors">
-                                 ✨ PREMIUM
+                     <div id="premium-upgrade-btn" class="mt-3">
+                         <a href="subscriptions.html" class="flex items-center justify-center gap-2 bg-slate-800/80 px-5 py-2.5 rounded-xl transition-all hover:bg-slate-700 border border-amber-500/30">
+                             <span class="text-xs font-bold tracking-wider bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+                                 👑 PREMIUM
                              </span>
                          </a>
                      </div>
@@ -786,22 +786,24 @@
                     </div>
                     
                     <!-- أدوات التحرير الأساسية -->
-                    <div class="flex items-center gap-1 px-2 py-1 bg-[#f8fafc] dark:bg-slate-700 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
-                        <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
-                            <i class="fas fa-adjust"></i> التدرج
-                        </button>
-                        <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
-                            <i class="fas fa-eraser"></i> الممحاة
-                        </button>
-                        <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="قص الصورة">
-                            <i class="fas fa-crop"></i> Crop
-                        </button>
-                        <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="أداة اليد">
-                            <i class="fa-regular fa-hand"></i> تحريك
-                        </button>
-                        <button onclick="openQRModal()" id="btn-qr" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="توليد QR Code">
-                            <i class="fas fa-qrcode"></i> QR
-                        </button>
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
+                            EDIT TOOLS
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]">
+                                <i class="fas fa-eraser"></i> ممحاة
+                            </button>
+                            <button onclick="toggleGradient()" id="btn-grad" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]">
+                                <i class="fas fa-adjust"></i> تدرج
+                            </button>
+                            <button onclick="toggleHandMode()" id="btn-hand" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="أداة اليد">
+                                <i class="fa-regular fa-hand"></i> تحريك
+                            </button>
+                            <button onclick="openQRModal()" id="btn-qr" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="توليد QR Code">
+                                <i class="fas fa-qrcode"></i> QR
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Universal File Input: Supports All Formats -->
