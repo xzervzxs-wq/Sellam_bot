@@ -7386,3 +7386,4 @@ function updateLayersList() {
         window.closeQRModal = closeQRModal;
         window.generateQR = generateQR;
  
+// force update
