@@ -86,6 +86,35 @@
     </style>
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <!-- QR Code Functions - يجب أن تكون هنا قبل الأزرار -->
+    <script>
+    function openQRModal() {
+        const modal = document.getElementById('qrModal');
+        if (!modal) { console.error('qrModal not found'); return; }
+        const badge = document.getElementById('qr-pro-badge');
+        
+        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
+        if (badge) {
+            if (isPremium) badge.classList.add('hidden');
+            else badge.classList.remove('hidden');
+        }
+        
+        const qrInput = document.getElementById('qrInput');
+        if (qrInput) qrInput.value = '';
+        
+        const preview = document.getElementById('qrPreviewArea');
+        if (preview) preview.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>';
+        
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+    
+    function setFastLink(url) {
+        const input = document.getElementById('qrInput');
+        if (input) { input.value = url; input.focus(); }
+    }
+    </script>
 </head>
 <body class="min-h-screen flex flex-col" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
 
@@ -1514,33 +1543,7 @@
 
     <script src="js/app.js?v=20260130_05"></script>
     <script>
-    // QR Code Functions
-    window.openQRModal = function() {
-        const modal = document.getElementById('qrModal');
-        const badge = document.getElementById('qr-pro-badge');
-        
-        // إظهار/إخفاء شارة PRO
-        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
-        if (isPremium) {
-            badge.classList.add('hidden');
-        } else {
-            badge.classList.remove('hidden');
-        }
-        
-        // تنظيف
-        document.getElementById('qrInput').value = '';
-        document.getElementById('qrPreviewArea').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>';
-        
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-    };
-    
-    window.setFastLink = function(url) {
-        const input = document.getElementById('qrInput');
-        input.value = url;
-        input.focus();
-    };
-
+    // addQRToDesign function
     window.addQRToDesign = function() {
         const val = document.getElementById('qrInput').value.trim() || "https://google.com";
         const selectedColor = document.getElementById('qrColorPicker').value;
