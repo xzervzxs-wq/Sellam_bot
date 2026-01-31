@@ -1476,20 +1476,43 @@
                 }
                 ctx.putImageData(imgData, 0, 0);
                 
-                // علامة مائية لغير البريميوم
+                // علامة مائية احترافية لغير البريميوم
                 const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
                 if (!isPremium) {
+                    const w = tempCanvas.width;
+                    const h = tempCanvas.height;
+                    
+                    // شريط مموه قطري
                     ctx.save();
-                    ctx.globalAlpha = 0.4;
-                    ctx.fillStyle = '#ff4444';
-                    ctx.font = 'bold 100px Arial';
+                    ctx.translate(w / 2, h / 2);
+                    ctx.rotate(-35 * Math.PI / 180);
+                    
+                    // خلفية الشريط (مموهة)
+                    const gradient = ctx.createLinearGradient(-w, 0, w, 0);
+                    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.85)');
+                    gradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.9)');
+                    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.85)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(-w, -45, w * 2, 90);
+                    
+                    // نص Premium
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 50px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-                    ctx.rotate(-35 * Math.PI / 180);
-                    ctx.fillText('Despro', 0, 0);
-                    ctx.fillText('Despro', -300, -220);
-                    ctx.fillText('Despro', 300, 220);
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText('👑 PREMIUM 👑', 0, 0);
+                    
+                    ctx.restore();
+                    
+                    // نص صغير في الأسفل
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(100, 100, 100, 0.7)';
+                    ctx.font = 'bold 28px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('اشترك لإزالة العلامة المائية', w / 2, h - 30);
                     ctx.restore();
                 }
                 
