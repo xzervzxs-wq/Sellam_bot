@@ -1444,19 +1444,18 @@
         const selectedColor = document.getElementById('qrColorPicker').value;
         const buffer = document.getElementById('hiddenBuffer');
         
-        buffer.innerHTML = ""; // تنظيف الحاوية
+        buffer.innerHTML = "";
         
-        // 1. توليد الباركود بدقة عالية
+        // توليد الباركود بدقة عالية
         new QRCode(buffer, {
             text: val,
-            width: 1024, // دقة عالية جداً لضمان عدم البكسلة عند التكبير
-            height: 1024,
+            width: 800,
+            height: 800,
             colorDark: selectedColor,
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
         });
 
-        // 2. معالجة الشفافية وإضافة للتصميم
         setTimeout(() => {
             const qrCanvas = buffer.querySelector('canvas');
             if (qrCanvas) {
@@ -1469,9 +1468,9 @@
                 const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                 const data = imgData.data;
 
-                // جعل اللون الأبيض شفافاً
+                // جعل الخلفية البيضاء شفافة
                 for (let i = 0; i < data.length; i += 4) {
-                    if (data[i] > 200 && data[i+1] > 200 && data[i+2] > 200) {
+                    if (data[i] > 220 && data[i+1] > 220 && data[i+2] > 220) {
                         data[i+3] = 0;
                     }
                 }
@@ -1483,77 +1482,35 @@
                     ctx.save();
                     ctx.globalAlpha = 0.4;
                     ctx.fillStyle = '#ff4444';
-                    ctx.font = 'bold 120px Arial';
+                    ctx.font = 'bold 100px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
                     ctx.rotate(-35 * Math.PI / 180);
                     ctx.fillText('Despro', 0, 0);
-                    ctx.fillText('Despro', -400, -300);
-                    ctx.fillText('Despro', 400, 300);
+                    ctx.fillText('Despro', -300, -220);
+                    ctx.fillText('Despro', 300, 220);
                     ctx.restore();
                 }
                 
-                // 3. استخراج رابط الصورة النهائي (Base64 PNG)
                 const finalPngUrl = tempCanvas.toDataURL("image/png");
 
-                // عرض المعاينة للمستخدم
+                // عرض المعاينة
                 document.getElementById('qrPreviewArea').innerHTML = `<img src="${finalPngUrl}" class="w-full h-full object-contain p-1">`;
                 
-                // 4. إضافة للتصميم باستخدام createWrapper
-                addQRImageToCanvas(finalPngUrl);
+                // استخدام نفس دالة المكتبة بالضبط!
+                if (typeof addAssetToCanvas === 'function') {
+                    addAssetToCanvas(finalPngUrl, true);
+                } else {
+                    alert('خطأ: لم يتم تحميل النظام');
+                }
                 
                 // إغلاق النافذة
                 setTimeout(() => {
                     document.getElementById('qrModal').style.display = 'none';
-                }, 400);
+                }, 300);
             }
         }, 300);
-    }
-    
-    function addQRImageToCanvas(imgDataUrl) {
-        // التأكد من وجود createWrapper
-        if (typeof createWrapper !== 'function') {
-            console.error('createWrapper غير موجودة');
-            alert('خطأ: لم يتم تحميل النظام بشكل صحيح');
-            return;
-        }
-        
-        const card = document.getElementById('card');
-        
-        // حساب موقع المنتصف
-        const qrSize = 280;
-        const centerX = (card.offsetWidth - qrSize) / 2;
-        const centerY = (card.offsetHeight - qrSize) / 2;
-        
-        // إنشاء wrapper باستخدام الدالة الأصلية (هذا يعطي المقابض والسحب)
-        const wrapper = createWrapper('image-layer');
-        wrapper.style.left = centerX + 'px';
-        wrapper.style.top = centerY + 'px';
-        wrapper.style.width = qrSize + 'px';
-        wrapper.style.height = qrSize + 'px';
-        wrapper.setAttribute('data-colorable', 'true');
-        
-        // إضافة الصورة للـ content-wrapper
-        const contentWrapper = wrapper.querySelector('.content-wrapper');
-        const img = document.createElement('img');
-        img.src = imgDataUrl;
-        img.style.cssText = 'width:100%; height:100%; pointer-events:none; user-select:none; object-fit:contain;';
-        img.draggable = false;
-        
-        contentWrapper.appendChild(img);
-        card.appendChild(wrapper);
-        
-        // ربط أحداث السحب والتحريك للعنصر الجديد
-        if (typeof setupInteract === 'function') {
-            setupInteract(wrapper, 'box');
-        }
-        
-        // تحديد العنصر الجديد
-        if (typeof selectEl === 'function') selectEl(wrapper);
-        if (typeof saveState === 'function') saveState();
-        
-        console.log('QR تم إضافته للتصميم بنجاح');
     }
     </script>
 </body>
