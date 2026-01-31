@@ -850,16 +850,16 @@
                             EDIT TOOLS
                         </span>
                         <div class="flex items-center gap-1.5">
-                           <button onclick="toggleGradient()" id="btn-grad" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#cbd5e1] dark:border-slate-500">
+                           <button onclick="toggleGradient()" id="btn-grad" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
                                 <i class="fas fa-adjust text-sm"></i> التدرج
                             </button>
-                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#cbd5e1] dark:border-slate-500">
+                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
                                 <i class="fas fa-eraser text-sm"></i> الممحاة
                             </button>
-                            <button onclick="toggleCropMode()" id="btn-crop" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#cbd5e1] dark:border-slate-500" title="قص الصورة">
+                            <button onclick="toggleCropMode()" id="btn-crop" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="قص الصورة">
                                 <i class="fas fa-crop text-sm"></i> Crop
                             </button>
-                            <button onclick="toggleHandMode()" id="btn-hand" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#cbd5e1] dark:border-slate-500" title="أداة اليد">
+                            <button onclick="toggleHandMode()" id="btn-hand" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="أداة اليد">
                                 <i class="fa-regular fa-hand text-sm"></i> تحريك
                             </button>
                         </div>
@@ -871,15 +871,18 @@
                             BUSINESS TOOLS
                         </span>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="openQRModal()" id="btn-qr" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#cbd5e1] dark:border-slate-500" title="توليد QR Code">
+                            <button onclick="openQRModal()" id="btn-qr" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="توليد QR Code">
                                 <i class="fas fa-qrcode text-sm"></i> باركود
                             </button>
-                            <button onclick="openSocialModal()" id="btn-social" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#cbd5e1] dark:border-slate-500">
+                            <button onclick="openSocialModal()" id="btn-social" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
                                 <div class="flex gap-1">
                                     <i class="fab fa-instagram text-xs"></i>
                                     <i class="fab fa-tiktok text-xs"></i>
                                 </div>
                                 Social
+                            </button>
+                            <button onclick="openDiscountModal()" id="btn-discount" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="صانع بطاقات الخصومات">
+                                <i class="fas fa-tags text-sm"></i> خصومات
                             </button>
                         </div>
                     </div>
@@ -1494,6 +1497,7 @@
 
     <script src="js/app.js?v=20260130_05"></script>
     <script src="js/social_media.js"></script>
+    <script src="js/discount_maker.js"></script>
     <script>
     // QR Code Functions
     function openQRModal() {
@@ -1621,6 +1625,13 @@
     <div id="social-modal" class="hidden fixed inset-0 bg-black/40 z-[200000] flex items-center justify-center backdrop-blur-sm transition-all duration-300 opacity-0" onclick="closeSocialModal()">
         <div class="bg-white rounded-[2.5rem] p-7 w-full max-w-[340px] shadow-[0_30px_70px_-20px_rgba(2,132,199,0.2)] modal-animate border border-sky-50/50 relative text-right" onclick="event.stopPropagation()">
             
+            <!-- زر الإغلاق -->
+            <button onclick="closeSocialModal()" class="absolute left-5 top-5 text-gray-300 hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
             <!-- الهيدر -->
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -1652,7 +1663,7 @@
                             <i class="fab fa-snapchat-ghost text-xl"></i>
                         </div>
                         <div onclick="selectPlat('Twitter')" id="plat-Twitter" class="platform-btn h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer border-2 border-gray-100 bg-gray-50/50 text-gray-400 hover:border-sky-300 hover:bg-white" title="X / Twitter">
-                            <i class="fab fa-twitter text-xl"></i>
+                            <i class="fab fa-x-twitter text-xl"></i>
                         </div>
                         <div onclick="selectPlat('TikTok')" id="plat-TikTok" class="platform-btn h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer border-2 border-gray-100 bg-gray-50/50 text-gray-400 hover:border-sky-300 hover:bg-white" title="TikTok">
                             <i class="fab fa-tiktok text-xl"></i>
@@ -1689,5 +1700,101 @@
             <input type="hidden" id="selectedPlatform" value="Instagram">
         </div>
     </div>
+
+    <!-- نافذة صانع بطاقات الخصومات -->
+    <div id="discountModal" class="fixed inset-0 z-[200000] hidden items-center justify-center bg-black/40 backdrop-blur-md p-4 text-right">
+        <div class="bg-white rounded-[2.2rem] p-6 w-full max-w-[380px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] discount-modal-animate relative border border-gray-100" onclick="event.stopPropagation()">
+            
+            <!-- زر الإغلاق -->
+            <button onclick="closeDiscountModal()" class="absolute left-5 top-5 text-gray-300 hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+
+            <!-- الهيدر -->
+            <div class="mb-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-black text-gray-800 tracking-tight">صانع بطاقات الخصم</h3>
+                    <span id="discount-pro-badge" class="bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 text-white text-[8px] px-2 py-0.5 rounded-full font-bold shadow-lg flex items-center gap-1">👑 Premium</span>
+                </div>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider text-right">أنشئ بطاقة احترافية لمنتجك</p>
+            </div>
+
+            <div class="space-y-4 text-right">
+                
+                <!-- رفع الصورة -->
+                <div>
+                    <input type="file" id="discountProdImgInput" accept="image/*" class="hidden" onchange="handleDiscountImg(this)">
+                    <div onclick="document.getElementById('discountProdImgInput').click()" class="border-2 border-dashed border-gray-200 rounded-2xl h-20 flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all bg-gray-50/50 overflow-hidden relative">
+                        <div id="discountUploadPlaceholder" class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                            <span class="text-[11px] font-bold text-gray-400">اضغط لرفع صورة المنتج</span>
+                        </div>
+                        <img id="discountImgPreview" class="absolute inset-0 w-full h-full object-contain p-2 hidden bg-white">
+                    </div>
+                </div>
+                
+                <!-- اسم المنتج -->
+                <div>
+                    <input type="text" id="discountProdName" placeholder="اكتب اسم المنتج" class="w-full border-2 border-gray-50 rounded-2xl px-4 py-3 text-xs outline-none focus:border-indigo-400 bg-gray-50/50 transition-all font-bold text-gray-700 text-center">
+                </div>
+
+                <!-- الأسعار -->
+                <div class="flex gap-2">
+                    <div class="flex-1 relative">
+                        <input type="number" id="discountProdPrice" placeholder="السعر" class="w-full border-2 border-gray-50 rounded-2xl px-4 py-2.5 text-xs font-bold outline-none focus:border-green-400 bg-gray-50/50 transition-all text-green-600 text-center">
+                    </div>
+                    <div class="flex-1 relative">
+                        <input type="number" id="discountProdOldPrice" placeholder="قبل (اختياري)" class="w-full border-2 border-gray-50 rounded-2xl px-4 py-2.5 text-xs font-bold outline-none focus:border-red-400 bg-gray-50/50 transition-all text-red-500 text-center line-through">
+                    </div>
+                </div>
+
+                <!-- القوالب -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="selectDiscountTemplate(1)" id="discount-tmpl-1" class="discount-template-btn bg-amber-50 text-amber-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-amber-100 transition-all border border-amber-100/50 shadow-sm active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 21v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">فخامة</span>
+                    </button>
+                    <button onclick="selectDiscountTemplate(2)" id="discount-tmpl-2" class="discount-template-btn bg-blue-50 text-blue-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-blue-100 transition-all border border-blue-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">زجاجي</span>
+                    </button>
+                    <button onclick="selectDiscountTemplate(3)" id="discount-tmpl-3" class="discount-template-btn bg-slate-100 text-slate-700 p-2.5 rounded-xl flex flex-col items-center hover:bg-slate-200 transition-all border border-slate-200 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m3 9 9 9 9-9"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">بوستر</span>
+                    </button>
+                </div>
+
+                <!-- أدوات الألوان -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 flex-1">
+                        <input type="color" id="discountCardColor" value="#fffbeb" style="width:32px;height:32px;-webkit-appearance:none;border:none;cursor:pointer;background:transparent;">
+                        <span class="text-[7px] font-black text-gray-400 uppercase tracking-tighter">خلفية</span>
+                    </div>
+                    <div class="flex items-center gap-2 flex-1">
+                        <input type="color" id="discountBorderColor" value="#b45309" style="width:32px;height:32px;-webkit-appearance:none;border:none;cursor:pointer;background:transparent;">
+                        <span class="text-[7px] font-black text-gray-400 uppercase tracking-tighter">إطار</span>
+                    </div>
+                </div>
+
+                <!-- زر الإضافة -->
+                <button onclick="generateDiscountCard()" class="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-black text-xs shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">إضافة للتصميم</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .discount-modal-animate {
+            animation: discountIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes discountIn {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .discount-template-btn.active {
+            border-color: #4f46e5 !important;
+            background-color: #eef2ff !important;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+    </style>
 </body>
 </html>

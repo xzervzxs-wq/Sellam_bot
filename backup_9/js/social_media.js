@@ -82,15 +82,16 @@ function addSocialHandleToCanvas() {
         // تحويل لـ PNG
         const pngUrl = canvas.toDataURL("image/png");
         
-        // إضافة للتصميم (نفس طريقة الباركود)
-        if (typeof addAssetToCanvas === 'function') {
-            addAssetToCanvas(pngUrl, true);
-        } else {
-            alert('خطأ: لم يتم تحميل النظام');
-            return;
-        }
-        
+        // إغلاق النافذة أولاً (بسرعة)
         closeSocialModal();
+        
+        // إضافة للتصميم بعد إغلاق النافذة (نفس طريقة الباركود)
+        setTimeout(() => {
+            if (typeof addAssetToCanvas === 'function') {
+                addAssetToCanvas(pngUrl, true);
+            }
+        }, 100);
+        
     }).catch(err => {
         console.error('Error capturing social handle:', err);
         alert('حدث خطأ أثناء إنشاء الصورة');
