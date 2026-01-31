@@ -802,6 +802,9 @@
                         <button onclick="openQRModal()" id="btn-qr" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="توليد QR Code">
                             <i class="fas fa-qrcode"></i> QR
                         </button>
+                        <button onclick="openColorPickerModal()" id="btn-color-picker" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="منتقي الألوان">
+                            <i class="fas fa-palette"></i> ألوان
+                        </button>
                     </div>
                     
                     <!-- Universal File Input: Supports All Formats -->
@@ -1327,6 +1330,99 @@
         </div>
     </footer>
 
+    <!-- نافذة منتقي الألوان الاحترافي -->
+    <div id="colorPickerModal" class="fixed inset-0 z-[100003] hidden items-center justify-center bg-black/40 backdrop-blur-md p-4">
+        <div class="bg-white rounded-[2rem] p-5 w-full max-w-[340px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] color-picker-animate relative border border-gray-100">
+            
+            <!-- زر الإغلاق -->
+            <button onclick="closeColorPickerModal()" class="absolute left-4 top-4 text-gray-300 hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+
+            <!-- الهيدر -->
+            <div class="mb-4 text-right">
+                <h3 class="text-base font-black text-gray-800">🎨 منتقي الألوان</h3>
+                <p class="text-[9px] text-gray-400 font-bold">اختر لونك واحفظه في المفضلة</p>
+            </div>
+            
+            <!-- صندوق التدرج -->
+            <div class="color-box-wrapper rounded-xl overflow-hidden mb-3" style="height: 140px; position: relative; cursor: crosshair; touch-action: none;" id="cpMainBox">
+                <div style="position:absolute;inset:0;background:linear-gradient(to right,#fff,rgba(255,255,255,0));"></div>
+                <div style="position:absolute;inset:0;background:linear-gradient(to top,#000,rgba(0,0,0,0));"></div>
+                <div id="cpBoxCursor" style="width:14px;height:14px;border:2px solid white;border-radius:50%;position:absolute;transform:translate(-50%,-50%);box-shadow:0 0 4px rgba(0,0,0,0.5);pointer-events:none;z-index:10;left:100%;top:0%;"></div>
+            </div>
+
+            <!-- شريط الـ Hue -->
+            <div id="cpHueBar" class="rounded-lg mb-4 cursor-pointer relative" style="height:14px;background:linear-gradient(to right,#ff0000 0%,#ffff00 17%,#00ff00 33%,#00ffff 50%,#0000ff 67%,#ff00ff 83%,#ff0000 100%);touch-action:none;">
+                <div id="cpHueCursor" style="width:10px;height:20px;background:white;border:2px solid #333;border-radius:4px;position:absolute;top:-3px;transform:translateX(-50%);pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.2);left:0%;"></div>
+            </div>
+
+            <!-- معاينة اللون + الكود -->
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl">
+                <div id="cpColorPreview" class="w-12 h-12 rounded-xl border-2 border-white shadow-md" style="background:#ff0000;"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[9px] text-gray-400 font-bold block">اللون المختار</span>
+                    <span id="cpHexValue" class="font-mono font-bold text-gray-700 text-sm">#FF0000</span>
+                </div>
+                <button onclick="copyColorHex()" class="p-2 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm" title="نسخ">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#64748b" viewBox="0 0 256 256"><path d="M216,40H88a16,16,0,0,0-16,16v72a16,16,0,0,0,16,16h128a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,88H88V56H216v72ZM176,152v48H48V72H64V56H48A16,16,0,0,0,32,72V200a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V152Z"></path></svg>
+                </button>
+            </div>
+
+            <!-- المفضلة -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold text-gray-500">⭐ المفضلة</span>
+                    <button onclick="addToFavoriteColors()" class="w-6 h-6 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg flex items-center justify-center transition shadow-sm" title="إضافة للمفضلة">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+                    </button>
+                </div>
+                <div id="favoriteColorsGrid" class="grid grid-cols-8 gap-1.5 min-h-[36px] p-2 bg-gray-50 rounded-xl">
+                    <!-- الألوان المفضلة ستظهر هنا -->
+                </div>
+            </div>
+
+            <!-- أزرار التطبيق -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="applyColorToText()" class="py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold text-xs transition shadow-lg shadow-indigo-100">
+                    <i class="fas fa-font ml-1"></i> تلوين النص
+                </button>
+                <button onclick="applyColorToElement()" class="py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold text-xs transition shadow-lg shadow-purple-100">
+                    <i class="fas fa-fill-drip ml-1"></i> تلوين العنصر
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .color-picker-animate {
+            animation: cpIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes cpIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .color-box-wrapper {
+            background-color: #ff0000;
+        }
+        .fav-color-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .fav-color-btn:hover {
+            transform: scale(1.15);
+            z-index: 10;
+        }
+        .fav-color-btn.delete-mode:hover {
+            border-color: #ef4444;
+        }
+    </style>
+
     <!-- نافذة QR Code -->
     <!-- النافذة الاحترافية لمولد الباركود -->
     <div id="qrModal" class="fixed inset-0 z-[100002] hidden items-center justify-center bg-black/40 backdrop-blur-md p-4 text-right">
@@ -1534,6 +1630,184 @@
                 }, 300);
             }
         }, 300);
+    }
+
+    // ========== منتقي الألوان الاحترافي ==========
+    let cpHue = 0;
+    let cpSaturation = 100;
+    let cpBrightness = 100;
+    let cpFinalHex = "#FF0000";
+    let favoriteColors = JSON.parse(localStorage.getItem('despro_favorite_colors') || '[]');
+
+    function openColorPickerModal() {
+        document.getElementById('colorPickerModal').style.display = 'flex';
+        initColorPicker();
+        renderFavoriteColors();
+    }
+
+    function closeColorPickerModal() {
+        document.getElementById('colorPickerModal').style.display = 'none';
+    }
+
+    function initColorPicker() {
+        const mainBox = document.getElementById('cpMainBox');
+        const hueBar = document.getElementById('cpHueBar');
+        
+        // تفاعل صندوق التدرج
+        function handleBox(e) {
+            const rect = mainBox.getBoundingClientRect();
+            let x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
+            let y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
+            
+            x = Math.max(0, Math.min(x, rect.width));
+            y = Math.max(0, Math.min(y, rect.height));
+            
+            cpSaturation = (x / rect.width) * 100;
+            cpBrightness = 100 - (y / rect.height) * 100;
+            
+            document.getElementById('cpBoxCursor').style.left = (x / rect.width * 100) + '%';
+            document.getElementById('cpBoxCursor').style.top = (y / rect.height * 100) + '%';
+            updatePickerColor();
+        }
+
+        // تفاعل شريط Hue
+        function handleHue(e) {
+            const rect = hueBar.getBoundingClientRect();
+            let x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
+            x = Math.max(0, Math.min(x, rect.width));
+            
+            cpHue = (x / rect.width) * 360;
+            document.getElementById('cpHueCursor').style.left = (x / rect.width * 100) + '%';
+            mainBox.style.backgroundColor = `hsl(${cpHue}, 100%, 50%)`;
+            updatePickerColor();
+        }
+
+        // ربط الأحداث
+        function addPickerInteraction(el, fn) {
+            const move = (e) => { e.preventDefault(); fn(e); };
+            const stop = () => { 
+                window.removeEventListener('mousemove', move); 
+                window.removeEventListener('touchmove', move); 
+            };
+            
+            el.onmousedown = (e) => { fn(e); window.addEventListener('mousemove', move); window.addEventListener('mouseup', stop); };
+            el.ontouchstart = (e) => { fn(e); window.addEventListener('touchmove', move, {passive: false}); window.addEventListener('touchend', stop); };
+        }
+
+        addPickerInteraction(mainBox, handleBox);
+        addPickerInteraction(hueBar, handleHue);
+    }
+
+    function updatePickerColor() {
+        const s = cpSaturation / 100;
+        const v = cpBrightness / 100;
+        const l = v * (1 - s / 2);
+        const sl = (l === 0 || l === 1) ? 0 : (v - l) / Math.min(l, 1 - l);
+        
+        const hslString = `hsl(${cpHue}, ${sl * 100}%, ${l * 100}%)`;
+        
+        // تحويل إلى HEX
+        const tempDiv = document.createElement('div');
+        tempDiv.style.color = hslString;
+        document.body.appendChild(tempDiv);
+        const rgb = window.getComputedStyle(tempDiv).color;
+        document.body.removeChild(tempDiv);
+        
+        const rgbValues = rgb.match(/\d+/g);
+        cpFinalHex = "#" + rgbValues.map(x => parseInt(x).toString(16).padStart(2, '0')).join('').toUpperCase();
+        
+        document.getElementById('cpColorPreview').style.backgroundColor = cpFinalHex;
+        document.getElementById('cpHexValue').innerText = cpFinalHex;
+    }
+
+    function copyColorHex() {
+        navigator.clipboard.writeText(cpFinalHex).then(() => {
+            showInfoModal('تم نسخ اللون: ' + cpFinalHex, 'تم', '✅');
+        }).catch(() => {
+            // Fallback
+            const el = document.createElement('textarea');
+            el.value = cpFinalHex;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showInfoModal('تم نسخ اللون: ' + cpFinalHex, 'تم', '✅');
+        });
+    }
+
+    function addToFavoriteColors() {
+        if (favoriteColors.includes(cpFinalHex)) {
+            showInfoModal('هذا اللون موجود بالفعل في المفضلة', 'تنبيه', '⚠️');
+            return;
+        }
+        if (favoriteColors.length >= 16) {
+            showInfoModal('المفضلة ممتلئة! احذف بعض الألوان أولاً', 'تنبيه', '⚠️');
+            return;
+        }
+        favoriteColors.push(cpFinalHex);
+        localStorage.setItem('despro_favorite_colors', JSON.stringify(favoriteColors));
+        renderFavoriteColors();
+        showInfoModal('تم إضافة اللون للمفضلة ⭐', 'تم', '✅');
+    }
+
+    function renderFavoriteColors() {
+        const grid = document.getElementById('favoriteColorsGrid');
+        if (favoriteColors.length === 0) {
+            grid.innerHTML = '<span class="text-[9px] text-gray-400 col-span-8 text-center py-1">اضغط + لإضافة ألوان</span>';
+            return;
+        }
+        grid.innerHTML = favoriteColors.map((color, i) => `
+            <button class="fav-color-btn" style="background:${color};" 
+                    onclick="useFavoriteColor('${color}')" 
+                    oncontextmenu="event.preventDefault(); removeFavoriteColor(${i});"
+                    title="انقر للاستخدام | انقر يمين للحذف"></button>
+        `).join('');
+    }
+
+    function useFavoriteColor(hex) {
+        cpFinalHex = hex;
+        document.getElementById('cpColorPreview').style.backgroundColor = hex;
+        document.getElementById('cpHexValue').innerText = hex;
+    }
+
+    function removeFavoriteColor(index) {
+        if (confirm('حذف هذا اللون من المفضلة؟')) {
+            favoriteColors.splice(index, 1);
+            localStorage.setItem('despro_favorite_colors', JSON.stringify(favoriteColors));
+            renderFavoriteColors();
+        }
+    }
+
+    function applyColorToText() {
+        if (!activeEl || !activeEl.classList.contains('text-layer')) {
+            showInfoModal('حدد نصاً أولاً!', 'تنبيه', '⚠️');
+            return;
+        }
+        const textDiv = activeEl.querySelector('.user-text');
+        if (textDiv) {
+            textDiv.style.color = cpFinalHex;
+        }
+        activeEl.style.color = cpFinalHex;
+        if (typeof saveState === 'function') saveState();
+        closeColorPickerModal();
+    }
+
+    function applyColorToElement() {
+        if (!activeEl) {
+            showInfoModal('حدد عنصراً أولاً!', 'تنبيه', '⚠️');
+            return;
+        }
+        if (activeEl.classList.contains('image-layer') && activeEl.getAttribute('data-colorable') === 'true') {
+            activeEl.style.backgroundColor = cpFinalHex;
+        } else if (activeEl.classList.contains('frame-layer')) {
+            activeEl.style.borderColor = cpFinalHex;
+            activeEl.style.backgroundColor = cpFinalHex;
+        } else {
+            showInfoModal('هذا العنصر غير قابل للتلوين', 'تنبيه', '⚠️');
+            return;
+        }
+        if (typeof saveState === 'function') saveState();
+        closeColorPickerModal();
     }
     </script>
 </body>
