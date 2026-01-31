@@ -1782,7 +1782,7 @@
             }
 
             const saveImg = document.getElementById('save-img');
-            const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.85);
+            const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 1.0);
             saveImg.src = imgData;
         }
 
@@ -7385,3 +7385,4 @@ function updateLayersList() {
         window.openQRModal = openQRModal;
         window.closeQRModal = closeQRModal;
         window.generateQR = generateQR;
+ 
