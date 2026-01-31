@@ -23,10 +23,11 @@ const iconPaths = {
 
 function openSocialModal() {
     const modal = document.getElementById('social-modal');
+    // Ensure hidden class is removed first
     modal.classList.remove('hidden');
-    setTimeout(() => {
-         modal.classList.remove('opacity-0');
-    }, 10);
+    // Force reflow
+    void modal.offsetWidth; 
+    modal.classList.remove('opacity-0');
     updatePreview();
 }
 
@@ -79,77 +80,90 @@ function addSocialHandleToCanvas() {
     const chosenColor = document.getElementById('handleColor').value;
     const chosenFont = document.getElementById('fontSelect').value;
     
-    // SVG Creation Logic
+    // Measurement Canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    ctx.font = `900 40px "${chosenFont}", sans-serif`;
+    
+    // Parse font family specifically for canvas measurement
+    let fontName = chosenFont;
+    if (fontName.includes("'")) {
+        fontName = fontName.replace(/'/g, "");
+    }
+    if (fontName.includes(",")) {
+        fontName = fontName.split(",")[0].trim();
+    }
+
+    ctx.font = `900 40px "${fontName}", sans-serif`;
     const textMetrics = ctx.measureText(handle);
     const textWidth = textMetrics.width;
     
     const iconPath = iconPaths[platform] || iconPaths['Instagram'];
     const iconSize = 50;
     const gap = 15;
-    const totalWidth = iconSize + gap + textWidth + 20; 
-    const totalHeight = 60;
+    const totalWidth = Math.ceil(iconSize + gap + textWidth + 20); 
+    const totalHeight = 80; // slightly taller to avoid cutoff
     
-    // Use proper font-family names in the SVG style
+    // Escape XML special characters in handle
+    const escapedHandle = handle.replace(/&/g, '&amp;')
+                               .replace(/</g, '&lt;')
+                               .replace(/>/g, '&gt;')
+                               .replace(/"/g, '&quot;')
+                               .replace(/'/g, '&apos;');
+
+    // Fix font family string for SVG Style
+    const fontFamilyValue = chosenFont.includes("'") ? chosenFont : `'${chosenFont}'`;
+
     const svgString = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@900&family=Tajawal:wght@700&family=Montserrat:wght@900&family=Pacifico&family=Dancing+Script:wght@700&family=Bebas+Neue&family=Playfair+Display:wght@900&family=Lobster&family=Caveat:wght@700&family=Cinzel:wght@900&display=swap');
-            .text { font-family: '${chosenFont}', sans-serif; font-weight: 900; font-size: 40px; fill: ${chosenColor}; }
+            .text { font-family: ${fontFamilyValue}, sans-serif; font-weight: 900; font-size: 40px; fill: ${chosenColor}; }
             .icon-g { stroke: ${chosenColor}; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
             ${platform === 'Twitter' ? '.icon-g { stroke: none; fill: '+chosenColor+'; }' : ''} 
         </style>
         
-        <g transform="translate(5, 5) scale(2)" class="icon-g">
+        <g transform="translate(10, 10) scale(2)" class="icon-g">
             ${iconPath}
         </g>
         
-        <text x="${iconSize + gap}" y="42" class="text" dominant-baseline="middle">${handle}</text>
+        <text x="${iconSize + gap}" y="50" class="text" dominant-baseline="middle">${escapedHandle}</text>
     </svg>`;
     
-    const svgBase64 = btoa(unescape(encodeURIComponent(svgString)));
-    const imgSrc = 'data:image/svg+xml;base64,' + svgBase64;
-
-    // Use createWrapper for standard handles
-    if (typeof window.createWrapper === 'function') {
-        const wrapper = window.createWrapper('image-layer');
+    // Convert SVG to PNG using Canvas (to ensure compatibility like QR Code)
+    const img = new Image();
+    const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+    
+    img.onload = function() {
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = totalWidth;
+        finalCanvas.height = totalHeight;
+        const finalCtx = finalCanvas.getContext('2d');
         
-        const displayScale = 0.5; 
+        finalCtx.drawImage(img, 0, 0);
         
-        wrapper.style.width = (totalWidth * displayScale) + 'px';
-        wrapper.style.height = (totalHeight * displayScale) + 'px';
+        // Convert to PNG Data URL
+        const pngUrl = finalCanvas.toDataURL("image/png");
         
-        const card = document.getElementById('card');
-        const cardW = parseFloat(card.style.width) || card.offsetWidth;
-        const cardH = parseFloat(card.style.height) || card.offsetHeight;
+        // Add to design using global function (Like QR Code)
+        if (typeof window.addAssetToCanvas === 'function') {
+            window.addAssetToCanvas(pngUrl, true);
+        } else {
+            console.error('addAssetToCanvas not found');
+            alert('خطأ: النظام غير جاهز');
+        }
         
-        wrapper.style.left = ((cardW - (totalWidth * displayScale)) / 2) + 'px';
-        wrapper.style.top = ((cardH - (totalHeight * displayScale)) / 2) + 'px';
-        
-        const img = document.createElement('img');
-        img.src = imgSrc;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.pointerEvents = 'none';
-        img.draggable = false;
-        
-        const contentWrapper = wrapper.querySelector('.content-wrapper');
-        contentWrapper.appendChild(img);
-        
-        card.appendChild(wrapper);
-        
-        if (typeof setupInteract === 'function') setupInteract(wrapper, 'box');
-        if (typeof selectEl === 'function') selectEl(wrapper);
-        if (typeof saveState === 'function') saveState();
-        
+        URL.revokeObjectURL(url);
         closeSocialModal();
-        if (typeof showSuccessModal === 'function') showSuccessModal('تم إضافة الحساب بنجاح ✅');
-    } else {
-        console.error("createWrapper function is missing!");
-        alert("System error: createWrapper missing.");
-    }
+    };
+
+    img.onerror = function() {
+        console.error('Error loading SVG image');
+        alert('حدث خطأ أثناء إنشاء الصورة');
+        closeSocialModal();
+    };
+    
+    img.src = url;
 }
 
 window.openSocialModal = openSocialModal;
