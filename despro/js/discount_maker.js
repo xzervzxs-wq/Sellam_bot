@@ -52,10 +52,10 @@ function handleDiscountImg(input) {
 
 function selectDiscountTemplate(id) {
     discountCurrentTemplate = id;
-    document.querySelectorAll('.discount-template-btn').forEach(btn => btn.classList.remove('active', 'border-indigo-600', 'bg-indigo-50', 'opacity-100', 'ring-2', 'ring-indigo-100', 'shadow-md'));
+    document.querySelectorAll('.discount-template-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById('discount-tmpl-' + id);
     if (activeBtn) {
-        activeBtn.classList.add('active', 'border-indigo-600', 'bg-indigo-50', 'opacity-100', 'ring-2', 'ring-indigo-100', 'shadow-md');
+        activeBtn.classList.add('active');
     }
     
     const colorInput = document.getElementById('discountCardColor');
@@ -240,34 +240,34 @@ function generateDiscountCard() {
     if (typeof userTier === 'undefined' || userTier !== 'premium') {
         ctx.save();
         
-        // شريط قطري شفاف
-        ctx.translate(cardW / 2, cardH / 2);
-        ctx.rotate(-Math.PI / 4);
-        
-        // خلفية الشريط بتدرج
-        const stripeGrad = ctx.createLinearGradient(-300, 0, 300, 0);
-        stripeGrad.addColorStop(0, "rgba(251, 191, 36, 0.85)");
-        stripeGrad.addColorStop(0.5, "rgba(245, 158, 11, 0.95)");
-        stripeGrad.addColorStop(1, "rgba(251, 191, 36, 0.85)");
-        ctx.fillStyle = stripeGrad;
-        ctx.fillRect(-400, -35, 800, 70);
-        
-        // النص على الشريط
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 32px 'Cairo', sans-serif";
+        // علامة مائية متكررة على الجنب (مثل AI4)
+        ctx.globalAlpha = 0.15; // شفافية خفيفة
+        ctx.font = "bold 22px 'Cairo', sans-serif";
+        ctx.fillStyle = "#000000";
         ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.shadowColor = "rgba(0,0,0,0.3)";
-        ctx.shadowBlur = 4;
-        ctx.fillText("👑 PREMIUM 👑", 0, 0);
+        
+        // نص متكرر عمودياً على الجنب الأيمن
+        const watermarkText = "👑 PREMIUM";
+        const spacing = 80; // المسافة بين كل نص
+        
+        for (let y = 50; y < cardH; y += spacing) {
+            ctx.save();
+            ctx.translate(cardW - 35, y);
+            ctx.rotate(-Math.PI / 2); // عمودي
+            ctx.fillText(watermarkText, 0, 0);
+            ctx.restore();
+        }
+        
+        // نص متكرر على الجنب الأيسر أيضاً
+        for (let y = 90; y < cardH; y += spacing) {
+            ctx.save();
+            ctx.translate(35, y);
+            ctx.rotate(Math.PI / 2); // عمودي معكوس
+            ctx.fillText(watermarkText, 0, 0);
+            ctx.restore();
+        }
         
         ctx.restore();
-        
-        // نص صغير في الأسفل
-        ctx.font = "bold 18px 'Cairo', sans-serif";
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
-        ctx.textAlign = "center";
-        ctx.fillText("اشترك لإزالة العلامة المائية", cardW / 2, cardH - 15);
     }
 
     // تحويل لـ PNG
