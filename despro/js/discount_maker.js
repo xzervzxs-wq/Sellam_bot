@@ -177,32 +177,45 @@ function generateDiscountCard() {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, cardW, cardH);
 
-        // البطاقة العائمة
+        // البطاقة العائمة - أكبر إذا كان هناك سعر سابق
+        const boxHeight = oldPrice ? 260 : 200;
+        const boxY = cardH - boxHeight - 30;
+        
         ctx.save();
         ctx.shadowColor = "rgba(0,0,0,0.2)";
         ctx.shadowBlur = 20;
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        roundRect(50, cardH - 280, cardW - 100, 230, 30);
+        roundRect(50, boxY, cardW - 100, boxHeight, 30);
         ctx.fill();
         ctx.restore();
 
         ctx.textAlign = "center";
         ctx.fillStyle = "#1e293b";
         ctx.font = "bold 40px 'Cairo', sans-serif";
-        ctx.fillText(name, cardW/2, cardH - 180);
-
-        ctx.font = "900 55px 'Cairo', sans-serif";
-        ctx.fillStyle = accentColor;
-        ctx.fillText(price + " ر.س", cardW/2, cardH - 100);
-
+        
+        // تحديد مواقع النصوص بناءً على وجود السعر السابق
         if(oldPrice) {
+            // عند وجود سعر سابق - رفع كل شيء للأعلى
+            ctx.fillText(name, cardW/2, boxY + 55);
+            
+            ctx.font = "900 55px 'Cairo', sans-serif";
+            ctx.fillStyle = accentColor;
+            ctx.fillText(price + " ر.س", cardW/2, boxY + 130);
+            
             ctx.font = "bold 35px 'Cairo', sans-serif";
             ctx.fillStyle = "#94a3b8";
             const oldP = oldPrice + " ر.س";
-            ctx.fillText(oldP, cardW/2, cardH - 55);
+            ctx.fillText(oldP, cardW/2, boxY + 185);
             const w = ctx.measureText(oldP).width;
             ctx.fillStyle = "#ef4444";
-            ctx.fillRect(cardW/2 - w/2, cardH - 65, w, 3);
+            ctx.fillRect(cardW/2 - w/2, boxY + 175, w, 3);
+        } else {
+            // بدون سعر سابق - توسيط عادي
+            ctx.fillText(name, cardW/2, boxY + 70);
+            
+            ctx.font = "900 55px 'Cairo', sans-serif";
+            ctx.fillStyle = accentColor;
+            ctx.fillText(price + " ر.س", cardW/2, boxY + 150);
         }
     }
 
