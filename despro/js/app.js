@@ -5924,14 +5924,73 @@
 
         function downloadImage() {
             const img = document.getElementById('save-img');
-            const link = document.createElement('a');
-            link.href = img.src;
-            // Generate random number for filename
-            const randomNum = Math.floor(Math.random() * 1000000);
-            link.download = `template_${randomNum}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const imgSrc = img.src;
+            
+            // التحقق من iOS (iPhone, iPad, iPod)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isIOS) {
+                // iOS: فتح الصورة في نافذة جديدة للحفظ بالضغط المطول
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html dir="rtl" lang="ar">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+                            <title>احفظ الصورة</title>
+                            <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body { 
+                                    background: #0f172a; 
+                                    min-height: 100vh; 
+                                    display: flex; 
+                                    flex-direction: column; 
+                                    align-items: center; 
+                                    padding: 20px;
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
+                                }
+                                .tip {
+                                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                                    color: white;
+                                    padding: 15px 25px;
+                                    border-radius: 15px;
+                                    margin-bottom: 20px;
+                                    text-align: center;
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+                                    max-width: 90%;
+                                }
+                                img { 
+                                    max-width: 95%; 
+                                    height: auto; 
+                                    border-radius: 12px;
+                                    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="tip">📱 اضغط مطولاً على الصورة ثم اختر "حفظ الصورة"</div>
+                            <img src="${imgSrc}" alt="التصميم">
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                } else {
+                    alert('📱 اضغط مطولاً على الصورة في المعاينة لحفظها');
+                }
+            } else {
+                // Android والكمبيوتر: الطريقة العادية
+                const link = document.createElement('a');
+                link.href = imgSrc;
+                const randomNum = Math.floor(Math.random() * 1000000);
+                link.download = `template_${randomNum}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
 
         function printDesignDirect() {
