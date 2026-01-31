@@ -1927,6 +1927,10 @@
                 if (!img.dataset.originalSrc) {
                     img.dataset.originalSrc = img.src;
                 }
+                // حفظ srcset الأصلي للاستعادة (مهم جداً للجودة) 
+                if (img.srcset && !img.dataset.originalSrcset) {
+                    img.dataset.originalSrcset = img.srcset;
+                }
 
                 try {
                     // 1. تحضير الصورة في الذاكرة (Canvas)
@@ -1937,20 +1941,16 @@
                         tempImg.onload = () => {
                             const canvas = document.createElement('canvas');
                             // تقليل الحجم أكثر للأمان في الآيفون (800px كافية جداً للطباعة المصغرة في A4)
-                            const MAX_DIMENSION = 800;
+                            // لا نقلص الصورة - نحافظ على الجودة الأصلية
                             let width = tempImg.naturalWidth;
                             let height = tempImg.naturalHeight;
 
-                            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-                                const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
-                                width *= ratio;
-                                height *= ratio;
-                            }
-
                             canvas.width = width;
                             canvas.height = height;
-
+                            
                             const ctx = canvas.getContext('2d');
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
                             ctx.drawImage(tempImg, 0, 0, width, height);
 
                             resolve(canvas.toDataURL('image/png'));
@@ -1968,12 +1968,14 @@
                                 .catch(() => resolve(img.src)); // ابق على القديم
                         };
 
+                        // استخدام currentSrc إذا كان متاحاً للحصول على أعلى جودة معروضة فعلياً
+                        const bestSrc = img.currentSrc || img.src;
+                        
                         // كسر الكاش بقوة
-                        const src = img.src;
-                        if (src.startsWith('data:')) {
-                            tempImg.src = src;
+                        if (bestSrc.startsWith('data:')) {
+                            tempImg.src = bestSrc;
                         } else {
-                            tempImg.src = src + (src.includes('?') ? '&' : '?') + 't=' + Date.now();
+                            tempImg.src = bestSrc + (bestSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
                         }
                     });
 
@@ -1997,9 +1999,16 @@
         function restoreOriginalImages(element) {
             const images = element.querySelectorAll('img');
             images.forEach(img => {
+                let changed = false;
                 if (img.dataset.originalSrc) {
                     img.src = img.dataset.originalSrc;
                     delete img.dataset.originalSrc;
+                    changed = true;
+                }
+                if (img.dataset.originalSrcset) {
+                    img.srcset = img.dataset.originalSrcset;
+                    delete img.dataset.originalSrcset;
+                    changed = true;
                 }
             });
         }
