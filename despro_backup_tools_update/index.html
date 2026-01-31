@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أستوديو Despro</title>
+    
+    <!-- تحقق سريع من الجلسة - سطر واحد فقط -->
+    <script>try{if(JSON.parse(localStorage.getItem('despro_session')))document.documentElement.classList.add('logged-in');}catch(e){}</script>
+    <style>.logged-in #studio-default-display{display:none!important}.logged-in #studio-name-display{display:block!important}</style>
+    
+    <!-- مكتبات التنسيق والخطوط -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <!-- إضافة مكتبة jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- إضافة مكتبة UTIF لقراءة ملفات TIF -->
+    <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
+    <!-- إضافة مكتبة PDF.js لقراءة ملفات PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    
+    <!-- تحميل بيانات الأصول من GitHub - يتم عبر fetch -->
+    <!-- سيتم تحميل official3.json عبر JavaScript -->
+    
+    <!-- مكتبة الأيقونات -->
+    <link id="fa-stylesheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+    
+    <!-- تحميل الخطوط العربية (مكتبة موسعة - 37 خط) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Akatab:wght@400;700&family=Alexandria:wght@400;700&family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Baloo+Bhaijaan+2:wght@400;700&family=Blaka&family=Blaka+Hollow&family=Blaka+Ink&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=El+Messiri:wght@400;700&family=Gulzar&family=Harmattan:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Katibeh&family=Kufam:wght@400;700&family=Lalezar&family=Lateef:wght@400;700&family=Lemonada:wght@400;700&family=Mada:wght@400;700&family=Marhey:wght@400;700&family=Markazi+Text:wght@400;700&family=Mirza:wght@400;700&family=Noto+Kufi+Arabic:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Serif+Arabic:wght@400;700&family=Rakkas&family=Readex+Pro:wght@400;700&family=Reem+Kufi:wght@400;700&family=Rubik:wght@400;700&family=Scheherazade+New:wght@400;700&family=Tajawal:wght@400;700&family=Vazirmatn:wght@400;700&family=Zain:wght@400;700&family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Inter:wght@400;600;700&family=Raleway:wght@400;600;700&family=Nunito:wght@400;600;700&family=Quicksand:wght@400;600;700&family=Outfit:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&family=Manrope:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Urbanist:wght@400;600;700&family=Lexend:wght@400;600;700&family=Figtree:wght@400;600;700&family=Geist:wght@400;600;700&family=Work+Sans:wght@400;600;700&family=Josefin+Sans:wght@400;600;700&family=Comfortaa:wght@400;600;700&family=Righteous&display=swap" rel="stylesheet" crossorigin="anonymous">
+
+    <script>
+        // إعداد PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+
+    <!-- Stylesheet خارجي -->
+    <link rel="stylesheet" href="css/style.css?v=20260130_02">
+    
+    <!-- Dark mode fixes - inline للتأكد من التطبيق -->
+    <style>
+        :root.dark-mode #layers-container {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+        }
+        :root.dark-mode #info-bar-placeholder {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #info-bar-placeholder svg {
+            stroke: #94a3b8 !important;
+        }
+        /* Dark Mode for Designer Panel */
+        :root.dark-mode #designer-panel > div:first-child {
+            background: linear-gradient(145deg, #1e293b, #0f172a) !important;
+            border-color: rgba(51, 65, 85, 0.8) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(30,41,59,0.8) inset !important;
+        }
+        :root.dark-mode #designer-panel .border-b.border-slate-100 {
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel h2.text-slate-800 {
+            color: #f1f5f9 !important;
+        }
+        :root.dark-mode #designer-panel p.text-slate-400 {
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #designer-panel .bg-slate-100 {
+            background-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .text-slate-400 {
+            color: #94a3b8 !important;
+        }
+        /* Statistics section dark mode */
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 {
+            background: linear-gradient(to bottom right, #1e293b, rgba(15, 23, 42, 0.8)) !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 h3 {
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .bg-white {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .text-slate-500 {
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .text-slate-800 {
+            color: #f1f5f9 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .border-t {
+            border-color: #334155 !important;
+        }
+        /* Dark mode for notes box */
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] h3 {
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] h3 span.text-\[10px\] {
+            background-color: #6366f1 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] h3 i {
+            color: #818cf8 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] textarea {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] textarea::placeholder {
+            color: #64748b !important;
+        }
+        :root.dark-mode #designer-panel #premium-notes-promo {
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel #premium-notes-promo span {
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #studio-subtitle-display {
+            color: #cbd5e1 !important;
+        }
+        :root.dark-mode #no-selection-msg {
+            color: #cbd5e1 !important;
+        }
+        /* تغميق خلفيات الأزرار في الدارك مود */
+        :root.dark-mode .bg-\[#f8fafc\],
+        :root.dark-mode #fav-colors-row,
+        :root.dark-mode #grad-controls,
+        :root.dark-mode .controls-row {
+            background-color: #1e293b !important;
+        }
+        :root.dark-mode .border-\[#e2e8f0\] {
+            border-color: #334155 !important;
+        }
+        :root.dark-mode .bg-\[#e2e8f0\] {
+            background-color: #334155 !important;
+        }
+    </style>
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body class="min-h-screen flex flex-col" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
+
+    <!-- تحميل الخطوط -->
+    <div id="hidden-font-loader">
+        <span style="font-family: 'Amiri', serif;">أ</span>
+        <!-- ... (باقي الخطوط) ... -->
+        <span style="font-family: 'Tajawal', sans-serif;">أ</span>
+    </div>
+
+    <!-- شاشة تسجيل الدخول -->
+        <!-- Login Overlay -->
+    <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-500" style="display: none; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);">
+        
+        <div id="preparing-studio-screen" class="hidden absolute inset-0 z-[60] flex flex-col items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 bg-[#0f172a]">
+                <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 animate-pulse"></div>
+                <div class="absolute top-0 left-0 w-full h-full opacity-30" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 32px 32px;"></div>
+            </div>
+            
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="relative w-32 h-32 mb-8">
+                    <div class="absolute inset-0 border-4 border-indigo-500/20 rounded-full animate-[spin_3s_linear_infinite]"></div>
+                    <div class="absolute inset-2 border-4 border-t-indigo-400 border-r-transparent border-b-purple-400 border-l-transparent rounded-full animate-[spin_2s_linear_infinite_reverse]"></div>
+                    <div class="absolute inset-6 border-4 border-indigo-300/30 rounded-full animate-ping"></div>
+                    
+                    <div class="absolute inset-0 flex items-center justify-center transform transition-all duration-500">
+                        <i class="fas fa-magic text-3xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-200 to-purple-200 animate-pulse filter drop-shadow-[0_0_10px_rgba(139,92,246,0.5)]"></i>
+                    </div>
+                </div>
+                
+                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-white mb-3 animate-pulse">جاري تجهيز مساحتك</h2>
+                <div class="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 backdrop-blur-md">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <p class="text-indigo-200 text-xs font-medium tracking-wide">يتم تحميل أدوات المصمم...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Login Card -->
+        <div class="login-container relative w-full max-w-sm bg-white/90 backdrop-blur-xl rounded-[30px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden border border-white/40 transform transition-all duration-500 hover:shadow-[0_25px_70px_-12px_rgba(79,70,229,0.3)] animate-slideUp">
+            
+            <!-- Ambient Light Effect -->
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/30 rounded-full blur-3xl pointer-events-none mix-blend-multiply"></div>
+            <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl pointer-events-none mix-blend-multiply"></div>
+
+            <div class="relative z-10 p-8">
+                <!-- Close Button -->
+                <button onclick="toggleLoginOverlay()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-300 group z-20">
+                    <i class="fas fa-times text-sm group-hover:rotate-90 transition-transform"></i>
+                </button>
+
+                <!-- Header Section -->
+                <div class="text-center mb-8 pt-2">
+                    <div class="relative w-20 h-20 mx-auto mb-5 group">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-500 opacity-20"></div>
+                        <div class="absolute inset-0 bg-[#6366f1] rounded-2xl shadow-xl flex items-center justify-center transform transition-transform duration-500 group-hover:-translate-y-1">
+                            <!-- أيقونة الباليت بخلفية زرقاء مثل الهيدر -->
+                            <i class="fas fa-palette text-3xl text-white"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-2">أستوديو Despro</h2>
+                    <div class="flex items-center justify-center gap-1 text-[13px] font-bold text-gray-500">
+                        <span>لتنبضَ أفكارك.. بالحياة</span>
+                        <span>✨</span>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="space-y-5 mb-8">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none z-10">
+                            <i class="fas fa-key text-gray-300 group-focus-within:text-indigo-500 transition-colors duration-300"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="login-code-input" 
+                            class="block w-full py-4 pr-12 pl-4 text-center text-lg font-bold tracking-[0.2em] text-gray-800 bg-gray-50/50 border border-gray-200 rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 placeholder-gray-300 transition-all duration-300 outline-none shadow-sm group-hover:bg-white" 
+                            placeholder="CODE" 
+                            autocomplete="off"
+                            onkeypress="if(event.key==='Enter') verifyCode()"
+                        >
+                    </div>
+
+                    <button id="login-btn" onclick="verifyCode()" class="relative w-full py-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/25 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group">
+                        <span id="login-btn-text" class="relative z-10 flex items-center justify-center gap-2">
+                            <span>دخول الاستوديو</span>
+                            <i class="fas fa-arrow-left text-sm group-hover:-translate-x-1 transition-transform"></i>
+                        </span>
+                        <span id="login-btn-spinner" class="hidden absolute inset-0 z-20 flex items-center justify-center bg-inherit">
+                            <i class="fas fa-circle-notch fa-spin text-xl"></i>
+                        </span>
+                        <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                    
+                    <!-- عنصر مخفي لتوافق الكود -->
+                    <div id="login-loading" class="hidden"></div>
+                </div>
+
+                <!-- Footer Services -->
+                <div class="grid grid-cols-3 gap-3">
+                    <a href="subscriptions.html" class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-amber-50 border border-transparent hover:border-amber-100 transition-all duration-300 group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-crown text-amber-600 text-xs"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 group-hover:text-amber-700">اشتراك</span>
+                    </a>
+                    
+                    <a href="https://wa.me/966531333714" target="_blank" class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-green-50 border border-transparent hover:border-green-100 transition-all duration-300 group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fab fa-whatsapp text-green-600 text-sm"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 group-hover:text-green-700">دعم فني</span>
+                    </a>
+                    
+                     <a href="https://wa.me/966531333714?text=استفسار" target="_blank" class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all duration-300 group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-question text-blue-600 text-xs"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 group-hover:text-blue-700">استفسار</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة التنبيه (للتحميل الداخلي) -->
+    <div id="startup-overlay" style="display: none;">
+        <div class="spinner mb-4"></div>
+        <div class="loading-text">جاري تجهيز أستوديو Despro...</div>
+    </div>
+    
+    <!-- نافذة الأصول العائمة -->
+    <div id="asset-window">
+        <div id="asset-header">
+            <span>🎨 عناصر القالب</span>
+            <button onclick="document.getElementById('asset-window').style.display='none'" class="text-white hover:text-red-400"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="asset-content">
+            <!-- سيتم تعبئة العناصر هنا -->
+        </div>
+    </div>
+
+    <!-- شاشة التصدير -->
+    <div id="export-overlay"><div class="spinner mb-4"></div><div class="text-white font-bold text-xl">جاري إنشاء الصورة...</div></div>
+    
+    <!-- نافذة التنبيه الجميلة (المصغرة) -->
+    <div id="info-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 100001; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+        <div class="bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-indigo-100 p-4 max-w-[280px] mx-4 text-center transform animate-bounce-in relative">
+            
+            <div class="flex items-center gap-2 justify-center mb-2 border-b border-gray-100 pb-2">
+                <div id="info-modal-icon" class="text-xl">💡</div>
+                <h3 id="info-modal-title" class="text-sm font-bold text-slate-800">تنبيه</h3>
+            </div>
+            
+            <p id="info-modal-message" class="text-slate-600 text-xs font-semibold mb-3 leading-relaxed"></p>
+            
+            <button onclick="closeInfoModal()" class="w-full bg-[#6366f1] text-white hover:bg-[#4f46e5] px-4 py-1.5 rounded-lg text-xs font-bold transition shadow-md hover:shadow-lg">
+                حسناً
+            </button>
+        </div>
+    </div>
+    
+    <!-- نافذة التأكيد الاحترافية -->
+    <div id="confirm-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 100001; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+        <div class="bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-red-100 p-4 max-w-[280px] mx-4 text-center transform animate-bounce-in relative">
+            <div class="flex items-center gap-2 justify-center mb-2 border-b border-gray-100 pb-2">
+                <div id="confirm-modal-icon" class="text-xl">⚠️</div>
+                <h3 id="confirm-modal-title" class="text-sm font-bold text-slate-800">تأكيد</h3>
+            </div>
+            <p id="confirm-modal-message" class="text-slate-600 text-xs font-semibold mb-3 leading-relaxed"></p>
+            <div class="flex gap-2">
+                <button id="confirm-modal-yes" class="flex-1 bg-[#ef4444] text-white hover:bg-[#dc2626] px-4 py-1.5 rounded-lg text-xs font-bold transition shadow-md hover:shadow-lg">
+                    نعم
+                </button>
+                <button onclick="closeConfirmModal(false)" class="flex-1 bg-gray-200 text-slate-700 hover:bg-gray-300 px-4 py-1.5 rounded-lg text-xs font-bold transition">
+                    لا
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="save-modal">
+        <div class="w-full h-full max-w-[95vw] md:max-w-6xl max-h-[95vh] bg-slate-900 rounded-2xl shadow-2xl flex overflow-hidden border border-slate-700 mx-4">
+            
+            <!-- القسم الأيمن: المعاينة -->
+            <div class="flex-1 bg-[#0f172a] relative p-6 flex items-center justify-center">
+                <!-- خلفية شبكية خفيفة -->
+                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px;"></div>
+                
+                <div class="relative shadow-2xl h-full w-full flex items-center justify-center z-10 pb-4">
+                    <img id="save-img" class="max-h-full max-w-full object-contain bg-white transition-transform duration-300 shadow-xl" alt="معاينة الطباعة">
+                </div>
+            </div>
+
+            <!-- القسم الأيسر: الخيارات -->
+            <div class="w-[320px] bg-slate-800 border-r border-slate-700 flex flex-col z-20 shadow-xl">
+                 <!-- رأس القائمة -->
+                 <div class="p-6 pb-4 border-b border-slate-700/50">
+                     <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2">
+                        <i class="fas fa-print text-[#6366f1]"></i> طباعة وتصدير
+                     </h2>
+                     <p class="text-slate-400 text-[11px] font-bold">معاينة وتخصيص طباعة A4</p>
+                 </div>
+                 
+                 <!-- المحتوى القابل للتمرير -->
+                 <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                     
+                     <!-- إعدادات النسخ -->
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50">
+                         <div class="flex items-center justify-between mb-3">
+                             <label class="text-slate-200 text-xs font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
+                             <span class="text-sm text-slate-200 font-bold bg-slate-600/70 px-3 py-1 rounded-full" id="a4-max-text"></span>
+                         </div>
+                         
+                         <div class="flex items-center gap-2">
+                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-600 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
+                         </div>
+                     </div>
+
+                     <!-- خيارات إضافية -->
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 space-y-3">
+                         <label class="flex items-center justify-between cursor-pointer group select-none">
+                             <div class="flex items-center gap-2">
+                                 <div class="w-8 h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
+                                     <i class="fas fa-scissors text-xs"></i>
+                                 </div>
+                                 <span class="text-slate-200 text-xs font-bold group-hover:text-white transition">فواصل القص</span>
+                             </div>
+                             <div class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="show-cut-lines" checked onchange="updateA4Count()" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#6366f1]"></div>
+                             </div>
+                         </label>
+                         
+                         <!-- Opacity Control for Cut Lines -->
+                         <div class="px-1 pt-2 pb-1">
+                             <div class="flex items-center gap-2">
+                                 <span class="text-[8px] text-slate-400 font-bold whitespace-nowrap">الشفافية:</span>
+                                 <input type="range" id="cut-lines-opacity" min="10" max="100" value="100" onchange="updateA4Count()" oninput="document.getElementById('opacity-value').innerText = this.value + '%'" class="flex-1 h-1.5 accent-[#6366f1] rounded-full" style="cursor: pointer;">
+                                 <span class="text-[8px] text-slate-400 font-bold w-5 text-right" id="opacity-value">100%</span>
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- ملاحظة -->
+                     <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                         <p class="text-[10px] text-blue-200 leading-relaxed font-bold flex gap-2">
+                             <i class="fas fa-info-circle mt-0.5"></i>
+                             يتم ترتيب البطاقات تلقائياً لاستغلال مساحة الورقة بالكامل.
+                         </p>
+                     </div>
+                 </div>
+
+                 <!-- ذيل القائمة (الأزرار) -->
+                 <div class="p-6 pt-4 border-t border-slate-700/50 bg-slate-800 flex flex-col gap-3">
+                     <button onclick="printDesignDirect()" class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-[#6366f1]/25 border border-white/10 active:scale-[0.98] transition flex items-center justify-center gap-2 group">
+                        <i class="fas fa-print text-lg group-hover:animate-pulse"></i> <span>طباعة فورية</span>
+                     </button>
+                     
+                     <div class="grid grid-cols-2 gap-3">
+                         <button onclick="downloadImage()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/5 active:scale-[0.98]">
+                            <i class="fas fa-image text-emerald-400"></i> صورة
+                         </button>
+                         <button onclick="downloadPDF()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/5 active:scale-[0.98]">
+                            <i class="fas fa-file-pdf text-red-400"></i> PDF
+                         </button>
+                     </div>
+
+                     <button onclick="closeA4Modal()" class="mt-3 text-slate-300 hover:text-white text-xs font-bold py-2 px-4 transition text-center hover:bg-slate-700/50 rounded-lg border border-slate-600 hover:border-slate-500">
+                         إغلاق النافذة
+                     </button>
+                     
+                     <!-- زر Premium لغير المشتركين -->
+                     <div id="premium-upgrade-btn" class="mt-1">
+                         <a href="subscriptions.html" class="flex items-center justify-center gap-1.5 bg-transparent px-4 py-1 rounded-lg transition-all hover:bg-amber-500/5">
+                             <span class="text-[9px] font-bold tracking-[0.2em] text-amber-500/70 hover:text-amber-400 transition-colors">
+                                 ✨ PREMIUM
+                             </span>
+                         </a>
+                     </div>
+                     
+                     <script>
+                         // إخفاء زر Premium للأعضاء البريميوم
+                         function updatePremiumBadge() {
+                             const btn = document.getElementById('premium-upgrade-btn');
+                             if (userTier === 'premium' && btn) {
+                                 btn.style.display = 'none';
+                             } else if (btn) {
+                                 btn.style.display = 'block';
+                             }
+                         }
+                         // تحديث عند فتح النافذة
+                         const observer = new MutationObserver(() => updatePremiumBadge());
+                         observer.observe(document.getElementById('save-modal'), { attributes: true });
+                         setTimeout(updatePremiumBadge, 100);
+                     </script>
+                 </div>
+            </div>
+            
+            <!-- زر قديم مخفي للحفاظ على التوافق -->
+            <button id="btn-modal-a4" onclick="generateA4Sheet()" class="hidden"></button>
+        </div>
+    </div>
+
+    <!-- مودال المشروع الجديد - ناعم وخفيف مع لون وردي -->
+    <div id="new-project-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onclick="if(event.target.id === 'new-project-modal') closeNewProjectModal()">
+        <div class="bg-white rounded-2xl p-5 shadow-lg max-w-sm w-full mx-4" onclick="event.stopPropagation()">
+            <!-- الرأس البسيط -->
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold text-[#1e293b]">هل تريد حفظ العمل؟</h2>
+                <p class="text-xs text-[#94a3b8] mt-1">لديك عمل حالي لم يتم حفظه</p>
+            </div>
+            
+            <!-- الأزرار الثلاث بجانب بعض -->
+            <div class="flex gap-2 justify-center">
+                <button onclick="saveCurrentAsTemplateAndNew()" class="flex-1 bg-[#ec4899] text-white px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#db2777] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-save group-hover:scale-110 transition-transform"></i>
+                    <span>حفظ العمل</span>
+                </button>
+                
+                <button onclick="resetCanvasWithoutSave()" class="flex-1 bg-white border border-[#ef4444] text-[#ef4444] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#fef2f2] hover:border-[#dc2626] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-trash-alt group-hover:scale-110 transition-transform"></i>
+                    <span>عدم الحفظ</span>
+                </button>
+                
+                <button onclick="closeNewProjectModal()" class="flex-1 bg-white border border-[#cbd5e1] text-[#64748b] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#f8fafc] hover:border-[#94a3b8] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-times group-hover:scale-110 transition-transform"></i>
+                    <span>إلغاء</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال حفظ باسم - ناعم وخفيف مع لون وردي -->
+    <div id="save-as-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onclick="if(event.target.id === 'save-as-modal') closeSaveAsModal()">
+        <div class="bg-white rounded-2xl p-5 shadow-lg max-w-sm w-full mx-4" onclick="event.stopPropagation()">
+            <!-- الرأس البسيط -->
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold text-[#1e293b] flex items-center justify-center gap-2">
+                    <i class="fas fa-save text-[#ec4899]"></i>
+                    <span>حفظ العمل</span>
+                </h2>
+                <p class="text-xs text-[#94a3b8] mt-1">احفظ عملك كقالب محفوظ</p>
+            </div>
+            
+            <!-- حقل الاسم -->
+            <div class="mb-4">
+                <label class="text-xs font-bold text-[#1e293b] block mb-2">اسم العمل:</label>
+                <input type="text" id="save-as-name" placeholder="أدخل اسم العمل..." class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-lg text-sm outline-none focus:border-[#6366f1] focus:bg-[#f0f9ff] text-[#1e293b] transition-all" />
+                <p class="text-xs text-[#94a3b8] mt-1.5">💡 يتم حفظ جميع عناصر العمل بصيغة JSON.</p>
+            </div>
+            
+            <!-- خيار حفظ الملاحظات (يظهر فقط إذا وُجدت ملاحظات) -->
+            <div id="save-notes-option" class="hidden mb-4">
+                <!-- للمشتركين البريميوم -->
+                <label id="notes-option-premium" class="flex items-center gap-2 cursor-pointer p-2.5 bg-[#fef3c7] border border-[#fbbf24] rounded-lg hover:bg-[#fef9c3] transition-all">
+                    <input type="checkbox" id="save-with-notes" class="w-4 h-4 accent-[#f59e0b] cursor-pointer" checked />
+                    <span class="text-xs font-bold text-[#92400e] flex items-center gap-1">
+                        <i class="fas fa-sticky-note"></i>
+                        حفظ مع الملاحظات
+                    </span>
+                </label>
+                <!-- للمشتركين المجانيين -->
+                <div id="notes-option-free" class="hidden flex items-center gap-2 p-2.5 bg-[#f1f5f9] border border-[#cbd5e1] rounded-lg opacity-60 cursor-not-allowed">
+                    <input type="checkbox" disabled class="w-4 h-4 accent-gray-400 cursor-not-allowed" />
+                    <span class="text-xs font-bold text-[#64748b] flex items-center gap-1">
+                        <i class="fas fa-sticky-note"></i>
+                        حفظ مع الملاحظات
+                    </span>
+                    <span class="text-xs font-bold text-[#f59e0b] mr-auto flex items-center gap-1">
+                        <i class="fas fa-crown"></i>
+                        Premium Members
+                    </span>
+                </div>
+            </div>
+            
+            <!-- الأزرار -->
+            <div class="flex gap-2 justify-center mb-3">
+                <button onclick="executeSaveAsFile()" class="flex-1 bg-[#ec4899] text-white px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#db2777] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-save group-hover:scale-110 transition-transform"></i>
+                    <span>حفظ الآن</span>
+                </button>
+                <button onclick="closeSaveAsModal()" class="flex-1 bg-white border border-[#cbd5e1] text-[#64748b] px-3 py-2.5 rounded-lg text-xs font-bold hover:bg-[#f8fafc] hover:border-[#94a3b8] transition-all shadow-sm flex items-center justify-center gap-2 group">
+                    <i class="fas fa-times group-hover:scale-110 transition-transform"></i>
+                    <span>إلغاء</span>
+                </button>
+            </div>
+
+            <!-- ملاحظة صغيرة مع أيقونة -->
+            <div class="bg-[#f0f9ff] border border-[#bfdbfe] rounded-lg p-2.5 text-center">
+                <p class="text-xs text-[#1e40af] font-medium flex items-center justify-center gap-1.5 direction-rtl">
+                    يمكنك فتحه لاحقاً عبر
+                    <span class="inline-flex items-center gap-1 text-[#6366f1] text-[11px] font-bold mr-1">
+                        <i class="fas fa-folder-open"></i> فتح ملف
+                    </span>
+                </p>
+            </div>
+            <input type="hidden" id="save-as-callback">
+        </div>
+    </div>
+
+    <!-- مودال النجاح - ناعم وعصري - تم رفع طبقة العرض فوق كل شيء -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-black/40 z-[200000] flex items-center justify-center backdrop-blur-sm transition-all duration-300 opacity-0" onclick="closeSuccessModal()">
+        <div class="bg-white rounded-2xl p-6 shadow-2xl max-w-[300px] w-full mx-4 transform transition-all duration-300 scale-90" id="success-modal-content" onclick="event.stopPropagation()">
+            <div class="text-center">
+                <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fas fa-check text-2xl text-green-500 animate-pulse"></i>
+                </div>
+                <h2 class="text-base font-bold text-[#1e293b] mb-1" id="success-modal-title">تمت العملية</h2>
+                <p class="text-[11px] text-[#64748b] mb-5 leading-relaxed" id="success-modal-message">تم تنفيذ الإجراء المطلوب بنجاح</p>
+                <button onclick="closeSuccessModal()" class="w-full bg-[#ec4899] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#db2777] transition-all shadow-md flex items-center justify-center gap-2 group hover:shadow-lg hover:-translate-y-0.5">
+                    <span>حسناً</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- مودال التدرج اللوني - تم إلغاؤه واستبداله بأدوات في الشريط العلوي -->
+
+
+    <!-- واجهة التطبيق -->
+    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
+        
+        <!-- اللوحة الجانبية -->
+        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
+            
+            <div class="flex items-center justify-center border-b border-[#e2e8f0] pb-3">
+                <div class="text-center">
+                    <div style="display: inline-block;">
+                        <!-- الشعار القديم - تم استبداله بالستايل الجديد -->
+                        <!-- اسم الاستوديو - يظهر لغير المشتركين (افتراضي) -->
+                        <div id="studio-default-display" style="display: block; white-space: nowrap;">
+                            <div style="display: inline-flex; align-items: center; gap: 8px;">
+                                <div style="width: 32px; height: 32px; background: #6366f1; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-palette text-white" style="font-size: 14px;"></i>
+                                </div>
+                                <span style="font-size: 24px; font-weight: bold; color: #1e293b;">استوديو المصمم</span>
+                                <span style="margin-right: 4px;">✨</span>
+                            </div>
+                        </div>
+                        <!-- اسم العضو مع الأيقونة - يظهر للمشتركين فقط -->
+                        <div id="studio-name-display" style="display: none; white-space: nowrap;">
+                            <div style="display: inline-flex; align-items: center; gap: 8px;">
+                                <div style="width: 32px; height: 32px; background: #6366f1; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-palette text-white" style="font-size: 14px;"></i>
+                                </div>
+                                <span id="studio-name-text" style="font-size: 24px; font-weight: bold; color: #1e293b;">أستوديو</span>
+                                <span style="margin-right: 4px;">✨</span>
+                            </div>
+                        </div>
+                        <!-- الوصف -->
+                        <p class="text-[10px] text-slate-600 font-bold" id="studio-subtitle-display" style="margin-top: 6px;">مساحة مخصصة <span style="margin: 0 4px; color: #64748b;">|</span>مشاريع منزلية <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-right: 4px; color: #64748b;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 12l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h6" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2c.39 0 .754 .112 1.061 .304" /><path d="M19 21.5l2.518 -2.58a1.74 1.74 0 0 0 0 -2.413a1.627 1.627 0 0 0 -2.346 0l-.168 .172l-.168 -.172a1.627 1.627 0 0 0 -2.346 0a1.74 1.74 0 0 0 0 2.412l2.51 2.59l0 -.009" /></svg></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إضافة النصوص -->
+            <div id="add-text-container" class="space-y-2 bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <label class="text-xs font-bold text-[#1e293b]">إضافة نصوص</label>
+                <div class="flex flex-col gap-2">
+                    <textarea id="user-text-input" rows="2" placeholder="اكتب النص هنا..." class="w-full p-2 bg-white border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-[#1e293b] resize-none"></textarea>
+                    <button onclick="addUserText()" class="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] flex items-center justify-center border border-[#6366f1] text-sm font-bold shadow-sm w-full">
+                        <i class="fas fa-plus ml-2"></i> إضافة النص
+                    </button>
+                </div>
+            </div>
+
+            <!-- أدوات الإضافة -->
+            <div class="grid grid-cols-3 gap-2">
+                <label class="col-span-2 bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition group">
+                    <i class="fas fa-image text-lg text-[#6366f1] group-hover:scale-110 transition-transform"></i> صورة
+                    <input type="file" onchange="addRegularImage(this)" class="hidden" accept="image/*">
+                </label>
+                <button onclick="createNewProject()" class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-file-circle-plus text-[#6366f1] group-hover:scale-110 transition-transform"></i> جديد</button>
+                
+                <!-- زر الإطارات مع Dropdown -->
+                <div class="relative" onclick="event.stopPropagation();">
+                    <button onclick="toggleFrameDropdown()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group min-w-[50px]">
+                        <i class="far fa-square text-[#6366f1] group-hover:scale-110 transition-transform"></i> إطار
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="frames-dropdown" class="hidden absolute top-full left-0 mt-2 bg-white border border-[#cbd5e1] rounded-lg shadow-lg z-50 p-1 w-[110px]">
+                        <button onclick="addFrameType('square')" class="w-full px-2 py-1.5 text-left text-[10px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:text-[#6366f1] rounded transition flex items-center gap-2 mb-1">
+                            <i class="far fa-square text-sm"></i> مربع
+                        </button>
+                        <button onclick="addFrameType('rounded')" class="w-full px-2 py-1.5 text-left text-[10px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:text-[#6366f1] rounded transition flex items-center gap-2 mb-1">
+                            <i class="far fa-square text-sm" style="border-radius: 6px;"></i> منحني
+                        </button>
+                        <button onclick="addFrameType('circle')" class="w-full px-2 py-1.5 text-left text-[10px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:text-[#6366f1] rounded transition flex items-center gap-2">
+                             <i class="far fa-circle text-sm"></i> دائرة
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- زر الأشكال مع Dropdown -->
+                <div class="relative" onclick="event.stopPropagation();">
+                    <button onclick="addShape()" class="w-full bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 group"><i class="fas fa-square-full text-[#6366f1] group-hover:scale-110 transition-transform"></i> شكل</button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="shapes-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-[#cbd5e1] rounded-lg shadow-lg z-40 p-2">
+                        <button onclick="addShapeType('square')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
+                            <div class="w-4 h-4 bg-[#6366f1] rounded" style="border-radius: 2px;"></div> مربع
+                        </button>
+                        <button onclick="addShapeType('circle')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
+                            <div class="w-4 h-4 bg-[#6366f1] rounded-full"></div> دائرة
+                        </button>
+                        <button onclick="addShapeType('line')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
+                            <div class="w-4 h-0.5 bg-[#6366f1]"></div> خط
+                        </button>
+                        <button onclick="addShapeType('rounded')" class="w-full px-3 py-2 text-left text-[11px] font-bold text-[#1e293b] hover:bg-[#f0f4ff] hover:border-l-4 hover:border-l-[#6366f1] rounded transition flex items-center gap-2">
+                            <div class="w-4 h-4 bg-[#6366f1] rounded-lg" style="border-radius: 4px;"></div> منحنى
+                        </button>
+                    </div>
+                </div>
+                
+                <label class="bg-white border border-[#cbd5e1] py-2 rounded-lg text-[#1e293b] text-xs font-bold hover:bg-[#f8fafc] hover:border-[#6366f1] flex flex-col items-center gap-1 cursor-pointer group transition">
+                    <i class="fas fa-folder-open text-[#6366f1] group-hover:scale-110 transition-transform"></i> فتح ملف
+                    <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
+                </label>
+            </div>
+
+            <!-- مقاسات العمل (يدوي فقط - 10x10 افتراضي) -->
+            <div id="dimensions-container" class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <label class="text-xs font-bold text-[#1e293b] mb-2 block flex items-center gap-2">
+                    <i class="fas fa-ruler-combined text-[#6366f1]"></i> أبعاد التصميم (سم)
+                </label>
+                
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div class="relative">
+                        <label class="text-[9px] text-[#64748b] font-bold block mb-1">العرض (Width)</label>
+                        <input type="text" inputmode="decimal" id="custom-width" value="10" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
+                        <span class="absolute left-2 top-[26px] text-[12px] font-bold text-[#64748b] dark:text-slate-300">سم</span>
+                    </div>
+                    <div class="relative">
+                        <label class="text-[9px] text-[#64748b] font-bold block mb-1">الارتفاع (Height)</label>
+                        <input type="text" inputmode="decimal" id="custom-height" value="10" class="w-full pl-8 px-2 py-1.5 border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-center font-bold text-[#1e293b]" onfocus="this.select()" oninput="this.value = arabicToEnglish(this.value); applyCustomSizeSimple()">
+                        <span class="absolute left-2 top-[26px] text-[12px] font-bold text-[#64748b] dark:text-slate-300">سم</span>
+                    </div>
+                </div>
+                
+                <div class="mt-2 text-center">
+                    <span id="size-display" class="text-[10px] font-bold text-[#64748b] bg-white px-2 py-1 rounded border border-[#e2e8f0]">1181 × 1181 px</span>
+                </div>
+                
+                <!-- التحكم بـ Zoom -->
+                <div id="zoom-container" class="mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-[9px] text-[#0c4a6e] font-bold">🔍 مستوى الزوم</label>
+                        <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">50%</span>
+                    </div>
+                    <input type="range" id="zoom-slider" min="25" max="200" value="50" class="w-full cursor-pointer" oninput="setCustomZoom(this.value)">
+                    <div class="flex gap-1 mt-2">
+                        <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">50%</button>
+                        <button onclick="setCustomZoom(75)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">75%</button>
+                        <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">100%</button>
+                        <button onclick="setCustomZoom(150)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">150%</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم مكتبة العناصر الرسمية -->
+            <div id="assets-library-container" class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleAssetsLibrary()">
+                    <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-shapes text-[#6366f1]"></i> مكتبة العناصر <span class="text-[#cbd5e1] mx-1">|</span> <span class="text-xs font-bold text-[#1e293b] flex items-center gap-1">مكتبة متجددة</span>
+                    </label>
+                    <i id="assets-library-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200" style="transform: rotate(-90deg);"></i>
+                </div>
+                
+                <div id="assets-library-content" class="mt-3 flex flex-col gap-2">
+                    <!-- القائمة المنسدلة للتصنيفات -->
+                    <div class="w-full">
+                        <select id="assets-category-select" class="w-full p-2 text-xs font-bold bg-white border border-[#cbd5e1] rounded-lg text-[#1e293b] outline-none focus:border-[#6366f1]" onchange="loadAssetsCategory()">
+                            <option value="">📂 اختر تصنيفاً...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- شبكة العناصر -->
+                    <div id="assets-grid" class="grid grid-cols-3 gap-2 max-h-[200px] overflow-y-auto p-1 bg-white rounded-lg border border-[#e2e8f0]">
+                        <div class="col-span-3 text-center text-[10px] text-[#64748b] py-4">اختر تصنيفاً لعرض العناصر</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم الطبقات الجديد -->
+            <div id="layers-container" class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayersPanel()">
+                    <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-layer-group text-[#ec4899]"></i> الطبقات
+                    </label>
+                    <i id="layers-panel-arrow" class="fas fa-chevron-left text-[#64748b] text-xs transition-transform duration-200"></i>
+                </div>
+                
+                <div id="layers-panel-content" class="hidden mt-3 flex flex-col gap-1 max-h-[250px] overflow-y-auto">
+                    <div id="layers-list" class="space-y-1">
+                        <div class="text-center text-[10px] text-[#64748b] py-4">لا توجد عناصر في منطقة العمل</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم الخصائص والحفظ -->
+            <div id="style-panel" class="bg-white p-4 rounded-2xl shadow-lg border border-[#cbd5e1] transition-all" onclick="event.stopPropagation()">
+                <div class="flex flex-col gap-3 mb-4 border-b border-[#e2e8f0] pb-3">
+                    <span class="text-xs font-black text-[#6366f1] uppercase tracking-wider" id="panel-title">التصدير</span>
+                    <!-- أزرار الحفظ -->
+                    <div class="flex flex-col gap-2">
+                        <!-- صف الأزرار العلوي: حفظ صورة + حفظ كملف -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="saveWorkDirectly()" class="bg-[#6366f1] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#4f46e5] flex items-center justify-center gap-2 shadow-md transition">
+                                <i class="fas fa-image"></i> حفظ صورة
+                            </button>
+                            <button onclick="openSaveAsModal()" class="bg-[#6366f1] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#4f46e5] flex items-center justify-center gap-2 shadow-md transition">
+                                <i class="fas fa-download"></i> حفظ كملف
+                            </button>
+                        </div>
+                        <!-- زر طباعة A4 كامل العرض -->
+                        <button onclick="generateA4Sheet()" class="w-full bg-[#ec4899] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#db2777] flex items-center justify-center gap-2 shadow-md transition">
+                            <i class="fas fa-print"></i> طباعة A4
+                        </button>
+                    </div>
+                </div>
+
+                <div id="no-selection-msg" class="text-center py-4 text-[#64748b] text-xs font-bold opacity-70">
+                    تصدير العمل النهائي
+                </div>
+
+                <div id="text-controls" class="hidden space-y-4">
+                    <input type="hidden" id="font-size">
+                    <input type="hidden" id="font-size-input">
+                    <input type="hidden" id="font-family">
+                </div>
+
+                <div id="frame-controls" class="hidden space-y-4">
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة العمل -->
+        <div class="lg:col-span-8 flex flex-col gap-1">
+            
+            <!-- شريط الأدوات العلوي -->
+            <div class="flex flex-wrap items-center bg-white p-2 rounded-xl border border-[#cbd5e1] shadow-sm justify-between gap-y-2 relative" onclick="event.stopPropagation()">
+                
+                <!-- زر الدارك مود - في الزاوية اليسرى -->
+                <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn absolute top-2 left-2 z-10" title="تبديل الوضع الليلي">
+                    <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
+                    <i class="fas fa-moon theme-moon"></i>
+                </button>
+                
+                <!-- الصف الأول: الأدوات مرتبة في أقسام -->
+                <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
+                    
+                    <!-- أزرار التراجع والإعادة -->
+                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
+                        <button onclick="undoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
+                        <div class="w-px h-4 bg-[#e2e8f0]"></div>
+                        <button onclick="redoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
+                    </div>
+                    
+                    <!-- قسم الخلفية - BACKGROUND -->
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#8b5cf6]/20 min-h-[52px]">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-purple-600 w-full text-center">
+                            BACKGROUND
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <label class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] cursor-pointer" title="لون الخلفية">
+                                <i class="fas fa-fill-drip"></i> الخلفية
+                                <div id="bg-color-preview" class="relative w-5 h-5 rounded-full border border-slate-300 shadow-sm" style="background-color: #ffffff;">
+                                    <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                </div>
+                            </label>
+                            <button onclick="toggleTransparentMode()" id="btn-transparent" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تفعيل/إلغاء الشفافية">
+                                <i class="fas fa-chess-board"></i> شفاف
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- قسم الأدوات الذكية - SMART TOOLS -->
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
+                            SMART TOOLS
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="toggleLassoMode()" id="btn-lasso" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="قص ذكي بالتحديد">
+                                <i class="fas fa-cut"></i> قص
+                            </button>
+                            <button onclick="toggleSmartEraserMode()" id="btn-smart-eraser-top" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="ممحاة ذكية بالتحديد">
+                                <i class="fas fa-eraser"></i> ممحاة
+                            </button>
+                            <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تلوين ذكي بالتحديد">
+                                <i class="fas fa-fill-drip"></i> تلوين
+                            </button>
+                            <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#e2e8f0]" title="اختر لون التعبئة">
+                        </div>
+                    </div>
+                    
+                    <!-- أدوات التحرير الأساسية -->
+                    <div class="flex items-center gap-1 px-2 py-1 bg-[#f8fafc] dark:bg-slate-700 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
+                        <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
+                            <i class="fas fa-adjust"></i> التدرج
+                        </button>
+                        <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
+                            <i class="fas fa-eraser"></i> الممحاة
+                        </button>
+                        <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="قص الصورة">
+                            <i class="fas fa-crop"></i> Crop
+                        </button>
+                        <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="أداة اليد">
+                            <i class="fa-regular fa-hand"></i> تحريك
+                        </button>
+                        <button onclick="openQRModal()" id="btn-qr" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="توليد QR Code">
+                            <i class="fas fa-qrcode"></i> باركود QR
+                        </button>
+                    </div>
+                    
+                    <!-- Universal File Input: Supports All Formats -->
+                    <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".tif,.tiff,.pdf,.psd,.ai,.eps,.svg,.png,.jpg,.jpeg,.webp,.bmp">
+                </div>
+                
+                <!-- لوحات التحكم -->
+                
+                <!-- إعدادات الممحاة - تظهر فوق الألوان -->
+                <div id="eraser-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 mb-2" style="order: 1 !important;">
+                    <div class="flex items-center gap-1 pl-2">
+                        <label class="flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" id="eraser-protect-bg" checked class="w-3 h-3 accent-[#6366f1]">
+                            <span class="text-[9px] font-bold text-[#1e293b]">حماية الخلفية</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center gap-1">
+                         <span class="text-[9px] font-bold text-[#1e293b]">حجم:</span>
+                         <input type="range" min="5" max="100" value="30" id="eraser-size" class="w-12 h-1 accent-[#6366f1] cursor-pointer">
+                         <span id="eraser-size-display" class="text-[9px] font-bold w-4">30</span>
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <span class="text-[9px] font-bold text-[#1e293b]">نعومة:</span>
+                        <input type="range" min="0" max="50" value="0" id="eraser-softness" class="w-12 h-1 accent-[#6366f1] cursor-pointer">
+                        <span id="eraser-softness-display" class="text-[9px] font-bold w-4">0</span>
+                    </div>
+                    
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <button id="btn-magic" onclick="toggleMagicMode()" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white border border-[#e2e8f0] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5" title="ممحاة سحرية">
+                        <i class="fas fa-magic"></i> السحرية
+                    </button>
+                    <button id="btn-smart-eraser" onclick="event.stopPropagation(); toggleSmartEraserMode()" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white border border-[#e2e8f0] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5" title="ممحاة ذكية بالتحديد">
+                        <i class="fas fa-draw-polygon"></i> الذكية
+                    </button>
+                    
+                    <div id="magic-tolerance-control" class="hidden items-center gap-1">
+                         <span class="text-[9px] font-bold text-[#6366f1]">دقة:</span>
+                         <input type="range" min="1" max="100" value="30" id="magic-tolerance" class="w-10 h-1 accent-[#6366f1] cursor-pointer">
+                         <span id="magic-tolerance-display" class="text-[9px] font-bold w-4">30</span>
+                    </div>
+
+                    <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                    <button onclick="exitEraserMode()" class="h-7 px-2.5 rounded text-[9px] font-bold bg-slate-300 text-slate-700 hover:bg-slate-400 transition">إنهاء</button>
+                </div>
+
+                <!-- إعدادات التدرج -->
+                <div id="grad-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] mb-2">
+                    <!-- Global Overlay Controls -->
+                    <div id="global-grad-inputs" class="flex items-center gap-2">
+                        <span class="text-[9px] font-bold text-[#1e293b]">تدرج:</span>
+                        <input type="color" id="global-grad-start" value="#000000" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="بداية التدرج (أسفل)">
+                        <input type="color" id="global-grad-end" value="#ffffff" oninput="updateGlobalGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent" title="نهاية التدرج (أعلى)">
+                        
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        <input type="range" min="0" max="1" step="0.1" value="0.8" oninput="updateGlobalGradient()" id="global-grad-opacity" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="الشفافية">
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        <span class="text-[9px] font-bold text-[#1e293b]">التمدد:</span>
+                        <input type="range" min="10" max="100" value="50" oninput="updateGlobalGradient()" id="global-grad-height" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="ارتفاع التدرج">
+                    </div>
+
+                    <!-- Element Gradient Controls -->
+                    <div id="element-grad-inputs" class="hidden items-center gap-2">
+                        <span class="text-[9px] font-bold text-[#1e293b]">البداية:</span>
+                        <input type="color" id="grad-start-color" value="#6366f1" oninput="syncFloatGradientInputs('start', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                        
+                        <span class="text-[9px] font-bold text-[#1e293b]">النهاية:</span>
+                        <input type="color" id="grad-end-color" value="#ec4899" oninput="syncFloatGradientInputs('end', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                        
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        
+                        <span class="text-[9px] font-bold text-[#1e293b]">الزاوية:</span>
+                        <input type="range" min="0" max="360" value="90" id="grad-angle" oninput="syncFloatGradientInputs('angle', this.value); updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="زاوية التدرج">
+
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+
+                        <span class="text-[9px] font-bold text-[#1e293b]">الشفافية:</span>
+                        <input type="range" min="0" max="1" step="0.1" value="1" id="grad-opacity" oninput="updateElementGradient()" class="w-16 h-1.5 accent-[#6366f1] cursor-pointer" title="شفافية التدرج">
+                        
+                        <div class="w-px h-4 bg-[#6366f1] mx-1"></div>
+                        <button onclick="toggleGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </div>
+
+                <!-- الألوان المفضلة -->
+                <div id="fav-colors-row" class="bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2" style="order: 2;">
+                    <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
+                    <div id="fav-colors-container" class="flex items-center gap-1.5 flex-wrap">
+                        <!-- سيتم تعبئتها بواسطة JS -->
+                    </div>
+                    <div class="w-px h-4 bg-[#e2e8f0] mx-1"></div>
+                    <div class="relative" title="إضافة لون جديد">
+                        <label for="add-fav-color" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
+                            <i class="fas fa-plus text-[8px]"></i>
+                        </label>
+                        <input type="color" id="add-fav-color" class="absolute opacity-0 w-0 h-0" onchange="addFavoriteColor(this.value)">
+                    </div>
+
+                    <!-- خصائص العنصر المحدد (شفافية الصورة) -->
+                    <div id="quick-props" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
+                        <span class="text-[9px] text-[#1e293b] font-bold whitespace-nowrap">شفافية:</span>
+                        <input type="range" id="layer-opacity" min="0" max="100" value="100" oninput="updateLayerOpacity(this.value)" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1] cursor-pointer">
+                        <span id="opacity-value" class="text-[9px] font-bold text-[#6366f1] w-6">100%</span>
+                        
+                        <!-- عناصر مخفية للاستخدام الداخلي -->
+                        <span id="text-color-section" class="hidden">
+                             <input type="color" id="quick-color" oninput="updateStyle('color', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                        </span>
+                    </div>
+
+                    <!-- إعدادات الإطار (تم نقلها هنا) -->
+                    <div id="frame-controls-toolbar" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
+                        <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
+                        <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
+                        <span class="text-[9px] font-bold text-[#1e293b]">سمك:</span>
+                        <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
+                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
+                        <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
+                        <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                    </div>
+                </div>
+
+                <!-- تم نقل أدوات التحكم بالنصوص والأطر إلى نافذة عائمة -->
+
+            </div>
+
+            <!-- شريط الملاحظات الجديد (قابل للفتح) -->
+            <div id="info-bar-placeholder" class="bg-[#f1f5f9] dark-mode:bg-[#1a1a2e] p-3 rounded text-[11px] text-[#1e293b] dark-mode:text-[#e8e8e8] border border-[#e2e8f0] dark-mode:border-[#2a2a3e] flex items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] dark-mode:hover:bg-[#252545] transition" onclick="openDesignerPanel()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-notebook" style="flex-shrink: 0; color: #6366f1;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18" /><path d="M13 8l2 0" /><path d="M13 12l2 0" /></svg> <span>اضغط هنا لكتابة ملاحظاتك - write your notes</span>
+            </div>
+
+            <!-- نافذة لوحة المصمم (Collapsible Designer Panel) -->
+        <!-- نافذة لوحة المصمم (Tiny Toast Style) -->
+        <!-- نافذة لوحة المصمم (Toast Style - Expanded) -->
+        <div id="designer-panel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
+            <div class="relative w-[400px] rounded-[2.2rem] overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transform transition-all duration-300 scale-100" 
+                 onclick="event.stopPropagation()"
+                 style="background: white; border: 1px solid rgba(243, 244, 246, 1);">
+                 
+                <!-- زينة خلفية -->
+                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-100/40 to-purple-100/40 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-100/30 to-rose-100/30 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
+
+                <!-- Header -->
+                <div class="px-5 pt-5 pb-3 flex items-center justify-between relative z-10 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg ring-1 ring-white/50" 
+                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                            <i class="fas fa-palette text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-slate-800 font-bold text-base tracking-tight">لوحة المصمم</h2>
+                            <p class="text-slate-400 text-[10px] font-medium">مساحتك الإبداعية الخاصة ✨</p>
+                        </div>
+                    </div>
+                    <button onclick="closeDesignerPanel()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center transition text-slate-400 hover:text-red-500 hover:rotate-90">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-5 space-y-4 relative z-10">
+                    <!-- Notes (Yellow Box - Big & Square) -->
+                    <div class="bg-[#fef3c7] p-4 rounded-xl shadow-sm border-l-4 border-[#f59e0b] group relative">
+                        <!-- Header for Notes -->
+                        <h3 class="font-bold text-[#92400e] mb-3 flex items-center justify-between text-xs relative z-10">
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
+                            </span>
+                            <span class="text-[10px] bg-[#f59e0b] text-white px-2 py-0.5 rounded-full shadow-sm" id="char-count">0/140</span>
+                        </h3>
+                        
+                        <!-- Big Area -->
+                        <textarea 
+                            id="designer-notes" 
+                            class="w-full h-20 p-3 bg-white/60 border border-[#f59e0b]/10 rounded-lg text-[#78350f] text-xs resize-none focus:outline-none focus:bg-white/90 focus:border-[#f59e0b]/30 transition-all placeholder:text-[#92400e]/50 leading-relaxed"
+                            placeholder="هنا مساحتك الخاصة.. دوّن أفكارك، تعليقاتك على التصميم، أو أي تفاصيل إبداعية تخطر ببالك لتذكرها لاحقاً"
+                            maxlength="140"
+                            onchange="updateDesignerNotes()"
+                            oninput="updateCharCount()"
+                        style="background-image: repeating-linear-gradient(to bottom, transparent, transparent 19px, #f59e0b15 19px, #f59e0b15 20px); background-size: 100% 20px; padding-top: 4px;"
+                        ></textarea>
+                        
+                        <!-- Premium Promo - يُخفى للبريميوم عبر JS -->
+                        <div id="premium-notes-promo" class="flex justify-between items-center mt-3 pt-2 border-t border-[#f59e0b]/10">
+                            <span class="text-[9px] text-[#92400e]/60">نسخة مجانية: 140 حرف فقط</span>
+                            <div class="flex items-center gap-1.5 cursor-pointer group/promo" onclick="showPremiumModal('زيادة حد الملاحظات')">
+                                <i class="fas fa-crown text-[10px] text-yellow-500 group-hover/promo:scale-110 transition-transform"></i>
+                                <span class="text-[10px] font-bold text-yellow-600 group-hover/promo:text-yellow-700 transition-colors">ترقية لـ 1000 كلمة</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics (Light Mode) -->
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100/80 p-4 rounded-xl border border-slate-200/60 shadow-sm">
+                        <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2 text-xs">
+                            <i class="fas fa-chart-pie text-indigo-500"></i> الإحصائيات
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div class="flex flex-col items-center bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
+                                <span class="text-slate-500 text-[10px] mb-1">عدد العناصر</span>
+                                <p class="font-bold text-slate-800 text-sm" id="element-count">0</p>
+                            </div>
+                            <div class="flex flex-col items-center bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
+                                <span class="text-slate-500 text-[10px] mb-1">حجم التصميم</span>
+                                <p class="font-mono font-bold text-slate-800 text-[11px] mt-1" id="canvas-size" dir="ltr">-</p>
+                            </div>
+                        </div>
+                        
+                         <!-- Colors (No Border) -->
+                         <div class="pt-3 border-t border-slate-200/60">
+                            <span class="text-slate-500 text-[10px] font-bold block mb-2">الألوان المستخدمة:</span>
+                            <div id="used-colors-palette" class="flex flex-wrap gap-2 min-h-[20px]">
+                                <!-- Colors injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Close Button Bottom -->
+                    <button onclick="closeDesignerPanel()" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-check"></i> إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+            <div class="preview-area" onclick="deselect(event)">
+                <div id="card-wrapper">
+                    <div id="ruler-h" class="ruler ruler-h"></div>
+                    <div id="ruler-v" class="ruler ruler-v"></div>
+                    <div id="card" onmousedown="deselectOnCard(event)" ontouchstart="handleCardTouch(event)">
+                        <div id="card-gradient"></div>
+                        <!-- خطوط الإرشاد للمنتصف -->
+                        <div id="guide-center-h" class="guide-line guide-h"></div>
+                        <div id="guide-center-v" class="guide-line guide-v"></div>
+                    </div>
+                    <!-- Crop Overlay -->
+                    <div id="crop-overlay" class="hidden absolute top-0 left-0 w-full h-full pointer-events-auto z-[50000]" style="background: rgba(0, 0, 0, 0.5);">
+                        <!-- Crop Area (draggable and resizable) -->
+                        <div id="crop-area" class="absolute border-2 border-yellow-400" style="box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), inset 0 0 0 1000px rgba(0, 0, 0, 0); cursor: move; background-color: transparent;">
+                            <!-- Top-left corner handle -->
+                            <div id="crop-handle-tl" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nwse-resize" style="top: -6px; left: -6px;"></div>
+                            <!-- Top-right corner handle -->
+                            <div id="crop-handle-tr" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nesw-resize" style="top: -6px; right: -6px;"></div>
+                            <!-- Bottom-left corner handle -->
+                            <div id="crop-handle-bl" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nesw-resize" style="bottom: -6px; left: -6px;"></div>
+                            <!-- Bottom-right corner handle -->
+                            <div id="crop-handle-br" class="absolute w-3 h-3 bg-yellow-400 border border-white cursor-nwse-resize" style="bottom: -6px; right: -6px;"></div>
+                            <!-- Top edge handle -->
+                            <div id="crop-handle-t" class="absolute w-6 h-2 bg-yellow-400 border border-white cursor-ns-resize" style="top: -5px; left: 50%; transform: translateX(-50%);"></div>
+                            <!-- Bottom edge handle -->
+                            <div id="crop-handle-b" class="absolute w-6 h-2 bg-yellow-400 border border-white cursor-ns-resize" style="bottom: -5px; left: 50%; transform: translateX(-50%);"></div>
+                            <!-- Left edge handle -->
+                            <div id="crop-handle-l" class="absolute w-2 h-6 bg-yellow-400 border border-white cursor-ew-resize" style="left: -5px; top: 50%; transform: translateY(-50%);"></div>
+                            <!-- Right edge handle -->
+                            <div id="crop-handle-r" class="absolute w-2 h-6 bg-yellow-400 border border-white cursor-ew-resize" style="right: -5px; top: 50%; transform: translateY(-50%);"></div>
+                        </div>
+                        <!-- Crop Buttons -->
+                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-[50001]">
+                            <button onclick="applyCrop()" class="px-4 py-2 bg-green-500 text-white rounded font-bold text-sm hover:bg-green-600 transition">✓ تطبيق</button>
+                            <button onclick="exitCropMode()" class="px-4 py-2 bg-red-500 text-white rounded font-bold text-sm hover:bg-red-600 transition">✕ إلغاء</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- لا يوجد فوتر -->
+
+    <!-- نافذة أدوات عائمة (بديلة عن الشريط العلوي لمنع إزاحة التصميم) -->
+    <div id="floating-context-toolbar" class="hidden fixed top-[18%] left-1/2 transform -translate-x-1/2 z-[99999] bg-white/95 backdrop-blur shadow-2xl rounded-2xl border border-indigo-100 p-2 flex flex-col gap-2 transition-all duration-300 pointer-events-auto min-w-[280px] max-h-[80vh] overflow-y-auto" style="box-shadow: 0 4px 16px -4px rgba(0,0,0,0.10);">
+        
+        <!-- Header with Close Button (Draggable Handle) -->
+        <div id="floating-toolbar-header" class="flex justify-between items-center px-1 mb-1 border-b border-gray-100 pb-1 cursor-move select-none sticky top-0 bg-white/95" title="اضغط واسحب للتحريك">
+            <span class="text-[10px] text-gray-400 font-bold pointer-events-none">خصائص العنصر</span>
+            <button onclick="closeFloatingToolbar()" class="text-red-500 hover:text-red-700 w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-50 transition" title="إغلاق">
+                <i class="fas fa-times text-[12px]"></i>
+            </button>
+        </div>
+
+        <!-- الصف الأول: زر التدرج + لون النص + حجم الخط -->
+        <div id="gradient-toggle-row" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-start flex-wrap">
+            <button id="btn-toggle-gradient" onclick="toggleGradientMode()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#f8fafc] text-[#334155] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#e2e8f0] shadow-sm">
+                <i class="fas fa-fill-drip text-[8px]"></i> تدرج
+            </button>
+            <button id="btn-edit-text" onclick="window.toggleTextEditor()" class="px-2 py-1 rounded text-[9px] font-bold bg-[#6366f1] text-white hover:bg-[#4f46e5] transition flex items-center gap-1 border border-[#4f46e5] shadow-sm">
+                <i class="fas fa-edit text-[9px]"></i> تحرير النص
+            </button>
+            <div class="w-px h-4 bg-[#e2e8f0]"></div>
+            
+            <!-- Partial Color Hint Tooltip Wrapper -->
+            <div class="relative group flex items-center gap-1">
+                <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">اللون:</span>
+                <input type="color" id="top-text-color" value="#1e293b" onchange="applyTextColor(this.value)" oninput="applyTextColor(this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1] bg-transparent" title="لون النص (حدد جزء لتلوينه)">
+                <!-- Tooltip -->
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-[8px] px-2 py-1 rounded pointer-events-none whitespace-nowrap z-50">ظلل نصاً لتلوينه منفرداً</span>
+            </div>
+
+            <div class="w-px h-4 bg-[#e2e8f0]"></div>
+            <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">الحجم:</span>
+            <input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size-input').value = this.value; document.getElementById('top-font-size-input').value = this.value;" class="w-14 h-1.5 accent-[#6366f1]" title="حجم الخط">
+            <input type="text" inputmode="numeric" id="top-font-size-input" value="35" oninput="this.value = arabicToEnglish(this.value); updateStyle('fontSize', this.value + 'px'); document.getElementById('font-size').value = this.value; document.getElementById('top-font-size').value = this.value;" class="w-10 px-1 py-0.5 border border-[#cbd5e1] rounded text-[10px] font-bold text-[#1e293b] text-center outline-none focus:border-[#6366f1]">
+        </div>
+        <!-- لوحة تحرير النص -->
+        <div id="text-editor-panel" style="display:none;" class="flex-col gap-1 p-2 bg-slate-50 rounded border border-slate-200 mx-2 mt-1">
+            <textarea id="direct-text-editor" class="w-full p-1 border border-slate-300 rounded text-[10px] resize-none" rows="2" dir="rtl" placeholder="النص..."></textarea>
+            <div class="flex gap-1">
+                <button onclick="window.applyTextFromEditor()" class="flex-1 px-2 py-1 bg-indigo-500 text-white text-[11px] font-bold rounded">تطبيق</button>
+                <button onclick="window.closeTextEditor()" class="px-2 py-1 bg-slate-200 text-[11px] font-bold rounded">إغلاق</button>
+            </div>
+        </div>
+
+        <!-- الصف الثاني: نوع الخط + قائمة الخطوط + نجمة المفضلة + B + المحاذاة -->
+        <div id="top-font-controls" class="hidden controls-row px-2 py-1 rounded items-center gap-2 justify-start flex-wrap">
+            <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">نوع الخط:</span>
+            <select id="top-font-family" onchange="handleFontSelection(this)" class="bg-white border border-[#cbd5e1] rounded text-[9px] py-0.5 px-1 font-bold outline-none focus:border-[#6366f1] text-[#1e293b] max-w-[130px]">
+                <!-- قسم المفضلة (يُملأ ديناميكياً) -->
+                <optgroup id="fav-fonts-group" label="⭐ المفضلة" style="display:none;"></optgroup>
+                <!-- الخطوط الأساسية -->
+                <optgroup label="الخطوط الأساسية">
+                    <option value="'Cairo', sans-serif">كايرو (Cairo) - مودرن</option>
+                    <option value="'Tajawal', sans-serif">تجوال (Tajawal) - المهندس</option>
+                    <option value="'Almarai', sans-serif">المراعي (Almarai) - رسمي</option>
+                    <option value="'Zain', sans-serif">زين (Zain) - عصري</option>
+                    <option value="'Mada', sans-serif">مدى (Mada) - ناعم</option>
+                </optgroup>
+                <!-- الخطوط العصرية الجديدة -->
+                <optgroup label="خطوط عصرية">
+                    <option value="'Rubik', sans-serif">روبيك (Rubik) - تطبيقات</option>
+                    <option value="'Readex Pro', sans-serif">ريدكس (Readex Pro) - واضح</option>
+                    <option value="'Alexandria', sans-serif">إسكندرية (Alexandria) - أنيق</option>
+                    <option value="'Noto Sans Arabic', sans-serif">نوتو سانس (Noto Sans) - حديث</option>
+                    <option value="'Noto Kufi Arabic', sans-serif">نوتو كوفي (Noto Kufi) - كوفي حديث</option>
+                    <option value="'Akatab', sans-serif">أكتب (Akatab) - بسيط</option>
+                    <option value="'Harmattan', sans-serif">هرمتان (Harmattan) - ناعم</option>
+                    <option value="'Mirza', sans-serif">ميرزا (Mirza) - فني</option>
+                </optgroup>
+                <!-- الخطوط الفنية والإبداعية -->
+                <optgroup label="خطوط فنية">
+                    <option value="'Blaka', cursive">بلاكا (Blaka) - إبداعي</option>
+                    <option value="'Blaka Ink', cursive">بلاكا حبر (Blaka Ink) - حبري</option>
+                    <option value="'Blaka Hollow', cursive">بلاكا مفرغ (Blaka Hollow) - مفرغ</option>
+                    <option value="'Marhey', cursive">مرحي (Marhey) - يدوي</option>
+                    <option value="'Katibeh', serif">كاتبة (Katibeh) - مزخرف</option>
+                    <option value="'Rakkas', serif">رقاص (Rakkas) - فني</option>
+                    <option value="'Lalezar', cursive">لاليزار (Lalezar) - عريض</option>
+                </optgroup>
+                <!-- الخطوط الكلاسيكية -->
+                <optgroup label="خطوط كلاسيكية">
+                    <option value="'Noto Serif Arabic', serif">نوتو سيريف (Noto Serif) - سيريف</option>
+                    <option value="'Amiri', serif">أميري (Amiri) - نسخ</option>
+                    <option value="'Aref Ruqaa', serif">عارف (Aref Ruqaa) - رقعة</option>
+                    <option value="'Scheherazade New', serif">شهرزاد (Scheherazade) - تراثي</option>
+                    <option value="'Lateef', serif">لطيف (Lateef) - كلاسيكي</option>
+                    <option value="'Gulzar', serif">جلزار (Gulzar) - نستعليق</option>
+                    <option value="'Markazi Text', serif">مركزي (Markazi) - عناوين</option>
+                </optgroup>
+                <!-- خطوط متنوعة -->
+                <optgroup label="خطوط متنوعة">
+                    <option value="'IBM Plex Sans Arabic', sans-serif">بلكس (IBM Plex) - تقني</option>
+                    <option value="'Vazirmatn', sans-serif">وزير (Vazirmatn) - نظيف</option>
+                    <option value="'Reem Kufi', sans-serif">ريم (Reem Kufi) - كوفي</option>
+                    <option value="'Kufam', sans-serif">كوفم (Kufam) - كوفي مطور</option>
+                    <option value="'El Messiri', sans-serif">المسيري (El Messiri) - مميز</option>
+                    <option value="'Changa', sans-serif">شانجا (Changa) - قوي</option>
+                    <option value="'Baloo Bhaijaan 2', cursive">بالو (Baloo) - طفولي</option>
+                    <option value="'Lemonada', cursive">ليمونادة (Lemonada) - عفوي</option>
+                </optgroup>
+                <!-- English Modern Fonts -->
+                <optgroup label="English Modern Fonts">
+                    <option value="'Poppins', sans-serif">Poppins - Modern</option>
+                    <option value="'Montserrat', sans-serif">Montserrat - Elegant</option>
+                    <option value="'Inter', sans-serif">Inter - Clean</option>
+                    <option value="'Raleway', sans-serif">Raleway - Stylish</option>
+                    <option value="'Nunito', sans-serif">Nunito - Friendly</option>
+                    <option value="'Quicksand', sans-serif">Quicksand - Rounded</option>
+                    <option value="'Outfit', sans-serif">Outfit - Geometric</option>
+                    <option value="'DM Sans', sans-serif">DM Sans - Professional</option>
+                    <option value="'Space Grotesk', sans-serif">Space Grotesk - Techy</option>
+                    <option value="'Sora', sans-serif">Sora - Minimal</option>
+                    <option value="'Manrope', sans-serif">Manrope - Fresh</option>
+                    <option value="'Plus Jakarta Sans', sans-serif">Jakarta Sans - Bold</option>
+                    <option value="'Urbanist', sans-serif">Urbanist - Urban</option>
+                    <option value="'Lexend', sans-serif">Lexend - Readable</option>
+                    <option value="'Figtree', sans-serif">Figtree - Simple</option>
+                    <option value="'Work Sans', sans-serif">Work Sans - Classic</option>
+                    <option value="'Josefin Sans', sans-serif">Josefin Sans - Vintage</option>
+                    <option value="'Comfortaa', cursive">Comfortaa - Smooth</option>
+                    <option value="'Righteous', cursive">Righteous - Display</option>
+                </optgroup>
+                <!-- إضافة خط مخصص -->
+                <optgroup label="──────────────">
+                    <option value="__ADD_CUSTOM_FONT__" style="color: #6366f1; font-weight: bold;">➕ إضافة خط مخصص...</option>
+                </optgroup>
+            </select>
+            <!-- زر النجمة للمفضلة -->
+            <button id="btn-fav-font" onclick="toggleFavoriteFont()" class="px-1.5 py-0.5 rounded text-[18px] bg-transparent border-none text-[#cbd5e1] hover:text-[#f59e0b] transition" title="إضافة/إزالة من المفضلة">
+                ☆
+            </button>
+            <input type="file" id="custom-font-input" accept=".ttf,.otf,.woff,.woff2" style="display:none" onchange="handleCustomFontUpload(this)">
+            <!-- زر البولد -->
+            <button id="btn-bold" onclick="toggleBold()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-[#cbd5e1] text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition" title="خط عريض">
+                B
+            </button>
+            
+            <!-- أزرار المحاذاة (صغيرة جانبية) -->
+            <div class="flex items-center gap-0.5 bg-white border border-[#cbd5e1] rounded px-1 py-0 overflow-hidden shadow-sm h-[24px]">
+                <button onclick="updateStyle('textAlign', 'right')" class="w-6 h-full flex items-center justify-center text-[#64748b] hover:text-[#6366f1] hover:bg-slate-50 transition" title="يمين">
+                    <i class="fas fa-align-right text-[10px]"></i>
+                </button>
+                <div class="w-px h-3 bg-gray-200"></div>
+                <button onclick="updateStyle('textAlign', 'center')" class="w-6 h-full flex items-center justify-center text-[#64748b] hover:text-[#6366f1] hover:bg-slate-50 transition" title="وسط">
+                    <i class="fas fa-align-center text-[10px]"></i>
+                </button>
+                <div class="w-px h-3 bg-gray-200"></div>
+                <button onclick="updateStyle('textAlign', 'left')" class="w-6 h-full flex items-center justify-center text-[#64748b] hover:text-[#6366f1] hover:bg-slate-50 transition" title="يسار">
+                    <i class="fas fa-align-left text-[10px]"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- إعدادات التدرج (تظهر عند التفعيل) -->
+        <div id="floating-grad-settings" class="hidden flex-col gap-2 p-2 bg-slate-50 rounded border border-slate-200 shadow-inner mx-2">
+            <div class="flex items-center gap-1 justify-between">
+                <div class="flex items-center gap-1">
+                    <span class="text-[9px] font-bold">بدء:</span>
+                    <input type="color" id="float-grad-start" value="#6366f1" oninput="syncGradientInputs('start', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                    <span class="text-[9px] font-bold ml-1">نهاية:</span>
+                    <input type="color" id="float-grad-end" value="#ec4899" oninput="syncGradientInputs('end', this.value); updateElementGradient()" class="w-5 h-5 rounded cursor-pointer border-none bg-transparent">
+                </div>
+                <div class="flex items-center gap-1">
+                     <span class="text-[9px] font-bold">زاوية:</span>
+                         <input type="range" min="0" max="360" value="90" id="float-grad-angle" oninput="syncGradientInputs('angle', this.value); updateElementGradient()" class="w-10 h-1 accent-[#6366f1]">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- (تم حذف لوحة تحرير النص من هنا لنقلها) -->
+    </div>
+
+    <!-- زر للإغلاق اليدوي للنافذة العائمة - تمت إزالته لدمجه في النافذة -->
+    <div id="close-floating-toolbar" class="hidden"></div>
+
+    <!-- Footer -->
+    <footer class="relative bg-gradient-to-r from-[#1e1b4b] to-[#312e81] text-white py-4 mt-auto border-t border-[#4338ca]/50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- الصف الرئيسي -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                
+                <!-- الجهة اليمنى: الشعار -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-[#6366f1] rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                        <i class="fas fa-palette text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-white">استوديو Despro</h3>
+                        <p class="text-[11px] text-white/60">للمشاريع الصغيرة والمنزلية</p>
+                    </div>
+                </div>
+                
+                <!-- الوسط: الروابط والأيقونات -->
+                <div class="flex items-center gap-4 bg-white/5 py-2 px-4 rounded-xl border border-white/5 backdrop-blur-sm">
+                    <!-- أزرار الإجراءات -->
+                    <div class="flex items-center gap-2">
+                        <a href="subscriptions.html" class="text-xs font-bold text-[#fbbf24] hover:text-[#fcd34d] transition flex items-center gap-2 px-3 py-1.5 bg-[#fbbf24]/10 hover:bg-[#fbbf24]/20 rounded-lg border border-[#fbbf24]/20">
+                            <i class="fas fa-crown"></i>
+                            الاشتراك
+                        </a>
+                        <div class="w-px h-5 bg-white/10"></div>
+                        <a href="https://wa.me/966531333714" target="_blank" class="text-xs font-bold text-white/90 hover:text-white transition flex items-center gap-2 px-2 py-1.5">
+                            <i class="fas fa-headset text-pink-400"></i>
+                            الدعم الفني
+                        </a>
+                    </div>
+                    
+                    <!-- فاصل -->
+                    <div class="w-px h-8 bg-white/10 mx-1"></div>
+                    
+                    <!-- أيقونات التواصل -->
+                    <div class="flex items-center gap-2" dir="ltr">
+                        <a href="https://wa.me/966531333714" target="_blank" class="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center transition border border-white/10 text-white/90 hover:text-white">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                        </a>
+                        <a href="https://x.com/sdr_10" target="_blank" class="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center transition border border-white/10 text-white/90 hover:text-white">
+                            <i class="fab fa-x-twitter text-lg"></i>
+                        </a>
+                        <a href="mailto:sloom059@gmail.com" class="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center transition border border-white/10 text-white/90 hover:text-white">
+                            <i class="fas fa-envelope text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- الجهة اليسرى: منطقة الأعضاء -->
+                <div class="flex flex-col items-center gap-2 bg-[#000000]/20 px-5 py-2 rounded-xl border border-white/5">
+                    <span class="text-[10px] font-extrabold tracking-[0.5em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 font-[sans-serif] w-full text-center">
+                        PREMIUM MEMBERS
+                    </span>
+                    <div id="auth-container">
+                        <button id="footer-login-btn" onclick="toggleLoginOverlay()" class="w-full text-xs font-bold text-white transition flex items-center justify-center gap-2 px-6 py-1.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg shadow-lg hover:shadow-violet-500/25 border border-white/10">
+                            <i class="fas fa-key text-xs text-white"></i>
+                            <span class="text-white">تسجيل دخول</span>
+                            <span class="text-white/40 font-light mx-0.5">|</span>
+                            <span class="font-sans tracking-wide text-[10px] text-white">Login</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- الحقوق -->
+            <div class="border-t border-white/5 mt-4 pt-3 flex flex-col md:flex-row justify-center items-center gap-4 text-[10px]">
+                <p class="text-white/40">© 2026 Studio Despro - جميع الحقوق محفوظة</p>
+                <div class="flex gap-3">
+                    <a href="privacy.html" class="text-white/70 hover:text-white transition">سياسة الخصوصية</a>
+                    <a href="terms.html" class="text-white/70 hover:text-white transition">الشروط والأحكام</a>
+                    <a href="refund.html" class="text-white/70 hover:text-white transition">سياسة الاسترجاع</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- نافذة QR Code -->
+    <!-- النافذة الاحترافية لمولد الباركود -->
+    <div id="qrModal" class="fixed inset-0 z-[100002] hidden items-center justify-center bg-black/40 backdrop-blur-md p-4 text-right">
+        <div class="bg-white rounded-[2.2rem] p-6 w-full max-w-[380px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] qr-modal-animate relative border border-gray-100">
+            
+            <!-- زر الإغلاق -->
+            <button onclick="this.closest('#qrModal').style.display='none'" class="absolute left-5 top-5 text-gray-300 hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+
+            <!-- الهيدر -->
+            <div class="mb-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-black text-gray-800 tracking-tight">مولد الباركود الذكي</h3>
+                    <span id="qr-pro-badge" class="bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 text-white text-[8px] px-2 py-0.5 rounded-full font-bold shadow-lg flex items-center gap-1">👑 Premium</span>
+                </div>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider text-right">أدخل الرابط واحصل على ملصق شفاف</p>
+            </div>
+            
+            <div class="space-y-4 text-right">
+                <!-- حقل الإدخال ولون الباركود -->
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <input type="text" id="qrInput" placeholder="ضع الرابط هنا..." 
+                               class="w-full border-2 border-gray-50 rounded-2xl px-4 py-3 text-xs outline-none focus:border-purple-400 bg-gray-50/50 transition-all font-bold text-left" dir="ltr">
+                    </div>
+                    <div class="shrink-0 flex flex-col items-center gap-1">
+                        <input type="color" id="qrColorPicker" value="#000000" title="اختر لون الباركود"
+                               style="width:38px;height:38px;-webkit-appearance:none;border:none;cursor:pointer;background:transparent;">
+                        <span class="text-[7px] font-black text-gray-400 uppercase tracking-tighter">Color</span>
+                    </div>
+                </div>
+                
+                <!-- أيقونات المنصات -->
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setFastLink('https://wa.me/966')" class="bg-green-50 text-green-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-green-100 transition-all border border-green-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">WhatsApp</span>
+                    </button>
+                    <button onclick="setFastLink('https://instagram.com/')" class="bg-pink-50 text-pink-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-pink-100 transition-all border border-pink-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">Instagram</span>
+                    </button>
+                    <button onclick="setFastLink('https://www.tiktok.com/@')" class="bg-slate-50 text-slate-800 p-2.5 rounded-xl flex flex-col items-center hover:bg-slate-200 transition-all border border-slate-100 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">TikTok</span>
+                    </button>
+                    <button onclick="setFastLink('https://')" class="bg-blue-50 text-blue-600 p-2.5 rounded-xl flex flex-col items-center hover:bg-blue-100 transition-all border border-blue-100/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <span class="text-[8px] font-bold mt-1 uppercase tracking-tighter">Website</span>
+                    </button>
+                </div>
+
+                <!-- منطقة المعاينة والزر -->
+                <div class="flex items-center gap-4 pt-4 border-t border-gray-50 mt-2">
+                    <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-100 flex-shrink-0">
+                        <div id="qrPreviewArea">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[9px] text-gray-400 font-bold leading-tight mb-3">سيتم تصدير الباركود كصورة PNG شفافة، مما يتيح لك إضافتها كعنصر قابل للتحريك.</p>
+                        <button onclick="addQRToDesign()" class="w-full bg-purple-600 text-white py-3.5 rounded-xl font-black text-xs shadow-lg shadow-purple-100 hover:bg-purple-700 active:scale-95 transition-all">إضافة للتصميم الآن</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- حاوية مؤقتة (مخفية) -->
+            <div id="hiddenBuffer" class="hidden"></div>
+        </div>
+    </div>
+    
+    <style>
+        .qr-modal-animate {
+            animation: qrIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes qrIn {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+    </style>
+
+    <script src="js/app.js?v=20260130_05"></script>
+    <script>
+    // QR Code Functions
+    function openQRModal() {
+        const modal = document.getElementById('qrModal');
+        const badge = document.getElementById('qr-pro-badge');
+        
+        // إظهار/إخفاء شارة PRO - نفس طريقة العلامة المائية
+        if (userTier === 'premium') {
+            badge.classList.add('hidden');
+        } else {
+            badge.classList.remove('hidden');
+        }
+        
+        // تنظيف
+        document.getElementById('qrInput').value = '';
+        document.getElementById('qrPreviewArea').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>';
+        
+        modal.style.display = 'flex';
+    }
+    
+    function setFastLink(url) {
+        const input = document.getElementById('qrInput');
+        input.value = url;
+        input.focus();
+    }
+
+    function addQRToDesign() {
+        const val = document.getElementById('qrInput').value.trim() || "https://google.com";
+        const selectedColor = document.getElementById('qrColorPicker').value;
+        const buffer = document.getElementById('hiddenBuffer');
+        
+        buffer.innerHTML = "";
+        
+        // توليد الباركود بدقة عالية
+        new QRCode(buffer, {
+            text: val,
+            width: 800,
+            height: 800,
+            colorDark: selectedColor,
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        setTimeout(() => {
+            const qrCanvas = buffer.querySelector('canvas');
+            if (qrCanvas) {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = qrCanvas.width;
+                tempCanvas.height = qrCanvas.height;
+                const ctx = tempCanvas.getContext('2d');
+                ctx.drawImage(qrCanvas, 0, 0);
+
+                const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                const data = imgData.data;
+
+                // جعل الخلفية البيضاء شفافة
+                for (let i = 0; i < data.length; i += 4) {
+                    if (data[i] > 220 && data[i+1] > 220 && data[i+2] > 220) {
+                        data[i+3] = 0;
+                    }
+                }
+                ctx.putImageData(imgData, 0, 0);
+                
+                // علامة مائية احترافية لغير البريميوم - نفس طريقة التصدير
+                if (userTier !== 'premium') {
+                    const w = tempCanvas.width;
+                    const h = tempCanvas.height;
+                    
+                    // شريط مموه قطري
+                    ctx.save();
+                    ctx.translate(w / 2, h / 2);
+                    ctx.rotate(-35 * Math.PI / 180);
+                    
+                    // خلفية الشريط (مموهة)
+                    const gradient = ctx.createLinearGradient(-w, 0, w, 0);
+                    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.85)');
+                    gradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.9)');
+                    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.85)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(-w, -45, w * 2, 90);
+                    
+                    // نص Premium
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 50px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText('👑 PREMIUM 👑', 0, 0);
+                    
+                    ctx.restore();
+                    
+                    // نص صغير في الأسفل
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(100, 100, 100, 0.7)';
+                    ctx.font = 'bold 28px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('اشترك لإزالة العلامة المائية', w / 2, h - 30);
+                    ctx.restore();
+                }
+                
+                const finalPngUrl = tempCanvas.toDataURL("image/png");
+
+                // عرض المعاينة
+                document.getElementById('qrPreviewArea').innerHTML = `<img src="${finalPngUrl}" class="w-full h-full object-contain p-1">`;
+                
+                // استخدام نفس دالة المكتبة بالضبط!
+                if (typeof addAssetToCanvas === 'function') {
+                    addAssetToCanvas(finalPngUrl, true);
+                } else {
+                    alert('خطأ: لم يتم تحميل النظام');
+                }
+                
+                // إغلاق النافذة
+                setTimeout(() => {
+                    document.getElementById('qrModal').style.display = 'none';
+                }, 300);
+            }
+        }, 300);
+    }
+    </script>
+</body>
+</html>
