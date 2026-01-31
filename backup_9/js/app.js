@@ -1394,7 +1394,7 @@
                 const options = {
                     pixelRatio: pixelRatio,
                     cacheBust: false,
-                    skipAutoScale: true,
+                    skipAutoScale: false,
                     width: actualWidth,
                     height: actualHeight,
                     style: {
@@ -1501,19 +1501,19 @@
                 // كشف بسيط للجوال
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 800;
                 // الآيفون يحتاج جودة أقل قليلاً لتفادي الانهيار، لكن التحويل لـ Base64 أعلاه هو الحل الحقيقي
-                const qualityScale = isMobile ? 1.5 : 2;
+                const qualityScale = isMobile ? 3 : 4;
 
                 // --- استراتيجية التوليد المتعدد ---
 
                 // دالة مساعدة لتشغيل htmlToImage
-                const tryHtmlToImage = async (pixelRatioVal = 2) => {
+                const tryHtmlToImage = async (pixelRatioVal = 4) => {
                     if (typeof htmlToImage === 'undefined') throw new Error("htmlToImage missing");
 
                     // إعدادات التصدير
                     const options = {
                         pixelRatio: pixelRatioVal,
                         cacheBust: false,
-                        skipAutoScale: true,
+                        skipAutoScale: false,
                         width: card.offsetWidth,
                         height: card.offsetHeight,
                         style: {
@@ -1538,7 +1538,7 @@
                 };
 
                 // دالة مساعدة لتشغيل html2canvas
-                const tryHtml2Canvas = async (scaleVal = 2) => {
+                const tryHtml2Canvas = async (scaleVal = 4) => {
                     if (typeof html2canvas === 'undefined') throw new Error("html2canvas missing");
                     // html2canvas أحياناً أفضل في التعامل مع التحويلات المعقدة
                     const canvas = await html2canvas(card, {
@@ -1782,7 +1782,7 @@
             }
 
             const saveImg = document.getElementById('save-img');
-            const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.85);
+            const imgData = isTransparent ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 1.0);
             saveImg.src = imgData;
         }
 
@@ -1817,7 +1817,9 @@
                 const x = (width - finalWidth) / 2;
                 const y = (height - finalHeight) / 2;
 
-                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                // تحديد الصيغة تلقائياً
+                const format = imgData.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+                pdf.addImage(imgData, format, x, y, finalWidth, finalHeight, undefined, 'FAST');
 
                 const randomNum = Math.floor(Math.random() * 1000000);
                 pdf.save(`template_${randomNum}.pdf`);
@@ -1867,7 +1869,9 @@
                     const x = (width - finalWidth) / 2;
                     const y = (height - finalHeight) / 2;
 
-                    pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                    // تحديد الصيغة تلقائياً
+                const format = imgData.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+                pdf.addImage(imgData, format, x, y, finalWidth, finalHeight, undefined, 'FAST');
 
                     // تحويل الـ PDF إلى Blob
                     const pdfBlob = pdf.output('blob');
@@ -1927,6 +1931,10 @@
                 if (!img.dataset.originalSrc) {
                     img.dataset.originalSrc = img.src;
                 }
+                // حفظ srcset الأصلي للاستعادة (مهم جداً للجودة) 
+                if (img.srcset && !img.dataset.originalSrcset) {
+                    img.dataset.originalSrcset = img.srcset;
+                }
 
                 try {
                     // 1. تحضير الصورة في الذاكرة (Canvas)
@@ -1937,20 +1945,16 @@
                         tempImg.onload = () => {
                             const canvas = document.createElement('canvas');
                             // تقليل الحجم أكثر للأمان في الآيفون (800px كافية جداً للطباعة المصغرة في A4)
-                            const MAX_DIMENSION = 800;
+                            // لا نقلص الصورة - نحافظ على الجودة الأصلية
                             let width = tempImg.naturalWidth;
                             let height = tempImg.naturalHeight;
 
-                            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-                                const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
-                                width *= ratio;
-                                height *= ratio;
-                            }
-
                             canvas.width = width;
                             canvas.height = height;
-
+                            
                             const ctx = canvas.getContext('2d');
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
                             ctx.drawImage(tempImg, 0, 0, width, height);
 
                             resolve(canvas.toDataURL('image/png'));
@@ -1968,12 +1972,14 @@
                                 .catch(() => resolve(img.src)); // ابق على القديم
                         };
 
+                        // استخدام currentSrc إذا كان متاحاً للحصول على أعلى جودة معروضة فعلياً
+                        const bestSrc = img.currentSrc || img.src;
+                        
                         // كسر الكاش بقوة
-                        const src = img.src;
-                        if (src.startsWith('data:')) {
-                            tempImg.src = src;
+                        if (bestSrc.startsWith('data:')) {
+                            tempImg.src = bestSrc;
                         } else {
-                            tempImg.src = src + (src.includes('?') ? '&' : '?') + 't=' + Date.now();
+                            tempImg.src = bestSrc + (bestSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
                         }
                     });
 
@@ -1997,9 +2003,16 @@
         function restoreOriginalImages(element) {
             const images = element.querySelectorAll('img');
             images.forEach(img => {
+                let changed = false;
                 if (img.dataset.originalSrc) {
                     img.src = img.dataset.originalSrc;
                     delete img.dataset.originalSrc;
+                    changed = true;
+                }
+                if (img.dataset.originalSrcset) {
+                    img.srcset = img.dataset.originalSrcset;
+                    delete img.dataset.originalSrcset;
+                    changed = true;
                 }
             });
         }
@@ -5967,7 +5980,9 @@
                 const x = (width - finalWidth) / 2;
                 const y = (height - finalHeight) / 2;
                 
-                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                // تحديد الصيغة تلقائياً
+                const format = imgData.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+                pdf.addImage(imgData, format, x, y, finalWidth, finalHeight, undefined, 'FAST');
                 
                 // فتح PDF مباشرة للطباعة - نفس الملف بالضبط
                 const pdfDataUri = pdf.output('bloburl');
@@ -7240,3 +7255,139 @@ function updateLayersList() {
  
 // Updated Fri Jan 30 20:09:08 UTC 2026
 /* Updated: Fri Jan 30 21:16:48 UTC 2026 */
+
+        // ==================== QR Code Functions ====================
+        function openQRModal() {
+            const modal = document.getElementById('qr-modal');
+            const badge = document.getElementById('qr-premium-badge');
+            const preview = document.getElementById('qr-preview');
+            
+            // إظهار شارة PRO لغير المشتركين
+            if (!isPremiumUser()) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            
+            // إخفاء المعاينة وتفريغ الحقل
+            preview.classList.add('hidden');
+            document.getElementById('qr-input').value = '';
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeQRModal() {
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+        
+        async function generateQR() {
+            const input = document.getElementById('qr-input').value.trim();
+            if (!input) {
+                showInfoModal('الرجاء إدخال رابط أو نص', 'تنبيه', '⚠️');
+                return;
+            }
+            
+            const canvas = document.getElementById('qr-canvas');
+            const preview = document.getElementById('qr-preview');
+            
+            try {
+                // توليد QR Code
+                await QRCode.toCanvas(canvas, input, {
+                    width: 150,
+                    margin: 2,
+                    color: {
+                        dark: '#1e293b',
+                        light: '#ffffff'
+                    }
+                });
+                
+                // إظهار المعاينة
+                preview.classList.remove('hidden');
+                
+                // إنشاء صورة نهائية
+                let finalCanvas = document.createElement('canvas');
+                let ctx = finalCanvas.getContext('2d');
+                
+                const qrSize = 150;
+                const padding = 10;
+                const watermarkHeight = isPremiumUser() ? 0 : 25;
+                
+                finalCanvas.width = qrSize + (padding * 2);
+                finalCanvas.height = qrSize + (padding * 2) + watermarkHeight;
+                
+                // خلفية بيضاء
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // رسم QR Code
+                ctx.drawImage(canvas, padding, padding);
+                
+                // إضافة علامة مائية لغير المشتركين
+                if (!isPremiumUser()) {
+                    // خلفية شفافة للعلامة المائية فوق الـ QR
+                    ctx.save();
+                    ctx.globalAlpha = 0.15;
+                    ctx.fillStyle = '#6366f1';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.translate(finalCanvas.width / 2, qrSize / 2 + padding);
+                    ctx.rotate(-30 * Math.PI / 180);
+                    
+                    // نص مكرر مائل
+                    for (let y = -80; y < 80; y += 25) {
+                        for (let x = -100; x < 100; x += 80) {
+                            ctx.fillText('Despro', x, y);
+                        }
+                    }
+                    ctx.restore();
+                    
+                    // نص تحت الـ QR
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = 'bold 9px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('صُمم بواسطة Despro', finalCanvas.width / 2, finalCanvas.height - 8);
+                }
+                
+                // تحويل إلى صورة وإضافتها للتصميم
+                const imgData = finalCanvas.toDataURL('image/png');
+                addQRToCanvas(imgData);
+                
+                // إغلاق النافذة
+                closeQRModal();
+                
+            } catch (error) {
+                console.error('QR Error:', error);
+                showInfoModal('حدث خطأ في توليد الـ QR', 'خطأ', '❌');
+            }
+        }
+        
+        function addQRToCanvas(imgData) {
+            const card = document.getElementById('card');
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'draggable-el image-layer';
+            wrapper.style.cssText = 'position:absolute; left:50px; top:50px; width:120px; height:auto; cursor:move; z-index:10;';
+            wrapper.setAttribute('data-colorable', 'false');
+            
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'content-wrapper';
+            contentWrapper.style.cssText = 'width:100%; height:100%; display:flex; align-items:center; justify-content:center;';
+            
+            const img = document.createElement('img');
+            img.src = imgData;
+            img.style.cssText = 'width:100%; height:auto; pointer-events:none; user-select:none;';
+            img.draggable = false;
+            
+            contentWrapper.appendChild(img);
+            wrapper.appendChild(contentWrapper);
+            card.appendChild(wrapper);
+            
+            // تحديد العنصر الجديد
+            selectEl(wrapper);
+            saveState();
+        }
+        // ==================== End QR Code Functions ====================
+
+        // Make QR functions globally accessible
+        window.openQRModal = openQRModal;
+        window.closeQRModal = closeQRModal;
+        window.generateQR = generateQR;
