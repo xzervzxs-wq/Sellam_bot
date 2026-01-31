@@ -58,23 +58,11 @@
         let userTier = 'free'; // 'free' أو 'premium'
         const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
 
-        // استعادة الـ tier من localStorage فوراً
-        (function() {
-            const savedTier = localStorage.getItem('userTier');
-            if (savedTier === 'premium') userTier = 'premium';
-        })();
-
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
             localStorage.setItem('userTier', userTier);
             applyTierRestrictions();
         }
-
-        // دالة للتحقق من حالة البريميوم (متاحة عالمياً)
-        window.isPremiumUser = function() {
-            const savedTier = localStorage.getItem('userTier');
-            return userTier === 'premium' || savedTier === 'premium';
-        };
 
         function applyTierRestrictions() {
             if (userTier === 'free') {
