@@ -52,7 +52,7 @@ function updatePreview() {
     
     // المعاينة - نفس الشكل الذي سيتم تصويره
     previewContainer.innerHTML = `
-        <div id="socialCaptureArea" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; background: transparent;" dir="ltr">
+        <div id="socialCaptureArea" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px 14px 16px; background: transparent;" dir="ltr">
             <span style="font-size: 24px; color: ${chosenColor}; display: flex; align-items: center; justify-content: center; line-height: 1;">
                 ${iconHtml}
             </span>
