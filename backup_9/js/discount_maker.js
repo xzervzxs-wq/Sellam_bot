@@ -249,38 +249,23 @@ function generateDiscountCard() {
         ctx.fillText(price + " ر.س", cardW/2, cardH - 60);
     }
 
-    // === العلامة المائية للمستخدمين غير Premium (شريط قطري متكرر مثل AI4) ===
+    // === العلامة المائية للمستخدمين غير Premium ===
     if (typeof userTier === 'undefined' || userTier !== 'premium') {
         ctx.save();
         
-        // حساب طول القطر للبطاقة
-        const diagonal = Math.sqrt(cardW * cardW + cardH * cardH);
-        const angle = Math.atan2(cardH, cardW); // زاوية من السفل اليسار لليمين العلوي
-        
-        // إعدادات النص
-        ctx.font = "bold 24px 'Cairo', sans-serif";
-        ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+        // علامة مائية كبيرة في المنتصف مع شفافية عالية
+        ctx.globalAlpha = 0.25;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
-        const watermarkText = "👑 PREMIUM 👑";
-        const textWidth = ctx.measureText(watermarkText).width;
-        const spacing = textWidth + 60; // المسافة بين كل نص
+        // النص الرئيسي الكبير
+        ctx.font = "bold 80px 'Cairo', sans-serif";
+        ctx.fillStyle = "#000000";
+        ctx.fillText("👑 Premium", cardW/2, cardH/2 - 20);
         
-        // رسم عدة خطوط قطرية متوازية
-        for (let offset = -diagonal; offset < diagonal * 1.5; offset += 120) {
-            ctx.save();
-            ctx.translate(0, cardH); // نقطة البداية: الزاوية السفلى اليسرى
-            ctx.rotate(-angle); // الدوران للاتجاه القطري
-            ctx.translate(offset, 0);
-            
-            // رسم النص متكرر على طول الخط القطري
-            for (let pos = 0; pos < diagonal + 200; pos += spacing) {
-                ctx.fillText(watermarkText, pos, 0);
-            }
-            
-            ctx.restore();
-        }
+        // نص فرعي تحته
+        ctx.font = "bold 28px 'Cairo', sans-serif";
+        ctx.fillText("اشترك للحصول على النسخة الكاملة", cardW/2, cardH/2 + 50);
         
         ctx.restore();
     }
