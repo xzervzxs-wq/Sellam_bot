@@ -897,10 +897,9 @@
                     </div>
                     <div class="w-px h-4 bg-[#e2e8f0] mx-1"></div>
                     <div class="relative" title="إضافة لون جديد للمفضلة">
-                        <button onclick="document.getElementById('add-fav-color').click()" class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center cursor-pointer hover:scale-110 transition shadow-md border-0">
-                            <i class="fas fa-plus text-[9px] text-white"></i>
+                        <button onclick="openColorPickerForFavorite()" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
+                            <i class="fas fa-plus text-[8px]"></i>
                         </button>
-                        <input type="color" id="add-fav-color" value="#6366f1" style="position:absolute;opacity:0;width:1px;height:1px;" onchange="addFavoriteColor(this.value)">
                     </div>
 
                     <!-- خصائص العنصر المحدد (شفافية الصورة) -->
@@ -1380,12 +1379,18 @@
             </div>
 
             <!-- أزرار التطبيق -->
-            <div class="grid grid-cols-2 gap-2">
+            <div id="colorPickerButtons" class="grid grid-cols-2 gap-2">
                 <button onclick="applyColorToText()" class="py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold text-xs transition shadow-lg shadow-indigo-100">
                     <i class="fas fa-font ml-1"></i> تلوين النص
                 </button>
                 <button onclick="applyColorToElement()" class="py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold text-xs transition shadow-lg shadow-purple-100">
                     <i class="fas fa-fill-drip ml-1"></i> تلوين العنصر
+                </button>
+            </div>
+            <!-- زر إضافة للمفضلة الرئيسية (يظهر فقط عند الضغط على + في المفضلة) -->
+            <div id="addToMainFavBtn" class="hidden mt-2">
+                <button onclick="addColorToMainFavorites()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-bold text-sm transition shadow-lg">
+                    <i class="fas fa-star ml-1"></i> إضافة هذا اللون للمفضلة
                 </button>
             </div>
         </div>
@@ -1636,14 +1641,41 @@
     let cpFinalHex = "#FF0000";
     let favoriteColors = JSON.parse(localStorage.getItem('despro_favorite_colors') || '[]');
 
+    let addToMainFavoritesMode = false; // هل نضيف للمفضلة الرئيسية؟
+
     function openColorPickerModal() {
+        addToMainFavoritesMode = false;
         document.getElementById('colorPickerModal').style.display = 'flex';
+        initColorPicker();
+        renderFavoriteColors();
+    }
+
+    // فتح منتقي الألوان لإضافة لون للمفضلة الرئيسية
+    function openColorPickerForFavorite() {
+        addToMainFavoritesMode = true;
+        document.getElementById('colorPickerModal').style.display = 'flex';
+        // إظهار زر الإضافة للمفضلة الرئيسية وإخفاء الأزرار الأخرى
+        document.getElementById('colorPickerButtons').classList.add('hidden');
+        document.getElementById('addToMainFavBtn').classList.remove('hidden');
         initColorPicker();
         renderFavoriteColors();
     }
 
     function closeColorPickerModal() {
         document.getElementById('colorPickerModal').style.display = 'none';
+        addToMainFavoritesMode = false;
+        // إرجاع الأزرار لوضعها الطبيعي
+        document.getElementById('colorPickerButtons').classList.remove('hidden');
+        document.getElementById('addToMainFavBtn').classList.add('hidden');
+    }
+    
+    // إضافة اللون المختار للمفضلة الرئيسية وإغلاق النافذة
+    function addColorToMainFavorites() {
+        if (typeof addFavoriteColor === 'function') {
+            addFavoriteColor(cpFinalHex);
+            closeColorPickerModal();
+            showInfoModal('تم إضافة اللون للمفضلة ⭐', 'تم', '✅');
+        }
     }
 
     function initColorPicker() {
