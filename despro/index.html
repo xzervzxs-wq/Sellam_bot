@@ -897,9 +897,10 @@
                     </div>
                     <div class="w-px h-4 bg-[#e2e8f0] mx-1"></div>
                     <div class="relative" title="إضافة لون جديد للمفضلة">
-                        <button onclick="openColorPickerForFavorite()" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
+                        <button onclick="document.getElementById('add-fav-color').click()" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
                             <i class="fas fa-plus text-[8px]"></i>
                         </button>
+                        <input type="color" id="add-fav-color" class="absolute opacity-0 w-0 h-0" onchange="addFavoriteColor(this.value)">
                     </div>
 
                     <!-- خصائص العنصر المحدد (شفافية الصورة) -->
