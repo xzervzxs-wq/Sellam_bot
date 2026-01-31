@@ -6,7 +6,7 @@
 const socialIcons = {
     Instagram: '<i class="fab fa-instagram"></i>',
     Snapchat: '<i class="fab fa-snapchat-ghost"></i>',
-    Twitter: '<i class="fab fa-twitter"></i>',
+    Twitter: '<i class="fab fa-x-twitter"></i>',
     TikTok: '<i class="fab fa-tiktok"></i>',
     Facebook: '<i class="fab fa-facebook-f"></i>',
     WhatsApp: '<i class="fab fa-whatsapp"></i>'
