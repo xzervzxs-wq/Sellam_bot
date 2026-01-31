@@ -245,7 +245,7 @@
             // إضافة حماية عند تحديث الصفحة أو إغلاقها
             window.addEventListener('beforeunload', (e) => {
                 const card = document.getElementById('card');
-                const hasElements = card && card.children.length > 1; // > 1 لأن card-gradient يحسب كعنصر
+                const hasElements = card && Array.from(card.children).some(child => child.id !== "card-gradient" && child.id !== "guide-center-h" && child.id !== "guide-center-v");
 
                 if (hasElements) {
                     e.preventDefault();
@@ -671,7 +671,7 @@
         // دالة لفتح مشروع جديد مع سؤال حفظ القالب
         function createNewProject() {
             const card = document.getElementById('card');
-            const hasElements = card.children.length > 0;
+            const hasElements = Array.from(card.children).some(child => child.id !== "card-gradient" && child.id !== "guide-center-h" && child.id !== "guide-center-v");
 
             if (!hasElements) {
                 // إذا لم يكن هناك عناصر، أنشئ جديد مباشرة
@@ -709,7 +709,7 @@
         function updateDesignerStats() {
             const card = document.getElementById('card');
             // حساب عدد العناصر (لا نحسب card-gradient)
-            const elementCount = Math.max(0, card.children.length - 1);
+            const elementCount = Array.from(card.children).filter(child => child.id !== "card-gradient" && child.id !== "guide-center-h" && child.id !== "guide-center-v").length;
             document.getElementById('element-count').textContent = elementCount;
 
             // حساب مقاس المربع
@@ -1080,7 +1080,7 @@
         // دالة لإعادة تعيين canvas للمشروع الجديد
         function resetCanvas() {
             const card = document.getElementById('card');
-            card.innerHTML = '<div id="card-gradient"></div>'; // إعادة إنشاء التدرج مخفياً
+            card.innerHTML = '<div id="card-gradient"></div><div id="guide-center-h" class="guide-line guide-h"></div><div id="guide-center-v" class="guide-line guide-v"></div>';
 
             // إعادة تعيين الأبعاد الافتراضية
             const defaultSize = Math.round(6 * DPI_RATIO); // 6cm افتراضي
