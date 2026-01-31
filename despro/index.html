@@ -86,35 +86,6 @@
     </style>
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    
-    <!-- QR Code Functions - يجب أن تكون هنا قبل الأزرار -->
-    <script>
-    function openQRModal() {
-        const modal = document.getElementById('qrModal');
-        if (!modal) { console.error('qrModal not found'); return; }
-        const badge = document.getElementById('qr-pro-badge');
-        
-        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
-        if (badge) {
-            if (isPremium) badge.classList.add('hidden');
-            else badge.classList.remove('hidden');
-        }
-        
-        const qrInput = document.getElementById('qrInput');
-        if (qrInput) qrInput.value = '';
-        
-        const preview = document.getElementById('qrPreviewArea');
-        if (preview) preview.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>';
-        
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-    }
-    
-    function setFastLink(url) {
-        const input = document.getElementById('qrInput');
-        if (input) { input.value = url; input.focus(); }
-    }
-    </script>
 </head>
 <body class="min-h-screen flex flex-col" onclick="deselect(event); closeShapesDropdown(); closeFramesDropdown();">
 
@@ -389,10 +360,10 @@
                      </button>
                      
                      <!-- زر Premium لغير المشتركين -->
-                     <div id="premium-upgrade-btn" class="mt-3">
-                         <a href="subscriptions.html" class="flex items-center justify-center gap-2 bg-slate-800/80 px-5 py-2.5 rounded-xl transition-all hover:bg-slate-700 border border-amber-500/30">
-                             <span class="text-xs font-bold tracking-wider bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-                                 👑 PREMIUM
+                     <div id="premium-upgrade-btn" class="mt-1">
+                         <a href="subscriptions.html" class="flex items-center justify-center gap-1.5 bg-transparent px-4 py-1 rounded-lg transition-all hover:bg-amber-500/5">
+                             <span class="text-[9px] font-bold tracking-[0.2em] text-amber-500/70 hover:text-amber-400 transition-colors">
+                                 ✨ PREMIUM
                              </span>
                          </a>
                      </div>
@@ -815,24 +786,22 @@
                     </div>
                     
                     <!-- أدوات التحرير الأساسية -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
-                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
-                            EDIT TOOLS
-                        </span>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]">
-                                <i class="fas fa-eraser"></i> ممحاة
-                            </button>
-                            <button onclick="toggleGradient()" id="btn-grad" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]">
-                                <i class="fas fa-adjust"></i> تدرج
-                            </button>
-                            <button onclick="toggleHandMode()" id="btn-hand" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="أداة اليد">
-                                <i class="fa-regular fa-hand"></i> تحريك
-                            </button>
-                            <button onclick="openQRModal()" id="btn-qr" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="توليد QR Code">
-                                <i class="fas fa-qrcode"></i> QR
-                            </button>
-                        </div>
+                    <div class="flex items-center gap-1 px-2 py-1 bg-[#f8fafc] dark:bg-slate-700 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
+                        <button onclick="toggleGradient()" id="btn-grad" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
+                            <i class="fas fa-adjust"></i> التدرج
+                        </button>
+                        <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500">
+                            <i class="fas fa-eraser"></i> الممحاة
+                        </button>
+                        <button onclick="toggleCropMode()" id="btn-crop" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="قص الصورة">
+                            <i class="fas fa-crop"></i> Crop
+                        </button>
+                        <button onclick="toggleHandMode()" id="btn-hand" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="أداة اليد">
+                            <i class="fa-regular fa-hand"></i> تحريك
+                        </button>
+                        <button onclick="openQRModal()" id="btn-qr" class="px-2 py-1 rounded text-[10px] font-bold bg-[#f1f5f9] dark:bg-slate-600 text-[#475569] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1 border border-[#cbd5e1] dark:border-slate-500" title="توليد QR Code">
+                            <i class="fas fa-qrcode"></i> QR
+                        </button>
                     </div>
                     
                     <!-- Universal File Input: Supports All Formats -->
@@ -1543,8 +1512,33 @@
 
     <script src="js/app.js?v=20260130_05"></script>
     <script>
-    // addQRToDesign function
-    window.addQRToDesign = function() {
+    // QR Code Functions
+    function openQRModal() {
+        const modal = document.getElementById('qrModal');
+        const badge = document.getElementById('qr-pro-badge');
+        
+        // إظهار/إخفاء شارة PRO
+        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
+        if (isPremium) {
+            badge.classList.add('hidden');
+        } else {
+            badge.classList.remove('hidden');
+        }
+        
+        // تنظيف
+        document.getElementById('qrInput').value = '';
+        document.getElementById('qrPreviewArea').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>';
+        
+        modal.style.display = 'flex';
+    }
+    
+    function setFastLink(url) {
+        const input = document.getElementById('qrInput');
+        input.value = url;
+        input.focus();
+    }
+
+    function addQRToDesign() {
         const val = document.getElementById('qrInput').value.trim() || "https://google.com";
         const selectedColor = document.getElementById('qrColorPicker').value;
         const buffer = document.getElementById('hiddenBuffer');
