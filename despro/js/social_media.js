@@ -1,6 +1,6 @@
 // ==========================================
 //  تكامل أيقونات التواصل الاجتماعي (Social Media Handling)
-//  نفس طريقة الباركود - رسم مباشر على Canvas
+//  استخدام html2canvas لتصوير المعاينة مباشرة
 // ==========================================
 
 const socialIcons = {
@@ -11,165 +11,6 @@ const socialIcons = {
     Facebook: '<i class="fab fa-facebook-f"></i>',
     WhatsApp: '<i class="fab fa-whatsapp"></i>'
 };
-
-// دوال رسم الأيقونات مباشرة على Canvas
-function drawInstagramIcon(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = size * 0.08;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    // المربع الخارجي مع زوايا مستديرة
-    const r = size * 0.2;
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + size - r, y);
-    ctx.quadraticCurveTo(x + size, y, x + size, y + r);
-    ctx.lineTo(x + size, y + size - r);
-    ctx.quadraticCurveTo(x + size, y + size, x + size - r, y + size);
-    ctx.lineTo(x + r, y + size);
-    ctx.quadraticCurveTo(x, y + size, x, y + size - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.stroke();
-    
-    // الدائرة الداخلية
-    ctx.beginPath();
-    ctx.arc(x + size/2, y + size/2, size * 0.25, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    // النقطة الصغيرة
-    ctx.beginPath();
-    ctx.arc(x + size * 0.75, y + size * 0.25, size * 0.06, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    
-    ctx.restore();
-}
-
-function drawTwitterIcon(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    // X logo (simplified)
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + size * 0.45, y + size * 0.5);
-    ctx.lineTo(x, y + size);
-    ctx.lineTo(x + size * 0.15, y + size);
-    ctx.lineTo(x + size * 0.5, y + size * 0.6);
-    ctx.lineTo(x + size * 0.85, y + size);
-    ctx.lineTo(x + size, y + size);
-    ctx.lineTo(x + size * 0.55, y + size * 0.5);
-    ctx.lineTo(x + size, y);
-    ctx.lineTo(x + size * 0.85, y);
-    ctx.lineTo(x + size * 0.5, y + size * 0.4);
-    ctx.lineTo(x + size * 0.15, y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-}
-
-function drawSnapchatIcon(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = size * 0.06;
-    
-    // Ghost shape simplified
-    ctx.beginPath();
-    ctx.moveTo(x + size * 0.5, y + size * 0.1);
-    ctx.bezierCurveTo(x + size * 0.2, y + size * 0.1, x + size * 0.15, y + size * 0.4, x + size * 0.15, y + size * 0.55);
-    ctx.lineTo(x + size * 0.05, y + size * 0.6);
-    ctx.lineTo(x + size * 0.15, y + size * 0.7);
-    ctx.lineTo(x + size * 0.25, y + size * 0.85);
-    ctx.lineTo(x + size * 0.4, y + size * 0.75);
-    ctx.lineTo(x + size * 0.5, y + size * 0.9);
-    ctx.lineTo(x + size * 0.6, y + size * 0.75);
-    ctx.lineTo(x + size * 0.75, y + size * 0.85);
-    ctx.lineTo(x + size * 0.85, y + size * 0.7);
-    ctx.lineTo(x + size * 0.95, y + size * 0.6);
-    ctx.lineTo(x + size * 0.85, y + size * 0.55);
-    ctx.bezierCurveTo(x + size * 0.85, y + size * 0.4, x + size * 0.8, y + size * 0.1, x + size * 0.5, y + size * 0.1);
-    ctx.stroke();
-    ctx.restore();
-}
-
-function drawTikTokIcon(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = size * 0.08;
-    ctx.lineCap = 'round';
-    
-    // Musical note shape
-    ctx.beginPath();
-    ctx.arc(x + size * 0.35, y + size * 0.7, size * 0.2, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(x + size * 0.55, y + size * 0.7);
-    ctx.lineTo(x + size * 0.55, y + size * 0.15);
-    ctx.quadraticCurveTo(x + size * 0.7, y + size * 0.2, x + size * 0.85, y + size * 0.35);
-    ctx.stroke();
-    
-    ctx.restore();
-}
-
-function drawFacebookIcon(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = size * 0.08;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    // f shape
-    ctx.beginPath();
-    ctx.moveTo(x + size * 0.65, y + size * 0.1);
-    ctx.lineTo(x + size * 0.5, y + size * 0.1);
-    ctx.quadraticCurveTo(x + size * 0.3, y + size * 0.1, x + size * 0.3, y + size * 0.35);
-    ctx.lineTo(x + size * 0.3, y + size * 0.9);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(x + size * 0.15, y + size * 0.45);
-    ctx.lineTo(x + size * 0.55, y + size * 0.45);
-    ctx.stroke();
-    
-    ctx.restore();
-}
-
-function drawWhatsAppIcon(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = size * 0.08;
-    ctx.lineCap = 'round';
-    
-    // Chat bubble
-    ctx.beginPath();
-    ctx.arc(x + size * 0.5, y + size * 0.45, size * 0.4, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    // Tail
-    ctx.beginPath();
-    ctx.moveTo(x + size * 0.2, y + size * 0.7);
-    ctx.lineTo(x + size * 0.1, y + size * 0.9);
-    ctx.lineTo(x + size * 0.35, y + size * 0.75);
-    ctx.stroke();
-    
-    ctx.restore();
-}
-
-function drawIcon(ctx, platform, x, y, size, color) {
-    switch(platform) {
-        case 'Instagram': drawInstagramIcon(ctx, x, y, size, color); break;
-        case 'Twitter': drawTwitterIcon(ctx, x, y, size, color); break;
-        case 'Snapchat': drawSnapchatIcon(ctx, x, y, size, color); break;
-        case 'TikTok': drawTikTokIcon(ctx, x, y, size, color); break;
-        case 'Facebook': drawFacebookIcon(ctx, x, y, size, color); break;
-        case 'WhatsApp': drawWhatsAppIcon(ctx, x, y, size, color); break;
-        default: drawInstagramIcon(ctx, x, y, size, color);
-    }
-}
 
 function openSocialModal() {
     const modal = document.getElementById('social-modal');
@@ -209,12 +50,13 @@ function updatePreview() {
     
     const iconHtml = socialIcons[platform] || '';
     
+    // المعاينة - نفس الشكل الذي سيتم تصويره
     previewContainer.innerHTML = `
-        <div class="flex items-center gap-2 px-2 py-1 leading-none select-none border border-transparent" dir="ltr" style="display: flex; align-items: center; gap: 8px;">
-            <div style="font-size: 20px; color: ${chosenColor}; display: flex; align-items: center; justify-content: center;">
+        <div id="socialCaptureArea" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; background: transparent;" dir="ltr">
+            <span style="font-size: 24px; color: ${chosenColor}; display: flex; align-items: center; justify-content: center; line-height: 1;">
                 ${iconHtml}
-            </div>
-            <span style="font-size: 16px; font-weight: 900; color: ${chosenColor}; line-height: 1; font-family: ${chosenFont}; white-space: nowrap;">
+            </span>
+            <span style="font-size: 22px; font-weight: 800; color: ${chosenColor}; line-height: 1; font-family: ${chosenFont}; white-space: nowrap;">
                 ${handle}
             </span>
         </div>
@@ -222,68 +64,37 @@ function updatePreview() {
 }
 
 function addSocialHandleToCanvas() {
-    const handle = document.getElementById('socialInput').value || "username";
-    const platform = document.getElementById('selectedPlatform').value;
-    const chosenColor = document.getElementById('handleColor').value;
-    const chosenFont = document.getElementById('fontSelect').value;
+    const captureArea = document.getElementById('socialCaptureArea');
     
-    // Parse font family
-    let fontName = chosenFont;
-    if (fontName.includes("'")) {
-        fontName = fontName.replace(/'/g, "");
-    }
-    if (fontName.includes(",")) {
-        fontName = fontName.split(",")[0].trim();
-    }
-    
-    // Canvas settings
-    const iconSize = 60;
-    const fontSize = 48;
-    const gap = 15;
-    const padding = 20;
-    
-    // Measure text width
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.font = `900 ${fontSize}px "${fontName}", Arial, sans-serif`;
-    const textWidth = tempCtx.measureText(handle).width;
-    
-    // Calculate total dimensions
-    const totalWidth = Math.ceil(padding + iconSize + gap + textWidth + padding);
-    const totalHeight = Math.ceil(iconSize + padding * 2);
-    
-    // Create final canvas
-    const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = totalWidth;
-    finalCanvas.height = totalHeight;
-    const ctx = finalCanvas.getContext('2d');
-    
-    // Clear canvas (transparent background)
-    ctx.clearRect(0, 0, totalWidth, totalHeight);
-    
-    // Draw icon
-    const iconX = padding;
-    const iconY = (totalHeight - iconSize) / 2;
-    drawIcon(ctx, platform, iconX, iconY, iconSize, chosenColor);
-    
-    // Draw text
-    ctx.fillStyle = chosenColor;
-    ctx.font = `900 ${fontSize}px "${fontName}", Arial, sans-serif`;
-    ctx.textBaseline = 'middle';
-    ctx.fillText(handle, padding + iconSize + gap, totalHeight / 2);
-    
-    // Convert to PNG (same as QR code!)
-    const pngUrl = finalCanvas.toDataURL("image/png");
-    
-    // Use same function as QR code
-    if (typeof addAssetToCanvas === 'function') {
-        addAssetToCanvas(pngUrl, true);
-    } else {
-        alert('خطأ: لم يتم تحميل النظام');
+    if (!captureArea) {
+        alert('يرجى إدخال المعرف أولاً');
         return;
     }
     
-    closeSocialModal();
+    // تصوير المعاينة بدقة عالية باستخدام html2canvas
+    html2canvas(captureArea, {
+        backgroundColor: null, // خلفية شفافة
+        scale: 4, // دقة عالية جداً (4x)
+        useCORS: true,
+        allowTaint: true,
+        logging: false
+    }).then(canvas => {
+        // تحويل لـ PNG
+        const pngUrl = canvas.toDataURL("image/png");
+        
+        // إضافة للتصميم (نفس طريقة الباركود)
+        if (typeof addAssetToCanvas === 'function') {
+            addAssetToCanvas(pngUrl, true);
+        } else {
+            alert('خطأ: لم يتم تحميل النظام');
+            return;
+        }
+        
+        closeSocialModal();
+    }).catch(err => {
+        console.error('Error capturing social handle:', err);
+        alert('حدث خطأ أثناء إنشاء الصورة');
+    });
 }
 
 window.openSocialModal = openSocialModal;
