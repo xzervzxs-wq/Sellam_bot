@@ -1544,6 +1544,11 @@
         contentWrapper.appendChild(img);
         card.appendChild(wrapper);
         
+        // ربط أحداث السحب والتحريك للعنصر الجديد
+        if (typeof setupInteract === 'function') {
+            setupInteract(wrapper, 'box');
+        }
+        
         // تحديد العنصر الجديد
         if (typeof selectEl === 'function') selectEl(wrapper);
         if (typeof saveState === 'function') saveState();
