@@ -53,16 +53,56 @@
         :root.dark-mode #info-bar-placeholder svg {
             stroke: #94a3b8 !important;
         }
-        :root.dark-mode #designer-panel {
-            background-color: transparent !important;
+        /* Dark Mode for Designer Panel */
+        :root.dark-mode #designer-panel > div:first-child {
+            background: linear-gradient(145deg, #1e293b, #0f172a) !important;
+            border-color: rgba(51, 65, 85, 0.8) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(30,41,59,0.8) inset !important;
         }
-        :root.dark-mode #designer-panel .bg-white\/5 {
-            background-color: rgba(15, 23, 42, 0.8) !important;
+        :root.dark-mode #designer-panel .border-b.border-slate-100 {
+            border-color: #334155 !important;
         }
-        :root.dark-mode #designer-panel h3,
-        :root.dark-mode #designer-panel p,
-        :root.dark-mode #designer-panel span {
+        :root.dark-mode #designer-panel h2.text-slate-800 {
+            color: #f1f5f9 !important;
+        }
+        :root.dark-mode #designer-panel p.text-slate-400 {
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #designer-panel .bg-slate-100 {
+            background-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .text-slate-400 {
+            color: #94a3b8 !important;
+        }
+        /* Statistics section dark mode */
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 {
+            background: linear-gradient(to bottom right, #1e293b, rgba(15, 23, 42, 0.8)) !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 h3 {
             color: #e2e8f0 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .bg-white {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .text-slate-500 {
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .text-slate-800 {
+            color: #f1f5f9 !important;
+        }
+        :root.dark-mode #designer-panel .bg-gradient-to-br.from-slate-50 .border-t {
+            border-color: #334155 !important;
+        }
+        /* Keep yellow notes box unchanged */
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] {
+            background-color: #fef3c7 !important;
+        }
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] h3,
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] span,
+        :root.dark-mode #designer-panel .bg-\[\#fef3c7\] textarea {
+            color: inherit !important;
         }
         :root.dark-mode #studio-subtitle-display {
             color: #cbd5e1 !important;
@@ -943,21 +983,21 @@
         <div id="designer-panel" class="hidden fixed inset-0 z-50 flex items-center justify-center pointer-events-none" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
             <div class="relative w-[400px] rounded-[24px] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100 pointer-events-auto" 
                  onclick="event.stopPropagation()"
-                 style="background: linear-gradient(145deg, #ffffff, #f8fafc); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255,255,255,0.8) inset;">
+                 style="background: linear-gradient(145deg, #f1f5f9, #e2e8f0); border: 1px solid rgba(203, 213, 225, 0.8); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(241,245,249,0.8) inset;">
                  
                 <!-- زينة خلفية -->
-                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-100/40 to-purple-100/40 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-100/30 to-rose-100/30 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-200/50 to-purple-200/50 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-200/40 to-rose-200/40 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
 
                 <!-- Header -->
-                <div class="px-5 pt-5 pb-3 flex items-center justify-between relative z-10 border-b border-slate-100">
+                <div class="px-5 pt-5 pb-3 flex items-center justify-between relative z-10 border-b border-slate-200">
                     <div class="flex items-center gap-3">
                         <div class="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg ring-1 ring-white/50" 
                              style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
                             <i class="fas fa-palette text-white text-lg"></i>
                         </div>
                         <div>
-                            <h2 class="text-slate-800 font-bold text-base tracking-tight">لوحة المصمم</h2>
+                            <h2 class="text-slate-700 font-bold text-base tracking-tight">لوحة المصمم</h2>
                             <p class="text-slate-400 text-[10px] font-medium">مساحتك الإبداعية الخاصة ✨</p>
                         </div>
                     </div>
