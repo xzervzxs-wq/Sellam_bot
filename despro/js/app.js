@@ -1394,7 +1394,7 @@
                 const options = {
                     pixelRatio: pixelRatio,
                     cacheBust: false,
-                    skipAutoScale: true,
+                    skipAutoScale: false,
                     width: actualWidth,
                     height: actualHeight,
                     style: {
@@ -1501,19 +1501,19 @@
                 // كشف بسيط للجوال
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 800;
                 // الآيفون يحتاج جودة أقل قليلاً لتفادي الانهيار، لكن التحويل لـ Base64 أعلاه هو الحل الحقيقي
-                const qualityScale = isMobile ? 1.5 : 2;
+                const qualityScale = isMobile ? 3 : 4;
 
                 // --- استراتيجية التوليد المتعدد ---
 
                 // دالة مساعدة لتشغيل htmlToImage
-                const tryHtmlToImage = async (pixelRatioVal = 2) => {
+                const tryHtmlToImage = async (pixelRatioVal = 4) => {
                     if (typeof htmlToImage === 'undefined') throw new Error("htmlToImage missing");
 
                     // إعدادات التصدير
                     const options = {
                         pixelRatio: pixelRatioVal,
                         cacheBust: false,
-                        skipAutoScale: true,
+                        skipAutoScale: false,
                         width: card.offsetWidth,
                         height: card.offsetHeight,
                         style: {
@@ -1538,7 +1538,7 @@
                 };
 
                 // دالة مساعدة لتشغيل html2canvas
-                const tryHtml2Canvas = async (scaleVal = 2) => {
+                const tryHtml2Canvas = async (scaleVal = 4) => {
                     if (typeof html2canvas === 'undefined') throw new Error("html2canvas missing");
                     // html2canvas أحياناً أفضل في التعامل مع التحويلات المعقدة
                     const canvas = await html2canvas(card, {
