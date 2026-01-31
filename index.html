@@ -1418,11 +1418,8 @@
         const modal = document.getElementById('qrModal');
         const badge = document.getElementById('qr-pro-badge');
         
-        // إظهار/إخفاء شارة PRO
-        const savedTier = localStorage.getItem('userTier');
-        const isPremium = savedTier === 'premium';
-        console.log('QR Modal Premium Check:', { savedTier, isPremium });
-        if (isPremium) {
+        // إظهار/إخفاء شارة PRO - نفس طريقة العلامة المائية
+        if (userTier === 'premium') {
             badge.classList.add('hidden');
         } else {
             badge.classList.remove('hidden');
@@ -1478,11 +1475,8 @@
                 }
                 ctx.putImageData(imgData, 0, 0);
                 
-                // علامة مائية احترافية لغير البريميوم
-                const savedTier = localStorage.getItem('userTier');
-                const isPremium = savedTier === 'premium';
-                console.log('QR Premium Check:', { savedTier, isPremium });
-                if (!isPremium) {
+                // علامة مائية احترافية لغير البريميوم - نفس طريقة التصدير
+                if (userTier !== 'premium') {
                     const w = tempCanvas.width;
                     const h = tempCanvas.height;
                     
