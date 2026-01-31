@@ -1817,7 +1817,9 @@
                 const x = (width - finalWidth) / 2;
                 const y = (height - finalHeight) / 2;
 
-                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                // تحديد الصيغة تلقائياً
+                const format = imgData.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+                pdf.addImage(imgData, format, x, y, finalWidth, finalHeight, undefined, 'FAST');
 
                 const randomNum = Math.floor(Math.random() * 1000000);
                 pdf.save(`template_${randomNum}.pdf`);
@@ -1867,7 +1869,9 @@
                     const x = (width - finalWidth) / 2;
                     const y = (height - finalHeight) / 2;
 
-                    pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                    // تحديد الصيغة تلقائياً
+                const format = imgData.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+                pdf.addImage(imgData, format, x, y, finalWidth, finalHeight, undefined, 'FAST');
 
                     // تحويل الـ PDF إلى Blob
                     const pdfBlob = pdf.output('blob');
@@ -5976,7 +5980,9 @@
                 const x = (width - finalWidth) / 2;
                 const y = (height - finalHeight) / 2;
                 
-                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                // تحديد الصيغة تلقائياً
+                const format = imgData.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+                pdf.addImage(imgData, format, x, y, finalWidth, finalHeight, undefined, 'FAST');
                 
                 // فتح PDF مباشرة للطباعة - نفس الملف بالضبط
                 const pdfDataUri = pdf.output('bloburl');
@@ -7385,5 +7391,3 @@ function updateLayersList() {
         window.openQRModal = openQRModal;
         window.closeQRModal = closeQRModal;
         window.generateQR = generateQR;
- 
-// force update
