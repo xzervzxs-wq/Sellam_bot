@@ -510,10 +510,9 @@
 
         function addAssetToCanvas(src, colorable, categoryName) {
             const img = new Image();
-            img.crossOrigin = "anonymous";
-            
             img.onload = function() {
                 const card = document.getElementById('card');
+                const cardRect = card.getBoundingClientRect();
 
                 // حساب الحجم المناسب
                 let w = img.naturalWidth;
@@ -524,20 +523,6 @@
                     const ratio = Math.min(maxSize / w, maxSize / h);
                     w = Math.round(w * ratio);
                     h = Math.round(h * ratio);
-                }
-
-                // ⭐ تحويل الصورة إلى base64 فوراً لضمان عملها على iOS
-                let finalSrc = src;
-                try {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    finalSrc = canvas.toDataURL('image/png');
-                } catch(e) {
-                    console.warn('تعذر تحويل الصورة إلى base64:', e);
-                    // نستمر بالصورة الأصلية
                 }
 
                 // حساب موقع في وسط البطاقة
@@ -554,7 +539,7 @@
                 wrapper.style.top = Math.max(10, centerY) + 'px';
 
                 const imgEl = document.createElement('img');
-                imgEl.src = finalSrc; // استخدام base64 بدل الرابط الخارجي
+                imgEl.src = src;
                 imgEl.style.width = '100%';
                 imgEl.style.height = '100%';
                 imgEl.style.objectFit = 'fill';
@@ -596,6 +581,7 @@
             };
             img.src = src;
         }
+
         function saveCurrentAsTemplate() {
             const templates = getTemplates();
             const card = document.getElementById('card');
@@ -1459,146 +1445,221 @@
 
         async function generateA4Sheet() {
             const loadingText = document.querySelector('#export-overlay .text-white');
-            if (loadingText) loadingText.innerText = "جاري تحضير العناصر للايفون...";
+            if(loadingText) loadingText.innerText = "جاري معالجة الصور والخطوط...";
 
             const overlay = document.getElementById('export-overlay');
             overlay.style.display = 'flex';
 
             deselect();
 
+            // حفظ مستوى الزوم الحالي
             savedZoomBeforeA4 = window.currentZoom || 100;
             const card = document.getElementById('card');
 
             try {
+                // 1. إعادة تعيين الزوم (مهم جداً للدقة)
                 setCustomZoom(100);
 
+                // 2. انتظار تحميل الخطوط (حل لمشكلة الخطوط في الآيفون)
                 if (document.fonts) {
                     await document.fonts.ready;
                 }
 
-                // 1. تحويل الصور لـ Base64 (هذا الجزء مهم جداً للايفون)
+                // 3. تحويل جميع الصور إلى Base64 (حل لمشكلة اختفاء الصور في الآيفون)
+                // هذا يمنع المتصفح من حظر الصور الخارجية أثناء التصدير
                 await convertAllImagesToDataURL(card);
-                
-                // 2. تكتيك "الفك القسري" (Hard Decoding) للايفون
-                // نمر على كل صورة ونجبرها أن "تُبنى" في ذاكرة المعالج الرسومي
-                const allImages = Array.from(card.querySelectorAll('img'));
-                const prepareImages = allImages.map(img => {
-                    return new Promise((resolve) => {
-                        if (!img.src) return resolve();
-                        
-                        // التأكد من أن الصورة محملة تماماً
-                        if (img.complete) {
-                            img.decode().then(resolve).catch(() => resolve());
-                        } else {
-                            img.onload = () => img.decode().then(resolve).catch(() => resolve());
-                            img.onerror = resolve;
-                        }
-                    });
-                });
-                
-                await Promise.all(prepareImages);
-                // انتظر 300ms إضافية للايفون ليتنفس محرك WebKit
-                await new Promise(r => setTimeout(r, 300));
 
-                // 3. إزالة أنماط الخلفية الشفافة
+                // 4. إزالة نمط الشطرنج مؤقتاً قبل التصوير (لكي تكون الصورة شفافة فعلاً)
                 const hadTransparentPattern = card.classList.contains('transparent-pattern');
                 if (hadTransparentPattern) {
                     card.classList.remove('transparent-pattern');
+                    // إزالة الـ inline styles المتعلقة بالخلفية أيضاً
                     card.style.backgroundImage = 'none';
                     card.style.backgroundColor = 'transparent';
                 }
 
-                if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
+                // --- إضافة تكتيك "الإحماء" المستوحى من ملفات القرآن ---
+                try {
+                    // دورة "إحماء" وهمية لتجهيز المتصفح ومحرك الرسم
+                    await htmlToImage.toPng(card, {
+                        quality: 0.1,
+                        pixelRatio: 0.5,
+                        width: 100, // حجم صغير جداً
+                        height: 100
+                    });
+                } catch(e) {
+                    // نتجاهل الـ error هنا، المهم المحاولة
+                }
+
+                // تأخير بسيط للاستقرار بعد الإحماء
+                await new Promise(r => setTimeout(r, 500));
+
+                if(loadingText) loadingText.innerText = "جاري إنشاء الملف...";
 
                 let cardDataUrl = null;
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-                
-                // ضبط خيارات التصوير للايفون بشكل خاص
-                const captureOptions = {
-                    pixelRatio: isIOS ? 1.5 : 2, // الايفون ينهار عند 2+ مع العناصر الكثيرة
-                    cacheBust: true,
-                    skipAutoScale: true,
-                    style: {
-                        transform: 'none',
-                        boxShadow: 'none'
-                    },
-                    // استبعاد العناصر غير الضرورية
-                    filter: (node) => {
-                        if (node.classList && node.classList.contains('control-box')) return false;
-                        return true;
+
+                // كشف بسيط للجوال
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 800;
+                // الآيفون يحتاج جودة أقل قليلاً لتفادي الانهيار، لكن التحويل لـ Base64 أعلاه هو الحل الحقيقي
+                const qualityScale = isMobile ? 1.5 : 2;
+
+                // --- استراتيجية التوليد المتعدد ---
+
+                // دالة مساعدة لتشغيل htmlToImage
+                const tryHtmlToImage = async (pixelRatioVal = 2) => {
+                    if (typeof htmlToImage === 'undefined') throw new Error("htmlToImage missing");
+
+                    // إعدادات التصدير
+                    const options = {
+                        pixelRatio: pixelRatioVal,
+                        cacheBust: false,
+                        skipAutoScale: true,
+                        width: card.offsetWidth,
+                        height: card.offsetHeight,
+                        style: {
+                            transform: 'none',
+                            boxShadow: 'none',
+                            margin: '0',
+                            backgroundImage: 'none' // منع نمط الشطرنج
+                        },
+                        filter: (node) => {
+                            return !node.classList || !node.classList.contains('control-box');
+                        }
+                    };
+
+                    // إذا كان المستخدم اختار الشفافية، لا نضيف backgroundColor
+                    // وإذا أراد خلفية، نضيفها بيضاء
+                    if (!isTransparent) {
+                        options.backgroundColor = '#ffffff';
                     }
+                    // لا نضيف backgroundColor إطلاقاً للشفافية (هذا يجعل PNG شفاف)
+
+                    return await htmlToImage.toPng(card, options);
                 };
 
-                // دالة التقاط الصورة مع محاولات متعددة
-                const captureImage = async () => {
+                // دالة مساعدة لتشغيل html2canvas
+                const tryHtml2Canvas = async (scaleVal = 2) => {
+                    if (typeof html2canvas === 'undefined') throw new Error("html2canvas missing");
+                    // html2canvas أحياناً أفضل في التعامل مع التحويلات المعقدة
+                    const canvas = await html2canvas(card, {
+                        scale: scaleVal,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: null, // شفاف
+                        logging: false,
+                        scrollX: 0, scrollY: 0, x: 0, y: 0,
+                        width: card.offsetWidth,
+                        height: card.offsetHeight
+                    });
+                    return canvas.toDataURL('image/png');
+                };
+
+                // محاولة التوليد
+                try {
+                     // نبدأ بـ htmlToImage لأنها أدق للنصوص
+                    cardDataUrl = await Promise.race([
+                        tryHtmlToImage(qualityScale),
+                        new Promise((_, r) => setTimeout(() => r(new Error('Timeout 1')), 15000))
+                    ]);
+                } catch (err1) {
+                    console.warn("فشلت المحاولة الأولى، جاري تجربة html2canvas...", err1);
                     try {
-                        // المحاولة بـ htmlToImage
-                        return await htmlToImage.toPng(card, captureOptions);
-                    } catch (e) {
-                        console.warn("فشل htmlToImage، تجربة html2canvas...");
-                        const canvas = await html2canvas(card, {
-                            useCORS: true,
-                            allowTaint: true,
-                            scale: isIOS ? 1.5 : 2,
-                            backgroundColor: null
-                        });
-                        return canvas.toDataURL('image/png');
+                        cardDataUrl = await Promise.race([
+                            tryHtml2Canvas(qualityScale),
+                            new Promise((_, r) => setTimeout(() => r(new Error('Timeout 2')), 10000))
+                        ]);
+                    } catch (err2) {
+                        // محاولة أخيرة بجودة منخفضة
+                        try {
+                             cardDataUrl = await Promise.race([
+                                tryHtmlToImage(1),
+                                new Promise((_, r) => setTimeout(() => r(new Error('Timeout 3')), 5000))
+                            ]);
+                        } catch (err3) {
+                            throw new Error("فشلت جميع محاولات إنشاء الصورة.");
+                        }
                     }
-                };
+                }
 
-                cardDataUrl = await captureImage();
-
-                // 4. استعادة الصور الأصلية والنمط
+                // --- استعادة الصور الأصلية (مهم لتخفيف الذاكرة) ---
                 restoreOriginalImages(card);
+
+                // --- إعادة نمط الشطرنج إذا كان موجوداً ---
                 if (hadTransparentPattern) {
                     card.classList.add('transparent-pattern');
-                    card.style.backgroundImage = ''; 
+                    card.style.backgroundImage = ''; // إعادة تفعيل CSS
                     card.style.backgroundColor = 'transparent';
                 }
 
-                if (!cardDataUrl) throw new Error("Image Generation Failed");
+                if (!cardDataUrl) throw new Error("لم يتم إنشاء بيانات الصورة");
 
-                // تخزين الصورة لاستخدامها في حفظ الصورة أو الـ PDF
-                currentCardData = cardDataUrl; 
+                currentCardData = cardDataUrl;
 
-                // 5. بناء معاينة الـ A4
+                // إعداد أبعاد A4 (300 DPI)
                 const A4_WIDTH = 2480;
                 const A4_HEIGHT = 3508;
+
                 const cardW = card.offsetWidth;
                 const cardH = card.offsetHeight;
                 const GAP = 40;
 
-                const pCols = Math.floor((A4_WIDTH + GAP) / (cardW + GAP));
-                const pRows = Math.floor((A4_HEIGHT + GAP) / (cardH + GAP));
-                
+                // حساب التوزيع
+                const portraitCols = Math.floor((A4_WIDTH + GAP) / (cardW + GAP));
+                const portraitRows = Math.floor((A4_HEIGHT + GAP) / (cardH + GAP));
+                const portraitCount = portraitCols * portraitRows;
+
+                const landscapeCols = Math.floor((A4_HEIGHT + GAP) / (cardW + GAP));
+                const landscapeRows = Math.floor((A4_WIDTH + GAP) / (cardH + GAP));
+                const landscapeCount = landscapeCols * landscapeRows;
+
+                let finalCanvasW, finalCanvasH, cols, rows;
+
+                if (landscapeCount > portraitCount) {
+                    finalCanvasW = A4_HEIGHT; finalCanvasH = A4_WIDTH;
+                    cols = landscapeCols; rows = landscapeRows;
+                } else {
+                    finalCanvasW = A4_WIDTH; finalCanvasH = A4_HEIGHT;
+                    cols = portraitCols; rows = portraitRows;
+                }
+
                 currentA4Layout = {
-                    canvasW: A4_WIDTH, canvasH: A4_HEIGHT,
-                    cols: pCols, rows: pRows,
+                    canvasW: finalCanvasW, canvasH: finalCanvasH,
+                    cols: cols, rows: rows,
                     cardW: cardW, cardH: cardH,
                     gap: GAP,
-                    maxCopies: pCols * pRows
+                    maxCopies: cols * rows
                 };
 
+                // عرض المودال بعد تجهيز الصورة
                 const img = new Image();
                 img.onload = () => {
                     cachedCardImage = img;
+
                     document.getElementById('a4-count').max = currentA4Layout.maxCopies;
                     document.getElementById('a4-count').value = currentA4Layout.maxCopies;
+                    document.getElementById('a4-max-text').innerText = `(من أصل ${currentA4Layout.maxCopies})`;
+
                     renderA4Preview(currentA4Layout.maxCopies);
-                    
+
                     overlay.style.display = 'none';
                     document.getElementById('save-modal').style.display = 'flex';
+
+                    // استعادة الزوم بعد النجاح
                     setCustomZoom(savedZoomBeforeA4);
                 };
+                img.onerror = () => { throw new Error("فشل تحميل الصورة المنشأة"); };
                 img.src = cardDataUrl;
 
             } catch (err) {
-                console.error("Critical Export Error:", err);
+                console.error("خطأ في A4:", err);
                 overlay.style.display = 'none';
+                // استعادة الزوم عند الفشل
                 setCustomZoom(savedZoomBeforeA4);
-                showInfoModal('فشل تصدير الصور. الآيفون يحتاج مساحة ذاكرة، جرب إغلاق التطبيقات الأخرى.', 'تنبيه الذاكرة', '⚠️');
+                showInfoModal('حدثت مشكلة أثناء المعالجة. حاول تقليل عدد العناصر أو جودة الصور.', 'عذراً', '⚠️');
             }
         }
+
+        // دالة للانتظار لتحميل جميع الصور
         function waitForImagesLoad(element) {
             const images = element.querySelectorAll('img');
 
