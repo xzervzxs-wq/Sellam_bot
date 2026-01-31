@@ -236,34 +236,36 @@ function generateDiscountCard() {
         ctx.fillText(price + " ر.س", cardW/2, cardH - 60);
     }
 
-    // === العلامة المائية للمستخدمين غير Premium ===
+    // === العلامة المائية للمستخدمين غير Premium (شريط قطري متكرر مثل AI4) ===
     if (typeof userTier === 'undefined' || userTier !== 'premium') {
         ctx.save();
         
-        // علامة مائية متكررة على الجنب (مثل AI4)
-        ctx.globalAlpha = 0.15; // شفافية خفيفة
-        ctx.font = "bold 22px 'Cairo', sans-serif";
-        ctx.fillStyle = "#000000";
+        // حساب طول القطر للبطاقة
+        const diagonal = Math.sqrt(cardW * cardW + cardH * cardH);
+        const angle = Math.atan2(cardH, cardW); // زاوية من السفل اليسار لليمين العلوي
+        
+        // إعدادات النص
+        ctx.font = "bold 24px 'Cairo', sans-serif";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
         ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         
-        // نص متكرر عمودياً على الجنب الأيمن
-        const watermarkText = "👑 PREMIUM";
-        const spacing = 80; // المسافة بين كل نص
+        const watermarkText = "👑 PREMIUM 👑";
+        const textWidth = ctx.measureText(watermarkText).width;
+        const spacing = textWidth + 60; // المسافة بين كل نص
         
-        for (let y = 50; y < cardH; y += spacing) {
+        // رسم عدة خطوط قطرية متوازية
+        for (let offset = -diagonal; offset < diagonal * 1.5; offset += 120) {
             ctx.save();
-            ctx.translate(cardW - 35, y);
-            ctx.rotate(-Math.PI / 2); // عمودي
-            ctx.fillText(watermarkText, 0, 0);
-            ctx.restore();
-        }
-        
-        // نص متكرر على الجنب الأيسر أيضاً
-        for (let y = 90; y < cardH; y += spacing) {
-            ctx.save();
-            ctx.translate(35, y);
-            ctx.rotate(Math.PI / 2); // عمودي معكوس
-            ctx.fillText(watermarkText, 0, 0);
+            ctx.translate(0, cardH); // نقطة البداية: الزاوية السفلى اليسرى
+            ctx.rotate(-angle); // الدوران للاتجاه القطري
+            ctx.translate(offset, 0);
+            
+            // رسم النص متكرر على طول الخط القطري
+            for (let pos = 0; pos < diagonal + 200; pos += spacing) {
+                ctx.fillText(watermarkText, pos, 0);
+            }
+            
             ctx.restore();
         }
         
