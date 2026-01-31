@@ -17,6 +17,16 @@ function openDiscountModal() {
     document.getElementById('discountUploadPlaceholder').classList.remove('hidden');
     discountUploadedImage = null;
     selectDiscountTemplate(1);
+    
+    // إظهار/إخفاء شارة Premium
+    const badge = document.getElementById('discount-pro-badge');
+    if (badge) {
+        if (typeof userTier !== 'undefined' && userTier === 'premium') {
+            badge.classList.add('hidden');
+        } else {
+            badge.classList.remove('hidden');
+        }
+    }
 }
 
 function closeDiscountModal() {
@@ -224,6 +234,40 @@ function generateDiscountCard() {
         ctx.fillStyle = accentColor;
         ctx.font = "900 60px 'Cairo', sans-serif";
         ctx.fillText(price + " ر.س", cardW/2, cardH - 60);
+    }
+
+    // === العلامة المائية للمستخدمين غير Premium ===
+    if (typeof userTier === 'undefined' || userTier !== 'premium') {
+        ctx.save();
+        
+        // شريط قطري شفاف
+        ctx.translate(cardW / 2, cardH / 2);
+        ctx.rotate(-Math.PI / 4);
+        
+        // خلفية الشريط بتدرج
+        const stripeGrad = ctx.createLinearGradient(-300, 0, 300, 0);
+        stripeGrad.addColorStop(0, "rgba(251, 191, 36, 0.85)");
+        stripeGrad.addColorStop(0.5, "rgba(245, 158, 11, 0.95)");
+        stripeGrad.addColorStop(1, "rgba(251, 191, 36, 0.85)");
+        ctx.fillStyle = stripeGrad;
+        ctx.fillRect(-400, -35, 800, 70);
+        
+        // النص على الشريط
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 32px 'Cairo', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(0,0,0,0.3)";
+        ctx.shadowBlur = 4;
+        ctx.fillText("👑 PREMIUM 👑", 0, 0);
+        
+        ctx.restore();
+        
+        // نص صغير في الأسفل
+        ctx.font = "bold 18px 'Cairo', sans-serif";
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.textAlign = "center";
+        ctx.fillText("اشترك لإزالة العلامة المائية", cardW / 2, cardH - 15);
     }
 
     // تحويل لـ PNG
