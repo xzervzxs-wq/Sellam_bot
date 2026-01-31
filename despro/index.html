@@ -1515,7 +1515,7 @@
     <script src="js/app.js?v=20260130_05"></script>
     <script>
     // QR Code Functions
-    function openQRModal() {
+    window.openQRModal = function() {
         const modal = document.getElementById('qrModal');
         const badge = document.getElementById('qr-pro-badge');
         
@@ -1533,15 +1533,15 @@
         
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
-    }
+    };
     
-    function setFastLink(url) {
+    window.setFastLink = function(url) {
         const input = document.getElementById('qrInput');
         input.value = url;
         input.focus();
-    }
+    };
 
-    function addQRToDesign() {
+    window.addQRToDesign = function() {
         const val = document.getElementById('qrInput').value.trim() || "https://google.com";
         const selectedColor = document.getElementById('qrColorPicker').value;
         const buffer = document.getElementById('hiddenBuffer');
