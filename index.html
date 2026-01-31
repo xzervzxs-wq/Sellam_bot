@@ -1419,7 +1419,9 @@
         const badge = document.getElementById('qr-pro-badge');
         
         // إظهار/إخفاء شارة PRO
-        const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
+        const savedTier = localStorage.getItem('userTier');
+        const isPremium = savedTier === 'premium';
+        console.log('QR Modal Premium Check:', { savedTier, isPremium });
         if (isPremium) {
             badge.classList.add('hidden');
         } else {
@@ -1477,7 +1479,9 @@
                 ctx.putImageData(imgData, 0, 0);
                 
                 // علامة مائية احترافية لغير البريميوم
-                const isPremium = typeof isPremiumUser === 'function' && isPremiumUser();
+                const savedTier = localStorage.getItem('userTier');
+                const isPremium = savedTier === 'premium';
+                console.log('QR Premium Check:', { savedTier, isPremium });
                 if (!isPremium) {
                     const w = tempCanvas.width;
                     const h = tempCanvas.height;
