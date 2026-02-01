@@ -192,23 +192,6 @@
             }
         }
 
-        // أداة القطارة لالتقاط الألوان من الشاشة
-        window.pickColorFromScreen = async function() {
-            if (!window.EyeDropper) {
-                alert("هذه الأداة تعمل فقط على الكمبيوتر (Chrome أو Edge) وليس على الهواتف أو الأجهزة اللوحية.");
-                return;
-            }
-            try {
-                const eyeDropper = new EyeDropper();
-                const result = await eyeDropper.open();
-                if (result && result.sRGBHex) {
-                    addFavoriteColor(result.sRGBHex);
-                    renderFavoriteColors();
-                }
-            } catch (e) {
-                console.log("تم إلغاء التقاط اللون");
-            }
-        };
 
         // متغيرات للتحكم في معاينة A4
         let currentCardData = null;
