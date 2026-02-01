@@ -24,6 +24,7 @@
             const savedTheme = localStorage.getItem('theme') || 'light';
             if (savedTheme === 'dark') {
                 document.documentElement.classList.add('dark-mode');
+                document.documentElement.classList.add("dark");
                 applyDarkModeColors();
             }
         }
@@ -42,6 +43,7 @@
         function toggleDarkMode() {
             const html = document.documentElement;
             const isDarkMode = html.classList.toggle('dark-mode');
+            html.classList.toggle("dark");
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 
             // لا حاجة لإعادة التحميل - CSS يتولى كل شيء!
