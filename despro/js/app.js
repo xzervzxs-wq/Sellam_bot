@@ -195,7 +195,7 @@
         // أداة القطارة لالتقاط الألوان من الشاشة
         window.pickColorFromScreen = async function() {
             if (!window.EyeDropper) {
-                alert("عذراً، أداة التقاط الألوان غير مدعومة في هذا المتصفح. استخدم Chrome أو Edge.");
+                alert("هذه الأداة تعمل فقط على الكمبيوتر (Chrome أو Edge) وليس على الهواتف أو الأجهزة اللوحية.");
                 return;
             }
             try {
