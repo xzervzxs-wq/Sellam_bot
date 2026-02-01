@@ -10,6 +10,11 @@
     <style>.logged-in #studio-default-display{display:none!important}.logged-in #studio-name-display{display:block!important}</style>
     
     <!-- مكتبات التنسيق والخطوط -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
@@ -583,7 +588,7 @@
                                 <div style="width: 32px; height: 32px; background: #6366f1; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                     <i class="fas fa-palette text-white" style="font-size: 14px;"></i>
                                 </div>
-                                <span style="font-size: 24px; font-weight: bold; color: #1e293b;">استوديو المصمم</span>
+                                <span style="font-size: 24px; font-weight: bold; color: #1e293b;">أستوديو <span style="color: #6366f1;">Despro</span></span>
                                 <span style="margin-right: 4px;">✨</span>
                             </div>
                         </div>
@@ -802,9 +807,9 @@
                     
                     <!-- أزرار التراجع والإعادة -->
                     <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
-                        <button onclick="undoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
-                        <div class="w-px h-4 bg-[#e2e8f0]"></div>
-                        <button onclick="redoAction()" class="p-1.5 text-[#64748b] hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
+                        <button onclick="undoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
+                        <div class="w-px h-4 bg-[#e2e8f0] dark:bg-slate-600"></div>
+                        <button onclick="redoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
                     </div>
                     
                     <!-- قسم الخلفية - BACKGROUND -->
