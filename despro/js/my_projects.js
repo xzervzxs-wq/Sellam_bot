@@ -65,9 +65,6 @@ function getClientName() {
     }
     return 'مشترك';
 }
-    }
-    return code;
-}
 
 // حفظ المشروع الحالي
 async function saveCurrentProject() {
