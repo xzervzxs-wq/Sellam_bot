@@ -131,14 +131,26 @@ async function saveCurrentProject() {
     const loadingToast = showToast('⏳ جاري حفظ المشروع...', 'loading');
     
     // الحصول على بيانات Canvas
-    const canvasData = canvas.toJSON(['id', 'name', 'selectable', 'evented']);
-    const thumbnail = canvas.toDataURL({
-        format: 'jpeg',
-        quality: 0.3,
-        multiplier: 0.3
-    });
+    let canvasData = {};
+    let thumbnail = '';
     
     try {
+        canvasData = canvas.toJSON(['id', 'name', 'selectable', 'evented']);
+        // thumbnail صغير جداً لتسريع الحفظ
+        thumbnail = canvas.toDataURL({
+            format: 'jpeg',
+            quality: 0.1,
+            multiplier: 0.15
+        });
+    } catch (e) {
+        console.log('Canvas error:', e);
+    }
+    
+    try {
+        // إضافة timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 ثانية
+        
         const response = await fetch(`${API_URL}/api/project/save`, {
             method: 'POST',
             headers: {
@@ -148,9 +160,12 @@ async function saveCurrentProject() {
                 client_code: clientCode,
                 project_name: projectName,
                 project_data: JSON.stringify(canvasData),
-                thumbnail: thumbnail
-            })
+                thumbnail: thumbnail.substring(0, 50000) // حد أقصى للصورة
+            }),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         // إزالة رسالة التحميل
         if (loadingToast) loadingToast.remove();
@@ -166,7 +181,12 @@ async function saveCurrentProject() {
     } catch (error) {
         // إزالة رسالة التحميل
         if (loadingToast) loadingToast.remove();
-        showToast('❌ خطأ في الاتصال: ' + error.message, 'error');
+        
+        if (error.name === 'AbortError') {
+            showToast('❌ انتهى وقت الاتصال، حاول مرة أخرى', 'error');
+        } else {
+            showToast('❌ خطأ: ' + error.message, 'error');
+        }
         console.error('Save error:', error);
     }
 }
