@@ -41,48 +41,23 @@ function showToast(message, type = 'info') {
 function getUserIdentity() {
     const session = localStorage.getItem('despro_session');
     
-    // ONLY check despro_session with VALID subscription code
+    // Check for Premium session (app.js already validates expiry at login)
     if (session) {
         try {
             const data = JSON.parse(session);
-            // Must have a real subscription code AND valid expiry
-            if (data.code && data.code.length > 0 && data.expiryDate) {
-                // Check if subscription is still valid
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                let expiryDate = null;
-                const dateStr = data.expiryDate.trim();
-                if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
-                    const [day, month, year] = dateStr.split('-');
-                    expiryDate = new Date(`${year}-${month}-${day}`);
-                } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    expiryDate = new Date(dateStr);
-                } else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                    expiryDate = new Date(dateStr);
-                }
-                
-                if (expiryDate) {
-                    expiryDate.setHours(0, 0, 0, 0);
-                    if (expiryDate >= today) {
-                        // Valid Premium User
-                        console.log('[MyProjects] Premium user:', data.code);
-                        return { 
-                            id: data.code, 
-                            type: 'premium', 
-                            name: data.name || 'مشترك مميز',
-                            limit: 10
-                        };
-                    }
-                }
+            // If we have a code, user is Premium (app.js handles expiry validation)
+            if (data.code && data.code.length > 0) {
+                return { 
+                    id: data.code, 
+                    type: 'premium', 
+                    name: data.name || 'مشترك مميز',
+                    limit: 10
+                };
             }
-        } catch(e){
-            console.log('[MyProjects] Session parse error:', e);
-        }
+        } catch(e){}
     }
     
     // Guest = Local Storage only (2 projects max)
-    console.log('[MyProjects] Guest user - limit 2');
     return { 
         id: 'local_guest', 
         type: 'free', 
