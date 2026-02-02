@@ -5,9 +5,9 @@
   "type": "module",
   "main": "js/app.js",
   "scripts": {
-    "dev": "python -m http.server 8000",
+    "dev": "npx serve -l 8000",
     "build": "echo 'Build process coming soon'",
-    "start": "python -m http.server 8000"
+    "start": "npx serve -l 8000"
   },
   "keywords": [
     "design",
