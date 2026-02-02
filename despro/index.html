@@ -768,16 +768,15 @@
                                 <i class="fas fa-download"></i> حفظ كملف
                             </button>
                         </div>
-                        <!-- صف الأزرار السفلي: طباعة A4 + أعمالي -->
+                        <!-- صف الأزرار السفلي: أعمالي يمين + طباعة A4 يسار -->
                         <div class="grid grid-cols-2 gap-2 mt-2">
-                            <!-- زر طباعة A4 -->
+                            <!-- زر أعمالي (يمين) -->
+                            <button type="button" id="myWorksBtn" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white px-2 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition border border-yellow-400/50">
+                                <i class="fas fa-crown text-yellow-100"></i> أعمالي
+                            </button>
+                            <!-- زر طباعة A4 (يسار) -->
                             <button onclick="generateA4Sheet()" class="bg-[#ec4899] text-white px-2 py-2.5 rounded-xl text-xs font-bold hover:bg-[#db2777] flex items-center justify-center gap-1.5 shadow-md transition">
                                 <i class="fas fa-print"></i> طباعة A4
-                            </button>
-                            <!-- زر أعمالي -->
-                            <button onclick="openMyProjectsModal()" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white px-2 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition border border-yellow-400/50 relative overflow-hidden group">
-                                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
-                                <i class="fas fa-crown text-yellow-100"></i> أعمالي
                             </button>
                         </div>
                     </div>
@@ -1883,5 +1882,21 @@
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
     </style>
+    
+    <!-- تفعيل زر أعمالي -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const myWorksBtn = document.getElementById('myWorksBtn');
+            if (myWorksBtn) {
+                myWorksBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof openMyProjectsModal === 'function') {
+                        openMyProjectsModal();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
