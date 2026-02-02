@@ -2,7 +2,7 @@
 // نظام حفظ وتحميل المشاريع - أعمالي
 // ==========================================
 
-const API_URL = 'https://your-railway-app.up.railway.app'; // سيتم تحديثه بعد Deploy
+const API_URL = 'https://sellambot-despro.up.railway.app';
 
 // الحصول على كود العميل من localStorage أو إنشاء جديد
 function getClientCode() {
