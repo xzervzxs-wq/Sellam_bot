@@ -289,17 +289,118 @@ function showClientCode() {
 
 // تسجيل الدخول بكود موجود
 function loginWithCode() {
-    // التحقق من الاشتراك أولاً
-    if (!checkPremiumAccess()) return;
-    
     const code = prompt('أدخل كود حسابك:');
     if (code && code.length >= 6) {
         localStorage.setItem('despro_client_code', code.toUpperCase());
         showSuccessMessage('تم تسجيل الدخول بنجاح!');
-        loadMyProjects();
+        loadProjectsList();
     } else if (code) {
         showErrorMessage('الكود غير صحيح');
     }
+}
+
+// فتح نافذة أعمالي
+function openMyProjectsModal() {
+    // التحقق من الاشتراك أولاً
+    if (!checkPremiumAccess()) return;
+    
+    const modal = document.getElementById('myProjectsModal');
+    const codeDisplay = document.getElementById('clientCodeDisplay');
+    
+    // عرض كود العميل
+    const code = getClientCode();
+    if (codeDisplay) {
+        codeDisplay.textContent = `كود: ${code}`;
+    }
+    
+    modal.classList.remove('hidden');
+    
+    // تحميل المشاريع
+    loadProjectsList();
+}
+
+// تحميل قائمة المشاريع (بدون تحقق - للاستخدام الداخلي)
+async function loadProjectsList() {
+    const clientCode = getClientCode();
+    const grid = document.getElementById('projectsGrid');
+    const countEl = document.getElementById('projectsCount');
+    
+    grid.innerHTML = `
+        <div class="col-span-full text-center py-12 text-gray-400">
+            <i class="fas fa-spinner fa-spin text-4xl mb-4 text-amber-500"></i>
+            <p>جاري تحميل المشاريع...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`${API_URL}/api/projects/${clientCode}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            if (countEl) countEl.textContent = `${result.count} مشاريع`;
+            displayProjectsInGrid(result.projects);
+        } else {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-12 text-red-400">
+                    <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                    <p>فشل في تحميل المشاريع</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-12 text-red-400">
+                <i class="fas fa-wifi text-4xl mb-4"></i>
+                <p>خطأ في الاتصال بالسيرفر</p>
+            </div>
+        `;
+    }
+}
+
+// عرض المشاريع في الـ Grid
+function displayProjectsInGrid(projects) {
+    const grid = document.getElementById('projectsGrid');
+    
+    if (projects.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <i class="fas fa-cloud text-6xl mb-4 text-amber-500/30"></i>
+                <p class="text-xl mb-2">لا توجد مشاريع محفوظة</p>
+                <p class="text-sm">اضغط "حفظ المشروع الحالي" لحفظ أول مشروع!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = '';
+    projects.forEach(project => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-amber-500 transition-all group border border-slate-600/50';
+        card.innerHTML = `
+            <div class="aspect-square bg-slate-800 relative overflow-hidden">
+                ${project.thumbnail ? 
+                    `<img src="${project.thumbnail}" class="w-full h-full object-contain" alt="${project.name}">` :
+                    `<div class="w-full h-full flex items-center justify-center text-slate-500">
+                        <i class="fas fa-image text-4xl"></i>
+                    </div>`
+                }
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button onclick="event.stopPropagation(); loadProject(${project.id})" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
+                        <i class="fas fa-folder-open ml-1"></i> فتح
+                    </button>
+                    <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-3">
+                <h3 class="text-white font-medium truncate text-sm">${project.name}</h3>
+                <p class="text-slate-400 text-xs mt-1">${formatDate(project.updated_at)}</p>
+            </div>
+        `;
+        card.onclick = () => loadProject(project.id);
+        grid.appendChild(card);
+    });
 }
 
 // تصدير الدوال للاستخدام العام
@@ -310,3 +411,4 @@ window.deleteProject = deleteProject;
 window.closeMyProjectsModal = closeMyProjectsModal;
 window.showClientCode = showClientCode;
 window.loginWithCode = loginWithCode;
+window.openMyProjectsModal = openMyProjectsModal;
