@@ -1,13 +1,11 @@
 // ==========================================
-// نظام حفظ وتحميل المشاريع - أعمالي
-// للمشتركين في Google Sheet فقط
+// Cloud Save System - Free & Premium
 // ==========================================
 
 const API_URL = 'https://sellambot-despro.up.railway.app';
 
-// دالة إظهار التنبيهات
+// Toast Notifications
 function showToast(message, type = 'info') {
-    // إزالة أي toast سابق
     const oldToast = document.getElementById('projectToast');
     if (oldToast) oldToast.remove();
     
@@ -20,117 +18,92 @@ function showToast(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.id = 'projectToast';
-    toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-[99999] text-lg font-bold`;
+    toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-[99999] text-lg font-bold flex items-center gap-3`;
     toast.innerHTML = message;
-    toast.style.cssText = 'animation: fadeIn 0.3s ease; min-width: 250px; text-align: center;';
+    toast.style.cssText = 'animation: fadeIn 0.3s ease; min-width: 280px; text-align: center;';
     document.body.appendChild(toast);
     
     if (type !== 'loading') {
         setTimeout(() => toast.remove(), 4000);
     }
-    
     return toast;
 }
 
-// التحقق من الاشتراك - من Google Sheet
-function checkPremiumAccess() {
-    // التحقق من الجلسة المحفوظة
+// User Identity Management
+function getUserIdentity() {
+    // 1. Check for logged in Premium session
     const session = localStorage.getItem('despro_session');
-    if (!session) {
-        alert('⭐ هذه الميزة متاحة للمشتركين فقط!\n\nسجل دخولك بالكود للحصول على:\n• حفظ غير محدود للمشاريع\n• الوصول من أي جهاز\n• بدون علامة مائية');
-        return false;
+    if (session) {
+        try {
+            const data = JSON.parse(session);
+            // Valid session = Premium if it has code
+            if (data.code || data.name) {
+                return { 
+                    id: data.code || ('PREM_' + Date.now()), // Fallback just in case
+                    type: 'premium', 
+                    name: data.name || 'مشترك مميز',
+                    limit: 10
+                };
+            }
+        } catch(e){}
     }
+    
+    // 2. Guest User (Free)
+    let guestId = localStorage.getItem('despro_guest_id');
+    if (!guestId) {
+        // Generate persistent guest ID
+        guestId = 'guest_' + Math.random().toString(36).substring(2, 10) + Date.now();
+        localStorage.setItem('despro_guest_id', guestId);
+    }
+    
+    return { 
+        id: guestId, 
+        type: 'free', 
+        name: 'زائر',
+        limit: 1
+    };
+}
+
+// Check limits and save
+async function saveCurrentProject() {
+    const user = getUserIdentity();
+    const loadingToast = showToast('⏳ جاري التحقق من المساحة...', 'loading');
     
     try {
-        const sessionData = JSON.parse(session);
-        // التحقق من انتهاء الصلاحية
-        if (sessionData.expiryDate) {
-            let expiryDate = null;
-            const dateStr = sessionData.expiryDate.trim();
-            if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
-                const [day, month, year] = dateStr.split('-');
-                expiryDate = new Date(`${year}-${month}-${day}`);
-            } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                expiryDate = new Date(dateStr);
-            } else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                expiryDate = new Date(dateStr);
+        // Check current project count
+        const checkRes = await fetch(`${API_URL}/api/projects/${user.id}`);
+        const checkData = await checkRes.json();
+        const currentCount = checkData.projects ? checkData.projects.length : 0;
+        
+        if (loadingToast) loadingToast.remove();
+
+        // Enforce Limits
+        if (currentCount >= user.limit) {
+            if (user.type === 'free') {
+                showSubscribeModal();
+            } else {
+                showToast(`⚠️ لقد وصلت للحد الأقصى (${user.limit} مشاريع). احذف بعض المشاريع للحفظ.`, 'error');
             }
-            if (expiryDate && expiryDate < new Date()) {
-                alert('⚠️ انتهت صلاحية اشتراكك!\n\nجدد اشتراكك للاستمرار.');
-                return false;
-            }
+            return;
         }
-        return true;
+        
+        // Proceed to Save
+        const projectName = prompt('أدخل اسم المشروع:', 'مشروع جديد');
+        if (!projectName) return;
+        
+        saveProjectToCloud(user.id, projectName);
+        
     } catch (e) {
-        return false;
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ في الاتصال', 'error');
+        console.error(e);
     }
 }
 
-// الحصول على كود العميل من الجلسة (كود الاشتراك نفسه)
-function getClientCode() {
-    const session = localStorage.getItem('despro_session');
-    if (session) {
-        try {
-            const sessionData = JSON.parse(session);
-            // استخدم كود الاشتراك كـ client code
-            if (sessionData.code) {
-                return sessionData.code;
-            }
-        } catch (e) {}
-    }
-    return null;
-}
-
-// الحصول على اسم المشترك
-function getClientName() {
-    const session = localStorage.getItem('despro_session');
-    if (session) {
-        try {
-            const sessionData = JSON.parse(session);
-            return sessionData.name || 'مشترك';
-        } catch (e) {}
-    }
-    return 'مشترك';
-}
-
-// حفظ المشروع الحالي - نفس طريقة "حفظ كملف" بالضبط
-async function saveCurrentProject() {
-    // التحقق من الاشتراك أولاً
-    if (!checkPremiumAccess()) return;
+// Actual Save Logic (DOM Based)
+async function saveProjectToCloud(clientId, projectName) {
+    const loadingToast = showToast('⏳ جاري حفظ المشروع سحابياً...', 'loading');
     
-    // جلب الجلسة مباشرة
-    const session = localStorage.getItem('despro_session');
-    let clientCode = null;
-    
-    if (session) {
-        try {
-            const sessionData = JSON.parse(session);
-            clientCode = sessionData.code;
-        } catch (e) {}
-    }
-    
-    // إذا ما فيه كود، استخدم اسم المشترك
-    if (!clientCode) {
-        const sessionName = sessionStorage.getItem('studioName');
-        if (sessionName) {
-            clientCode = sessionName.replace(/\s+/g, '_');
-        }
-    }
-    
-    // تأكد من وجود كود العميل
-    if (!clientCode) {
-        showToast('⚠️ خطأ في الجلسة! أعد تسجيل الدخول', 'error');
-        return;
-    }
-    
-    const projectName = prompt('أدخل اسم المشروع:', 'مشروع جديد');
-    
-    if (!projectName) return;
-    
-    // إظهار رسالة التحميل
-    const loadingToast = showToast('⏳ جاري حفظ المشروع...', 'loading');
-    
-    // ============= نفس كود "حفظ كملف" بالضبط =============
     const card = document.getElementById('card');
     if (!card) {
         if (loadingToast) loadingToast.remove();
@@ -141,34 +114,30 @@ async function saveCurrentProject() {
     const projectData = {
         name: projectName,
         html: card.innerHTML,
-        width: card.style.width,
-        height: card.style.height,
         wVal: card.getAttribute('data-card-width'),
         hVal: card.getAttribute('data-card-height'),
+        // Add backup style dimensions
+        width: card.style.width,
+        height: card.style.height,
         customW: document.getElementById('custom-width')?.value || '10',
         customH: document.getElementById('custom-height')?.value || '10',
         timestamp: new Date().toLocaleString('ar-SA'),
-        version: "2.0"
+        version: "2.5"
     };
-    
-    // حفظ الملاحظات إذا موجودة
+
+    // Notes
     const notesField = document.getElementById('designer-notes');
-    if (notesField && notesField.value.trim()) {
-        projectData.notes = notesField.value.trim();
-    }
-    // ============= نهاية كود "حفظ كملف" =============
+    if (notesField) projectData.notes = notesField.value.trim();
     
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
         
         const response = await fetch(`${API_URL}/api/project/save`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                client_code: clientCode,
+                client_code: clientId,
                 project_name: projectName,
                 project_data: JSON.stringify(projectData),
                 thumbnail: ''
@@ -177,449 +146,243 @@ async function saveCurrentProject() {
         });
         
         clearTimeout(timeoutId);
-        
-        // إزالة رسالة التحميل
         if (loadingToast) loadingToast.remove();
         
         const result = await response.json();
         
         if (result.success) {
-            showToast('✅ تم حفظ المشروع بنجاح!', 'success');
-            loadProjectsList(); // تحديث القائمة
-        } else {
-            showToast('❌ فشل: ' + (result.error || 'خطأ غير معروف'), 'error');
-        }
-    } catch (error) {
-        // إزالة رسالة التحميل
-        if (loadingToast) loadingToast.remove();
-        
-        if (error.name === 'AbortError') {
-            showToast('❌ انتهى وقت الاتصال، حاول مرة أخرى', 'error');
-        } else {
-            showToast('❌ خطأ: ' + error.message, 'error');
-        }
-        console.error('Save error:', error);
-    }
-}
-
-// تحميل قائمة المشاريع
-async function loadMyProjects() {
-    // التحقق من الاشتراك أولاً
-    if (!checkPremiumAccess()) return;
-    
-    // جلب كود العميل
-    let clientCode = getClientCode();
-    if (!clientCode) {
-        const sessionName = sessionStorage.getItem('studioName');
-        if (sessionName) {
-            clientCode = sessionName.replace(/\s+/g, '_');
-        }
-    }
-    
-    if (!clientCode) {
-        alert('⚠️ خطأ في الجلسة! أعد تسجيل الدخول.');
-        return;
-    }
-    
-    try {
-        showLoadingMessage('جاري تحميل المشاريع...');
-        
-        const response = await fetch(`${API_URL}/api/projects/${clientCode}`);
-        const result = await response.json();
-        
-        hideLoadingMessage();
-        
-        if (result.success) {
-            displayProjectsModal(result.projects);
-        } else {
-            showErrorMessage('فشل في تحميل المشاريع');
-        }
-    } catch (error) {
-        hideLoadingMessage();
-        showErrorMessage('خطأ في الاتصال بالسيرفر');
-        console.error('Load error:', error);
-    }
-}
-
-// الدالة الرئيسية للعرض موجودة في الأسفل (displayProjectsInGrid)
-
-// تحميل مشروع محدد
-async function loadProject(projectId) {
-    // جلب كود العميل مع fallback
-    let clientCode = getClientCode();
-    if (!clientCode) {
-        const sessionName = sessionStorage.getItem('studioName');
-        if (sessionName) {
-            clientCode = sessionName.replace(/\s+/g, '_');
-        }
-    }
-    
-    if (!clientCode) {
-        showToast('❌ خطأ في الجلسة!', 'error');
-        return;
-    }
-    
-    const loadingToast = showToast('⏳ جاري تحميل المشروع...', 'loading');
-    
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        
-        const response = await fetch(`${API_URL}/api/project/${projectId}?client_code=${clientCode}`, {
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        const result = await response.json();
-        
-        if (loadingToast) loadingToast.remove();
-        
-        if (result.success && result.project) {
-            // الـ data ممكن يكون string أو object
-            let projectData = result.project.data;
-            if (typeof projectData === 'string') {
-                projectData = JSON.parse(projectData);
+            showToast('✅ تم الحفظ بنجاح!', 'success');
+            // Check if modal is open, if so refresh list
+            const modal = document.getElementById('myProjectsModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                loadProjectsList();
             }
-            
-            // ============= نفس كود "فتح ملف" بالضبط =============
-            // تحقق من سلامة الملف
-            if (!projectData.html && !projectData.wVal && !projectData.width) {
-                showToast('❌ ملف المشروع غير صالح', 'error');
-                return;
-            }
-            
-            const card = document.getElementById('card');
-            card.innerHTML = projectData.html;
-            
-            // تصحيح مفاتيح البيانات (توافقية مع الإصدارات المختلفة)
-            const wVal = projectData.wVal || projectData.cardWidth;
-            const hVal = projectData.hVal || projectData.cardHeight;
-            const customW = projectData.customW || projectData.customWidth || '10';
-            const customH = projectData.customH || projectData.customHeight || '10';
-            
-            // استعادة الأبعاد في الحقول
-            document.getElementById('custom-width').value = customW;
-            document.getElementById('custom-height').value = customH;
-            
-            if (wVal && hVal) {
-                // استخدام دالة setCardSize لضمان تحديث كل شيء
-                if (typeof setCardSize === 'function') {
-                    setCardSize(parseFloat(wVal), parseFloat(hVal));
-                }
-                
-                card.setAttribute('data-card-width', wVal);
-                card.setAttribute('data-card-height', hVal);
-            } else if (projectData.width && projectData.height) {
-                card.style.width = projectData.width;
-                card.style.height = projectData.height;
-            }
-            
-            // إعادة تفعيل الأحداث للعناصر
-            if (typeof rebindEvents === 'function') rebindEvents();
-            
-            // ضبط الزوم على 50%
-            if (typeof setCustomZoom === 'function') setCustomZoom(50);
-            
-            // استعادة الملاحظات
-            const notesField = document.getElementById('designer-notes');
-            if (projectData.notes && notesField) {
-                notesField.value = projectData.notes;
-                if (typeof updateCharCount === 'function') updateCharCount();
-            } else if (notesField) {
-                notesField.value = '';
-            }
-            // ============= نهاية كود "فتح ملف" =============
-            
-            closeMyProjectsModal();
-            showToast('✅ تم تحميل المشروع!', 'success');
-            
         } else {
-            showToast('❌ فشل تحميل المشروع: ' + (result.error || ''), 'error');
+            showToast('❌ فشل الحفظ: ' + (result.error || ''), 'error');
         }
     } catch (error) {
         if (loadingToast) loadingToast.remove();
-        if (error.name === 'AbortError') {
-            showToast('❌ انتهى وقت الاتصال', 'error');
-        } else {
-            showToast('❌ خطأ: ' + error.message, 'error');
-        }
-        console.error('Load project error:', error);
+        showToast('❌ خطأ: ' + error.message, 'error');
     }
 }
 
-// حذف مشروع
-async function deleteProject(projectId) {
-    if (!confirm('هل أنت متأكد من حذف هذا المشروع؟')) return;
-    
-    // جلب كود العميل مع fallback
-    let clientCode = getClientCode();
-    if (!clientCode) {
-        const sessionName = sessionStorage.getItem('studioName');
-        if (sessionName) {
-            clientCode = sessionName.replace(/\s+/g, '_');
-        }
-    }
-    
-    if (!clientCode) {
-        showToast('❌ خطأ في الجلسة!', 'error');
-        return;
-    }
-    
-    const loadingToast = showToast('⏳ جاري حذف المشروع...', 'loading');
-    
-    try {
-        const response = await fetch(`${API_URL}/api/project/${projectId}?client_code=${clientCode}`, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
-        
-        if (loadingToast) loadingToast.remove();
-        
-        if (result.success) {
-            showToast('✅ تم حذف المشروع', 'success');
-            loadProjectsList(); // إعادة تحميل القائمة
-        } else {
-            showToast('❌ فشل الحذف: ' + (result.error || ''), 'error');
-        }
-    } catch (error) {
-        if (loadingToast) loadingToast.remove();
-        showToast('❌ خطأ في الاتصال', 'error');
-    }
-}
-
-// الدالة closeMyProjectsModal موجودة في الأسفل
-
-// تنسيق التاريخ
-function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ar-SA', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-}
-
-// رسائل التحميل والنجاح والخطأ
-function showLoadingMessage(msg) {
-    // يمكن استخدام Toast أو Modal
-    console.log(msg);
-}
-
-function hideLoadingMessage() {
-    // إخفاء رسالة التحميل
-}
-
-function showSuccessMessage(msg) {
-    alert(msg);
-}
-
-function showErrorMessage(msg) {
-    alert(msg);
-}
-
-// عرض كود العميل
-function showClientCode() {
-    // التحقق من الاشتراك أولاً
-    if (!checkPremiumAccess()) return;
-    
-    const code = getClientCode();
-    alert(`كود حسابك: ${code}\n\nاحتفظ بهذا الكود للوصول لمشاريعك من أي جهاز.`);
-}
-
-// تسجيل الدخول بكود موجود
-function loginWithCode() {
-    const code = prompt('أدخل كود حسابك:');
-    if (code && code.length >= 6) {
-        localStorage.setItem('despro_client_code', code.toUpperCase());
-        showSuccessMessage('تم تسجيل الدخول بنجاح!');
-        loadProjectsList();
-    } else if (code) {
-        showErrorMessage('الكود غير صحيح');
-    }
-}
-
-// فتح نافذة أعمالي
+// Modal Management
 function openMyProjectsModal() {
-    // التحقق من الاشتراك أولاً
-    if (!checkPremiumAccess()) return;
-    
     const modal = document.getElementById('myProjectsModal');
-    const nameDisplay = document.getElementById('clientNameDisplay');
-    
-    // عرض اسم المشترك
-    const name = getClientName();
-    if (nameDisplay) {
-        nameDisplay.textContent = `مرحباً ${name}!`;
+    if (modal) {
+        modal.classList.remove('hidden');
+        loadProjectsList();
     }
-    
-    modal.classList.remove('hidden');
-    
-    // تحميل المشاريع
-    loadProjectsList();
 }
 
-// تحميل قائمة المشاريع (بدون تحقق - للاستخدام الداخلي)
-async function loadProjectsList() {
-    // جلب كود العميل
-    let clientCode = getClientCode();
-    if (!clientCode) {
-        const sessionName = sessionStorage.getItem('studioName');
-        if (sessionName) {
-            clientCode = sessionName.replace(/\s+/g, '_');
-        }
+function closeMyProjectsModal() {
+    const modal = document.getElementById('myProjectsModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function showSubscribeModal() {
+    const modal = document.getElementById('subscribeModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        // Close projects modal if open to focus on subscribe
+        closeMyProjectsModal();
     }
-    
+}
+
+function closeSubscribeModal() {
+    const modal = document.getElementById('subscribeModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function loadProjectsList() {
+    const user = getUserIdentity();
     const grid = document.getElementById('projectsGrid');
-    const countEl = document.getElementById('projectsCount');
+    
+    // UI Elements for limit
+    const countLabel = document.getElementById('projectsLimitLabel');
+    const countDetail = document.getElementById('projectsCountDetail');
+    // const limitDetail = document.getElementById('projectsLimitDetail');
+    const usageBar = document.getElementById('projectsUsageBar');
+    
+    if (countLabel) countLabel.textContent = user.type === 'premium' ? 'مساحة تخزين Premium' : 'مساحة تخزين مجانية';
     
     grid.innerHTML = `
-        <div class="col-span-full text-center py-12 text-gray-400">
-            <i class="fas fa-spinner fa-spin text-4xl mb-4 text-amber-500"></i>
-            <p>جاري تحميل المشاريع...</p>
+        <div class="h-64 flex flex-col items-center justify-center text-slate-400 gap-3">
+            <i class="fas fa-circle-notch fa-spin text-2xl text-amber-500"></i>
+            <span class="text-xs">جاري جلب مشاريعك...</span>
         </div>
     `;
     
-    if (!clientCode) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12 text-gray-400">
-                <i class="fas fa-cloud text-6xl mb-4 text-amber-500/30"></i>
-                <p class="text-xl">لا توجد مشاريع محفوظة</p>
-            </div>
-        `;
-        return;
-    }
-    
     try {
-        const response = await fetch(`${API_URL}/api/projects/${clientCode}`);
+        const response = await fetch(`${API_URL}/api/projects/${user.id}`);
         const result = await response.json();
         
         if (result.success) {
-            if (countEl) countEl.textContent = `${result.count} مشاريع`;
-            displayProjectsInGrid(result.projects);
+            const projects = result.projects || [];
+            const count = projects.length;
+            
+            // Update Usage Bar
+            // For Premium: 10, Free: 1
+            const percent = Math.min((count / user.limit) * 100, 100);
+            if (usageBar) {
+                usageBar.style.width = `${percent}%`;
+                usageBar.className = `h-full rounded-full transition-all duration-500 ${
+                    percent >= 100 ? 'bg-red-500' : 
+                    percent >= 80 ? 'bg-amber-500' : 
+                    'bg-gradient-to-r from-amber-400 to-amber-600'
+                }`;
+            }
+            
+            if (countDetail) countDetail.textContent = `${count} من ${user.limit} مستخدم`;
+            
+            displayProjectsInGrid(projects);
         } else {
-            grid.innerHTML = `
-                <div class="col-span-full text-center py-12 text-red-400">
-                    <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
-                    <p>فشل في تحميل المشاريع</p>
-                </div>
-            `;
+            const projects = []; // Default to empty if API fails for new users
+             displayProjectsInGrid(projects);
+             if (countDetail) countDetail.textContent = `0 من ${user.limit} مستخدم`;
         }
-    } catch (error) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12 text-red-400">
-                <i class="fas fa-wifi text-4xl mb-4"></i>
-                <p>خطأ في الاتصال بالسيرفر</p>
-            </div>
-        `;
+    } catch(e) {
+        // Fallback for empty/error state
+        const projects = [];
+        displayProjectsInGrid(projects);
     }
 }
 
-// عرض المشاريع في القائمة (تصميم جديد)
 function displayProjectsInGrid(projects) {
     const grid = document.getElementById('projectsGrid');
     
     if (projects.length === 0) {
         grid.innerHTML = `
-            <div class="h-full flex flex-col items-center justify-center text-slate-400 py-12 opacity-70">
-                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-cloud text-3xl text-slate-300 dark:text-slate-600"></i>
-                </div>
-                <p class="text-sm font-bold text-slate-500 dark:text-slate-400">لا توجد مشاريع محفوظة</p>
-                <p class="text-[10px] text-slate-400 mt-1">ابدأ بحفظ مشروعك الأول الآن</p>
+            <div class="flex flex-col items-center justify-center py-12 text-slate-400 opacity-60">
+                <i class="fas fa-folder-open text-4xl mb-3 text-slate-300 dark:text-slate-700"></i>
+                <p class="text-xs">لا توجد مشاريع محفوظة</p>
             </div>
         `;
         return;
     }
     
-    // ترتيب المشاريع من الأحدث للأقدم
     projects.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-    
     grid.innerHTML = '';
     
     projects.forEach(project => {
-        // حساب حجم تقريبي للملف (اذا البيانات نصية)
-        let sizeStr = 'غير معروف';
-        try {
-            if (project.data) {
-                const bytes = new Blob([project.data]).size;
-                const kb = Math.round(bytes / 1024);
-                sizeStr = kb > 1024 ? (kb/1024).toFixed(1) + ' MB' : kb + ' KB';
-            }
-        } catch(e) {}
+        const el = document.createElement('div');
+        el.className = 'group flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all cursor-pointer relative overflow-hidden';
         
-        const card = document.createElement('div');
-        card.className = 'group flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 hover:border-amber-500/50 hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-750 transition-all cursor-pointer relative overflow-hidden';
-        
-        // تأثير hover خفيف
-        card.innerHTML = `
-            <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            
+        el.innerHTML = `
             <!-- Icon -->
-            <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0 border border-indigo-100 dark:border-indigo-500/20 group-hover:bg-amber-50 dark:group-hover:bg-amber-500/10 group-hover:text-amber-500 group-hover:border-amber-200 dark:group-hover:border-amber-500/20 transition-all">
-                <i class="fas fa-file-contract text-lg"></i>
+            <div class="h-12 w-12 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center text-amber-500 shadow-sm border border-slate-100 dark:border-slate-600 group-hover:scale-110 transition-transform">
+                <i class="fas fa-file-contract"></i>
             </div>
             
             <!-- Info -->
             <div class="flex-1 min-w-0">
-                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'مشروع بدون عنوان'}</h4>
-                <div class="flex items-center gap-3 text-[10px] text-slate-400 mt-1">
-                    <span class="flex items-center gap-1 bg-slate-100 dark:bg-slate-700/50 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400">
-                        <i class="far fa-clock text-[9px]"></i> ${formatDate(project.updated_at)}
-                    </span>
-                    <span class="flex items-center gap-1 text-slate-400">
-                        <i class="fas fa-hdd text-[9px]"></i> ${sizeStr}
-                    </span>
+                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'بدون عنوان'}</h4>
+                <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-1">
+                    <span>${new Date(project.updated_at).toLocaleDateString('ar-SA')}</span>
                 </div>
             </div>
-
+            
             <!-- Actions -->
-            <div class="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all transform sm:translate-x-2 group-hover:translate-x-0">
-                <button onclick="event.stopPropagation(); loadProject(${project.id})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center shadow-sm" title="فتح المشروع">
+            <div class="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all sm:translate-x-2 group-hover:translate-x-0">
+                 <button onclick="event.stopPropagation(); loadProject('${project.id}')" class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
                     <i class="fas fa-folder-open text-xs"></i>
                 </button>
-                <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-red-500 hover:text-white transition flex items-center justify-center shadow-sm" title="حذف">
+                <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center">
                     <i class="fas fa-trash text-xs"></i>
                 </button>
             </div>
         `;
         
-        card.onclick = () => loadProject(project.id);
-        grid.appendChild(card);
+        el.onclick = () => loadProject(project.id);
+        grid.appendChild(el);
     });
 }
 
-// عرض نافذة المشاريع (تحديث للنسخة الجديدة)
-function displayProjectsModal(projects) {
-    const modal = document.getElementById('myProjectsModal');
-    const content = document.getElementById('myProjectsContent');
-    const countEl = document.getElementById('projectsCount');
-    const nameEl = document.getElementById('clientNameDisplay');
+async function loadProject(projectId) {
+    const user = getUserIdentity();
+    const loadingToast = showToast('⏳ جاري فتح المشروع...', 'loading');
     
-    // تحديث الاسم
-    const clientName = getClientName();
-    if (nameEl) nameEl.textContent = `أهلاً بك، ${clientName}`;
-    
-    // تحديث العدد
-    if (countEl) countEl.textContent = projects.length;
-    
-    // عرض القائمة
-    displayProjectsInGrid(projects);
-    
-    // فتح النافذة
-    modal.classList.remove('hidden');
+    try {
+        const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`);
+        const result = await res.json();
+        
+        if (loadingToast) loadingToast.remove();
+        
+        if (result.success && result.project) {
+            let data = result.project.data;
+            if (typeof data === 'string') data = JSON.parse(data);
+            
+            // Restore Logic
+            const card = document.getElementById('card');
+            
+            // HTML restore
+            if (data.html) card.innerHTML = data.html;
+            
+            // Dimensions
+            const wVal = data.wVal || data.cardWidth;
+            const hVal = data.hVal || data.cardHeight;
+            const customW = data.customW || '10';
+            const customH = data.customH || '10';
+            
+            document.getElementById('custom-width').value = customW;
+            document.getElementById('custom-height').value = customH;
+
+            if (wVal && hVal) {
+                card.setAttribute('data-card-width', wVal);
+                card.setAttribute('data-card-height', hVal);
+                if (window.setCardSize) window.setCardSize(parseFloat(wVal), parseFloat(hVal));
+            } else if (data.width && data.height) {
+                 card.style.width = data.width;
+                 card.style.height = data.height;
+            }
+            
+            if (window.rebindEvents) window.rebindEvents();
+            if (window.setCustomZoom) window.setCustomZoom(50);
+            
+            const notesField = document.getElementById('designer-notes');
+            if (notesField && data.notes) notesField.value = data.notes;
+            
+            closeMyProjectsModal();
+            showToast('✅ تم فتح المشروع بنجاح', 'success');
+        } else {
+             showToast('❌ فشل الفتح', 'error');
+        }
+    } catch(e) {
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ في التحميل', 'error');
+    }
 }
 
-// إغلاق نافذة المشاريع - بسيط مثل حفظ كملف
-function closeMyProjectsModal() {
-    const modal = document.getElementById('myProjectsModal');
-    if (modal) modal.classList.add('hidden');
+async function deleteProject(projectId) {
+    if (!confirm('هل أنت متأكد من الحذف؟ لا يمكن التراجع.')) return;
+    
+    const user = getUserIdentity();
+    const loadingToast = showToast('⏳ جاري الحذف...', 'loading');
+    
+    try {
+        const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`, { method: 'DELETE' });
+        const result = await res.json();
+        
+        if (loadingToast) loadingToast.remove();
+        
+        if (result.success) {
+            showToast('✅ تم الحذف', 'success');
+            loadProjectsList();
+        } else {
+            showToast('❌ فشل الحذف', 'error');
+        }
+    } catch(e) {
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ في الاتصال', 'error');
+    }
 }
-window.loadMyProjects = loadMyProjects;
+
+// Exports
+window.openMyProjectsModal = openMyProjectsModal;
+window.closeMyProjectsModal = closeMyProjectsModal;
+window.saveCurrentProject = saveCurrentProject;
 window.loadProject = loadProject;
 window.deleteProject = deleteProject;
-window.closeMyProjectsModal = closeMyProjectsModal;
-window.showClientCode = showClientCode;
-window.loginWithCode = loginWithCode;
-window.openMyProjectsModal = openMyProjectsModal;
+window.showSubscribeModal = showSubscribeModal;
+window.closeSubscribeModal = closeSubscribeModal;
+window.getUserIdentity = getUserIdentity;
