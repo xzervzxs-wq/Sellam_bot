@@ -39,14 +39,14 @@ function showToast(message, type = 'info') {
 
 // User Identity Management
 function getUserIdentity() {
-    // Method 1: Check localStorage despro_session
+    // Method 1: Check localStorage despro_session (الكود الرئيسي للمشترك)
     const session = localStorage.getItem('despro_session');
     if (session) {
         try {
             const data = JSON.parse(session);
             if (data.code && data.code.length > 0) {
                 return { 
-                    id: data.code, 
+                    id: data.code,  // نستخدم كود الاشتراك مباشرة
                     type: 'premium', 
                     name: data.name || 'مشترك مميز',
                     limit: 10
@@ -59,7 +59,22 @@ function getUserIdentity() {
     const studioName = sessionStorage.getItem('studioName');
     const sessionId = sessionStorage.getItem('sessionId');
     if (studioName && sessionId) {
-        // User is logged in via app.js
+        // استخدم الكود من localStorage إذا موجود
+        const savedSession = localStorage.getItem('despro_session');
+        if (savedSession) {
+            try {
+                const savedData = JSON.parse(savedSession);
+                if (savedData.code) {
+                    return { 
+                        id: savedData.code, 
+                        type: 'premium', 
+                        name: studioName,
+                        limit: 10
+                    };
+                }
+            } catch(e){}
+        }
+        // إذا ما فيه كود محفوظ، استخدم sessionId
         return { 
             id: sessionId, 
             type: 'premium', 
@@ -70,9 +85,25 @@ function getUserIdentity() {
     
     // Method 3: Check if page shows premium UI (data-tier attribute)
     if (document.documentElement.getAttribute('data-tier') === 'premium') {
+        // حاول تجيب الكود من localStorage
+        const savedSession = localStorage.getItem('despro_session');
+        if (savedSession) {
+            try {
+                const savedData = JSON.parse(savedSession);
+                if (savedData.code) {
+                    return { 
+                        id: savedData.code, 
+                        type: 'premium', 
+                        name: savedData.name || 'مشترك',
+                        limit: 10
+                    };
+                }
+            } catch(e){}
+        }
+        // fallback - هذا ما لازم يصير
         const name = sessionStorage.getItem('studioName') || 'مشترك';
         return { 
-            id: 'premium_' + Date.now(), 
+            id: 'guest_premium_' + Date.now(), 
             type: 'premium', 
             name: name,
             limit: 10
