@@ -4,13 +4,13 @@
 
 const API_URL = 'https://sellambot-despro.up.railway.app';
 
-// Toast Notifications
+// Toast Notifications - Smaller & Cleaner
 function showToast(message, type = 'info') {
     const oldToast = document.getElementById('projectToast');
     if (oldToast) oldToast.remove();
     
     const colors = {
-        success: 'bg-green-500',
+        success: 'bg-emerald-500',
         error: 'bg-red-500',
         info: 'bg-blue-500',
         loading: 'bg-amber-500'
@@ -18,13 +18,22 @@ function showToast(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.id = 'projectToast';
-    toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-[99999] text-lg font-bold flex items-center gap-3`;
+    // Reduced padding and font size for a sleek look
+    toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg z-[99999] text-sm font-bold flex items-center gap-2`;
     toast.innerHTML = message;
-    toast.style.cssText = 'animation: fadeIn 0.3s ease; min-width: 280px; text-align: center;';
+    toast.style.cssText = 'animation: slideDown 0.3s ease; min-width: auto; white-space: nowrap;';
     document.body.appendChild(toast);
     
+    // Add slide down animation style if not exists
+    if (!document.getElementById('toastStyle')) {
+        const style = document.createElement('style');
+        style.id = 'toastStyle';
+        style.innerHTML = `@keyframes slideDown { from { transform: translate(-50%, -100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }`;
+        document.head.appendChild(style);
+    }
+    
     if (type !== 'loading') {
-        setTimeout(() => toast.remove(), 4000);
+        setTimeout(() => toast.remove(), 3000);
     }
     return toast;
 }
@@ -39,7 +48,7 @@ function getUserIdentity() {
             // Valid session = Premium if it has code
             if (data.code || data.name) {
                 return { 
-                    id: data.code || ('PREM_' + Date.now()), // Fallback just in case
+                    id: data.code || ('PREM_' + Date.now()), 
                     type: 'premium', 
                     name: data.name || 'مشترك مميز',
                     limit: 10
@@ -67,22 +76,20 @@ function getUserIdentity() {
 // Check limits and save
 async function saveCurrentProject() {
     const user = getUserIdentity();
-    const loadingToast = showToast('⏳ جاري التحقق من المساحة...', 'loading');
+    // Removed the "Thinking..." toast to be less intrusive
     
     try {
-        // Check current project count
+        // Check current project count silently
         const checkRes = await fetch(`${API_URL}/api/projects/${user.id}`);
         const checkData = await checkRes.json();
         const currentCount = checkData.projects ? checkData.projects.length : 0;
         
-        if (loadingToast) loadingToast.remove();
-
         // Enforce Limits
         if (currentCount >= user.limit) {
             if (user.type === 'free') {
                 showSubscribeModal();
             } else {
-                showToast(`⚠️ لقد وصلت للحد الأقصى (${user.limit} مشاريع). احذف بعض المشاريع للحفظ.`, 'error');
+                showToast(`⚠️ المجلد ممتلئ! الحد الأقصى ${user.limit} مشاريع.`, 'error');
             }
             return;
         }
@@ -94,20 +101,19 @@ async function saveCurrentProject() {
         saveProjectToCloud(user.id, projectName);
         
     } catch (e) {
-        if (loadingToast) loadingToast.remove();
-        showToast('❌ خطأ في الاتصال', 'error');
+        showToast('❌ تأكد من اتصالك بالإنترنت', 'error');
         console.error(e);
     }
 }
 
 // Actual Save Logic (DOM Based)
 async function saveProjectToCloud(clientId, projectName) {
-    const loadingToast = showToast('⏳ جاري حفظ المشروع سحابياً...', 'loading');
+    const loadingToast = showToast('⏳ جاري الحفظ...', 'loading');
     
     const card = document.getElementById('card');
     if (!card) {
         if (loadingToast) loadingToast.remove();
-        showToast('❌ خطأ: لم يتم العثور على منطقة العمل', 'error');
+        showToast('❌ خطأ: منطقة العمل فارغة', 'error');
         return;
     }
     
@@ -151,18 +157,15 @@ async function saveProjectToCloud(clientId, projectName) {
         const result = await response.json();
         
         if (result.success) {
-            showToast('✅ تم الحفظ بنجاح!', 'success');
-            // Check if modal is open, if so refresh list
-            const modal = document.getElementById('myProjectsModal');
-            if (modal && !modal.classList.contains('hidden')) {
-                loadProjectsList();
-            }
+            showToast('✅ تم الحفظ بنجاح', 'success');
+            // Automatically open the list to show the new file
+            openMyProjectsModal();
         } else {
-            showToast('❌ فشل الحفظ: ' + (result.error || ''), 'error');
+            showToast('❌ فشل الحفظ', 'error');
         }
     } catch (error) {
         if (loadingToast) loadingToast.remove();
-        showToast('❌ خطأ: ' + error.message, 'error');
+        showToast('❌ فشل الحفظ', 'error');
     }
 }
 
@@ -184,7 +187,6 @@ function showSubscribeModal() {
     const modal = document.getElementById('subscribeModal');
     if (modal) {
         modal.classList.remove('hidden');
-        // Close projects modal if open to focus on subscribe
         closeMyProjectsModal();
     }
 }
@@ -198,20 +200,21 @@ async function loadProjectsList() {
     const user = getUserIdentity();
     const grid = document.getElementById('projectsGrid');
     
-    // UI Elements for limit
     const countLabel = document.getElementById('projectsLimitLabel');
     const countDetail = document.getElementById('projectsCountDetail');
-    // const limitDetail = document.getElementById('projectsLimitDetail');
     const usageBar = document.getElementById('projectsUsageBar');
     
-    if (countLabel) countLabel.textContent = user.type === 'premium' ? 'مساحة تخزين Premium' : 'مساحة تخزين مجانية';
+    if (countLabel) countLabel.textContent = user.type === 'premium' ? 'مساحة تخزين المميزة' : 'مساحة تخزين مجانية';
     
-    grid.innerHTML = `
-        <div class="h-64 flex flex-col items-center justify-center text-slate-400 gap-3">
-            <i class="fas fa-circle-notch fa-spin text-2xl text-amber-500"></i>
-            <span class="text-xs">جاري جلب مشاريعك...</span>
-        </div>
-    `;
+    // Show spinner if empty initially
+    if (!grid.hasChildNodes() || grid.innerHTML.includes('لا توجد')) {
+        grid.innerHTML = `
+            <div class="h-48 flex flex-col items-center justify-center text-slate-400 gap-2">
+                <i class="fas fa-circle-notch fa-spin text-xl text-amber-500"></i>
+                <span class="text-[10px]">تحديث القائمة...</span>
+            </div>
+        `;
+    }
     
     try {
         const response = await fetch(`${API_URL}/api/projects/${user.id}`);
@@ -222,7 +225,6 @@ async function loadProjectsList() {
             const count = projects.length;
             
             // Update Usage Bar
-            // For Premium: 10, Free: 1
             const percent = Math.min((count / user.limit) * 100, 100);
             if (usageBar) {
                 usageBar.style.width = `${percent}%`;
@@ -233,18 +235,15 @@ async function loadProjectsList() {
                 }`;
             }
             
-            if (countDetail) countDetail.textContent = `${count} من ${user.limit} مستخدم`;
+            if (countDetail) countDetail.textContent = `${count} من ${user.limit}`;
             
             displayProjectsInGrid(projects);
         } else {
-            const projects = []; // Default to empty if API fails for new users
-             displayProjectsInGrid(projects);
-             if (countDetail) countDetail.textContent = `0 من ${user.limit} مستخدم`;
+             displayProjectsInGrid([]);
+             if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
         }
     } catch(e) {
-        // Fallback for empty/error state
-        const projects = [];
-        displayProjectsInGrid(projects);
+        grid.innerHTML = '<div class="text-center py-8 text-red-400 text-xs">تعذر الاتصال</div>';
     }
 }
 
@@ -254,8 +253,8 @@ function displayProjectsInGrid(projects) {
     if (projects.length === 0) {
         grid.innerHTML = `
             <div class="flex flex-col items-center justify-center py-12 text-slate-400 opacity-60">
-                <i class="fas fa-folder-open text-4xl mb-3 text-slate-300 dark:text-slate-700"></i>
-                <p class="text-xs">لا توجد مشاريع محفوظة</p>
+                <i class="fas fa-folder-open text-3xl mb-2 text-slate-300 dark:text-slate-700"></i>
+                <p class="text-[10px]">لا توجد مشاريع محفوظة</p>
             </div>
         `;
         return;
@@ -270,25 +269,25 @@ function displayProjectsInGrid(projects) {
         
         el.innerHTML = `
             <!-- Icon -->
-            <div class="h-12 w-12 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center text-amber-500 shadow-sm border border-slate-100 dark:border-slate-600 group-hover:scale-110 transition-transform">
-                <i class="fas fa-file-contract"></i>
+            <div class="h-10 w-10 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center text-amber-500 shadow-sm border border-slate-100 dark:border-slate-600 group-hover:scale-105 transition-transform">
+                <i class="fas fa-file-contract text-sm"></i>
             </div>
             
             <!-- Info -->
             <div class="flex-1 min-w-0">
-                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'بدون عنوان'}</h4>
-                <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-1">
+                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-xs truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'بدون عنوان'}</h4>
+                <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
                     <span>${new Date(project.updated_at).toLocaleDateString('ar-SA')}</span>
                 </div>
             </div>
             
             <!-- Actions -->
-            <div class="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all sm:translate-x-2 group-hover:translate-x-0">
-                 <button onclick="event.stopPropagation(); loadProject('${project.id}')" class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
-                    <i class="fas fa-folder-open text-xs"></i>
+            <div class="flex items-center gap-1">
+                 <button onclick="event.stopPropagation(); loadProject('${project.id}')" class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-slate-700 text-indigo-500 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center" title="فتح">
+                    <i class="fas fa-folder-open text-[10px]"></i>
                 </button>
-                <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center">
-                    <i class="fas fa-trash text-xs"></i>
+                <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="w-7 h-7 rounded-full bg-red-50 dark:bg-slate-700 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="حذف">
+                    <i class="fas fa-trash text-[10px]"></i>
                 </button>
             </div>
         `;
@@ -300,7 +299,7 @@ function displayProjectsInGrid(projects) {
 
 async function loadProject(projectId) {
     const user = getUserIdentity();
-    const loadingToast = showToast('⏳ جاري فتح المشروع...', 'loading');
+    const loadingToast = showToast('⏳ جاري التحميل...', 'loading');
     
     try {
         const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`);
@@ -312,13 +311,10 @@ async function loadProject(projectId) {
             let data = result.project.data;
             if (typeof data === 'string') data = JSON.parse(data);
             
-            // Restore Logic
             const card = document.getElementById('card');
             
-            // HTML restore
             if (data.html) card.innerHTML = data.html;
             
-            // Dimensions
             const wVal = data.wVal || data.cardWidth;
             const hVal = data.hVal || data.cardHeight;
             const customW = data.customW || '10';
@@ -343,9 +339,9 @@ async function loadProject(projectId) {
             if (notesField && data.notes) notesField.value = data.notes;
             
             closeMyProjectsModal();
-            showToast('✅ تم فتح المشروع بنجاح', 'success');
+            showToast('✅ تم الفتح', 'success');
         } else {
-             showToast('❌ فشل الفتح', 'error');
+             showToast('❌ الملف غير موجود', 'error');
         }
     } catch(e) {
         if (loadingToast) loadingToast.remove();
@@ -354,7 +350,7 @@ async function loadProject(projectId) {
 }
 
 async function deleteProject(projectId) {
-    if (!confirm('هل أنت متأكد من الحذف؟ لا يمكن التراجع.')) return;
+    if (!confirm('حذف هذا المشروع نهائياً؟')) return;
     
     const user = getUserIdentity();
     const loadingToast = showToast('⏳ جاري الحذف...', 'loading');
@@ -366,8 +362,8 @@ async function deleteProject(projectId) {
         if (loadingToast) loadingToast.remove();
         
         if (result.success) {
-            showToast('✅ تم الحذف', 'success');
             loadProjectsList();
+            showToast('🗑️ تم الحذف', 'info');
         } else {
             showToast('❌ فشل الحذف', 'error');
         }
