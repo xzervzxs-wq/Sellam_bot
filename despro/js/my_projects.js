@@ -17,9 +17,18 @@ function checkPremiumAccess() {
     try {
         const sessionData = JSON.parse(session);
         // التحقق من انتهاء الصلاحية
-        if (sessionData.expiry) {
-            const expiryDate = new Date(sessionData.expiry);
-            if (expiryDate < new Date()) {
+        if (sessionData.expiryDate) {
+            let expiryDate = null;
+            const dateStr = sessionData.expiryDate.trim();
+            if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                const [day, month, year] = dateStr.split('-');
+                expiryDate = new Date(`${year}-${month}-${day}`);
+            } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                expiryDate = new Date(dateStr);
+            } else if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                expiryDate = new Date(dateStr);
+            }
+            if (expiryDate && expiryDate < new Date()) {
                 alert('⚠️ انتهت صلاحية اشتراكك!\n\nجدد اشتراكك للاستمرار.');
                 return false;
             }
@@ -30,7 +39,7 @@ function checkPremiumAccess() {
     }
 }
 
-// الحصول على كود العميل من الجلسة المحفوظة
+// الحصول على كود العميل من الجلسة (كود الاشتراك نفسه)
 function getClientCode() {
     const session = localStorage.getItem('despro_session');
     if (session) {
@@ -42,22 +51,20 @@ function getClientCode() {
             }
         } catch (e) {}
     }
-    
-    // fallback للكود القديم
-    let code = localStorage.getItem('despro_client_code');
-    if (!code) {
-        code = generateClientCode();
-        localStorage.setItem('despro_client_code', code);
-    }
-    return code;
+    return null;
 }
 
-// إنشاء كود عميل عشوائي
-function generateClientCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 8; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
+// الحصول على اسم المشترك
+function getClientName() {
+    const session = localStorage.getItem('despro_session');
+    if (session) {
+        try {
+            const sessionData = JSON.parse(session);
+            return sessionData.name || 'مشترك';
+        } catch (e) {}
+    }
+    return 'مشترك';
+}
     }
     return code;
 }
@@ -305,12 +312,12 @@ function openMyProjectsModal() {
     if (!checkPremiumAccess()) return;
     
     const modal = document.getElementById('myProjectsModal');
-    const codeDisplay = document.getElementById('clientCodeDisplay');
+    const nameDisplay = document.getElementById('clientNameDisplay');
     
-    // عرض كود العميل
-    const code = getClientCode();
-    if (codeDisplay) {
-        codeDisplay.textContent = `كود: ${code}`;
+    // عرض اسم المشترك
+    const name = getClientName();
+    if (nameDisplay) {
+        nameDisplay.textContent = `مرحباً ${name}!`;
     }
     
     modal.classList.remove('hidden');
