@@ -285,29 +285,41 @@ function displayProjectsModal(projects) {
 
 // تحميل مشروع محدد
 async function loadProject(projectId) {
-    const clientCode = getClientCode();
+    // جلب كود العميل مع fallback
+    let clientCode = getClientCode();
+    if (!clientCode) {
+        const sessionName = sessionStorage.getItem('studioName');
+        if (sessionName) {
+            clientCode = sessionName.replace(/\s+/g, '_');
+        }
+    }
+    
+    if (!clientCode) {
+        showToast('❌ خطأ في الجلسة!', 'error');
+        return;
+    }
+    
+    const loadingToast = showToast('⏳ جاري تحميل المشروع...', 'loading');
     
     try {
-        showLoadingMessage('جاري تحميل المشروع...');
-        
         const response = await fetch(`${API_URL}/api/project/${projectId}?client_code=${clientCode}`);
         const result = await response.json();
         
-        hideLoadingMessage();
+        if (loadingToast) loadingToast.remove();
         
         if (result.success) {
             const projectData = JSON.parse(result.project.data);
             canvas.loadFromJSON(projectData, () => {
                 canvas.renderAll();
                 closeMyProjectsModal();
-                showSuccessMessage('تم تحميل المشروع! ✅');
+                showToast('✅ تم تحميل المشروع!', 'success');
             });
         } else {
-            showErrorMessage('فشل في تحميل المشروع');
+            showToast('❌ فشل تحميل المشروع: ' + (result.error || ''), 'error');
         }
     } catch (error) {
-        hideLoadingMessage();
-        showErrorMessage('خطأ في الاتصال بالسيرفر');
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ في الاتصال', 'error');
         console.error('Load project error:', error);
     }
 }
@@ -316,7 +328,21 @@ async function loadProject(projectId) {
 async function deleteProject(projectId) {
     if (!confirm('هل أنت متأكد من حذف هذا المشروع؟')) return;
     
-    const clientCode = getClientCode();
+    // جلب كود العميل مع fallback
+    let clientCode = getClientCode();
+    if (!clientCode) {
+        const sessionName = sessionStorage.getItem('studioName');
+        if (sessionName) {
+            clientCode = sessionName.replace(/\s+/g, '_');
+        }
+    }
+    
+    if (!clientCode) {
+        showToast('❌ خطأ في الجلسة!', 'error');
+        return;
+    }
+    
+    const loadingToast = showToast('⏳ جاري حذف المشروع...', 'loading');
     
     try {
         const response = await fetch(`${API_URL}/api/project/${projectId}?client_code=${clientCode}`, {
@@ -324,14 +350,17 @@ async function deleteProject(projectId) {
         });
         const result = await response.json();
         
+        if (loadingToast) loadingToast.remove();
+        
         if (result.success) {
-            showSuccessMessage('تم حذف المشروع');
-            loadMyProjects(); // إعادة تحميل القائمة
+            showToast('✅ تم حذف المشروع', 'success');
+            loadProjectsList(); // إعادة تحميل القائمة
         } else {
-            showErrorMessage('فشل في حذف المشروع');
+            showToast('❌ فشل الحذف: ' + (result.error || ''), 'error');
         }
     } catch (error) {
-        showErrorMessage('خطأ في الاتصال بالسيرفر');
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ في الاتصال', 'error');
     }
 }
 
