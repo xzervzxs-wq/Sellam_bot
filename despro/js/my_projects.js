@@ -5,6 +5,33 @@
 
 const API_URL = 'https://sellambot-despro.up.railway.app';
 
+// دالة إظهار التنبيهات
+function showToast(message, type = 'info') {
+    // إزالة أي toast سابق
+    const oldToast = document.getElementById('projectToast');
+    if (oldToast) oldToast.remove();
+    
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        info: 'bg-blue-500',
+        loading: 'bg-amber-500'
+    };
+    
+    const toast = document.createElement('div');
+    toast.id = 'projectToast';
+    toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl z-[99999] text-lg font-bold`;
+    toast.innerHTML = message;
+    toast.style.cssText = 'animation: fadeIn 0.3s ease; min-width: 250px; text-align: center;';
+    document.body.appendChild(toast);
+    
+    if (type !== 'loading') {
+        setTimeout(() => toast.remove(), 4000);
+    }
+    
+    return toast;
+}
+
 // التحقق من الاشتراك - من Google Sheet
 function checkPremiumAccess() {
     // التحقق من الجلسة المحفوظة
@@ -92,13 +119,16 @@ async function saveCurrentProject() {
     
     // تأكد من وجود كود العميل
     if (!clientCode) {
-        alert('⚠️ خطأ في الجلسة!\n\nأعد تسجيل الدخول وحاول مرة أخرى.');
+        showToast('⚠️ خطأ في الجلسة! أعد تسجيل الدخول', 'error');
         return;
     }
     
     const projectName = prompt('أدخل اسم المشروع:', 'مشروع جديد');
     
     if (!projectName) return;
+    
+    // إظهار رسالة التحميل
+    const loadingToast = showToast('⏳ جاري حفظ المشروع...', 'loading');
     
     // الحصول على بيانات Canvas
     const canvasData = canvas.toJSON(['id', 'name', 'selectable', 'evented']);
@@ -107,14 +137,6 @@ async function saveCurrentProject() {
         quality: 0.3,
         multiplier: 0.3
     });
-    
-    // إظهار رسالة التحميل
-    const saveBtn = document.querySelector('[onclick="saveCurrentProject()"]');
-    const originalText = saveBtn ? saveBtn.innerHTML : '';
-    if (saveBtn) {
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الحفظ...';
-        saveBtn.disabled = true;
-    }
     
     try {
         const response = await fetch(`${API_URL}/api/project/save`, {
@@ -130,27 +152,21 @@ async function saveCurrentProject() {
             })
         });
         
+        // إزالة رسالة التحميل
+        if (loadingToast) loadingToast.remove();
+        
         const result = await response.json();
         
-        // إعادة الزر لحالته الأصلية
-        if (saveBtn) {
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-        }
-        
         if (result.success) {
-            alert('✅ تم حفظ المشروع بنجاح!');
+            showToast('✅ تم حفظ المشروع بنجاح!', 'success');
             loadProjectsList(); // تحديث القائمة
         } else {
-            alert('❌ فشل في حفظ المشروع: ' + (result.error || 'خطأ غير معروف'));
+            showToast('❌ فشل: ' + (result.error || 'خطأ غير معروف'), 'error');
         }
     } catch (error) {
-        // إعادة الزر لحالته الأصلية
-        if (saveBtn) {
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-        }
-        alert('❌ خطأ في الاتصال بالسيرفر:\n' + error.message);
+        // إزالة رسالة التحميل
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ في الاتصال: ' + error.message, 'error');
         console.error('Save error:', error);
     }
 }
