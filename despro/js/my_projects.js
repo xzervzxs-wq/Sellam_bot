@@ -130,21 +130,30 @@ async function saveCurrentProject() {
     // إظهار رسالة التحميل
     const loadingToast = showToast('⏳ جاري حفظ المشروع...', 'loading');
     
-    // الحصول على بيانات Canvas
-    let canvasData = {};
-    let thumbnail = '';
-    
-    try {
-        canvasData = canvas.toJSON(['id', 'name', 'selectable', 'evented']);
-        // thumbnail صغير جداً لتسريع الحفظ
-        thumbnail = canvas.toDataURL({
-            format: 'jpeg',
-            quality: 0.1,
-            multiplier: 0.15
-        });
-    } catch (e) {
-        console.log('Canvas error:', e);
+    // الحصول على بيانات المشروع من الـ DOM
+    const card = document.getElementById('card');
+    if (!card) {
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ: لم يتم العثور على منطقة العمل', 'error');
+        return;
     }
+    
+    const projectData = {
+        html: card.innerHTML,
+        width: card.style.width,
+        height: card.style.height,
+        wVal: card.getAttribute('data-card-width'),
+        hVal: card.getAttribute('data-card-height'),
+        customW: document.getElementById('custom-width')?.value || '',
+        customH: document.getElementById('custom-height')?.value || '',
+        timestamp: new Date().toISOString()
+    };
+    
+    // إنشاء صورة مصغرة بسيطة
+    let thumbnail = '';
+    try {
+        // لا نحتاج thumbnail حالياً
+    } catch (e) {}
     
     try {
         // إضافة timeout
@@ -159,8 +168,8 @@ async function saveCurrentProject() {
             body: JSON.stringify({
                 client_code: clientCode,
                 project_name: projectName,
-                project_data: JSON.stringify(canvasData),
-                thumbnail: thumbnail.substring(0, 50000) // حد أقصى للصورة
+                project_data: JSON.stringify(projectData),
+                thumbnail: thumbnail
             }),
             signal: controller.signal
         });
@@ -322,11 +331,32 @@ async function loadProject(projectId) {
                 projectData = JSON.parse(projectData);
             }
             
-            canvas.loadFromJSON(projectData, () => {
-                canvas.renderAll();
+            // تحميل المشروع للـ Card (DOM-based)
+            const card = document.getElementById('card');
+            if (card && projectData.html) {
+                card.innerHTML = projectData.html;
+                
+                // استعادة أبعاد البطاقة
+                if (projectData.width) card.style.width = projectData.width;
+                if (projectData.height) card.style.height = projectData.height;
+                if (projectData.wVal) card.setAttribute('data-card-width', projectData.wVal);
+                if (projectData.hVal) card.setAttribute('data-card-height', projectData.hVal);
+                
+                // استعادة القيم المخصصة
+                const customW = document.getElementById('custom-width');
+                const customH = document.getElementById('custom-height');
+                if (customW && projectData.customW) customW.value = projectData.customW;
+                if (customH && projectData.customH) customH.value = projectData.customH;
+                
+                // تحديث الطبقات إذا موجودة
+                if (typeof updateLayersList === 'function') updateLayersList();
+                if (typeof initDraggableForAll === 'function') initDraggableForAll();
+                
                 closeMyProjectsModal();
                 showToast('✅ تم تحميل المشروع!', 'success');
-            });
+            } else {
+                showToast('❌ بيانات المشروع غير صالحة', 'error');
+            }
         } else {
             showToast('❌ فشل تحميل المشروع: ' + (result.error || ''), 'error');
         }
