@@ -390,7 +390,7 @@ async function loadProjectsList() {
     const countDetail = document.getElementById('projectsCountDetail');
     const usageBar = document.getElementById('projectsUsageBar');
     
-    if (countLabel) countLabel.textContent = user.type === 'premium' ? '☁️ تخزين سحابي' : '💾 تخزين محلي';
+    if (countLabel) countLabel.textContent = user.type === 'premium' ? '☁️ تخزين سحابي .. معك أينما ذهبت' : '';
     
     // Warning for Free Users - Only show if they have at least 1 project
     let warningEl = document.getElementById('guestWarning');
