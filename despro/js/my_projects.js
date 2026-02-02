@@ -71,7 +71,24 @@ async function saveCurrentProject() {
     // التحقق من الاشتراك أولاً
     if (!checkPremiumAccess()) return;
     
-    const clientCode = getClientCode();
+    // جلب الجلسة مباشرة
+    const session = localStorage.getItem('despro_session');
+    let clientCode = null;
+    
+    if (session) {
+        try {
+            const sessionData = JSON.parse(session);
+            clientCode = sessionData.code;
+        } catch (e) {}
+    }
+    
+    // إذا ما فيه كود، استخدم اسم المشترك
+    if (!clientCode) {
+        const sessionName = sessionStorage.getItem('studioName');
+        if (sessionName) {
+            clientCode = sessionName.replace(/\s+/g, '_');
+        }
+    }
     
     // تأكد من وجود كود العميل
     if (!clientCode) {
@@ -126,7 +143,19 @@ async function loadMyProjects() {
     // التحقق من الاشتراك أولاً
     if (!checkPremiumAccess()) return;
     
-    const clientCode = getClientCode();
+    // جلب كود العميل
+    let clientCode = getClientCode();
+    if (!clientCode) {
+        const sessionName = sessionStorage.getItem('studioName');
+        if (sessionName) {
+            clientCode = sessionName.replace(/\s+/g, '_');
+        }
+    }
+    
+    if (!clientCode) {
+        alert('⚠️ خطأ في الجلسة! أعد تسجيل الدخول.');
+        return;
+    }
     
     try {
         showLoadingMessage('جاري تحميل المشاريع...');
@@ -330,7 +359,15 @@ function openMyProjectsModal() {
 
 // تحميل قائمة المشاريع (بدون تحقق - للاستخدام الداخلي)
 async function loadProjectsList() {
-    const clientCode = getClientCode();
+    // جلب كود العميل
+    let clientCode = getClientCode();
+    if (!clientCode) {
+        const sessionName = sessionStorage.getItem('studioName');
+        if (sessionName) {
+            clientCode = sessionName.replace(/\s+/g, '_');
+        }
+    }
+    
     const grid = document.getElementById('projectsGrid');
     const countEl = document.getElementById('projectsCount');
     
@@ -340,6 +377,16 @@ async function loadProjectsList() {
             <p>جاري تحميل المشاريع...</p>
         </div>
     `;
+    
+    if (!clientCode) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <i class="fas fa-cloud text-6xl mb-4 text-amber-500/30"></i>
+                <p class="text-xl">لا توجد مشاريع محفوظة</p>
+            </div>
+        `;
+        return;
+    }
     
     try {
         const response = await fetch(`${API_URL}/api/projects/${clientCode}`);
