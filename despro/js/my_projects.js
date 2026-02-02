@@ -241,43 +241,8 @@ async function loadMyProjects() {
     }
 }
 
-// عرض نافذة المشاريع
-function displayProjectsModal(projects) {
-    const modal = document.getElementById('myProjectsModal');
-    const grid = document.getElementById('projectsGrid');
-    
-    grid.innerHTML = '';
-    
-    if (projects.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12 text-gray-400">
-                <i class="fas fa-folder-open text-6xl mb-4"></i>
-                <p class="text-xl">لا توجد مشاريع محفوظة</p>
-                <p class="text-sm mt-2">ابدأ بحفظ مشروعك الأول!</p>
-            </div>
-        `;
-    } else {
-        projects.forEach(project => {
-            const card = document.createElement('div');
-            card.className = 'bg-gray-700 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all group';
-            card.innerHTML = `
-                <div class="aspect-square bg-gray-800 relative overflow-hidden">
-                    ${project.thumbnail ? 
-                        `<img src="${project.thumbnail}" class="w-full h-full object-contain" alt="${project.name}">` :
-                        `<div class="w-full h-full flex items-center justify-center text-gray-500">
-                            <i class="fas fa-image text-4xl"></i>
-                        </div>`
-                    }
-                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <button onclick="loadProject(${project.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-folder-open ml-1"></i> فتح
-                        </button>
-                        <button onclick="deleteProject(${project.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="p-3">
+// تم تحديث الدالة في الأسفل لدعم التصميم الجديد
+// function displayProjectsModal(projects) { ... }
                     <h3 class="text-white font-medium truncate">${project.name}</h3>
                     <p class="text-gray-400 text-xs mt-1">${formatDate(project.updated_at)}</p>
                 </div>
@@ -570,54 +535,121 @@ async function loadProjectsList() {
     }
 }
 
-// عرض المشاريع في الـ Grid
+// عرض المشاريع في القائمة (تصميم جديد)
 function displayProjectsInGrid(projects) {
     const grid = document.getElementById('projectsGrid');
     
     if (projects.length === 0) {
         grid.innerHTML = `
-            <div class="col-span-full text-center py-12 text-gray-400">
-                <i class="fas fa-cloud text-6xl mb-4 text-amber-500/30"></i>
-                <p class="text-xl mb-2">لا توجد مشاريع محفوظة</p>
-                <p class="text-sm">اضغط "حفظ المشروع الحالي" لحفظ أول مشروع!</p>
+            <div class="h-full flex flex-col items-center justify-center text-slate-400 py-12 opacity-70">
+                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-cloud text-3xl text-slate-300 dark:text-slate-600"></i>
+                </div>
+                <p class="text-sm font-bold text-slate-500 dark:text-slate-400">لا توجد مشاريع محفوظة</p>
+                <p class="text-[10px] text-slate-400 mt-1">ابدأ بحفظ مشروعك الأول الآن</p>
             </div>
         `;
         return;
     }
     
+    // ترتيب المشاريع من الأحدث للأقدم
+    projects.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+    
     grid.innerHTML = '';
+    
     projects.forEach(project => {
+        // حساب حجم تقريبي للملف (اذا البيانات نصية)
+        let sizeStr = 'غير معروف';
+        try {
+            if (project.data) {
+                const bytes = new Blob([project.data]).size;
+                const kb = Math.round(bytes / 1024);
+                sizeStr = kb > 1024 ? (kb/1024).toFixed(1) + ' MB' : kb + ' KB';
+            }
+        } catch(e) {}
+        
         const card = document.createElement('div');
-        card.className = 'bg-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-amber-500 transition-all group border border-slate-600/50';
+        card.className = 'group flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 hover:border-amber-500/50 hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-750 transition-all cursor-pointer relative overflow-hidden';
+        
+        // تأثير hover خفيف
         card.innerHTML = `
-            <div class="aspect-square bg-slate-800 relative overflow-hidden">
-                ${project.thumbnail ? 
-                    `<img src="${project.thumbnail}" class="w-full h-full object-contain" alt="${project.name}">` :
-                    `<div class="w-full h-full flex items-center justify-center text-slate-500">
-                        <i class="fas fa-image text-4xl"></i>
-                    </div>`
-                }
-                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button onclick="event.stopPropagation(); loadProject(${project.id})" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
-                        <i class="fas fa-folder-open ml-1"></i> فتح
-                    </button>
-                    <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg">
-                        <i class="fas fa-trash"></i>
-                    </button>
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            
+            <!-- Icon -->
+            <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0 border border-indigo-100 dark:border-indigo-500/20 group-hover:bg-amber-50 dark:group-hover:bg-amber-500/10 group-hover:text-amber-500 group-hover:border-amber-200 dark:group-hover:border-amber-500/20 transition-all">
+                <i class="fas fa-file-contract text-lg"></i>
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'مشروع بدون عنوان'}</h4>
+                <div class="flex items-center gap-3 text-[10px] text-slate-400 mt-1">
+                    <span class="flex items-center gap-1 bg-slate-100 dark:bg-slate-700/50 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400">
+                        <i class="far fa-clock text-[9px]"></i> ${formatDate(project.updated_at)}
+                    </span>
+                    <span class="flex items-center gap-1 text-slate-400">
+                        <i class="fas fa-hdd text-[9px]"></i> ${sizeStr}
+                    </span>
                 </div>
             </div>
-            <div class="p-3">
-                <h3 class="text-white font-medium truncate text-sm">${project.name}</h3>
-                <p class="text-slate-400 text-xs mt-1">${formatDate(project.updated_at)}</p>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all transform sm:translate-x-2 group-hover:translate-x-0">
+                <button onclick="event.stopPropagation(); loadProject(${project.id})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center shadow-sm" title="فتح المشروع">
+                    <i class="fas fa-folder-open text-xs"></i>
+                </button>
+                <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-red-500 hover:text-white transition flex items-center justify-center shadow-sm" title="حذف">
+                    <i class="fas fa-trash text-xs"></i>
+                </button>
             </div>
         `;
+        
         card.onclick = () => loadProject(project.id);
         grid.appendChild(card);
     });
 }
 
-// تصدير الدوال للاستخدام العام
-window.saveCurrentProject = saveCurrentProject;
+// عرض نافذة المشاريع (تحديث للنسخة الجديدة)
+function displayProjectsModal(projects) {
+    const modal = document.getElementById('myProjectsModal');
+    const content = document.getElementById('myProjectsContent');
+    const countEl = document.getElementById('projectsCount');
+    const nameEl = document.getElementById('clientNameDisplay');
+    
+    // تحديث الاسم
+    const clientName = getClientName();
+    if (nameEl) nameEl.textContent = `أهلاً بك، ${clientName}`;
+    
+    // تحديث العدد
+    if (countEl) countEl.textContent = projects.length;
+    
+    // عرض القائمة
+    displayProjectsInGrid(projects);
+    
+    // فتح النافذة
+    modal.classList.remove('hidden');
+    
+    // Animation
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+// إغلاق نافذة المشاريع
+function closeMyProjectsModal() {
+    const modal = document.getElementById('myProjectsModal');
+    const content = document.getElementById('myProjectsContent');
+    
+    if (content) {
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+    }
+    
+    setTimeout(() => {
+        if (modal) modal.classList.add('hidden');
+    }, 300);
+}
 window.loadMyProjects = loadMyProjects;
 window.loadProject = loadProject;
 window.deleteProject = deleteProject;
