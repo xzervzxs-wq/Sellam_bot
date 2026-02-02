@@ -302,13 +302,26 @@ async function loadProject(projectId) {
     const loadingToast = showToast('⏳ جاري تحميل المشروع...', 'loading');
     
     try {
-        const response = await fetch(`${API_URL}/api/project/${projectId}?client_code=${clientCode}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
+        const response = await fetch(`${API_URL}/api/project/${projectId}?client_code=${clientCode}`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
         const result = await response.json();
         
         if (loadingToast) loadingToast.remove();
         
-        if (result.success) {
-            const projectData = JSON.parse(result.project.data);
+        if (result.success && result.project) {
+            // الـ data ممكن يكون string أو object
+            let projectData = result.project.data;
+            if (typeof projectData === 'string') {
+                projectData = JSON.parse(projectData);
+            }
+            
             canvas.loadFromJSON(projectData, () => {
                 canvas.renderAll();
                 closeMyProjectsModal();
@@ -319,7 +332,11 @@ async function loadProject(projectId) {
         }
     } catch (error) {
         if (loadingToast) loadingToast.remove();
-        showToast('❌ خطأ في الاتصال', 'error');
+        if (error.name === 'AbortError') {
+            showToast('❌ انتهى وقت الاتصال', 'error');
+        } else {
+            showToast('❌ خطأ: ' + error.message, 'error');
+        }
         console.error('Load project error:', error);
     }
 }
