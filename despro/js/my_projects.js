@@ -108,9 +108,15 @@ async function saveCurrentProject() {
         multiplier: 0.3
     });
     
+    // إظهار رسالة التحميل
+    const saveBtn = document.querySelector('[onclick="saveCurrentProject()"]');
+    const originalText = saveBtn ? saveBtn.innerHTML : '';
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الحفظ...';
+        saveBtn.disabled = true;
+    }
+    
     try {
-        alert('جاري حفظ المشروع...');
-        
         const response = await fetch(`${API_URL}/api/project/save`, {
             method: 'POST',
             headers: {
@@ -126,14 +132,25 @@ async function saveCurrentProject() {
         
         const result = await response.json();
         
+        // إعادة الزر لحالته الأصلية
+        if (saveBtn) {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+        
         if (result.success) {
-            alert('تم حفظ المشروع بنجاح! ✅');
+            alert('✅ تم حفظ المشروع بنجاح!');
             loadProjectsList(); // تحديث القائمة
         } else {
-            alert('فشل في حفظ المشروع: ' + result.error);
+            alert('❌ فشل في حفظ المشروع: ' + (result.error || 'خطأ غير معروف'));
         }
     } catch (error) {
-        alert('خطأ في الاتصال بالسيرفر: ' + error.message);
+        // إعادة الزر لحالته الأصلية
+        if (saveBtn) {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+        alert('❌ خطأ في الاتصال بالسيرفر:\n' + error.message);
         console.error('Save error:', error);
     }
 }
