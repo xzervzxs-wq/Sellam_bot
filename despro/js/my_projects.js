@@ -409,7 +409,7 @@ async function loadProjectsList() {
                 <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 text-xs"></i>
                 <p class="text-[11px] text-amber-700 dark:text-amber-400 font-medium leading-relaxed">
                     تنبيه: المشاريع محفوظة في متصفحك فقط. مسح بيانات المتصفح سيحذفها.
-                    <a href="#" onclick="showSubscribeModal()" class="underline font-bold hover:text-amber-800">اشترك للحفظ السحابي</a>
+                    <a href="#" onclick="showSubscribeModal()" class="underline font-bold hover:text-amber-800">اشترك للحفظ السحابي ليبقى معك أينما ذهبت</a>
                 </p>
             `;
             const listArea = document.getElementById('projectsGrid');
