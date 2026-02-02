@@ -39,35 +39,31 @@ function showToast(message, type = 'info') {
 
 // User Identity Management - ROBUST & STABLE
 function getUserIdentity() {
-    // 1. Check for logged in Premium session with multiple fallback checks
+    // 1. Check for ACTUAL Premium subscription (must have a real subscription code)
     const session = localStorage.getItem('despro_session');
     const legacyCode = localStorage.getItem('despro_client_code');
-    const sessionName = sessionStorage.getItem('studioName');
 
-    // Try to find a STABLE Premium ID
+    // Try to find a REAL Premium subscription code
     let premiumId = null;
     let premiumName = 'مشترك مميز';
 
     if (session) {
         try {
             const data = JSON.parse(session);
-            if (data.code) premiumId = data.code;
-            if (data.name) premiumName = data.name;
+            // Must have a real subscription code (not just a name)
+            if (data.code && data.code.length > 0) {
+                premiumId = data.code;
+                if (data.name) premiumName = data.name;
+            }
         } catch(e){}
     }
 
-    // Fallback 1: Legacy Code
-    if (!premiumId && legacyCode) {
+    // Fallback: Legacy subscription code only
+    if (!premiumId && legacyCode && legacyCode.length > 0) {
         premiumId = legacyCode;
     }
 
-    // Fallback 2: Studio Name (last resort for stable ID)
-    if (!premiumId && sessionName) {
-        premiumId = 'NAME_' + sessionName.replace(/\s+/g, '_');
-        premiumName = sessionName;
-    }
-
-    // If we found a stable Premium ID
+    // If we found a REAL subscription code = Premium user
     if (premiumId) {
         return { 
             id: premiumId, 
@@ -77,7 +73,7 @@ function getUserIdentity() {
         };
     }
     
-    // 2. Guest User (Free) - Persistent ID
+    // 2. Guest User (Free) - Persistent ID with 2 projects limit
     let guestId = localStorage.getItem('despro_guest_id');
     if (!guestId) {
         // Generate persistent guest ID
@@ -89,7 +85,7 @@ function getUserIdentity() {
         id: guestId, 
         type: 'free', 
         name: 'زائر',
-        limit: 1
+        limit: 2
     };
 }
 
