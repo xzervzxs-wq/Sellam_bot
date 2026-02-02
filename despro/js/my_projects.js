@@ -1,21 +1,49 @@
 // ==========================================
 // نظام حفظ وتحميل المشاريع - أعمالي
-// للمشتركين Premium فقط
+// للمشتركين في Google Sheet فقط
 // ==========================================
 
 const API_URL = 'https://sellambot-despro.up.railway.app';
 
-// التحقق من الاشتراك
+// التحقق من الاشتراك - من Google Sheet
 function checkPremiumAccess() {
-    if (typeof userTier === 'undefined' || userTier !== 'premium') {
-        alert('⭐ هذه الميزة متاحة للمشتركين فقط!\n\nاشترك الآن للحصول على:\n• حفظ غير محدود للمشاريع\n• الوصول من أي جهاز\n• بدون علامة مائية');
+    // التحقق من الجلسة المحفوظة
+    const session = localStorage.getItem('despro_session');
+    if (!session) {
+        alert('⭐ هذه الميزة متاحة للمشتركين فقط!\n\nسجل دخولك بالكود للحصول على:\n• حفظ غير محدود للمشاريع\n• الوصول من أي جهاز\n• بدون علامة مائية');
         return false;
     }
-    return true;
+    
+    try {
+        const sessionData = JSON.parse(session);
+        // التحقق من انتهاء الصلاحية
+        if (sessionData.expiry) {
+            const expiryDate = new Date(sessionData.expiry);
+            if (expiryDate < new Date()) {
+                alert('⚠️ انتهت صلاحية اشتراكك!\n\nجدد اشتراكك للاستمرار.');
+                return false;
+            }
+        }
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
-// الحصول على كود العميل من localStorage أو إنشاء جديد
+// الحصول على كود العميل من الجلسة المحفوظة
 function getClientCode() {
+    const session = localStorage.getItem('despro_session');
+    if (session) {
+        try {
+            const sessionData = JSON.parse(session);
+            // استخدم كود الاشتراك كـ client code
+            if (sessionData.code) {
+                return sessionData.code;
+            }
+        } catch (e) {}
+    }
+    
+    // fallback للكود القديم
     let code = localStorage.getItem('despro_client_code');
     if (!code) {
         code = generateClientCode();
