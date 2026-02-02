@@ -39,13 +39,11 @@ function showToast(message, type = 'info') {
 
 // User Identity Management
 function getUserIdentity() {
+    // Method 1: Check localStorage despro_session
     const session = localStorage.getItem('despro_session');
-    
-    // Check for Premium session (app.js already validates expiry at login)
     if (session) {
         try {
             const data = JSON.parse(session);
-            // If we have a code, user is Premium (app.js handles expiry validation)
             if (data.code && data.code.length > 0) {
                 return { 
                     id: data.code, 
@@ -55,6 +53,30 @@ function getUserIdentity() {
                 };
             }
         } catch(e){}
+    }
+    
+    // Method 2: Check sessionStorage (backup - set by app.js on login)
+    const studioName = sessionStorage.getItem('studioName');
+    const sessionId = sessionStorage.getItem('sessionId');
+    if (studioName && sessionId) {
+        // User is logged in via app.js
+        return { 
+            id: sessionId, 
+            type: 'premium', 
+            name: studioName,
+            limit: 10
+        };
+    }
+    
+    // Method 3: Check if page shows premium UI (data-tier attribute)
+    if (document.documentElement.getAttribute('data-tier') === 'premium') {
+        const name = sessionStorage.getItem('studioName') || 'مشترك';
+        return { 
+            id: 'premium_' + Date.now(), 
+            type: 'premium', 
+            name: name,
+            limit: 10
+        };
     }
     
     // Guest = Local Storage only (2 projects max)
