@@ -1,10 +1,11 @@
 // ==========================================
-// Cloud Save System - Free & Premium
+// Hybrid Save System - Local for Free, Cloud for Premium
 // ==========================================
 
 const API_URL = 'https://sellambot-despro.up.railway.app';
+const LOCAL_STORAGE_KEY = 'despro_local_projects';
 
-// Toast Notifications - Smaller & Cleaner
+// Toast Notifications
 function showToast(message, type = 'info') {
     const oldToast = document.getElementById('projectToast');
     if (oldToast) oldToast.remove();
@@ -18,7 +19,6 @@ function showToast(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.id = 'projectToast';
-    // Reduced padding and font size for a sleek look
     toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg z-[99999] text-sm font-bold flex items-center gap-2`;
     toast.innerHTML = message;
     toast.style.cssText = 'animation: slideDown 0.3s ease; min-width: auto; white-space: nowrap;';
@@ -37,20 +37,17 @@ function showToast(message, type = 'info') {
     return toast;
 }
 
-// User Identity Management - ROBUST & STABLE
+// User Identity Management
 function getUserIdentity() {
-    // 1. Check for ACTUAL Premium subscription (must have a real subscription code)
     const session = localStorage.getItem('despro_session');
     const legacyCode = localStorage.getItem('despro_client_code');
 
-    // Try to find a REAL Premium subscription code
     let premiumId = null;
     let premiumName = 'مشترك مميز';
 
     if (session) {
         try {
             const data = JSON.parse(session);
-            // Must have a real subscription code (not just a name)
             if (data.code && data.code.length > 0) {
                 premiumId = data.code;
                 if (data.name) premiumName = data.name;
@@ -58,12 +55,10 @@ function getUserIdentity() {
         } catch(e){}
     }
 
-    // Fallback: Legacy subscription code only
     if (!premiumId && legacyCode && legacyCode.length > 0) {
         premiumId = legacyCode;
     }
 
-    // If we found a REAL subscription code = Premium user
     if (premiumId) {
         return { 
             id: premiumId, 
@@ -73,45 +68,94 @@ function getUserIdentity() {
         };
     }
     
-    // 2. Guest User (Free) - Persistent ID with 2 projects limit
-    let guestId = localStorage.getItem('despro_guest_id');
-    if (!guestId) {
-        // Generate persistent guest ID
-        guestId = 'guest_' + Math.random().toString(36).substring(2, 10) + Date.now();
-        localStorage.setItem('despro_guest_id', guestId);
-    }
-    
+    // Guest = Local Storage only
     return { 
-        id: guestId, 
+        id: 'local_guest', 
         type: 'free', 
         name: 'زائر',
         limit: 2
     };
 }
 
-// Open Name Modal instead of Prompt
-async function saveCurrentProject() {
-    // This is just a redirect to openNameModal now if using button direct call
-    // But since button calls openNameModal directly, this might be redundant unless called elsewhere
-    openNameModal();
+// ==========================================
+// LOCAL STORAGE FUNCTIONS (For Free Users)
+// ==========================================
+function getLocalProjects() {
+    try {
+        const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch(e) {
+        return [];
+    }
 }
 
-// Open Name Input Modal
-async function openNameModal() {
+function saveLocalProjects(projects) {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(projects));
+}
+
+function saveProjectLocally(projectName, projectData) {
+    const projects = getLocalProjects();
+    const newProject = {
+        id: 'local_' + Date.now(),
+        name: projectName,
+        data: projectData,
+        updated_at: new Date().toISOString()
+    };
+    projects.unshift(newProject);
+    saveLocalProjects(projects);
+    return newProject;
+}
+
+function deleteLocalProject(projectId) {
+    let projects = getLocalProjects();
+    projects = projects.filter(p => p.id !== projectId);
+    saveLocalProjects(projects);
+}
+
+function getLocalProject(projectId) {
+    const projects = getLocalProjects();
+    return projects.find(p => p.id === projectId);
+}
+
+// ==========================================
+// MODAL & UI FUNCTIONS
+// ==========================================
+function openNameModal() {
     const user = getUserIdentity();
     
+    // Check limits
+    if (user.type === 'free') {
+        const localProjects = getLocalProjects();
+        if (localProjects.length >= user.limit) {
+            showSubscribeModal();
+            return;
+        }
+    } else {
+        // Premium - check server
+        checkPremiumLimitAndOpenModal(user);
+        return;
+    }
+
+    const modal = document.getElementById('nameProjectModal');
+    const input = document.getElementById('newProjectNameInput');
+    
+    if (modal) {
+        modal.classList.remove('hidden');
+        if(input) {
+            input.value = '';
+            setTimeout(() => input.focus(), 100);
+        }
+    }
+}
+
+async function checkPremiumLimitAndOpenModal(user) {
     try {
-        // Check limits before opening modal
         const checkRes = await fetch(`${API_URL}/api/projects/${user.id}`);
         const checkData = await checkRes.json();
         const currentCount = checkData.projects ? checkData.projects.length : 0;
         
         if (currentCount >= user.limit) {
-            if (user.type === 'free') {
-                showSubscribeModal();
-            } else {
-                showToast(`⚠️ المجلد ممتلئ! الحد الأقصى ${user.limit} مشاريع.`, 'error');
-            }
+            showToast(`⚠️ المجلد ممتلئ! الحد الأقصى ${user.limit} مشاريع.`, 'error');
             return;
         }
 
@@ -135,7 +179,6 @@ function closeNameModal() {
     if (modal) modal.classList.add('hidden');
 }
 
-// Proceed to save after naming
 function confirmSaveProject() {
     const input = document.getElementById('newProjectNameInput');
     const name = input ? input.value.trim() : 'مشروع جديد';
@@ -147,10 +190,49 @@ function confirmSaveProject() {
     
     closeNameModal();
     const user = getUserIdentity();
-    saveProjectToCloud(user.id, name);
+    
+    if (user.type === 'free') {
+        saveProjectLocal(name);
+    } else {
+        saveProjectToCloud(user.id, name);
+    }
 }
 
-// Actual Save Logic
+// Save for FREE users (Local)
+function saveProjectLocal(projectName) {
+    const loadingToast = showToast('⏳ جاري الحفظ...', 'loading');
+    
+    const card = document.getElementById('card');
+    if (!card) {
+        if (loadingToast) loadingToast.remove();
+        showToast('❌ خطأ: منطقة العمل فارغة', 'error');
+        return;
+    }
+    
+    const projectData = {
+        name: projectName,
+        html: card.innerHTML,
+        wVal: card.getAttribute('data-card-width'),
+        hVal: card.getAttribute('data-card-height'),
+        width: card.style.width,
+        height: card.style.height,
+        customW: document.getElementById('custom-width')?.value || '10',
+        customH: document.getElementById('custom-height')?.value || '10',
+        timestamp: new Date().toLocaleString('en-GB'),
+        version: "2.5"
+    };
+
+    const notesField = document.getElementById('designer-notes');
+    if (notesField) projectData.notes = notesField.value.trim();
+    
+    saveProjectLocally(projectName, projectData);
+    
+    if (loadingToast) loadingToast.remove();
+    showToast('✅ تم الحفظ في المتصفح', 'success');
+    openMyProjectsModal();
+}
+
+// Save for PREMIUM users (Cloud)
 async function saveProjectToCloud(clientId, projectName) {
     const loadingToast = showToast('⏳ جاري الحفظ...', 'loading');
     
@@ -170,7 +252,7 @@ async function saveProjectToCloud(clientId, projectName) {
         height: card.style.height,
         customW: document.getElementById('custom-width')?.value || '10',
         customH: document.getElementById('custom-height')?.value || '10',
-        timestamp: new Date().toLocaleString('en-GB'), // English date in data
+        timestamp: new Date().toLocaleString('en-GB'),
         version: "2.5"
     };
 
@@ -199,7 +281,7 @@ async function saveProjectToCloud(clientId, projectName) {
         const result = await response.json();
         
         if (result.success) {
-            showToast('✅ تم الحفظ بنجاح', 'success');
+            showToast('✅ تم الحفظ على السحابة', 'success');
             openMyProjectsModal();
         } else {
             showToast('❌ فشل الحفظ', 'error');
@@ -237,14 +319,13 @@ function closeSubscribeModal() {
     if (modal) modal.classList.add('hidden');
 }
 
+// Load Projects List (Hybrid)
 async function loadProjectsList() {
     const user = getUserIdentity();
     const grid = document.getElementById('projectsGrid');
     
-    // Update Header Text to "أعمالي" with icon
     const limitLabel = document.getElementById('projectsLimitLabel');
     if (limitLabel && limitLabel.parentElement) {
-         // Try to find the h3 directly above/adjacent to the limit label
          const titleEl = limitLabel.parentElement.querySelector('h3');
          if (titleEl) {
              titleEl.innerHTML = '<i class="fas fa-crown text-amber-500 ml-2"></i> أعمالي';
@@ -255,10 +336,9 @@ async function loadProjectsList() {
     const countDetail = document.getElementById('projectsCountDetail');
     const usageBar = document.getElementById('projectsUsageBar');
     
-    if (countLabel) countLabel.textContent = user.type === 'premium' ? 'مساحة تخزين المميزة' : 'مساحة تخزين مجانية';
+    if (countLabel) countLabel.textContent = user.type === 'premium' ? '☁️ تخزين سحابي' : '💾 تخزين محلي';
     
-    // Add Warning for Free Users - Insert at top of grid or before it
-    // Check if warning already exists
+    // Warning for Free Users
     let warningEl = document.getElementById('guestWarning');
     if (user.type === 'free') {
         if (!warningEl) {
@@ -268,11 +348,10 @@ async function loadProjectsList() {
             warningEl.innerHTML = `
                 <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 text-xs"></i>
                 <p class="text-[11px] text-amber-700 dark:text-amber-400 font-medium leading-relaxed">
-                    تنبيه: الحفظ مرتبط بالمتصفح (Cookies). مسح بيانات المتصفح سيحذف مشاريعك.
-                    <a href="#" onclick="showSubscribeModal()" class="underline font-bold hover:text-amber-800">اشترك للحفظ الدائم</a>
+                    تنبيه: المشاريع محفوظة في متصفحك فقط. مسح بيانات المتصفح سيحذفها.
+                    <a href="#" onclick="showSubscribeModal()" class="underline font-bold hover:text-amber-800">اشترك للحفظ السحابي</a>
                 </p>
             `;
-            // Insert after header section (before grid)
             const listArea = document.getElementById('projectsGrid');
             if (listArea && listArea.parentElement) {
                 listArea.parentElement.insertBefore(warningEl, listArea);
@@ -284,46 +363,64 @@ async function loadProjectsList() {
         if (warningEl) warningEl.style.display = 'none';
     }
 
-    if (!grid.hasChildNodes() || grid.innerHTML.includes('لا توجد')) {
-        grid.innerHTML = `
-            <div class="h-48 flex flex-col items-center justify-center text-slate-400 gap-2">
-                <i class="fas fa-circle-notch fa-spin text-xl text-amber-500"></i>
-                <span class="text-[10px]">تحديث القائمة...</span>
-            </div>
-        `;
-    }
+    grid.innerHTML = `
+        <div class="h-48 flex flex-col items-center justify-center text-slate-400 gap-2">
+            <i class="fas fa-circle-notch fa-spin text-xl text-amber-500"></i>
+            <span class="text-[10px]">تحديث القائمة...</span>
+        </div>
+    `;
     
-    try {
-        const response = await fetch(`${API_URL}/api/projects/${user.id}`);
-        const result = await response.json();
+    if (user.type === 'free') {
+        // Load from Local Storage
+        const projects = getLocalProjects();
+        const count = projects.length;
         
-        if (result.success) {
-            const projects = result.projects || [];
-            const count = projects.length;
-            
-            const percent = Math.min((count / user.limit) * 100, 100);
-            if (usageBar) {
-                usageBar.style.width = `${percent}%`;
-                usageBar.className = `h-full rounded-full transition-all duration-500 ${
-                    percent >= 100 ? 'bg-red-500' : 
-                    percent >= 80 ? 'bg-amber-500' : 
-                    'bg-gradient-to-r from-amber-400 to-amber-600'
-                }`;
-            }
-            
-            if (countDetail) countDetail.textContent = `${count} من ${user.limit}`;
-            
-            displayProjectsInGrid(projects);
-        } else {
-             displayProjectsInGrid([]);
-             if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
+        const percent = Math.min((count / user.limit) * 100, 100);
+        if (usageBar) {
+            usageBar.style.width = `${percent}%`;
+            usageBar.className = `h-full rounded-full transition-all duration-500 ${
+                percent >= 100 ? 'bg-red-500' : 
+                percent >= 80 ? 'bg-amber-500' : 
+                'bg-gradient-to-r from-amber-400 to-amber-600'
+            }`;
         }
-    } catch(e) {
-        grid.innerHTML = '<div class="text-center py-8 text-red-400 text-xs">تعذر الاتصال</div>';
+        
+        if (countDetail) countDetail.textContent = `${count} من ${user.limit}`;
+        displayProjectsInGrid(projects, 'local');
+        
+    } else {
+        // Load from Server
+        try {
+            const response = await fetch(`${API_URL}/api/projects/${user.id}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                const projects = result.projects || [];
+                const count = projects.length;
+                
+                const percent = Math.min((count / user.limit) * 100, 100);
+                if (usageBar) {
+                    usageBar.style.width = `${percent}%`;
+                    usageBar.className = `h-full rounded-full transition-all duration-500 ${
+                        percent >= 100 ? 'bg-red-500' : 
+                        percent >= 80 ? 'bg-amber-500' : 
+                        'bg-gradient-to-r from-amber-400 to-amber-600'
+                    }`;
+                }
+                
+                if (countDetail) countDetail.textContent = `${count} من ${user.limit}`;
+                displayProjectsInGrid(projects, 'cloud');
+            } else {
+                displayProjectsInGrid([], 'cloud');
+                if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
+            }
+        } catch(e) {
+            grid.innerHTML = '<div class="text-center py-8 text-red-400 text-xs">تعذر الاتصال بالسيرفر</div>';
+        }
     }
 }
 
-function displayProjectsInGrid(projects) {
+function displayProjectsInGrid(projects, storageType) {
     const grid = document.getElementById('projectsGrid');
     
     if (projects.length === 0) {
@@ -348,111 +445,146 @@ function displayProjectsInGrid(projects) {
         const el = document.createElement('div');
         el.className = 'group flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all cursor-pointer relative overflow-hidden';
         
-        // English Date Format
         const dateObj = new Date(project.updated_at);
         const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         
+        const isLocal = storageType === 'local';
+        const projectId = project.id;
+        
         el.innerHTML = `
             <div class="h-10 w-10 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center text-amber-500 shadow-sm border border-slate-100 dark:border-slate-600 group-hover:scale-105 transition-transform">
-                <i class="fas fa-file-contract text-sm"></i>
+                <i class="fas ${isLocal ? 'fa-hdd' : 'fa-cloud'} text-sm"></i>
             </div>
             
             <div class="flex-1 min-w-0">
-                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-xs truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'Untitled Project'}</h4>
+                <h4 class="font-bold text-slate-700 dark:text-slate-200 text-xs truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">${project.name || 'Untitled'}</h4>
                 <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5 font-mono">
                     <span>${dateStr}</span>
                 </div>
             </div>
             
             <div class="flex items-center gap-1">
-                 <button onclick="event.stopPropagation(); loadProject('${project.id}')" class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-slate-700 text-indigo-500 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center" title="Open">
+                <button onclick="event.stopPropagation(); loadProject('${projectId}', '${storageType}')" class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-slate-700 text-indigo-500 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center" title="فتح">
                     <i class="fas fa-folder-open text-[10px]"></i>
                 </button>
-                <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="w-7 h-7 rounded-full bg-red-50 dark:bg-slate-700 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="Delete">
+                <button onclick="event.stopPropagation(); deleteProject('${projectId}', '${storageType}')" class="w-7 h-7 rounded-full bg-red-50 dark:bg-slate-700 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="حذف">
                     <i class="fas fa-trash text-[10px]"></i>
                 </button>
             </div>
         `;
         
-        el.onclick = () => loadProject(project.id);
+        el.onclick = () => loadProject(projectId, storageType);
         grid.appendChild(el);
     });
 }
 
-async function loadProject(projectId) {
-    const user = getUserIdentity();
-    const loadingToast = showToast('Loading...', 'loading');
+// Load Project (Hybrid)
+async function loadProject(projectId, storageType) {
+    const loadingToast = showToast('⏳ جاري التحميل...', 'loading');
     
-    try {
-        const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`);
-        const result = await res.json();
-        
+    let data;
+    
+    if (storageType === 'local') {
+        const project = getLocalProject(projectId);
         if (loadingToast) loadingToast.remove();
         
-        if (result.success && result.project) {
-            let data = result.project.data;
-            if (typeof data === 'string') data = JSON.parse(data);
-            
-            const card = document.getElementById('card');
-            
-            if (data.html) card.innerHTML = data.html;
-            
-            const wVal = data.wVal || data.cardWidth;
-            const hVal = data.hVal || data.cardHeight;
-            const customW = data.customW || '10';
-            const customH = data.customH || '10';
-            
-            document.getElementById('custom-width').value = customW;
-            document.getElementById('custom-height').value = customH;
-
-            if (wVal && hVal) {
-                card.setAttribute('data-card-width', wVal);
-                card.setAttribute('data-card-height', hVal);
-                if (window.setCardSize) window.setCardSize(parseFloat(wVal), parseFloat(hVal));
-            } else if (data.width && data.height) {
-                 card.style.width = data.width;
-                 card.style.height = data.height;
-            }
-            
-            if (window.rebindEvents) window.rebindEvents();
-            if (window.setCustomZoom) window.setCustomZoom(50);
-            
-            const notesField = document.getElementById('designer-notes');
-            if (notesField && data.notes) notesField.value = data.notes;
-            
-            closeMyProjectsModal();
-            showToast('✅ Project Loaded', 'success');
+        if (project) {
+            data = project.data;
         } else {
-             showToast('❌ Not Found', 'error');
+            showToast('❌ المشروع غير موجود', 'error');
+            return;
         }
-    } catch(e) {
+    } else {
+        // Cloud
+        const user = getUserIdentity();
+        try {
+            const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`);
+            const result = await res.json();
+            
+            if (loadingToast) loadingToast.remove();
+            
+            if (result.success && result.project) {
+                data = result.project.data;
+                if (typeof data === 'string') data = JSON.parse(data);
+            } else {
+                showToast('❌ المشروع غير موجود', 'error');
+                return;
+            }
+        } catch(e) {
+            if (loadingToast) loadingToast.remove();
+            showToast('❌ خطأ في الاتصال', 'error');
+            return;
+        }
+    }
+    
+    // Apply project data
+    const card = document.getElementById('card');
+    
+    if (data.html) card.innerHTML = data.html;
+    
+    const wVal = data.wVal || data.cardWidth;
+    const hVal = data.hVal || data.cardHeight;
+    const customW = data.customW || '10';
+    const customH = data.customH || '10';
+    
+    document.getElementById('custom-width').value = customW;
+    document.getElementById('custom-height').value = customH;
+
+    if (wVal && hVal) {
+        card.setAttribute('data-card-width', wVal);
+        card.setAttribute('data-card-height', hVal);
+        if (window.setCardSize) window.setCardSize(parseFloat(wVal), parseFloat(hVal));
+    } else if (data.width && data.height) {
+        card.style.width = data.width;
+        card.style.height = data.height;
+    }
+    
+    if (window.rebindEvents) window.rebindEvents();
+    if (window.setCustomZoom) window.setCustomZoom(50);
+    
+    const notesField = document.getElementById('designer-notes');
+    if (notesField && data.notes) notesField.value = data.notes;
+    
+    closeMyProjectsModal();
+    showToast('✅ تم تحميل المشروع', 'success');
+}
+
+// Delete Project (Hybrid)
+async function deleteProject(projectId, storageType) {
+    if (!confirm('هل أنت متأكد من حذف هذا المشروع؟')) return;
+    
+    const loadingToast = showToast('⏳ جاري الحذف...', 'loading');
+    
+    if (storageType === 'local') {
+        deleteLocalProject(projectId);
         if (loadingToast) loadingToast.remove();
-        showToast('❌ Error Loading', 'error');
+        showToast('🗑️ تم الحذف', 'info');
+        loadProjectsList();
+    } else {
+        // Cloud
+        const user = getUserIdentity();
+        try {
+            const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`, { method: 'DELETE' });
+            const result = await res.json();
+            
+            if (loadingToast) loadingToast.remove();
+            
+            if (result.success) {
+                loadProjectsList();
+                showToast('🗑️ تم الحذف', 'info');
+            } else {
+                showToast('❌ فشل الحذف', 'error');
+            }
+        } catch(e) {
+            if (loadingToast) loadingToast.remove();
+            showToast('❌ خطأ في الاتصال', 'error');
+        }
     }
 }
 
-async function deleteProject(projectId) {
-    if (!confirm('Are you sure you want to delete this project?')) return;
-    
-    const user = getUserIdentity();
-    const loadingToast = showToast('Deleting...', 'loading');
-    
-    try {
-        const res = await fetch(`${API_URL}/api/project/${projectId}?client_code=${user.id}`, { method: 'DELETE' });
-        const result = await res.json();
-        
-        if (loadingToast) loadingToast.remove();
-        
-        if (result.success) {
-            loadProjectsList();
-            showToast('🗑️ Deleted', 'info');
-        } else {
-            showToast('❌ Error Deleting', 'error');
-        }
-    } catch(e) {
-        if (loadingToast) loadingToast.remove();
-        showToast('❌ Network Error', 'error');
-    }
+// Legacy function
+async function saveCurrentProject() {
+    openNameModal();
 }
 
 // Exports
