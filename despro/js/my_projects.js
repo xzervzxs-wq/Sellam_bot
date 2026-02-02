@@ -1,8 +1,18 @@
 // ==========================================
 // نظام حفظ وتحميل المشاريع - أعمالي
+// للمشتركين Premium فقط
 // ==========================================
 
 const API_URL = 'https://sellambot-despro.up.railway.app';
+
+// التحقق من الاشتراك
+function checkPremiumAccess() {
+    if (typeof userTier === 'undefined' || userTier !== 'premium') {
+        alert('⭐ هذه الميزة متاحة للمشتركين فقط!\n\nاشترك الآن للحصول على:\n• حفظ غير محدود للمشاريع\n• الوصول من أي جهاز\n• بدون علامة مائية');
+        return false;
+    }
+    return true;
+}
 
 // الحصول على كود العميل من localStorage أو إنشاء جديد
 function getClientCode() {
@@ -26,6 +36,9 @@ function generateClientCode() {
 
 // حفظ المشروع الحالي
 async function saveCurrentProject() {
+    // التحقق من الاشتراك أولاً
+    if (!checkPremiumAccess()) return;
+    
     const clientCode = getClientCode();
     const projectName = prompt('أدخل اسم المشروع:', 'مشروع جديد');
     
@@ -73,6 +86,9 @@ async function saveCurrentProject() {
 
 // تحميل قائمة المشاريع
 async function loadMyProjects() {
+    // التحقق من الاشتراك أولاً
+    if (!checkPremiumAccess()) return;
+    
     const clientCode = getClientCode();
     
     try {
@@ -236,12 +252,18 @@ function showErrorMessage(msg) {
 
 // عرض كود العميل
 function showClientCode() {
+    // التحقق من الاشتراك أولاً
+    if (!checkPremiumAccess()) return;
+    
     const code = getClientCode();
     alert(`كود حسابك: ${code}\n\nاحتفظ بهذا الكود للوصول لمشاريعك من أي جهاز.`);
 }
 
 // تسجيل الدخول بكود موجود
 function loginWithCode() {
+    // التحقق من الاشتراك أولاً
+    if (!checkPremiumAccess()) return;
+    
     const code = prompt('أدخل كود حسابك:');
     if (code && code.length >= 6) {
         localStorage.setItem('despro_client_code', code.toUpperCase());
