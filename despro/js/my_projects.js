@@ -609,27 +609,12 @@ function displayProjectsModal(projects) {
     
     // فتح النافذة
     modal.classList.remove('hidden');
-    
-    // Animation
-    setTimeout(() => {
-        content.classList.remove('scale-95', 'opacity-0');
-        content.classList.add('scale-100', 'opacity-100');
-    }, 10);
 }
 
-// إغلاق نافذة المشاريع
+// إغلاق نافذة المشاريع - بسيط مثل حفظ كملف
 function closeMyProjectsModal() {
     const modal = document.getElementById('myProjectsModal');
-    const content = document.getElementById('myProjectsContent');
-    
-    if (content) {
-        content.classList.remove('scale-100', 'opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-    }
-    
-    setTimeout(() => {
-        if (modal) modal.classList.add('hidden');
-    }, 300);
+    if (modal) modal.classList.add('hidden');
 }
 window.loadMyProjects = loadMyProjects;
 window.loadProject = loadProject;

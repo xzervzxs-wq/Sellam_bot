@@ -1495,8 +1495,8 @@
         </div>
     </div>
     <!-- نافذة أعمالي - تصميم جديد -->
-    <div id="myProjectsModal" class="hidden fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 transition-all duration-300">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-amber-500/20 transform scale-95 opacity-0 transition-all duration-300" id="myProjectsContent">
+    <div id="myProjectsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40" onclick="if(event.target.id === 'myProjectsModal') closeMyProjectsModal()">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-amber-500/20" onclick="event.stopPropagation()">
             
             <!-- Header -->
             <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-4 flex items-center justify-between border-b border-amber-500/20 relative overflow-hidden">
