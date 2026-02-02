@@ -771,7 +771,7 @@
                         <!-- صف الأزرار السفلي: أعمالي يمين + طباعة A4 يسار -->
                         <div class="grid grid-cols-2 gap-2 mt-2">
                             <!-- زر أعمالي (يمين) -->
-                            <button type="button" id="myWorksBtn" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white px-2 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition border border-yellow-400/50">
+                            <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white px-2 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition border border-yellow-400/50">
                                 <i class="fas fa-crown text-yellow-100"></i> أعمالي
                             </button>
                             <!-- زر طباعة A4 (يسار) -->
@@ -1882,21 +1882,5 @@
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
     </style>
-    
-    <!-- تفعيل زر أعمالي -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const myWorksBtn = document.getElementById('myWorksBtn');
-            if (myWorksBtn) {
-                myWorksBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (typeof openMyProjectsModal === 'function') {
-                        openMyProjectsModal();
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
