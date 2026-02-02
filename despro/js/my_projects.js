@@ -72,6 +72,13 @@ async function saveCurrentProject() {
     if (!checkPremiumAccess()) return;
     
     const clientCode = getClientCode();
+    
+    // تأكد من وجود كود العميل
+    if (!clientCode) {
+        alert('⚠️ خطأ في الجلسة!\n\nأعد تسجيل الدخول وحاول مرة أخرى.');
+        return;
+    }
+    
     const projectName = prompt('أدخل اسم المشروع:', 'مشروع جديد');
     
     if (!projectName) return;
@@ -85,7 +92,7 @@ async function saveCurrentProject() {
     });
     
     try {
-        showLoadingMessage('جاري حفظ المشروع...');
+        alert('جاري حفظ المشروع...');
         
         const response = await fetch(`${API_URL}/api/project/save`, {
             method: 'POST',
@@ -103,15 +110,13 @@ async function saveCurrentProject() {
         const result = await response.json();
         
         if (result.success) {
-            hideLoadingMessage();
-            showSuccessMessage('تم حفظ المشروع بنجاح! ✅');
+            alert('تم حفظ المشروع بنجاح! ✅');
+            loadProjectsList(); // تحديث القائمة
         } else {
-            hideLoadingMessage();
-            showErrorMessage('فشل في حفظ المشروع: ' + result.error);
+            alert('فشل في حفظ المشروع: ' + result.error);
         }
     } catch (error) {
-        hideLoadingMessage();
-        showErrorMessage('خطأ في الاتصال بالسيرفر');
+        alert('خطأ في الاتصال بالسيرفر: ' + error.message);
         console.error('Save error:', error);
     }
 }
