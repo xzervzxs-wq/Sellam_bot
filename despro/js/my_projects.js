@@ -333,6 +333,49 @@ function closeSubscribeModal() {
     if (modal) modal.classList.add('hidden');
 }
 
+// Migrate Local Projects to Cloud (when user becomes Premium)
+async function migrateLocalToCloud(user) {
+    const localProjects = getLocalProjects();
+    if (localProjects.length === 0) return;
+    
+    console.log('[Migration] Found', localProjects.length, 'local projects to migrate');
+    showToast('⏳ جاري نقل مشاريعك للسحابة...', 'loading');
+    
+    let migrated = 0;
+    for (const project of localProjects) {
+        try {
+            const response = await fetch(`${API_URL}/api/project/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_code: user.id,
+                    project_name: project.name,
+                    project_data: JSON.stringify(project.data),
+                    thumbnail: ''
+                })
+            });
+            const result = await response.json();
+            if (result.success) migrated++;
+        } catch(e) {
+            console.log('[Migration] Failed to migrate:', project.name);
+        }
+    }
+    
+    // Clear local storage after migration
+    if (migrated > 0) {
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        console.log('[Migration] Cleared local storage, migrated', migrated, 'projects');
+    }
+    
+    // Remove loading toast
+    const toast = document.getElementById('projectToast');
+    if (toast) toast.remove();
+    
+    if (migrated > 0) {
+        showToast(`✅ تم نقل ${migrated} مشروع للسحابة`, 'success');
+    }
+}
+
 // Load Projects List (Hybrid)
 async function loadProjectsList() {
     const user = getUserIdentity();
@@ -375,6 +418,9 @@ async function loadProjectsList() {
         }
     } else {
         if (warningEl) warningEl.style.display = 'none';
+        
+        // Premium user - check for local projects to migrate
+        await migrateLocalToCloud(user);
     }
 
     grid.innerHTML = `
