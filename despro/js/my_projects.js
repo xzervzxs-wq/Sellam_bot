@@ -392,9 +392,11 @@ async function loadProjectsList() {
     
     if (countLabel) countLabel.textContent = user.type === 'premium' ? '☁️ تخزين سحابي' : '💾 تخزين محلي';
     
-    // Warning for Free Users
+    // Warning for Free Users - Only show if they have at least 1 project
     let warningEl = document.getElementById('guestWarning');
-    if (user.type === 'free') {
+    const localProjects = getLocalProjects();
+    
+    if (user.type === 'free' && localProjects.length > 0) {
         if (!warningEl) {
             warningEl = document.createElement('div');
             warningEl.id = 'guestWarning';
@@ -417,7 +419,9 @@ async function loadProjectsList() {
         if (warningEl) warningEl.style.display = 'none';
         
         // Premium user - check for local projects to migrate
-        await migrateLocalToCloud(user);
+        if (user.type === 'premium') {
+            await migrateLocalToCloud(user);
+        }
     }
 
     grid.innerHTML = `
