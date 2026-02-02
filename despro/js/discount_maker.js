@@ -9,7 +9,6 @@ let discountUploadedImage = null;
 function openDiscountModal() {
     const modal = document.getElementById('discountModal');
     modal.style.display = 'flex';
-    // Reset form
     document.getElementById('discountProdName').value = '';
     document.getElementById('discountProdPrice').value = '';
     document.getElementById('discountProdOldPrice').value = '';
@@ -18,7 +17,6 @@ function openDiscountModal() {
     discountUploadedImage = null;
     selectDiscountTemplate(1);
     
-    // إظهار/إخفاء شارة Premium
     const badge = document.getElementById('discount-pro-badge');
     if (badge) {
         if (typeof userTier !== 'undefined' && userTier === 'premium') {
@@ -73,7 +71,7 @@ function selectDiscountTemplate(id) {
     }
 }
 
-function generateDiscountCard() {
+async function generateDiscountCard() {
     const name = document.getElementById('discountProdName').value || "اسم المنتج";
     const price = document.getElementById('discountProdPrice').value || "00";
     const oldPrice = document.getElementById('discountProdOldPrice').value;
@@ -90,7 +88,7 @@ function generateDiscountCard() {
     
     const cardW = 600;
     const cardH = 800;
-    const scale = 4; // دقة عالية للطباعة
+    const scale = 4;
     
     canvas.width = cardW * scale;
     canvas.height = cardH * scale;
@@ -110,7 +108,6 @@ function generateDiscountCard() {
         ctx.closePath();
     }
 
-    // حساب لون النص بناءً على الخلفية
     const hex = bgColor.replace('#','');
     const r = parseInt(hex.substring(0,2), 16);
     const g = parseInt(hex.substring(2,4), 16);
@@ -119,9 +116,40 @@ function generateDiscountCard() {
     const mainTextColor = isDark ? "#ffffff" : "#1f2937";
     const accentColor = borderColor;
 
-    // === القالب 1: فخامة (Luxury) ===
+    function drawModernPrice(ctx, priceValue, x, y, color, baseSize) {
+        return new Promise((resolve) => {
+            ctx.save();
+            
+            const numberFont = "900 " + baseSize + "px 'Cairo', sans-serif";
+            ctx.font = numberFont;
+            const numWidth = ctx.measureText(priceValue).width;
+            
+            const svgSize = baseSize * 0.75; 
+            const gap = baseSize * 0.2;
+            const totalWidth = numWidth + svgSize + gap;
+            
+            let startX = x - (totalWidth / 2);
+            
+            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1500"><path d="M887.52 1234.67h0A460.06 460.06 0 0 0 849.13 1378l424.38-90.21a460.46 460.46 0 0 0 38.39-143.33ZM1273.51 1017.52A460.12 460.12 0 0 0 1311.9 874.2L981.32 944.5V809.35l292.18-62.09a460.26 460.26 0 0 0 38.39-143.33L981.31 674.18V188.11a466.3 466.3 0 0 0-132.21 111V702.29l-132.21 28.1V122A466.27 466.27 0 0 0 584.68 233V758.48L288.86 821.34a460.2 460.2 0 0 0-38.4 143.33l334.22-71v170.21L226.49 1140a460.26 460.26 0 0 0-38.39 143.33L563 1203.61a119.09 119.09 0 0 0 73.81-49.22l68.75-101.94v0a65.69 65.69 0 0 0 11.3-37V865.54l132.21-28.1v270.31l424.4-90.25Z" fill="${color}"></path></svg>`;
+            
+            const img = new Image();
+            const blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = () => {
+                ctx.drawImage(img, startX, y - svgSize + (baseSize * 0.1), svgSize, svgSize);
+                ctx.textAlign = "left";
+                ctx.fillStyle = color;
+                ctx.fillText(priceValue, startX + svgSize + gap, y);
+                URL.revokeObjectURL(url);
+                ctx.restore();
+                resolve(totalWidth);
+            };
+            img.src = url;
+        });
+    }
+
     if (discountCurrentTemplate === 1) {
-        // الخلفية
         ctx.shadowColor = "rgba(0,0,0,0.15)";
         ctx.shadowBlur = 20;
         ctx.shadowOffsetY = 10;
@@ -130,12 +158,10 @@ function generateDiscountCard() {
         ctx.fill();
         ctx.shadowColor = "transparent";
         
-        // الإطار الذهبي
         ctx.strokeStyle = accentColor;
         ctx.lineWidth = 3;
         ctx.strokeRect(50, 50, cardW - 100, cardH - 100);
         
-        // الصورة (دائرية)
         ctx.save();
         ctx.beginPath();
         ctx.arc(cardW/2, 280, 200, 0, Math.PI*2);
@@ -150,34 +176,28 @@ function generateDiscountCard() {
         ctx.fillStyle = mainTextColor;
         ctx.fillText(name, cardW/2, contentY);
         
-        ctx.font = "900 65px 'Cairo', sans-serif";
-        ctx.fillStyle = accentColor;
-        ctx.fillText(price + " ر.س", cardW/2, contentY + 90);
+        await drawModernPrice(ctx, price, cardW/2, contentY + 90, accentColor, 65);
         
         if(oldPrice) {
-            ctx.font = "40px 'Cairo', sans-serif";
-            ctx.fillStyle = "#9ca3af"; 
-            const oldP = oldPrice + " ر.س";
-            ctx.fillText(oldP, cardW/2, contentY + 150);
-            const w = ctx.measureText(oldP).width;
-            ctx.fillStyle = "#ef4444"; 
-            ctx.fillRect(cardW/2 - w/2, contentY + 140, w, 3);
+            const oldPriceSize = 40;
+            const oldPriceColor = "#9ca3af";
+            const totalW = await drawModernPrice(ctx, oldPrice, cardW/2, contentY + 150, oldPriceColor, oldPriceSize);
+            
+            ctx.fillStyle = "#ef4444";
+            const startX = (cardW/2) - (totalW / 2);
+            ctx.fillRect(startX, contentY + 150 - (oldPriceSize * 0.3), totalW, 3);
         }
     } 
     
-    // === القالب 2: زجاجي (Glass) ===
     else if (discountCurrentTemplate === 2) {
-        // صورة كاملة
         ctx.drawImage(discountUploadedImage, 0, 0, cardW, cardH);
         
-        // تظليل
         const grad = ctx.createLinearGradient(0, cardH/2, 0, cardH);
         grad.addColorStop(0, "rgba(0,0,0,0)");
         grad.addColorStop(1, "rgba(0,0,0,0.6)");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, cardW, cardH);
 
-        // البطاقة العائمة - أكبر إذا كان هناك سعر سابق
         const boxHeight = oldPrice ? 260 : 200;
         const boxY = cardH - boxHeight - 30;
         
@@ -193,33 +213,25 @@ function generateDiscountCard() {
         ctx.fillStyle = "#1e293b";
         ctx.font = "bold 40px 'Cairo', sans-serif";
         
-        // تحديد مواقع النصوص بناءً على وجود السعر السابق
         if(oldPrice) {
-            // عند وجود سعر سابق - رفع كل شيء للأعلى
             ctx.fillText(name, cardW/2, boxY + 55);
             
-            ctx.font = "900 55px 'Cairo', sans-serif";
-            ctx.fillStyle = accentColor;
-            ctx.fillText(price + " ر.س", cardW/2, boxY + 130);
+            await drawModernPrice(ctx, price, cardW/2 + 80, boxY + 130, accentColor, 55);
             
-            ctx.font = "bold 35px 'Cairo', sans-serif";
-            ctx.fillStyle = "#94a3b8";
-            const oldP = oldPrice + " ر.س";
-            ctx.fillText(oldP, cardW/2, boxY + 185);
-            const w = ctx.measureText(oldP).width;
+            const oldPriceSize = 40;
+            const oldPriceColor = "#94a3b8";
+            const totalW = await drawModernPrice(ctx, oldPrice, cardW/2 - 80, boxY + 130, oldPriceColor, oldPriceSize);
+            
             ctx.fillStyle = "#ef4444";
-            ctx.fillRect(cardW/2 - w/2, boxY + 175, w, 3);
-        } else {
-            // بدون سعر سابق - توسيط عادي
-            ctx.fillText(name, cardW/2, boxY + 70);
+            const startX = (cardW/2 - 80) - (totalW / 2);
+            ctx.fillRect(startX, boxY + 130 - (oldPriceSize * 0.3), totalW, 3);
             
-            ctx.font = "900 55px 'Cairo', sans-serif";
-            ctx.fillStyle = accentColor;
-            ctx.fillText(price + " ر.س", cardW/2, boxY + 150);
+        } else {
+            ctx.fillText(name, cardW/2, boxY + 70);
+            await drawModernPrice(ctx, price, cardW/2, boxY + 150, accentColor, 55);
         }
     }
 
-    // === القالب 3: بوستر ===
     else if (discountCurrentTemplate === 3) {
         ctx.drawImage(discountUploadedImage, 0, 0, cardW, cardH);
         const grad = ctx.createLinearGradient(0, cardH/2, 0, cardH);
@@ -235,48 +247,34 @@ function generateDiscountCard() {
         ctx.fillText(name, cardW/2, cardH - 180);
         
         if(oldPrice) {
-            ctx.font = "bold 36px 'Cairo', sans-serif";
-            ctx.fillStyle = "#cbd5e1"; 
-            const oldP = oldPrice + " ر.س";
-            ctx.fillText(oldP, cardW/2, cardH - 135);
-            const w = ctx.measureText(oldP).width;
+            const oldPriceSize = 36;
+            const oldPriceColor = "#cbd5e1";
+            const totalW = await drawModernPrice(ctx, oldPrice, cardW/2, cardH - 135, oldPriceColor, oldPriceSize);
+            
             ctx.fillStyle = "#ef4444"; 
-            ctx.fillRect(cardW/2 - w/2, cardH - 145, w, 4);
+            const startX = (cardW/2) - (totalW / 2);
+            ctx.fillRect(startX, cardH - 135 - (oldPriceSize * 0.3), totalW, 4);
         }
         
-        ctx.fillStyle = accentColor;
-        ctx.font = "900 60px 'Cairo', sans-serif";
-        ctx.fillText(price + " ر.س", cardW/2, cardH - 60);
+        await drawModernPrice(ctx, price, cardW/2, cardH - 60, accentColor, 60);
     }
 
-    // === العلامة المائية للمستخدمين غير Premium ===
     if (typeof userTier === 'undefined' || userTier !== 'premium') {
         ctx.save();
-        
-        // علامة مائية كبيرة في المنتصف مع شفافية عالية
         ctx.globalAlpha = 0.25;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        
-        // النص الرئيسي الكبير
         ctx.font = "bold 80px 'Cairo', sans-serif";
         ctx.fillStyle = "#000000";
         ctx.fillText("👑 Premium", cardW/2, cardH/2 - 20);
-        
-        // نص فرعي تحته
         ctx.font = "bold 28px 'Cairo', sans-serif";
         ctx.fillText("اشترك للحصول على النسخة الكاملة", cardW/2, cardH/2 + 50);
-        
         ctx.restore();
     }
 
-    // تحويل لـ PNG
     const finalCardUrl = canvas.toDataURL("image/png");
-    
-    // إغلاق النافذة أولاً
     closeDiscountModal();
     
-    // إضافة للتصميم باستخدام addAssetToCanvas (نفس الباركود والسوشيال)
     setTimeout(() => {
         if (typeof addAssetToCanvas === 'function') {
             addAssetToCanvas(finalCardUrl, false);
@@ -286,7 +284,6 @@ function generateDiscountCard() {
     }, 100);
 }
 
-// تصدير الدوال للاستخدام العام
 window.openDiscountModal = openDiscountModal;
 window.closeDiscountModal = closeDiscountModal;
 window.handleDiscountImg = handleDiscountImg;
