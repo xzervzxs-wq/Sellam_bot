@@ -37,25 +37,50 @@ function showToast(message, type = 'info') {
     return toast;
 }
 
-// User Identity Management
+// User Identity Management - ROBUST & STABLE
 function getUserIdentity() {
+    // 1. Check for logged in Premium session with multiple fallback checks
     const session = localStorage.getItem('despro_session');
+    const legacyCode = localStorage.getItem('despro_client_code');
+    const sessionName = sessionStorage.getItem('studioName');
+
+    // Try to find a STABLE Premium ID
+    let premiumId = null;
+    let premiumName = 'مشترك مميز';
+
     if (session) {
         try {
             const data = JSON.parse(session);
-            if (data.code || data.name) {
-                return { 
-                    id: data.code || ('PREM_' + Date.now()), 
-                    type: 'premium', 
-                    name: data.name || 'مشترك مميز',
-                    limit: 10
-                };
-            }
+            if (data.code) premiumId = data.code;
+            if (data.name) premiumName = data.name;
         } catch(e){}
     }
+
+    // Fallback 1: Legacy Code
+    if (!premiumId && legacyCode) {
+        premiumId = legacyCode;
+    }
+
+    // Fallback 2: Studio Name (last resort for stable ID)
+    if (!premiumId && sessionName) {
+        premiumId = 'NAME_' + sessionName.replace(/\s+/g, '_');
+        premiumName = sessionName;
+    }
+
+    // If we found a stable Premium ID
+    if (premiumId) {
+        return { 
+            id: premiumId, 
+            type: 'premium', 
+            name: premiumName,
+            limit: 10
+        };
+    }
     
+    // 2. Guest User (Free) - Persistent ID
     let guestId = localStorage.getItem('despro_guest_id');
     if (!guestId) {
+        // Generate persistent guest ID
         guestId = 'guest_' + Math.random().toString(36).substring(2, 10) + Date.now();
         localStorage.setItem('despro_guest_id', guestId);
     }
@@ -220,12 +245,49 @@ async function loadProjectsList() {
     const user = getUserIdentity();
     const grid = document.getElementById('projectsGrid');
     
+    // Update Header Text to "أعمالي" with icon
+    const limitLabel = document.getElementById('projectsLimitLabel');
+    if (limitLabel && limitLabel.parentElement) {
+         // Try to find the h3 directly above/adjacent to the limit label
+         const titleEl = limitLabel.parentElement.querySelector('h3');
+         if (titleEl) {
+             titleEl.innerHTML = '<i class="fas fa-crown text-amber-500 ml-2"></i> أعمالي';
+         }
+    }
+    
     const countLabel = document.getElementById('projectsLimitLabel');
     const countDetail = document.getElementById('projectsCountDetail');
     const usageBar = document.getElementById('projectsUsageBar');
     
     if (countLabel) countLabel.textContent = user.type === 'premium' ? 'مساحة تخزين المميزة' : 'مساحة تخزين مجانية';
     
+    // Add Warning for Free Users - Insert at top of grid or before it
+    // Check if warning already exists
+    let warningEl = document.getElementById('guestWarning');
+    if (user.type === 'free') {
+        if (!warningEl) {
+            warningEl = document.createElement('div');
+            warningEl.id = 'guestWarning';
+            warningEl.className = 'mx-4 mt-2 p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded-xl flex gap-3 items-start';
+            warningEl.innerHTML = `
+                <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 text-xs"></i>
+                <p class="text-[11px] text-amber-700 dark:text-amber-400 font-medium leading-relaxed">
+                    تنبيه: الحفظ مرتبط بالمتصفح (Cookies). مسح بيانات المتصفح سيحذف مشاريعك.
+                    <a href="#" onclick="showSubscribeModal()" class="underline font-bold hover:text-amber-800">اشترك للحفظ الدائم</a>
+                </p>
+            `;
+            // Insert after header section (before grid)
+            const listArea = document.getElementById('projectsGrid');
+            if (listArea && listArea.parentElement) {
+                listArea.parentElement.insertBefore(warningEl, listArea);
+            }
+        } else {
+            warningEl.style.display = 'flex';
+        }
+    } else {
+        if (warningEl) warningEl.style.display = 'none';
+    }
+
     if (!grid.hasChildNodes() || grid.innerHTML.includes('لا توجد')) {
         grid.innerHTML = `
             <div class="h-48 flex flex-col items-center justify-center text-slate-400 gap-2">
