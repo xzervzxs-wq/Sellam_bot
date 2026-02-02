@@ -383,9 +383,9 @@ async function loadProjectsList() {
          const titleEl = limitLabel.parentElement.querySelector('h3');
          if (titleEl) {
              if (user.type === 'premium') {
-                 titleEl.innerHTML = '<i class="fas fa-palette text-amber-500 ml-2"></i> أعمالي';
+                 titleEl.innerHTML = '<i class="fas fa-crown text-amber-500 ml-2"></i> أعمالي';
              } else {
-                 titleEl.innerHTML = '<i class="fas fa-palette text-amber-500 ml-2"></i> أعمالي<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">كل فكرة تستحق البقاء ✨</span>';
+                 titleEl.innerHTML = 'أعمالي<br><span style="font-size: 10px; font-weight: normal; color: #94a3b8;">كل فكرة تستحق البقاء ✨</span>';
              }
          }
     }
