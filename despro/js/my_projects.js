@@ -241,23 +241,7 @@ async function loadMyProjects() {
     }
 }
 
-// تم تحديث الدالة في الأسفل لدعم التصميم الجديد
-// function displayProjectsModal(projects) { ... }
-                    <h3 class="text-white font-medium truncate">${project.name}</h3>
-                    <p class="text-gray-400 text-xs mt-1">${formatDate(project.updated_at)}</p>
-                </div>
-            `;
-            card.onclick = (e) => {
-                if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
-                    loadProject(project.id);
-                }
-            };
-            grid.appendChild(card);
-        });
-    }
-    
-    modal.classList.remove('hidden');
-}
+// الدالة الرئيسية للعرض موجودة في الأسفل (displayProjectsInGrid)
 
 // تحميل مشروع محدد
 async function loadProject(projectId) {
@@ -404,10 +388,7 @@ async function deleteProject(projectId) {
     }
 }
 
-// إغلاق نافذة المشاريع
-function closeMyProjectsModal() {
-    document.getElementById('myProjectsModal').classList.add('hidden');
-}
+// الدالة closeMyProjectsModal موجودة في الأسفل
 
 // تنسيق التاريخ
 function formatDate(dateString) {
