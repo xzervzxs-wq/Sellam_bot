@@ -93,7 +93,7 @@ function getClientName() {
     return 'مشترك';
 }
 
-// حفظ المشروع الحالي
+// حفظ المشروع الحالي - نفس طريقة "حفظ كملف" بالضبط
 async function saveCurrentProject() {
     // التحقق من الاشتراك أولاً
     if (!checkPremiumAccess()) return;
@@ -130,7 +130,7 @@ async function saveCurrentProject() {
     // إظهار رسالة التحميل
     const loadingToast = showToast('⏳ جاري حفظ المشروع...', 'loading');
     
-    // الحصول على بيانات المشروع من الـ DOM
+    // ============= نفس كود "حفظ كملف" بالضبط =============
     const card = document.getElementById('card');
     if (!card) {
         if (loadingToast) loadingToast.remove();
@@ -139,26 +139,28 @@ async function saveCurrentProject() {
     }
     
     const projectData = {
+        name: projectName,
         html: card.innerHTML,
         width: card.style.width,
         height: card.style.height,
         wVal: card.getAttribute('data-card-width'),
         hVal: card.getAttribute('data-card-height'),
-        customW: document.getElementById('custom-width')?.value || '',
-        customH: document.getElementById('custom-height')?.value || '',
-        timestamp: new Date().toISOString()
+        customW: document.getElementById('custom-width')?.value || '10',
+        customH: document.getElementById('custom-height')?.value || '10',
+        timestamp: new Date().toLocaleString('ar-SA'),
+        version: "2.0"
     };
     
-    // إنشاء صورة مصغرة بسيطة
-    let thumbnail = '';
-    try {
-        // لا نحتاج thumbnail حالياً
-    } catch (e) {}
+    // حفظ الملاحظات إذا موجودة
+    const notesField = document.getElementById('designer-notes');
+    if (notesField && notesField.value.trim()) {
+        projectData.notes = notesField.value.trim();
+    }
+    // ============= نهاية كود "حفظ كملف" =============
     
     try {
-        // إضافة timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 ثانية
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
         
         const response = await fetch(`${API_URL}/api/project/save`, {
             method: 'POST',
@@ -169,7 +171,7 @@ async function saveCurrentProject() {
                 client_code: clientCode,
                 project_name: projectName,
                 project_data: JSON.stringify(projectData),
-                thumbnail: thumbnail
+                thumbnail: ''
             }),
             signal: controller.signal
         });
@@ -331,32 +333,58 @@ async function loadProject(projectId) {
                 projectData = JSON.parse(projectData);
             }
             
-            // تحميل المشروع للـ Card (DOM-based)
-            const card = document.getElementById('card');
-            if (card && projectData.html) {
-                card.innerHTML = projectData.html;
-                
-                // استعادة أبعاد البطاقة
-                if (projectData.width) card.style.width = projectData.width;
-                if (projectData.height) card.style.height = projectData.height;
-                if (projectData.wVal) card.setAttribute('data-card-width', projectData.wVal);
-                if (projectData.hVal) card.setAttribute('data-card-height', projectData.hVal);
-                
-                // استعادة القيم المخصصة
-                const customW = document.getElementById('custom-width');
-                const customH = document.getElementById('custom-height');
-                if (customW && projectData.customW) customW.value = projectData.customW;
-                if (customH && projectData.customH) customH.value = projectData.customH;
-                
-                // تحديث الطبقات إذا موجودة
-                if (typeof updateLayersList === 'function') updateLayersList();
-                if (typeof initDraggableForAll === 'function') initDraggableForAll();
-                
-                closeMyProjectsModal();
-                showToast('✅ تم تحميل المشروع!', 'success');
-            } else {
-                showToast('❌ بيانات المشروع غير صالحة', 'error');
+            // ============= نفس كود "فتح ملف" بالضبط =============
+            // تحقق من سلامة الملف
+            if (!projectData.html && !projectData.wVal && !projectData.width) {
+                showToast('❌ ملف المشروع غير صالح', 'error');
+                return;
             }
+            
+            const card = document.getElementById('card');
+            card.innerHTML = projectData.html;
+            
+            // تصحيح مفاتيح البيانات (توافقية مع الإصدارات المختلفة)
+            const wVal = projectData.wVal || projectData.cardWidth;
+            const hVal = projectData.hVal || projectData.cardHeight;
+            const customW = projectData.customW || projectData.customWidth || '10';
+            const customH = projectData.customH || projectData.customHeight || '10';
+            
+            // استعادة الأبعاد في الحقول
+            document.getElementById('custom-width').value = customW;
+            document.getElementById('custom-height').value = customH;
+            
+            if (wVal && hVal) {
+                // استخدام دالة setCardSize لضمان تحديث كل شيء
+                if (typeof setCardSize === 'function') {
+                    setCardSize(parseFloat(wVal), parseFloat(hVal));
+                }
+                
+                card.setAttribute('data-card-width', wVal);
+                card.setAttribute('data-card-height', hVal);
+            } else if (projectData.width && projectData.height) {
+                card.style.width = projectData.width;
+                card.style.height = projectData.height;
+            }
+            
+            // إعادة تفعيل الأحداث للعناصر
+            if (typeof rebindEvents === 'function') rebindEvents();
+            
+            // ضبط الزوم على 50%
+            if (typeof setCustomZoom === 'function') setCustomZoom(50);
+            
+            // استعادة الملاحظات
+            const notesField = document.getElementById('designer-notes');
+            if (projectData.notes && notesField) {
+                notesField.value = projectData.notes;
+                if (typeof updateCharCount === 'function') updateCharCount();
+            } else if (notesField) {
+                notesField.value = '';
+            }
+            // ============= نهاية كود "فتح ملف" =============
+            
+            closeMyProjectsModal();
+            showToast('✅ تم تحميل المشروع!', 'success');
+            
         } else {
             showToast('❌ فشل تحميل المشروع: ' + (result.error || ''), 'error');
         }
