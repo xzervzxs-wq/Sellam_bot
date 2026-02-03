@@ -1181,6 +1181,16 @@
 /* === تنسيق الجوال فقط === */
 /* ============================================ */
 @media (max-width: 768px) {
+    /* ========== إزالة المستطيل الأبيض خلف مربع العمل ========== */
+    .preview-area {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 10px !important;
+        min-height: auto !important;
+        border-radius: 0 !important;
+    }
+    
     /* ========== إزالة المسافات والخلفيات ========== */
     /* الحاوية الرئيسية - بدون padding */
     .max-w-7xl.mx-auto.p-4 {
@@ -1205,8 +1215,8 @@
         max-height: 40vh !important;
         min-height: 180px !important;
         overflow: auto !important;
-        margin: 0 !important;
-        padding: 4px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
         border-radius: 8px !important;
     }
     
