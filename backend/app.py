@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -7,6 +7,9 @@ import os
 import json
 from datetime import datetime
 import uuid
+import requests
+import base64
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -313,3 +316,112 @@ def delete_project(project_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
+
+# ============================================
+# === Image Proxy for iOS CORS Issues ===
+# ============================================
+
+@app.route('/api/image-proxy', methods=['POST'])
+@limiter.limit("30 per minute")
+def image_proxy():
+    """
+    Proxy لجلب الصور وتحويلها لـ Base64
+    يحل مشكلة CORS على iOS Safari
+    """
+    try:
+        data = request.get_json()
+        image_url = data.get('url')
+        
+        if not image_url:
+            return jsonify({"success": False, "error": "URL مطلوب"}), 400
+        
+        # التحقق من أن الرابط هو صورة
+        if not any(ext in image_url.lower() for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', 'image']):
+            # لا نمنع، قد تكون صورة بدون امتداد واضح
+            pass
+        
+        # جلب الصورة من السيرفر الخارجي
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
+            'Accept': 'image/*,*/*',
+            'Referer': image_url
+        }
+        
+        response = requests.get(image_url, headers=headers, timeout=15, stream=True)
+        
+        if response.status_code != 200:
+            return jsonify({"success": False, "error": f"فشل جلب الصورة: {response.status_code}"}), 400
+        
+        # تحويل لـ Base64
+        content_type = response.headers.get('Content-Type', 'image/png')
+        if 'image' not in content_type:
+            content_type = 'image/png'
+        
+        image_data = response.content
+        base64_data = base64.b64encode(image_data).decode('utf-8')
+        data_url = f"data:{content_type};base64,{base64_data}"
+        
+        return jsonify({
+            "success": True,
+            "dataUrl": data_url,
+            "contentType": content_type,
+            "size": len(image_data)
+        })
+        
+    except requests.Timeout:
+        return jsonify({"success": False, "error": "انتهت مهلة الاتصال"}), 408
+    except requests.RequestException as e:
+        return jsonify({"success": False, "error": f"خطأ في الاتصال: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/batch-image-proxy', methods=['POST'])
+@limiter.limit("10 per minute")
+def batch_image_proxy():
+    """
+    Proxy لجلب عدة صور دفعة واحدة
+    أكثر كفاءة من طلب كل صورة على حدة
+    """
+    try:
+        data = request.get_json()
+        urls = data.get('urls', [])
+        
+        if not urls or not isinstance(urls, list):
+            return jsonify({"success": False, "error": "قائمة URLs مطلوبة"}), 400
+        
+        if len(urls) > 20:
+            return jsonify({"success": False, "error": "الحد الأقصى 20 صورة"}), 400
+        
+        results = {}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
+            'Accept': 'image/*,*/*'
+        }
+        
+        for url in urls:
+            try:
+                response = requests.get(url, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    content_type = response.headers.get('Content-Type', 'image/png')
+                    if 'image' not in content_type:
+                        content_type = 'image/png'
+                    base64_data = base64.b64encode(response.content).decode('utf-8')
+                    results[url] = {
+                        "success": True,
+                        "dataUrl": f"data:{content_type};base64,{base64_data}"
+                    }
+                else:
+                    results[url] = {"success": False, "error": f"Status {response.status_code}"}
+            except Exception as e:
+                results[url] = {"success": False, "error": str(e)}
+        
+        return jsonify({
+            "success": True,
+            "results": results,
+            "processed": len(results)
+        })
+        
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
