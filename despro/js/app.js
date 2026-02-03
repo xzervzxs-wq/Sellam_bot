@@ -1494,11 +1494,21 @@
                 deselect();
                 setCustomZoom(100);
                 
-                // انتظار تحميل الخطوط العربية
+                // انتظار تحميل الخطوط العربية (Cairo)
                 if (document.fonts) {
                     await document.fonts.ready;
-                    // انتظار إضافي للتأكد من تحميل الخطوط العربية
-                    await new Promise(r => setTimeout(r, 500));
+                    
+                    // تحميل خط Cairo بشكل صريح
+                    try {
+                        await document.fonts.load('400 16px "Cairo"');
+                        await document.fonts.load('700 16px "Cairo"');
+                        console.log('iOS: Cairo font loaded');
+                    } catch(e) {
+                        console.warn('iOS: Cairo font load failed', e);
+                    }
+                    
+                    // انتظار إضافي
+                    await new Promise(r => setTimeout(r, 800));
                 }
                 
                 // إجبار إعادة رسم النص (مهم للخطوط العربية)
