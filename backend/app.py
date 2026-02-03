@@ -59,6 +59,35 @@ with app.app_context():
 def home():
     return jsonify({"status": "ok", "message": "Despro API is running!"})
 
+@app.route('/api/all-projects')
+def get_all_projects():
+    """Get all projects (admin only - for debugging)"""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT id, client_code, project_name, created_at 
+            FROM projects 
+            ORDER BY created_at DESC
+            LIMIT 50
+        ''')
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        projects = []
+        for row in rows:
+            projects.append({
+                "id": row[0],
+                "client_code": row[1],
+                "project_name": row[2],
+                "created_at": row[3].isoformat() if row[3] else None
+            })
+        
+        return jsonify({"success": True, "count": len(projects), "projects": projects})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route('/api/client/register', methods=['POST'])
 def register_client():
     """Register a new client with unique code"""
