@@ -1192,6 +1192,58 @@
         transform: scale(0.5) !important;
         transform-origin: top center !important;
     }
+    
+    /* ========== الأزرار ========== */
+    /* إخفاء عناوين الأقسام */
+    .text-\[8px\].font-extrabold.tracking-\[0\.2em\] {
+        display: none !important;
+    }
+    
+    /* إزالة خلفيات وحدود مجموعات الأدوات */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 {
+        background: none !important;
+        border: none !important;
+        padding: 2px !important;
+        min-height: 0 !important;
+    }
+    
+    /* تصغير الأزرار */
+    .h-9.px-3.rounded-lg,
+    .h-7.px-2\.5.rounded {
+        height: 28px !important;
+        padding: 2px 6px !important;
+        font-size: 9px !important;
+        border-radius: 6px !important;
+    }
+    
+    /* تصغير الأيقونات */
+    .h-9.px-3.rounded-lg i,
+    .h-7.px-2\.5.rounded i {
+        font-size: 10px !important;
+        margin-left: 2px !important;
+    }
+    
+    /* الأزرار متراصة بدون فراغات */
+    .flex.items-center.gap-1\.5 {
+        gap: 2px !important;
+    }
+    
+    /* شريط الأدوات العلوي - سطرين */
+    .w-full.flex.flex-wrap.items-center.gap-2.mb-2.pb-2.border-b {
+        gap: 3px !important;
+        padding-bottom: 4px !important;
+    }
+    
+    /* ========== مكتبة العناصر مغلقة ========== */
+    #assets-library-content {
+        display: none !important;
+    }
+    
+    /* عند الفتح بالجافاسكربت */
+    #assets-library-content.show-mobile {
+        display: flex !important;
+        flex-direction: column !important;
+    }
 }
 
 /* ============================================ */
