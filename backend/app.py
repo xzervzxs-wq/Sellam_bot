@@ -70,6 +70,12 @@ with app.app_context():
 def home():
     return jsonify({"status": "ok", "message": "Despro API is running!"})
 
+@app.route('/api/health')
+@limiter.exempt  # بدون rate limiting للـ health check
+def health_check():
+    """Lightweight health check for uptime monitoring"""
+    return "OK", 200
+
 @app.route('/api/all-projects')
 def get_all_projects():
     """Get all projects (admin only - for debugging)"""
