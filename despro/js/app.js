@@ -1446,6 +1446,46 @@
             }
         }
 
+
+        // ============================================
+        // === Server-Side A4 Generation for iOS ===
+        // ============================================
+        const A4_API_URL = 'https://sellambot-despro.up.railway.app';
+        
+        // كشف iOS (آيفون/آيباد)
+        function isIOS() {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        // توليد A4 عبر السيرفر (للآيفون)
+        async function generateA4ViaServer(cardDataUrl, cardWidth, cardHeight, copies, showCutLines) {
+            const response = await fetch(A4_API_URL + '/api/generate-a4-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image: cardDataUrl,
+                    cardWidth: cardWidth,
+                    cardHeight: cardHeight,
+                    copies: copies,
+                    showCutLines: showCutLines,
+                    isTransparent: isTransparent
+                })
+            });
+            
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'فشل إنشاء الملف');
+            }
+            
+            // فتح الملف مباشرة في نافذة جديدة
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            
+            return true;
+        }
+
         // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
         async function downloadPDFViaServer() {
             const overlay = document.getElementById('export-overlay');
