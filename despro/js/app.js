@@ -245,30 +245,6 @@
             // حفظ الحالة الأولية (فارغة) لتمكين التراجع
             saveState();
 
-            // مراقبة إضافة صور جديدة وإضافة crossOrigin تلقائياً (مهم للآيفون)
-            const cardObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === 1) { // Element node
-                            if (node.tagName === 'IMG' && !node.crossOrigin) {
-                                node.crossOrigin = "anonymous";
-                            }
-                            // أيضاً فحص الصور داخل العناصر المضافة
-                            node.querySelectorAll && node.querySelectorAll('img').forEach(img => {
-                                if (!img.crossOrigin) {
-                                    img.crossOrigin = "anonymous";
-                                }
-                            });
-                        }
-                    });
-                });
-            });
-            
-            const cardElement = document.getElementById('card');
-            if (cardElement) {
-                cardObserver.observe(cardElement, { childList: true, subtree: true });
-            }
-
             // إضافة حماية عند تحديث الصفحة أو إغلاقها
             window.addEventListener('beforeunload', (e) => {
                 const card = document.getElementById('card');
@@ -2157,15 +2133,8 @@
                 el.removeAttribute('data-events-bound');
                 setupInteract(el, el.classList.contains('text-layer') ? 'text' : 'box');
             });
-            
-            // إضافة crossOrigin لجميع الصور (مهم جداً للآيفون)
-            document.querySelectorAll('#card img').forEach(img => {
-                if (!img.crossOrigin) {
-                    img.crossOrigin = "anonymous";
-                }
-            });
         }
-            
+
         function createWrapper(type) {
             const div = document.createElement('div');
             div.className = `draggable-el ${type} selected`;
