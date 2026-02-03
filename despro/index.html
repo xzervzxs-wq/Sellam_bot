@@ -42,7 +42,39 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=20260203_v4">
+    <link rel="stylesheet" href="css/style.css?v=20260203_v5">
+    
+    <!-- ========== تعديلات الجوال المباشرة ========== -->
+    <style>
+        @media screen and (max-width: 800px) {
+            /* إزالة الخلفية البيضاء خلف مربع العمل */
+            .preview-area {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 5px !important;
+                border-radius: 0 !important;
+            }
+            
+            /* تصغير مربع العمل */
+            #card-wrapper {
+                transform: scale(0.5) !important;
+                transform-origin: top center !important;
+            }
+            
+            /* تصغير كل الأزرار */
+            button {
+                font-size: 10px !important;
+                padding: 4px 6px !important;
+                min-height: 28px !important;
+            }
+            
+            /* إخفاء المكتبة */
+            #assets-library-content {
+                display: none !important;
+            }
+        }
+    </style>
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
