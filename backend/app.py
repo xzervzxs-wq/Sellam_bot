@@ -336,14 +336,14 @@ def generate_a4_pdf():
         
         # استخراج البيانات
         image_base64 = data.get('image')  # صورة البطاقة بصيغة Base64
-        card_width = data.get('cardWidth', 300)  # عرض البطاقة بالبكسل
-        card_height = data.get('cardHeight', 200)  # ارتفاع البطاقة بالبكسل
-        copies = data.get('copies', 1)  # عدد النسخ المطلوبة
+        copies = data.get('copies', 10)  # عدد النسخ المطلوبة
         show_cut_lines = data.get('showCutLines', False)  # خطوط القص
         is_transparent = data.get('isTransparent', False)  # خلفية شفافة
         
         if not image_base64:
             return jsonify({"success": False, "error": "No image provided"}), 400
+        
+        print(f"[A4 PDF] Received request: copies={copies}, showCutLines={show_cut_lines}")
         
         # تحويل Base64 إلى صورة
         if ',' in image_base64:
@@ -351,6 +351,11 @@ def generate_a4_pdf():
         
         image_data = base64.b64decode(image_base64)
         card_image = Image.open(io.BytesIO(image_data))
+        
+        # استخدام حجم الصورة الفعلي
+        card_width = card_image.width
+        card_height = card_image.height
+        print(f"[A4 PDF] Card image size: {card_width}x{card_height}")
         
         # تحويل إلى RGB إذا كانت RGBA وليست شفافة
         if card_image.mode == 'RGBA' and not is_transparent:
@@ -387,6 +392,8 @@ def generate_a4_pdf():
         max_copies = cols * rows
         actual_copies = min(copies, max_copies)
         
+        print(f"[A4 PDF] Grid: {cols}x{rows} = {max_copies} max, drawing {actual_copies}, orientation={orientation}")
+        
         # إنشاء صورة A4
         if is_transparent:
             a4_image = Image.new('RGBA', (canvas_w, canvas_h), (255, 255, 255, 0))
@@ -399,10 +406,9 @@ def generate_a4_pdf():
         start_x = (canvas_w - total_w) // 2
         start_y = (canvas_h - total_h) // 2
         
-        # تغيير حجم البطاقة إذا لزم الأمر
-        if card_image.size != (card_width, card_height):
-            card_image = card_image.resize((card_width, card_height), Image.Resampling.LANCZOS)
+        print(f"[A4 PDF] Canvas: {canvas_w}x{canvas_h}, start: ({start_x}, {start_y})")
         
+        # لا نغير حجم البطاقة - نستخدمها كما هي
         # رسم البطاقات
         drawn = 0
         for row in range(rows):
