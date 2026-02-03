@@ -1176,3 +1176,169 @@
     background: linear-gradient(180deg, transparent 0%, #94a3b8 10%, #94a3b8 90%, transparent 100%);
     box-shadow: 0 0 2px rgba(148, 163, 184, 0.5);
 }
+
+/* ============================================ */
+/* === تنسيقات الجوال (Mobile Responsive) === */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+    /* شريط الأدوات العلوي - ترتيب الأقسام */
+    .w-full.flex.flex-wrap.items-center.gap-2.mb-2.pb-2.border-b {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+        padding: 8px !important;
+    }
+    
+    /* أقسام الأدوات (الخلفية، أدوات ذكية، تحرير، أعمال) */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 {
+        min-height: auto !important;
+        padding: 6px 8px !important;
+        width: 100% !important;
+    }
+    
+    /* عناوين الأقسام */
+    .text-\[8px\].font-extrabold.tracking-\[0\.2em\] {
+        font-size: 7px !important;
+        letter-spacing: 0.1em !important;
+        margin-bottom: 2px !important;
+    }
+    
+    /* الأزرار داخل الأقسام */
+    .flex.items-center.gap-1\.5 {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+    }
+    
+    /* تصغير الأزرار */
+    .h-7.px-2\.5, .h-9.px-3 {
+        height: 28px !important;
+        padding: 4px 8px !important;
+        font-size: 8px !important;
+    }
+    
+    /* أيقونات الأزرار */
+    .h-7.px-2\.5 i, .h-9.px-3 i {
+        font-size: 10px !important;
+    }
+    
+    /* قسم التراجع والإعادة */
+    .flex.items-center.gap-1.bg-\[\#f8fafc\].px-2.py-1 {
+        grid-column: span 1 !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* جعل الأقسام في سطرين */
+    .w-full.flex.flex-wrap.items-center.gap-2.mb-2.pb-2.border-b {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 5px !important;
+    }
+    
+    /* تصغير إضافي للأزرار */
+    .h-7.px-2\.5, .h-9.px-3 {
+        height: 26px !important;
+        padding: 3px 6px !important;
+        font-size: 7px !important;
+    }
+    
+    /* إخفاء نص الأزرار وإبقاء الأيقونات فقط */
+    .h-9.px-3.rounded-lg span,
+    .h-7.px-2\.5.rounded span:not(.text-\[8px\]) {
+        display: none !important;
+    }
+    
+    /* الأزرار تصير مربعة صغيرة */
+    .h-9.px-3.rounded-lg, .h-7.px-2\.5.rounded {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+    }
+    
+    /* تكبير الأيقونات شوي */
+    .h-9.px-3.rounded-lg i, .h-7.px-2\.5.rounded i {
+        font-size: 12px !important;
+        margin: 0 !important;
+    }
+    
+    /* قسم الخصائص والتصدير - يظهر أولاً */
+    #style-panel {
+        order: -1 !important;
+    }
+    
+    /* تصغير قسم التصدير */
+    #style-panel .grid.grid-cols-2.gap-2 button {
+        padding: 8px 4px !important;
+        font-size: 9px !important;
+    }
+    
+    /* إخفاء عناوين الأقسام في الشاشات الصغيرة جداً */
+    .text-\[8px\].font-extrabold.tracking-\[0\.2em\] {
+        display: none !important;
+    }
+    
+    /* الأقسام تصير بدون حدود وبخلفية شفافة */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 {
+        background: transparent !important;
+        border: none !important;
+        padding: 4px !important;
+        min-height: auto !important;
+    }
+    
+    /* الأزرار داخل الأقسام متراصة */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 > .flex {
+        gap: 3px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* شاشات صغيرة جداً - 3 أزرار بالصف */
+    .w-full.flex.flex-wrap.items-center.gap-2.mb-2.pb-2.border-b {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        padding: 6px !important;
+    }
+    
+    /* كل قسم يأخذ عرض تلقائي */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 {
+        width: auto !important;
+        flex-grow: 0 !important;
+    }
+    
+    /* الأزرار أصغر */
+    .h-9.px-3.rounded-lg, .h-7.px-2\.5.rounded {
+        width: 28px !important;
+        height: 28px !important;
+    }
+    
+    .h-9.px-3.rounded-lg i, .h-7.px-2\.5.rounded i {
+        font-size: 11px !important;
+    }
+    
+    /* قسم التراجع/الإعادة */
+    .flex.items-center.gap-1.bg-\[\#f8fafc\].px-2.py-1 {
+        padding: 4px !important;
+    }
+    
+    .flex.items-center.gap-1.bg-\[\#f8fafc\].px-2.py-1 button {
+        padding: 4px !important;
+    }
+    
+    /* ترتيب قسم التصدير ليظهر أولاً */
+    #style-panel {
+        order: -2 !important;
+    }
+    
+    /* اللوحة الجانبية تصير عمودية مرتبة */
+    .lg\:col-span-4 {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+}
+
