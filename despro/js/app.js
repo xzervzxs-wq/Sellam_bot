@@ -4473,6 +4473,7 @@
 
                 // حفظ الجلسة
                 const sessionObj = {
+                        code: code,
                         name: userData.name,
                         expiryDate: userData.expiryDate,
                         sessionId: sessionId
