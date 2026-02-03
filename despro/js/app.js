@@ -1493,76 +1493,83 @@
         }
 
         // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
+        // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
         async function downloadPDFViaServer() {
             const overlay = document.getElementById('export-overlay');
             const loadingText = document.querySelector('#export-overlay .text-white');
             const card = document.getElementById('card');
             
-            if (!card) {
-                showInfoModal('لم يتم العثور على البطاقة', 'خطأ', '❌');
-                return;
-            }
-            
             overlay.style.display = 'flex';
             if(loadingText) loadingText.innerText = "جاري تجهيز البطاقة...";
             
             try {
-                const savedZoom = currentZoom;
-                setCustomZoom(100);
-                deselect();
-                await waitForImagesLoad(card);
-                // تم حذف convertExternalImagesToBase64 - htmlToImage يتعامل مع الصور
-                
-                if(loadingText) loadingText.innerText = "جاري التقاط البطاقة...";
-                
                 let cardDataUrl;
-                try {
-                    cardDataUrl = await htmlToImage.toPng(card, {
-                        quality: 0.9,
-                        pixelRatio: 1.5,
-                        cacheBust: true,
-                        useCORS: true,
-                        allowTaint: false,
-                        backgroundColor: isTransparent ? null : '#ffffff'
-                    });
-                } catch (e) {
-                    console.error("htmlToImage failed, trying html2canvas...", e);
-                    const canvas = await html2canvas(card, {
-                        scale: 1.5,
-                        useCORS: true,
-                        allowTaint: false,
-                        backgroundColor: isTransparent ? null : '#ffffff'
-                    });
-                    cardDataUrl = canvas.toDataURL('image/png', 0.9);
-                }
                 
-                restoreOriginalImages(card);
-                setCustomZoom(savedZoom);
+                // أولاً: استخدم الصورة المحفوظة مسبقاً إذا موجودة
+                if (currentCardData && currentCardData.length > 100) {
+                    console.log("Using cached currentCardData");
+                    cardDataUrl = currentCardData;
+                } else {
+                    // ثانياً: حاول التقاط صورة جديدة
+                    console.log("Capturing new image...");
+                    const savedZoom = currentZoom;
+                    setCustomZoom(100);
+                    deselect();
+                    await waitForImagesLoad(card);
+                    
+                    if(loadingText) loadingText.innerText = "جاري التقاط البطاقة...";
+                    
+                    try {
+                        // استخدم حجم أصغر للآيفون
+                        cardDataUrl = await htmlToImage.toPng(card, {
+                            quality: 0.8,
+                            pixelRatio: 1,
+                            cacheBust: true,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                    } catch (e) {
+                        console.error("htmlToImage failed:", e);
+                        try {
+                            const canvas = await html2canvas(card, {
+                                scale: 1,
+                                useCORS: true,
+                                allowTaint: true,
+                                backgroundColor: isTransparent ? null : '#ffffff'
+                            });
+                            cardDataUrl = canvas.toDataURL('image/png', 0.8);
+                        } catch (e2) {
+                            console.error("html2canvas also failed:", e2);
+                            throw new Error("فشل التقاط الصورة - جرب الزر الأحمر أولاً");
+                        }
+                    }
+                    setCustomZoom(savedZoom);
+                }
                 
                 if (!cardDataUrl || cardDataUrl.length < 100) {
-                    throw new Error("فشل في التقاط صورة البطاقة");
+                    throw new Error("فشل في الحصول على صورة البطاقة");
                 }
                 
-                const cardRect = card.getBoundingClientRect();
-                const cardW = Math.round(cardRect.width * 1.5);
-                const cardH = Math.round(cardRect.height * 1.5);
+                console.log("Image data length:", cardDataUrl.length);
+                
                 const copies = parseInt(document.getElementById('a4-count')?.value) || 10;
                 const showCutLines = document.getElementById('show-cut-lines')?.checked || false;
                 
                 if(loadingText) loadingText.innerText = "جاري إنشاء ملف PDF في السيرفر...";
                 
-                await generateA4ViaServer(cardDataUrl, cardW, cardH, copies, showCutLines);
+                await generateA4ViaServer(cardDataUrl, 0, 0, copies, showCutLines);
                 
                 overlay.style.display = 'none';
-                showSuccessModal('تم فتح ملف PDF!', 'تم');
+                showSuccessModal('تم تحميل ملف PDF!', 'تم');
                 
             } catch (err) {
                 console.error("Server PDF Error:", err);
                 overlay.style.display = 'none';
-                restoreOriginalImages(document.getElementById('card'));
                 showInfoModal('فشل إنشاء الملف: ' + err.message, 'خطأ', '❌');
             }
         }
+
         async function generateA4Sheet() {
             const loadingText = document.querySelector('#export-overlay .text-white');
             if(loadingText) loadingText.innerText = "جاري معالجة الصور والخطوط...";
