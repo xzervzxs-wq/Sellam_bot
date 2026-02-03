@@ -1500,15 +1500,19 @@
                 
                 if (loadingText) loadingText.innerText = "جاري إنشاء نسخة آمنة...";
                 
-                // 1. إنشاء Clone مخفي
+                // 1. إنشاء Clone (مرئي لـ iOS لكن مغطى)
                 const clone = card.cloneNode(true);
                 clone.style.position = 'fixed';
-                clone.style.left = '-9999px';
+                clone.style.left = '0';
                 clone.style.top = '0';
                 clone.style.transform = 'none';
                 clone.style.width = card.offsetWidth + 'px';
                 clone.style.height = card.offsetHeight + 'px';
+                clone.style.zIndex = '99999';
+                clone.style.background = '#ffffff';
                 clone.id = 'ios-clone';
+                
+                console.log('iOS: Clone created at visible position');
                 
                 // إزالة control boxes
                 clone.querySelectorAll('.control-box, .resize-handle').forEach(el => el.remove());
