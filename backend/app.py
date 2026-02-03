@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import psycopg2
 import os
 import json
@@ -7,7 +9,20 @@ from datetime import datetime
 import uuid
 
 app = Flask(__name__)
-CORS(app)
+
+# تقييد CORS لموقعك فقط
+CORS(app, origins=[
+    "https://xzervzxs-wq.github.io",
+    "http://localhost:*",
+    "http://127.0.0.1:*"
+])
+
+# Rate Limiting - منع الإغراق
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["100 per minute", "1000 per hour"]
+)
 
 # Database connection
 DATABASE_URL = os.environ.get('DATABASE_URL')
