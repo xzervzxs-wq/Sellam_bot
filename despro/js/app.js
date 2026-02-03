@@ -1494,33 +1494,52 @@
 
         // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
         // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
+        // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
         async function downloadPDFViaServer() {
             const overlay = document.getElementById('export-overlay');
             const loadingText = document.querySelector('#export-overlay .text-white');
             const card = document.getElementById('card');
+            const saveImg = document.getElementById('save-img');
             
             overlay.style.display = 'flex';
             if(loadingText) loadingText.innerText = "جاري تجهيز البطاقة...";
             
             try {
-                let cardDataUrl;
+                let cardDataUrl = null;
                 
-                // أولاً: استخدم الصورة المحفوظة مسبقاً إذا موجودة
-                if (currentCardData && currentCardData.length > 100) {
-                    console.log("Using cached currentCardData");
+                // الطريقة 1: استخدم الصورة المعروضة في save-img
+                if (saveImg && saveImg.src && saveImg.src.startsWith('data:')) {
+                    console.log("Method 1: Using save-img src");
+                    cardDataUrl = saveImg.src;
+                }
+                
+                // الطريقة 2: استخدم currentCardData المحفوظة
+                if (!cardDataUrl && currentCardData && currentCardData.length > 100) {
+                    console.log("Method 2: Using currentCardData");
                     cardDataUrl = currentCardData;
-                } else {
-                    // ثانياً: حاول التقاط صورة جديدة
-                    console.log("Capturing new image...");
+                }
+                
+                // الطريقة 3: استخدم cachedCardImage
+                if (!cardDataUrl && cachedCardImage) {
+                    console.log("Method 3: Using cachedCardImage");
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = cachedCardImage.width;
+                    tempCanvas.height = cachedCardImage.height;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.drawImage(cachedCardImage, 0, 0);
+                    cardDataUrl = tempCanvas.toDataURL('image/png');
+                }
+                
+                // الطريقة 4: التقاط صورة جديدة (للأجهزة غير iOS)
+                if (!cardDataUrl && card) {
+                    console.log("Method 4: Capturing new image");
+                    if(loadingText) loadingText.innerText = "جاري التقاط البطاقة...";
+                    
                     const savedZoom = currentZoom;
                     setCustomZoom(100);
                     deselect();
-                    await waitForImagesLoad(card);
-                    
-                    if(loadingText) loadingText.innerText = "جاري التقاط البطاقة...";
                     
                     try {
-                        // استخدم حجم أصغر للآيفون
                         cardDataUrl = await htmlToImage.toPng(card, {
                             quality: 0.8,
                             pixelRatio: 1,
@@ -1531,24 +1550,12 @@
                         });
                     } catch (e) {
                         console.error("htmlToImage failed:", e);
-                        try {
-                            const canvas = await html2canvas(card, {
-                                scale: 1,
-                                useCORS: true,
-                                allowTaint: true,
-                                backgroundColor: isTransparent ? null : '#ffffff'
-                            });
-                            cardDataUrl = canvas.toDataURL('image/png', 0.8);
-                        } catch (e2) {
-                            console.error("html2canvas also failed:", e2);
-                            throw new Error("فشل التقاط الصورة - جرب الزر الأحمر أولاً");
-                        }
                     }
                     setCustomZoom(savedZoom);
                 }
                 
-                if (!cardDataUrl || cardDataUrl.length < 100) {
-                    throw new Error("فشل في الحصول على صورة البطاقة");
+                if (!cardDataUrl || cardDataUrl.length < 500) {
+                    throw new Error("لم يتم العثور على صورة. اضغط 'طباعة A4' أولاً ثم جرب مرة ثانية.");
                 }
                 
                 console.log("Image data length:", cardDataUrl.length);
@@ -1556,9 +1563,9 @@
                 const copies = parseInt(document.getElementById('a4-count')?.value) || 10;
                 const showCutLines = document.getElementById('show-cut-lines')?.checked || false;
                 
-                if(loadingText) loadingText.innerText = "جاري إنشاء ملف PDF في السيرفر...";
+                if(loadingText) loadingText.innerText = "جاري إرسال للسيرفر...";
                 
-                await generateA4ViaServer(cardDataUrl, 500, 300, copies, showCutLines); // السيرفر يستخدم حجم الصورة الفعلي
+                await generateA4ViaServer(cardDataUrl, 500, 300, copies, showCutLines);
                 
                 overlay.style.display = 'none';
                 showSuccessModal('تم تحميل ملف PDF!', 'تم');
@@ -1566,7 +1573,7 @@
             } catch (err) {
                 console.error("Server PDF Error:", err);
                 overlay.style.display = 'none';
-                showInfoModal('فشل إنشاء الملف: ' + err.message, 'خطأ', '❌');
+                showInfoModal(err.message || 'فشل إنشاء الملف', 'خطأ', '❌');
             }
         }
 
