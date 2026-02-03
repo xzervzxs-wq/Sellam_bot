@@ -485,49 +485,81 @@ async function loadProjectsList() {
         displayProjectsInGrid(projects, 'local');
         
     } else {
-        // Load from Server
-        try {
-            const response = await fetch(`${API_URL}/api/projects/${user.id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                mode: 'cors',
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                const projects = result.projects || [];
-                const count = projects.length;
-                
-                const percent = Math.min((count / user.limit) * 100, 100);
-                if (usageBar) {
-                    usageBar.style.width = `${percent}%`;
-                    usageBar.className = `h-full rounded-full transition-all duration-500 ${
-                        percent >= 100 ? 'bg-red-500' : 
-                        percent >= 80 ? 'bg-amber-500' : 
-                        'bg-gradient-to-r from-amber-400 to-amber-600'
-                    }`;
+        // Load from Server with Retry (Railway cold start fix)
+        const maxRetries = 3;
+        let lastError = null;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                // Show loading on retry
+                if (attempt > 1) {
+                    grid.innerHTML = `<div class="text-center py-8 text-amber-500 text-xs">
+                        <i class="fas fa-sync fa-spin mb-2 text-lg"></i><br>
+                        جاري الاتصال... (محاولة ${attempt}/${maxRetries})
+                    </div>`;
                 }
                 
-                if (countDetail) countDetail.textContent = `${count} من ${user.limit}`;
-                displayProjectsInGrid(projects, 'cloud');
-            } else {
-                displayProjectsInGrid([], 'cloud');
-                if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+                
+                const response = await fetch(`${API_URL}/api/projects/${user.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    signal: controller.signal,
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const projects = result.projects || [];
+                    const count = projects.length;
+                    
+                    const percent = Math.min((count / user.limit) * 100, 100);
+                    if (usageBar) {
+                        usageBar.style.width = `${percent}%`;
+                        usageBar.className = `h-full rounded-full transition-all duration-500 ${
+                            percent >= 100 ? 'bg-red-500' : 
+                            percent >= 80 ? 'bg-amber-500' : 
+                            'bg-gradient-to-r from-amber-400 to-amber-600'
+                        }`;
+                    }
+                    
+                    if (countDetail) countDetail.textContent = `${count} من ${user.limit}`;
+                    displayProjectsInGrid(projects, 'cloud');
+                    return; // Success - exit function
+                } else {
+                    displayProjectsInGrid([], 'cloud');
+                    if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
+                    return; // Success - exit function
+                }
+            } catch(e) {
+                lastError = e;
+                console.warn(`Attempt ${attempt} failed:`, e.message);
+                
+                if (attempt < maxRetries) {
+                    await new Promise(r => setTimeout(r, 2000)); // Wait 2 seconds before retry
+                }
             }
-        } catch(e) {
-            console.error('Server connection error:', e);
-            grid.innerHTML = `<div class="text-center py-8 text-red-400 text-xs">
-                <i class="fas fa-exclamation-triangle mb-2"></i><br>
-                تعذر الاتصال بالسيرفر<br>
-                <span class="text-[10px] opacity-60">${e.message}</span>
-            </div>`;
+        }
+        
+        // All retries failed
+        console.error('All server connection attempts failed:', lastError);
+        grid.innerHTML = `<div class="text-center py-8 text-red-400 text-xs">
+            <i class="fas fa-exclamation-triangle mb-2 text-lg"></i><br>
+            تعذر الاتصال بالسيرفر<br>
+            <span class="text-[10px] opacity-60">يرجى المحاولة لاحقاً</span><br>
+            <button onclick="loadProjectsList()" class="mt-3 px-4 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-600">
+                <i class="fas fa-redo ml-1"></i> إعادة المحاولة
+            </button>
+        </div>`;
         }
     }
 }
