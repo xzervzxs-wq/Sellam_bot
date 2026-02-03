@@ -1481,7 +1481,13 @@
             // فتح الملف مباشرة في نافذة جديدة
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            // للآيفون: نستخدم رابط تحميل بدل نافذة جديدة
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'design-A4.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             
             return true;
         }
