@@ -1295,50 +1295,109 @@
     }
 }
 
-@media (max-width: 480px) {
-    /* شاشات صغيرة جداً - 3 أزرار بالصف */
-    .w-full.flex.flex-wrap.items-center.gap-2.mb-2.pb-2.border-b {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 4px !important;
-        padding: 6px !important;
-    }
-    
-    /* كل قسم يأخذ عرض تلقائي */
-    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 {
-        width: auto !important;
-        flex-grow: 0 !important;
-    }
-    
-    /* الأزرار أصغر */
-    .h-9.px-3.rounded-lg, .h-7.px-2\.5.rounded {
-        width: 28px !important;
-        height: 28px !important;
-    }
-    
-    .h-9.px-3.rounded-lg i, .h-7.px-2\.5.rounded i {
-        font-size: 11px !important;
-    }
-    
-    /* قسم التراجع/الإعادة */
-    .flex.items-center.gap-1.bg-\[\#f8fafc\].px-2.py-1 {
-        padding: 4px !important;
-    }
-    
-    .flex.items-center.gap-1.bg-\[\#f8fafc\].px-2.py-1 button {
-        padding: 4px !important;
-    }
-    
-    /* ترتيب قسم التصدير ليظهر أولاً */
-    #style-panel {
-        order: -2 !important;
-    }
-    
-    /* اللوحة الجانبية تصير عمودية مرتبة */
-    .lg\:col-span-4 {
+/* ============================================ */
+/* === تحسينات الجوال (مخصص حسب الطلب) === */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+    /* 1. إعادة ترتيب الهيكل: العمل أولاً، القوائم تحت */
+    .max-w-7xl.grid {
         display: flex !important;
         flex-direction: column !important;
+    }
+
+    /* منطقة العمل (تظهر في الأعلى) */
+    .lg\:col-span-8 {
+        order: 1 !important;
+        width: 100% !important;
+    }
+
+    /* القائمة الجانبية (تظهر في الأسفل) */
+    .lg\:col-span-4 {
+        order: 2 !important;
+        width: 100% !important;
+    }
+
+    /* 2. تصغير منطقة العمل لتناسب الشاشة */
+    #card-wrapper {
+        min-height: 250px !important;
+        max-height: 45vh !important; /* لا تأخذ الشاشة كاملة */
+    }
+
+    /* 3. شريط الأدوات العلوي (تنسيق الأزرار المتراصة) */
+    /* الحاوية الرئيسية للأدوات */
+    .w-full.flex.flex-wrap.items-center.gap-2.mb-2.pb-2 {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        justify-content: space-between !important;
+        padding: 0 !important;
+    }
+
+    /* إزالة حدود وخلفيات مجموعات الأدوات لتوفير المساحة */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        width: auto !important;
+        min-height: auto !important;
+        flex-grow: 1 !important; /* تمدد لتعبئة السطر */
+    }
+
+    /* إخفاء عناوين المجموعات (سمارت، تحرير...) */
+    .text-\[8px\].font-extrabold {
+        display: none !important;
+    }
+
+    /* حاوية الأزرار الداخلية */
+    .flex.flex-col.items-center.gap-1.bg-\[\#000000\]\/5 > div {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        gap: 3px !important;
+        justify-content: center !important;
+    }
+
+    /* تنسيق الأزرار (صغيرة، نص ظاهر، متراصة) */
+    .h-9.px-3.rounded-lg, 
+    .h-7.px-2\.5.rounded {
+        height: 32px !important;
+        padding: 0 4px !important;
+        font-size: 10px !important;
+        flex-grow: 1 !important; /* الزر يتمدد ليغطي الفراغ */
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background-color: white !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        margin: 0 !important;
+        min-width: fit-content !important;
+    }
+
+    /* إجبار ظهور النصوص والأيقونات */
+    .h-9.px-3.rounded-lg span,
+    .h-7.px-2\.5.rounded span, /* قد يكون النص داخل span أو مباشر */
+    .h-9.px-3.rounded-lg i,
+    .h-7.px-2\.5.rounded i {
+        display: inline-block !important;
+    }
+
+    .h-9.px-3.rounded-lg i,
+    .h-7.px-2\.5.rounded i {
+        margin-left: 4px !important;
+        font-size: 11px !important;
+    }
+
+    /* إخفاء مكتبة العناصر افتراضياً في الجوال (يفتحها المستخدم) */
+    #assets-library-content {
+        display: none;
+    }
+    /* عند الضغط على الزر، الجافاسكربت سيضيف ستايل display:flex، لذا هذا يعمل كحالة ابتدائية */
+
+    /* 4. قسم التصدير (تحت العمل) */
+    #style-panel {
+        margin-bottom: 20px !important;
     }
 }
 
