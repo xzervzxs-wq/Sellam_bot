@@ -1178,6 +1178,23 @@
 }
 
 /* ============================================ */
+/* === تنسيق الجوال فقط === */
+/* ============================================ */
+@media (max-width: 768px) {
+    /* تصغير مربع العمل ليناسب الشاشة */
+    #card-wrapper {
+        max-height: 45vh !important;
+        min-height: 200px !important;
+        overflow: auto !important;
+    }
+    
+    #card {
+        transform: scale(0.5) !important;
+        transform-origin: top center !important;
+    }
+}
+
+/* ============================================ */
 /* === تنسيقات الجوال (Mobile Responsive) === */
 /* ============================================ */
 
