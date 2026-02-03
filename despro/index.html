@@ -418,6 +418,11 @@
                             <i class="fas fa-file-pdf text-red-400"></i> PDF
                          </button>
                      </div>
+                     
+                     <!-- زر خاص للآيفون - يستخدم السيرفر -->
+                     <button id="server-pdf-btn" onclick="downloadPDFViaServer()" style="display: none;" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/10 active:scale-[0.98] shadow-lg">
+                        <i class="fab fa-apple text-lg"></i> <span>تحميل PDF (للآيفون)</span>
+                     </button>
 
                      <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-xs font-bold py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-600 hover:border-slate-500">
                          إغلاق النافذة
@@ -1617,7 +1622,7 @@
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
     </style>
 
-    <script src="js/app.js?v=20260203_fixed_a4_grid"></script>
+    <script src="js/app.js?v=20260203_ios_server_fix"></script>
     <script src="js/social_media.js?v=20260202_99"></script>
     <script src="js/discount_maker.js?v=20260202_99"></script>
     <script src="js/my_projects.js?v=20260203_v2_FORCE"></script>

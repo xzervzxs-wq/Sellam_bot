@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -7,6 +7,12 @@ import os
 import json
 from datetime import datetime
 import uuid
+import base64
+import io
+from PIL import Image
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
 
 app = Flask(__name__)
 
@@ -307,6 +313,197 @@ def delete_project(project_id):
             return jsonify({"success": True, "message": "تم حذف المشروع"})
         else:
             return jsonify({"success": False, "error": "Project not found"}), 404
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ============================================
+# === Server-Side A4 PDF Generation (iOS Fix) ===
+# ============================================
+
+@app.route('/api/generate-a4-pdf', methods=['POST'])
+@limiter.limit("10 per minute")  # حد 10 طلبات في الدقيقة
+def generate_a4_pdf():
+    """
+    Generate A4 PDF with repeated card images - Server Side Rendering
+    This bypasses iOS Safari canvas memory limits
+    """
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"success": False, "error": "No data provided"}), 400
+        
+        # استخراج البيانات
+        image_base64 = data.get('image')  # صورة البطاقة بصيغة Base64
+        card_width = data.get('cardWidth', 300)  # عرض البطاقة بالبكسل
+        card_height = data.get('cardHeight', 200)  # ارتفاع البطاقة بالبكسل
+        copies = data.get('copies', 1)  # عدد النسخ المطلوبة
+        show_cut_lines = data.get('showCutLines', False)  # خطوط القص
+        is_transparent = data.get('isTransparent', False)  # خلفية شفافة
+        
+        if not image_base64:
+            return jsonify({"success": False, "error": "No image provided"}), 400
+        
+        # تحويل Base64 إلى صورة
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[1]
+        
+        image_data = base64.b64decode(image_base64)
+        card_image = Image.open(io.BytesIO(image_data))
+        
+        # تحويل إلى RGB إذا كانت RGBA وليست شفافة
+        if card_image.mode == 'RGBA' and not is_transparent:
+            background = Image.new('RGB', card_image.size, (255, 255, 255))
+            background.paste(card_image, mask=card_image.split()[3])
+            card_image = background
+        elif card_image.mode != 'RGB' and card_image.mode != 'RGBA':
+            card_image = card_image.convert('RGB')
+        
+        # أبعاد A4 بدقة 300 DPI
+        A4_WIDTH_PX = 2480
+        A4_HEIGHT_PX = 3508
+        GAP = 40  # الفراغ بين البطاقات
+        
+        # حساب التوزيع الأمثل (portrait vs landscape)
+        portrait_cols = (A4_WIDTH_PX + GAP) // (card_width + GAP)
+        portrait_rows = (A4_HEIGHT_PX + GAP) // (card_height + GAP)
+        portrait_count = portrait_cols * portrait_rows
+        
+        landscape_cols = (A4_HEIGHT_PX + GAP) // (card_width + GAP)
+        landscape_rows = (A4_WIDTH_PX + GAP) // (card_height + GAP)
+        landscape_count = landscape_cols * landscape_rows
+        
+        # اختيار الاتجاه الأفضل
+        if landscape_count > portrait_count:
+            canvas_w, canvas_h = A4_HEIGHT_PX, A4_WIDTH_PX
+            cols, rows = landscape_cols, landscape_rows
+            orientation = 'landscape'
+        else:
+            canvas_w, canvas_h = A4_WIDTH_PX, A4_HEIGHT_PX
+            cols, rows = portrait_cols, portrait_rows
+            orientation = 'portrait'
+        
+        max_copies = cols * rows
+        actual_copies = min(copies, max_copies)
+        
+        # إنشاء صورة A4
+        if is_transparent:
+            a4_image = Image.new('RGBA', (canvas_w, canvas_h), (255, 255, 255, 0))
+        else:
+            a4_image = Image.new('RGB', (canvas_w, canvas_h), (255, 255, 255))
+        
+        # حساب نقطة البداية للتوسيط
+        total_w = cols * card_width + (cols - 1) * GAP
+        total_h = rows * card_height + (rows - 1) * GAP
+        start_x = (canvas_w - total_w) // 2
+        start_y = (canvas_h - total_h) // 2
+        
+        # تغيير حجم البطاقة إذا لزم الأمر
+        if card_image.size != (card_width, card_height):
+            card_image = card_image.resize((card_width, card_height), Image.Resampling.LANCZOS)
+        
+        # رسم البطاقات
+        drawn = 0
+        for row in range(rows):
+            for col in range(cols):
+                if drawn >= actual_copies:
+                    break
+                
+                x = start_x + col * (card_width + GAP)
+                y = start_y + row * (card_height + GAP)
+                
+                if card_image.mode == 'RGBA':
+                    a4_image.paste(card_image, (x, y), card_image)
+                else:
+                    a4_image.paste(card_image, (x, y))
+                
+                drawn += 1
+            if drawn >= actual_copies:
+                break
+        
+        # إنشاء PDF
+        pdf_buffer = io.BytesIO()
+        
+        # تحديد اتجاه الصفحة
+        if orientation == 'landscape':
+            page_size = (A4[1], A4[0])  # A4 مقلوبة
+        else:
+            page_size = A4
+        
+        c = canvas.Canvas(pdf_buffer, pagesize=page_size)
+        
+        # تحويل الصورة لـ buffer
+        img_buffer = io.BytesIO()
+        if is_transparent:
+            a4_image.save(img_buffer, format='PNG')
+        else:
+            a4_image.save(img_buffer, format='JPEG', quality=95)
+        img_buffer.seek(0)
+        
+        # رسم الصورة على PDF
+        img_reader = ImageReader(img_buffer)
+        c.drawImage(img_reader, 0, 0, width=page_size[0], height=page_size[1])
+        
+        c.save()
+        pdf_buffer.seek(0)
+        
+        # إرجاع الملف
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=f'design-A4-{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+        )
+        
+    except Exception as e:
+        print(f"A4 PDF Generation Error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/a4-info', methods=['POST'])
+def get_a4_info():
+    """
+    Get A4 layout information without generating PDF
+    Returns: max copies, orientation, etc.
+    """
+    try:
+        data = request.get_json()
+        
+        card_width = data.get('cardWidth', 300)
+        card_height = data.get('cardHeight', 200)
+        
+        A4_WIDTH_PX = 2480
+        A4_HEIGHT_PX = 3508
+        GAP = 40
+        
+        # Portrait
+        portrait_cols = (A4_WIDTH_PX + GAP) // (card_width + GAP)
+        portrait_rows = (A4_HEIGHT_PX + GAP) // (card_height + GAP)
+        portrait_count = portrait_cols * portrait_rows
+        
+        # Landscape
+        landscape_cols = (A4_HEIGHT_PX + GAP) // (card_width + GAP)
+        landscape_rows = (A4_WIDTH_PX + GAP) // (card_height + GAP)
+        landscape_count = landscape_cols * landscape_rows
+        
+        if landscape_count > portrait_count:
+            return jsonify({
+                "success": True,
+                "maxCopies": landscape_count,
+                "cols": landscape_cols,
+                "rows": landscape_rows,
+                "orientation": "landscape"
+            })
+        else:
+            return jsonify({
+                "success": True,
+                "maxCopies": portrait_count,
+                "cols": portrait_cols,
+                "rows": portrait_rows,
+                "orientation": "portrait"
+            })
+            
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
