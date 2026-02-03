@@ -1558,7 +1558,7 @@
                 
                 if(loadingText) loadingText.innerText = "جاري إنشاء ملف PDF في السيرفر...";
                 
-                await generateA4ViaServer(cardDataUrl, 0, 0, copies, showCutLines);
+                await generateA4ViaServer(cardDataUrl, 500, 300, copies, showCutLines); // السيرفر يستخدم حجم الصورة الفعلي
                 
                 overlay.style.display = 'none';
                 showSuccessModal('تم تحميل ملف PDF!', 'تم');
