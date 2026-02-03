@@ -1446,6 +1446,77 @@
             }
         }
 
+        // === دالة تحميل PDF عبر السيرفر (للآيفون) ===
+        async function downloadPDFViaServer() {
+            const overlay = document.getElementById('export-overlay');
+            const loadingText = document.querySelector('#export-overlay .text-white');
+            const card = document.getElementById('card');
+            
+            if (!card) {
+                showInfoModal('لم يتم العثور على البطاقة', 'خطأ', '❌');
+                return;
+            }
+            
+            overlay.style.display = 'flex';
+            if(loadingText) loadingText.innerText = "جاري تجهيز البطاقة...";
+            
+            try {
+                const savedZoom = currentZoom;
+                setCustomZoom(100);
+                deselect();
+                await waitForImagesLoad(card);
+                await convertExternalImagesToBase64(card);
+                
+                if(loadingText) loadingText.innerText = "جاري التقاط البطاقة...";
+                
+                let cardDataUrl;
+                try {
+                    cardDataUrl = await htmlToImage.toPng(card, {
+                        quality: 0.9,
+                        pixelRatio: 1.5,
+                        cacheBust: true,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: isTransparent ? null : '#ffffff'
+                    });
+                } catch (e) {
+                    console.error("htmlToImage failed, trying html2canvas...", e);
+                    const canvas = await html2canvas(card, {
+                        scale: 1.5,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: isTransparent ? null : '#ffffff'
+                    });
+                    cardDataUrl = canvas.toDataURL('image/png', 0.9);
+                }
+                
+                restoreOriginalImages(card);
+                setCustomZoom(savedZoom);
+                
+                if (!cardDataUrl || cardDataUrl.length < 100) {
+                    throw new Error("فشل في التقاط صورة البطاقة");
+                }
+                
+                const cardRect = card.getBoundingClientRect();
+                const cardW = Math.round(cardRect.width * 1.5);
+                const cardH = Math.round(cardRect.height * 1.5);
+                const copies = parseInt(document.getElementById('a4-count')?.value) || 10;
+                const showCutLines = document.getElementById('show-cut-lines')?.checked || false;
+                
+                if(loadingText) loadingText.innerText = "جاري إنشاء ملف PDF في السيرفر...";
+                
+                await generateA4ViaServer(cardDataUrl, cardW, cardH, copies, showCutLines);
+                
+                overlay.style.display = 'none';
+                showSuccessModal('تم فتح ملف PDF!', 'تم');
+                
+            } catch (err) {
+                console.error("Server PDF Error:", err);
+                overlay.style.display = 'none';
+                restoreOriginalImages(document.getElementById('card'));
+                showInfoModal('فشل إنشاء الملف: ' + err.message, 'خطأ', '❌');
+            }
+        }
         async function generateA4Sheet() {
             const loadingText = document.querySelector('#export-overlay .text-white');
             if(loadingText) loadingText.innerText = "جاري معالجة الصور والخطوط...";
