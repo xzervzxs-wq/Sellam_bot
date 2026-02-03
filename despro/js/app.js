@@ -6,6 +6,34 @@
         // ==========================================
 
         // ==========================================
+        //  iOS Detection & Image Proxy
+        // ==========================================
+        const IMAGE_PROXY_URL = "https://sellambot-despro.up.railway.app/api/image-proxy";
+        
+        function isIOS() {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+        
+        async function fetchImageViaProxy(imageUrl) {
+            try {
+                const response = await fetch(IMAGE_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: imageUrl })
+                });
+                if (!response.ok) throw new Error('Proxy failed');
+                const data = await response.json();
+                return data.dataUrl;
+            } catch (e) {
+                console.warn('Proxy fetch failed for:', imageUrl, e);
+                return null;
+            }
+        }
+        // ==========================================
+
+
+        // ==========================================
         //  نظام الوضع الليلي والنهاري (Dark Mode)
         // ==========================================
         const DARK_MODE_COLORS = {
@@ -1923,6 +1951,8 @@
 
         async function convertAllImagesToDataURL(element) {
             const images = Array.from(element.querySelectorAll('img'));
+            const useProxy = isIOS(); // iOS needs Proxy
+            console.log('Converting ' + images.length + ' images, useProxy: ' + useProxy);
 
             // استخدام تسلسل للمعالجة لتخفيف الضغط على المعالج في الآيفون
             // بدلاً من معالجة كل الصور دفعة واحدة
@@ -1939,9 +1969,22 @@
                     img.dataset.originalSrcset = img.srcset;
                 }
 
+                // تخطي الصور التي هي بالفعل Base64
+                const bestSrc = img.currentSrc || img.src;
+                if (bestSrc.startsWith('data:')) continue;
+                
                 try {
-                    // 1. تحضير الصورة في الذاكرة (Canvas)
-                    const dataUrl = await new Promise((resolve, reject) => {
+                    let dataUrl = null;
+                    
+                    // iOS: استخدام Server Proxy
+                    if (useProxy) {
+                        console.log('iOS: Fetching via proxy...');
+                        dataUrl = await fetchImageViaProxy(bestSrc);
+                    }
+                    
+                    // Fallback: Canvas method (Desktop أو إذا فشل Proxy)
+                    if (!dataUrl) {
+                    dataUrl = await new Promise((resolve, reject) => {
                         const tempImg = new Image();
                         tempImg.crossOrigin = "Anonymous";
 
@@ -1985,6 +2028,7 @@
                             tempImg.src = bestSrc + (bestSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
                         }
                     });
+                    } // end if (!dataUrl)
 
                     // 2. الخطوة الأهم: تعيين المصدر والانتظار حتى "يفهم" المتصفح الصورة الجديدة
                     img.src = dataUrl;
