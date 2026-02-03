@@ -1555,46 +1555,43 @@
                 // 4. التقاط البطاقة مباشرة
                 let cardDataUrl = null;
                 
-                // htmlToImage أفضل مع الخطوط العربية (Cairo)
                 try {
-                    console.log('iOS: Trying htmlToImage first (better for Arabic fonts)...');
-                    if (typeof htmlToImage !== 'undefined') {
-                        cardDataUrl = await htmlToImage.toPng(card, {
-                            pixelRatio: 2,
-                            cacheBust: true,
+                    console.log('iOS: Trying html2canvas...');
+                    if (typeof html2canvas !== 'undefined') {
+                        const canvas = await html2canvas(card, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
-                            style: {
-                                'font-family': 'inherit'
-                            },
-                            filter: (node) => {
-                                return !node.classList || !node.classList.contains('control-box');
-                            }
+                            logging: true,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight,
+                            // تحسينات للنص العربي
+                            letterRendering: true,
+                            foreignObjectRendering: false,
+                            removeContainer: true
                         });
-                        console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
+                        cardDataUrl = canvas.toDataURL('image/png');
+                        console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
                     }
                 } catch (e) {
-                    console.error('iOS: htmlToImage failed', e);
+                    console.error('iOS: html2canvas failed', e);
                 }
                 
-                // Fallback to html2canvas
+                // Fallback to htmlToImage
                 if (!cardDataUrl || cardDataUrl.length < 1000) {
                     try {
-                        console.log('iOS: Trying html2canvas as fallback...');
-                        if (typeof html2canvas !== 'undefined') {
-                            const canvas = await html2canvas(card, {
-                                scale: 2,
-                                useCORS: true,
-                                allowTaint: true,
-                                backgroundColor: isTransparent ? null : '#ffffff',
-                                logging: false,
-                                width: card.offsetWidth,
-                                height: card.offsetHeight
+                        console.log('iOS: Trying htmlToImage...');
+                        if (typeof htmlToImage !== 'undefined') {
+                            cardDataUrl = await htmlToImage.toPng(card, {
+                                pixelRatio: 2,
+                                cacheBust: true,
+                                backgroundColor: isTransparent ? null : '#ffffff'
                             });
-                            cardDataUrl = canvas.toDataURL('image/png');
-                            console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
+                            console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
                         }
                     } catch (e2) {
-                        console.error('iOS: html2canvas failed', e2);
+                        console.error('iOS: htmlToImage failed', e2);
                     }
                 }
                 
