@@ -1519,6 +1519,9 @@
                 const images = clone.querySelectorAll('img');
                 let processedCount = 0;
                 
+                console.log('iOS: Found ' + images.length + ' images in clone');
+                if (loadingText) loadingText.innerText = "وجدنا " + images.length + " صورة...";
+                
                 for (const img of images) {
                     const src = img.src || img.currentSrc;
                     if (!src || src.startsWith('data:')) continue;
@@ -1544,6 +1547,8 @@
                 if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
                 
                 // 4. التقاط الـ Clone
+                console.log('iOS: Starting capture...');
+                if (loadingText) loadingText.innerText = "جاري التقاط الصورة الآن...";
                 let cardDataUrl = null;
                 
                 // إزالة transparent pattern
@@ -1577,9 +1582,14 @@
                 // 5. التنظيف
                 document.body.removeChild(clone);
                 
+                console.log('iOS: Capture result length = ' + (cardDataUrl ? cardDataUrl.length : 0));
+                
                 if (!cardDataUrl || cardDataUrl.length < 100) {
-                    throw new Error('فشل في التقاط الصورة');
+                    throw new Error('فشل في التقاط الصورة - الناتج فارغ');
                 }
+                
+                console.log('iOS: Capture SUCCESS! Image size: ' + cardDataUrl.length);
+                if (loadingText) loadingText.innerText = "تم التقاط الصورة بنجاح!";
                 
                 // 6. إعداد A4
                 currentCardData = cardDataUrl;
