@@ -422,6 +422,42 @@ def generate_a4_pdf():
             if drawn >= actual_copies:
                 break
         
+        # رسم خطوط القص إذا مطلوبة
+        if show_cut_lines:
+            from PIL import ImageDraw
+            draw = ImageDraw.Draw(a4_image)
+            cut_color = (200, 200, 200)  # رمادي فاتح
+            dash_length = 15
+            
+            drawn_lines = 0
+            for row in range(rows):
+                for col in range(cols):
+                    if drawn_lines >= actual_copies:
+                        break
+                    
+                    x = start_x + col * (card_width + GAP)
+                    y = start_y + row * (card_height + GAP)
+                    
+                    # خط علوي
+                    for dx in range(0, card_width, dash_length * 2):
+                        draw.line([(x + dx, y), (x + min(dx + dash_length, card_width), y)], fill=cut_color, width=1)
+                    
+                    # خط سفلي
+                    for dx in range(0, card_width, dash_length * 2):
+                        draw.line([(x + dx, y + card_height), (x + min(dx + dash_length, card_width), y + card_height)], fill=cut_color, width=1)
+                    
+                    # خط يسار
+                    for dy in range(0, card_height, dash_length * 2):
+                        draw.line([(x, y + dy), (x, y + min(dy + dash_length, card_height))], fill=cut_color, width=1)
+                    
+                    # خط يمين
+                    for dy in range(0, card_height, dash_length * 2):
+                        draw.line([(x + card_width, y + dy), (x + card_width, y + min(dy + dash_length, card_height))], fill=cut_color, width=1)
+                    
+                    drawn_lines += 1
+                if drawn_lines >= actual_copies:
+                    break
+        
         # إنشاء PDF
         pdf_buffer = io.BytesIO()
         
