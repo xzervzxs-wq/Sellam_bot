@@ -1476,7 +1476,7 @@
 
 
         // ==========================================
-        //  iOS A4 Export (Safe Clone Strategy)
+        //  iOS A4 Export (Direct Capture Method)
         // ==========================================
         async function generateA4ForIOS() {
             const overlay = document.getElementById('export-overlay');
@@ -1488,114 +1488,118 @@
             overlay.style.display = 'flex';
             if (loadingText) loadingText.innerText = "جاري التحضير للآيفون...";
             
-            // حفظ الزوم
             const savedZoom = window.currentZoom || 100;
             
             try {
                 deselect();
                 setCustomZoom(100);
                 
-                // انتظار الخطوط
                 if (document.fonts) await document.fonts.ready;
                 
-                if (loadingText) loadingText.innerText = "جاري إنشاء نسخة آمنة...";
+                // 1. تحويل الصور في البطاقة الأصلية
+                if (loadingText) loadingText.innerText = "جاري تحويل الصور...";
                 
-                // 1. إنشاء Clone (مرئي لـ iOS لكن مغطى)
-                const clone = card.cloneNode(true);
-                clone.style.position = 'fixed';
-                clone.style.left = '0';
-                clone.style.top = '0';
-                clone.style.transform = 'none';
-                clone.style.width = card.offsetWidth + 'px';
-                clone.style.height = card.offsetHeight + 'px';
-                clone.style.zIndex = '99999';
-                clone.style.background = '#ffffff';
-                clone.id = 'ios-clone';
+                const images = card.querySelectorAll('img');
+                console.log('iOS: Found ' + images.length + ' images');
                 
-                console.log('iOS: Clone created at visible position');
-                
-                // إزالة control boxes
-                clone.querySelectorAll('.control-box, .resize-handle').forEach(el => el.remove());
-                
-                document.body.appendChild(clone);
-                
-                // 2. جلب الصور عبر الـ Proxy
-                const images = clone.querySelectorAll('img');
-                let processedCount = 0;
-                
-                console.log('iOS: Found ' + images.length + ' images in clone');
-                if (loadingText) loadingText.innerText = "وجدنا " + images.length + " صورة...";
-                
-                for (const img of images) {
+                for (let i = 0; i < images.length; i++) {
+                    const img = images[i];
                     const src = img.src || img.currentSrc;
+                    
                     if (!src || src.startsWith('data:')) continue;
                     
-                    processedCount++;
-                    if (loadingText) loadingText.innerText = "جاري تحميل صورة " + processedCount + "...";
+                    if (loadingText) loadingText.innerText = "جاري تحميل صورة " + (i+1) + " من " + images.length + "...";
                     
+                    // حفظ الأصلي
+                    if (!img.dataset.originalSrc) img.dataset.originalSrc = src;
+                    
+                    // جلب عبر Proxy
                     try {
+                        console.log('iOS: Fetching image ' + (i+1) + ' via proxy...');
                         const dataUrl = await fetchImageViaProxy(src);
                         if (dataUrl) {
                             img.src = dataUrl;
                             img.removeAttribute('srcset');
-                            if (img.decode) await img.decode().catch(() => {});
+                            console.log('iOS: Image ' + (i+1) + ' converted!');
+                        } else {
+                            console.warn('iOS: Proxy returned null for image ' + (i+1));
                         }
                     } catch (e) {
-                        console.warn('Failed to proxy image:', src);
+                        console.error('iOS: Failed to fetch image ' + (i+1), e);
                     }
                 }
                 
-                // 3. انتظار الاستقرار
-                await new Promise(r => setTimeout(r, 500));
+                // 2. انتظار
+                await new Promise(r => setTimeout(r, 1000));
                 
                 if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
                 
-                // 4. التقاط الـ Clone
-                console.log('iOS: Starting capture...');
-                if (loadingText) loadingText.innerText = "جاري التقاط الصورة الآن...";
+                // 3. إزالة نمط الشطرنج مؤقتاً
+                const hadPattern = card.classList.contains('transparent-pattern');
+                if (hadPattern) {
+                    card.classList.remove('transparent-pattern');
+                    card.style.backgroundImage = 'none';
+                }
+                
+                // 4. التقاط البطاقة مباشرة
                 let cardDataUrl = null;
                 
-                // إزالة transparent pattern
-                clone.classList.remove('transparent-pattern');
-                clone.style.backgroundImage = 'none';
-                
                 try {
-                    if (typeof htmlToImage !== 'undefined') {
-                        cardDataUrl = await htmlToImage.toPng(clone, {
-                            pixelRatio: 2,
-                            cacheBust: true,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight,
-                            backgroundColor: isTransparent ? null : '#ffffff'
-                        });
-                    }
-                } catch (e1) {
-                    console.warn('htmlToImage failed:', e1);
-                    // Fallback to html2canvas
+                    console.log('iOS: Trying html2canvas...');
                     if (typeof html2canvas !== 'undefined') {
-                        const canvas = await html2canvas(clone, {
+                        const canvas = await html2canvas(card, {
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff'
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: true,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
+                        console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
+                    }
+                } catch (e) {
+                    console.error('iOS: html2canvas failed', e);
+                }
+                
+                // Fallback to htmlToImage
+                if (!cardDataUrl || cardDataUrl.length < 1000) {
+                    try {
+                        console.log('iOS: Trying htmlToImage...');
+                        if (typeof htmlToImage !== 'undefined') {
+                            cardDataUrl = await htmlToImage.toPng(card, {
+                                pixelRatio: 2,
+                                cacheBust: true,
+                                backgroundColor: isTransparent ? null : '#ffffff'
+                            });
+                            console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
+                        }
+                    } catch (e2) {
+                        console.error('iOS: htmlToImage failed', e2);
                     }
                 }
                 
-                // 5. التنظيف
-                document.body.removeChild(clone);
-                
-                console.log('iOS: Capture result length = ' + (cardDataUrl ? cardDataUrl.length : 0));
-                
-                if (!cardDataUrl || cardDataUrl.length < 100) {
-                    throw new Error('فشل في التقاط الصورة - الناتج فارغ');
+                // 5. استعادة نمط الشطرنج
+                if (hadPattern) {
+                    card.classList.add('transparent-pattern');
                 }
                 
-                console.log('iOS: Capture SUCCESS! Image size: ' + cardDataUrl.length);
-                if (loadingText) loadingText.innerText = "تم التقاط الصورة بنجاح!";
+                // 6. استعادة الصور الأصلية
+                images.forEach(img => {
+                    if (img.dataset.originalSrc) {
+                        img.src = img.dataset.originalSrc;
+                        delete img.dataset.originalSrc;
+                    }
+                });
                 
-                // 6. إعداد A4
+                console.log('iOS: Final result length: ' + (cardDataUrl ? cardDataUrl.length : 0));
+                
+                if (!cardDataUrl || cardDataUrl.length < 1000) {
+                    throw new Error('فشل التقاط الصورة');
+                }
+                
+                // 7. إعداد A4
                 currentCardData = cardDataUrl;
                 
                 const A4_WIDTH = 2480;
@@ -1650,15 +1654,10 @@
                 console.error("iOS A4 Error:", err);
                 overlay.style.display = 'none';
                 setCustomZoom(savedZoom);
-                
-                // محاولة تنظيف الـ clone إذا موجود
-                const existingClone = document.getElementById('ios-clone');
-                if (existingClone) document.body.removeChild(existingClone);
-                
-                showInfoModal('حدث خطأ: ' + err.message, 'خطأ', '⚠️');
+                showInfoModal('خطأ: ' + err.message, 'خطأ', '⚠️');
             }
         }
-        // ==========================================
+                // ==========================================
 
         async function generateA4Sheet() {
             // === iOS: استخدام طريقة خاصة ===
