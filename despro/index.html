@@ -809,94 +809,90 @@
                     <i class="fas fa-moon theme-moon"></i>
                 </button>
                 
-                <!-- الصف الأول: الأدوات مرتبة في أقسام -->
-                <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
+                <!-- الصف الأول: الأدوات مرتبة في نظام مرن متمدد واحترافي -->
+                <div class="w-full flex flex-wrap items-stretch gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
                     
-                    <!-- أزرار التراجع والإعادة -->
-                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
-                        <button onclick="undoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
-                        <div class="w-px h-4 bg-[#e2e8f0] dark:bg-slate-600"></div>
-                        <button onclick="redoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
-                    </div>
-                    
-                    <!-- قسم الخلفية - BACKGROUND -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#8b5cf6]/20 min-h-[52px]">
-                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-purple-600 w-full text-center">
-                            BACKGROUND
-                        </span>
-                        <div class="flex items-center gap-1.5">
-                            <label class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] cursor-pointer" title="لون الخلفية">
-                                <i class="fas fa-fill-drip"></i> الخلفية
-                                <div id="bg-color-preview" class="relative w-5 h-5 rounded-full border border-slate-300 shadow-sm" style="background-color: #ffffff;">
-                                    <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                                </div>
-                            </label>
-                            <button onclick="toggleTransparentMode()" id="btn-transparent" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تفعيل/إلغاء الشفافية">
-                                <i class="fas fa-chess-board"></i> شفاف
+                    <!-- HISTORY (Undo/Redo) -->
+                    <div class="flex-1 min-w-[80px] bg-white border border-slate-200 rounded-xl p-1.5 flex flex-col items-center justify-center gap-1 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300 group">
+                         <span class="text-[9px] font-bold text-slate-400 tracking-wider group-hover:text-indigo-400 transition-colors">HISTORY</span>
+                         <div class="flex items-center gap-1 w-full justify-center">
+                            <button onclick="undoAction()" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-white hover:bg-[#6366f1] transition-all bg-slate-50" title="تراجع">
+                                <i class="fas fa-undo text-xs"></i>
                             </button>
-                        </div>
-                    </div>
-                    
-                    <!-- قسم الأدوات الذكية - SMART TOOLS -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
-                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
-                            SMART TOOLS
-                        </span>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="toggleLassoMode()" id="btn-lasso" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="قص ذكي بالتحديد">
-                                <i class="fas fa-cut"></i> قص
+                            <button onclick="redoAction()" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-white hover:bg-[#6366f1] transition-all bg-slate-50" title="إعادة">
+                                <i class="fas fa-redo text-xs"></i>
                             </button>
-                            <button onclick="toggleSmartEraserMode()" id="btn-smart-eraser-top" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="ممحاة ذكية بالتحديد">
-                                <i class="fas fa-eraser"></i> ممحاة
-                            </button>
-                            <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="h-7 px-2.5 rounded text-[9px] font-bold bg-white text-[#1e293b] hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0]" title="تلوين ذكي بالتحديد">
-                                <i class="fas fa-fill-drip"></i> تلوين
-                            </button>
-                            <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="w-6 h-6 rounded cursor-pointer border border-[#e2e8f0]" title="اختر لون التعبئة">
-                        </div>
-                    </div>
-                    
-                    <!-- قسم أدوات التحرير - EDIT TOOLS -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
-                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
-                            EDIT TOOLS
-                        </span>
-                        <div class="flex items-center gap-1.5">
-                           <button onclick="toggleGradient()" id="btn-grad" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
-                                <i class="fas fa-adjust text-sm"></i> التدرج
-                            </button>
-                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
-                                <i class="fas fa-eraser text-sm"></i> الممحاة
-                            </button>
-                            <button onclick="toggleCropMode()" id="btn-crop" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="قص الصورة">
-                                <i class="fas fa-crop text-sm"></i> Crop
-                            </button>
-                            <button onclick="toggleHandMode()" id="btn-hand" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="أداة اليد">
-                                <i class="fa-regular fa-hand text-sm"></i> تحريك
-                            </button>
-                        </div>
+                         </div>
                     </div>
 
-                    <!-- قسم أدوات الأعمال - BUSINESS TOOLS -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
-                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
-                            BUSINESS TOOLS
-                        </span>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="openQRModal()" id="btn-qr" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="توليد QR Code">
-                                <i class="fas fa-qrcode text-sm"></i> باركود
-                            </button>
-                            <button onclick="openSocialModal()" id="btn-social" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
-                                <div class="flex gap-1">
-                                    <i class="fab fa-instagram text-xs"></i>
-                                    <i class="fab fa-tiktok text-xs"></i>
+                    <!-- BACKGROUND -->
+                    <div class="flex-1 min-w-[140px] bg-white border border-slate-200 rounded-xl p-1.5 flex flex-col items-center justify-center gap-1 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300 group">
+                         <span class="text-[9px] font-bold text-slate-400 tracking-wider group-hover:text-indigo-400 transition-colors">BACKGROUND</span>
+                         <div class="flex items-center gap-2 w-full justify-center px-1">
+                            <label class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer border border-transparent hover:shadow-md text-[10px] font-bold" title="لون الخلفية">
+                                <i class="fas fa-fill-drip"></i> Color
+                                <div id="bg-color-preview" class="w-3 h-3 rounded-full border border-white/50 shadow-sm relative overflow-hidden" style="background-color: #ffffff;">
+                                    <input type="color" id="main-bg-color" oninput="setCardBackgroundColor(this.value)" value="#ffffff" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                                 </div>
-                                Social
+                            </label>
+                            <button onclick="toggleTransparentMode()" id="btn-transparent" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-2 border border-transparent hover:shadow-md text-[10px] font-bold" title="شفاف">
+                                <i class="fas fa-chess-board"></i> Trans
                             </button>
-                            <button onclick="openDiscountModal()" id="btn-discount" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="صانع بطاقات الخصومات">
-                                <i class="fas fa-tags text-sm"></i> خصومات
+                         </div>
+                    </div>
+
+                    <!-- SMART TOOLS -->
+                    <div class="flex-[1.5] min-w-[180px] bg-white border border-slate-200 rounded-xl p-1.5 flex flex-col items-center justify-center gap-1 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300 group">
+                         <span class="text-[9px] font-bold text-slate-400 tracking-wider group-hover:text-indigo-400 transition-colors">SMART TOOLS</span>
+                         <div class="flex items-center gap-1 w-full justify-center px-1">
+                            <button onclick="toggleLassoMode()" id="btn-lasso" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold" title="قص">
+                                <i class="fas fa-cut"></i> Cut
                             </button>
-                        </div>
+                            <button onclick="toggleSmartEraserMode()" id="btn-smart-eraser-top" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold" title="ممحاة">
+                                <i class="fas fa-eraser"></i> Erase
+                            </button>
+                            <div class="flex-1 relative h-8 group/fill">
+                                <button onclick="toggleSmartFillMode()" id="btn-smart-fill" class="w-full h-full rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold" title="تلوين">
+                                    <i class="fas fa-fill"></i> Fill
+                                </button>
+                                <input type="color" id="smart-fill-picker" value="#6366f1" onchange="setSmartFillColor(this.value)" class="absolute bottom-0 right-0 w-3 h-3 rounded opacity-0 cursor-pointer">
+                            </div>
+                         </div>
+                    </div>
+
+                    <!-- EDIT TOOLS -->
+                    <div class="flex-[1.5] min-w-[200px] bg-white border border-slate-200 rounded-xl p-1.5 flex flex-col items-center justify-center gap-1 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300 group">
+                         <span class="text-[9px] font-bold text-slate-400 tracking-wider group-hover:text-indigo-400 transition-colors">EDIT TOOLS</span>
+                         <div class="flex items-center gap-1 w-full justify-center px-1">
+                            <button onclick="toggleGradient()" id="btn-grad" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center text-[10px] font-bold" title="تدرج">
+                                <i class="fas fa-adjust"></i>
+                            </button>
+                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center text-[10px] font-bold" title="ممحاة عادية">
+                                <i class="fas fa-eraser"></i>
+                            </button>
+                            <button onclick="toggleCropMode()" id="btn-crop" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center text-[10px] font-bold" title="Crop">
+                                <i class="fas fa-crop"></i>
+                            </button>
+                            <button onclick="toggleHandMode()" id="btn-hand" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center text-[10px] font-bold" title="تحريك">
+                                <i class="fa-regular fa-hand"></i>
+                            </button>
+                         </div>
+                    </div>
+
+                    <!-- BUSINESS TOOLS -->
+                    <div class="flex-[1.5] min-w-[160px] bg-white border border-slate-200 rounded-xl p-1.5 flex flex-col items-center justify-center gap-1 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300 group">
+                         <span class="text-[9px] font-bold text-slate-400 tracking-wider group-hover:text-indigo-400 transition-colors">BUSINESS</span>
+                         <div class="flex items-center gap-1 w-full justify-center px-1">
+                            <button onclick="openQRModal()" id="btn-qr" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold" title="QR Code">
+                                <i class="fas fa-qrcode"></i> QR
+                            </button>
+                            <button onclick="openSocialModal()" id="btn-social" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold" title="Social">
+                                <i class="fab fa-instagram"></i> Soc
+                            </button>
+                            <button onclick="openDiscountModal()" id="btn-discount" class="flex-1 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#6366f1] hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold" title="Discounts">
+                                <i class="fas fa-tags"></i> Tag
+                            </button>
+                         </div>
                     </div>
                     
                     <!-- Universal File Input: Supports All Formats -->
