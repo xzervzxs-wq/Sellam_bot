@@ -1474,7 +1474,185 @@
             }
         }
 
+
+        // ==========================================
+        //  iOS A4 Export (Safe Clone Strategy)
+        // ==========================================
+        async function generateA4ForIOS() {
+            const overlay = document.getElementById('export-overlay');
+            const loadingText = document.querySelector('#export-overlay .text-white');
+            const card = document.getElementById('card');
+            
+            if (!card || !overlay) return;
+            
+            overlay.style.display = 'flex';
+            if (loadingText) loadingText.innerText = "جاري التحضير للآيفون...";
+            
+            // حفظ الزوم
+            const savedZoom = window.currentZoom || 100;
+            
+            try {
+                deselect();
+                setCustomZoom(100);
+                
+                // انتظار الخطوط
+                if (document.fonts) await document.fonts.ready;
+                
+                if (loadingText) loadingText.innerText = "جاري إنشاء نسخة آمنة...";
+                
+                // 1. إنشاء Clone مخفي
+                const clone = card.cloneNode(true);
+                clone.style.position = 'fixed';
+                clone.style.left = '-9999px';
+                clone.style.top = '0';
+                clone.style.transform = 'none';
+                clone.style.width = card.offsetWidth + 'px';
+                clone.style.height = card.offsetHeight + 'px';
+                clone.id = 'ios-clone';
+                
+                // إزالة control boxes
+                clone.querySelectorAll('.control-box, .resize-handle').forEach(el => el.remove());
+                
+                document.body.appendChild(clone);
+                
+                // 2. جلب الصور عبر الـ Proxy
+                const images = clone.querySelectorAll('img');
+                let processedCount = 0;
+                
+                for (const img of images) {
+                    const src = img.src || img.currentSrc;
+                    if (!src || src.startsWith('data:')) continue;
+                    
+                    processedCount++;
+                    if (loadingText) loadingText.innerText = "جاري تحميل صورة " + processedCount + "...";
+                    
+                    try {
+                        const dataUrl = await fetchImageViaProxy(src);
+                        if (dataUrl) {
+                            img.src = dataUrl;
+                            img.removeAttribute('srcset');
+                            if (img.decode) await img.decode().catch(() => {});
+                        }
+                    } catch (e) {
+                        console.warn('Failed to proxy image:', src);
+                    }
+                }
+                
+                // 3. انتظار الاستقرار
+                await new Promise(r => setTimeout(r, 500));
+                
+                if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
+                
+                // 4. التقاط الـ Clone
+                let cardDataUrl = null;
+                
+                // إزالة transparent pattern
+                clone.classList.remove('transparent-pattern');
+                clone.style.backgroundImage = 'none';
+                
+                try {
+                    if (typeof htmlToImage !== 'undefined') {
+                        cardDataUrl = await htmlToImage.toPng(clone, {
+                            pixelRatio: 2,
+                            cacheBust: true,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                    }
+                } catch (e1) {
+                    console.warn('htmlToImage failed:', e1);
+                    // Fallback to html2canvas
+                    if (typeof html2canvas !== 'undefined') {
+                        const canvas = await html2canvas(clone, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        cardDataUrl = canvas.toDataURL('image/png');
+                    }
+                }
+                
+                // 5. التنظيف
+                document.body.removeChild(clone);
+                
+                if (!cardDataUrl || cardDataUrl.length < 100) {
+                    throw new Error('فشل في التقاط الصورة');
+                }
+                
+                // 6. إعداد A4
+                currentCardData = cardDataUrl;
+                
+                const A4_WIDTH = 2480;
+                const A4_HEIGHT = 3508;
+                const cardW = card.offsetWidth;
+                const cardH = card.offsetHeight;
+                const GAP = 40;
+
+                const portraitCols = Math.floor((A4_WIDTH + GAP) / (cardW + GAP));
+                const portraitRows = Math.floor((A4_HEIGHT + GAP) / (cardH + GAP));
+                const portraitCount = portraitCols * portraitRows;
+
+                const landscapeCols = Math.floor((A4_HEIGHT + GAP) / (cardW + GAP));
+                const landscapeRows = Math.floor((A4_WIDTH + GAP) / (cardH + GAP));
+                const landscapeCount = landscapeCols * landscapeRows;
+
+                let finalCanvasW, finalCanvasH, cols, rows;
+
+                if (landscapeCount > portraitCount) {
+                    finalCanvasW = A4_HEIGHT; finalCanvasH = A4_WIDTH;
+                    cols = landscapeCols; rows = landscapeRows;
+                } else {
+                    finalCanvasW = A4_WIDTH; finalCanvasH = A4_HEIGHT;
+                    cols = portraitCols; rows = portraitRows;
+                }
+
+                currentA4Layout = {
+                    canvasW: finalCanvasW, canvasH: finalCanvasH,
+                    cols: cols, rows: rows,
+                    cardW: cardW, cardH: cardH,
+                    gap: GAP,
+                    maxCopies: cols * rows
+                };
+
+                const img = new Image();
+                img.onload = () => {
+                    cachedCardImage = img;
+                    document.getElementById('a4-count').max = currentA4Layout.maxCopies;
+                    document.getElementById('a4-count').value = currentA4Layout.maxCopies;
+                    document.getElementById('a4-max-text').innerText = "(من أصل " + currentA4Layout.maxCopies + ")";
+
+                    renderA4Preview(currentA4Layout.maxCopies);
+
+                    overlay.style.display = 'none';
+                    document.getElementById('save-modal').style.display = 'flex';
+                    setCustomZoom(savedZoom);
+                };
+                img.onerror = () => { throw new Error("فشل تحميل الصورة"); };
+                img.src = cardDataUrl;
+                
+            } catch (err) {
+                console.error("iOS A4 Error:", err);
+                overlay.style.display = 'none';
+                setCustomZoom(savedZoom);
+                
+                // محاولة تنظيف الـ clone إذا موجود
+                const existingClone = document.getElementById('ios-clone');
+                if (existingClone) document.body.removeChild(existingClone);
+                
+                showInfoModal('حدث خطأ: ' + err.message, 'خطأ', '⚠️');
+            }
+        }
+        // ==========================================
+
         async function generateA4Sheet() {
+            // === iOS: استخدام طريقة خاصة ===
+            if (isIOS()) {
+                console.log("iOS detected - using special method");
+                return generateA4ForIOS();
+            }
+            
             const loadingText = document.querySelector('#export-overlay .text-white');
             if(loadingText) loadingText.innerText = "جاري معالجة الصور والخطوط...";
 
