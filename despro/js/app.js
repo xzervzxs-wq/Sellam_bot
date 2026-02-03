@@ -1576,9 +1576,9 @@
                             logging: true,
                             width: card.offsetWidth,
                             height: card.offsetHeight,
-                            // تحسينات للنص العربي
+                            // تحسينات للنص العربي - foreignObject يجعل الحروف متصلة
                             letterRendering: true,
-                            foreignObjectRendering: false,
+                            foreignObjectRendering: true,
                             removeContainer: true
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
