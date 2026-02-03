@@ -1494,7 +1494,18 @@
                 deselect();
                 setCustomZoom(100);
                 
-                if (document.fonts) await document.fonts.ready;
+                // انتظار تحميل الخطوط العربية
+                if (document.fonts) {
+                    await document.fonts.ready;
+                    // انتظار إضافي للتأكد من تحميل الخطوط العربية
+                    await new Promise(r => setTimeout(r, 500));
+                }
+                
+                // إجبار إعادة رسم النص (مهم للخطوط العربية)
+                card.style.display = 'none';
+                card.offsetHeight; // Force reflow
+                card.style.display = '';
+                await new Promise(r => setTimeout(r, 300));
                 
                 // 1. تحويل الصور في البطاقة الأصلية
                 if (loadingText) loadingText.innerText = "جاري تحويل الصور...";
@@ -1554,7 +1565,11 @@
                             backgroundColor: isTransparent ? null : '#ffffff',
                             logging: true,
                             width: card.offsetWidth,
-                            height: card.offsetHeight
+                            height: card.offsetHeight,
+                            // تحسينات للنص العربي
+                            letterRendering: true,
+                            foreignObjectRendering: false,
+                            removeContainer: true
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
                         console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
