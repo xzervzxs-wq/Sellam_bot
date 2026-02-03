@@ -1465,7 +1465,7 @@
                 setCustomZoom(100);
                 deselect();
                 await waitForImagesLoad(card);
-                await convertExternalImagesToBase64(card);
+                // تم حذف convertExternalImagesToBase64 - htmlToImage يتعامل مع الصور
                 
                 if(loadingText) loadingText.innerText = "جاري التقاط البطاقة...";
                 
