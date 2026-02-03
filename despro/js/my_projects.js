@@ -511,15 +511,7 @@ async function loadProjectsList() {
                 if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
             }
         } catch(e) {
-            grid.innerHTML = `<div class="text-center py-8 text-red-400 text-xs">
-                <i class="fas fa-exclamation-triangle mb-2"></i><br>
-                تعذر الاتصال بالسيرفر<br>
-                <button onclick="loadProjectsList()" class="mt-3 px-4 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-600">
-                    <i class="fas fa-redo ml-1"></i> إعادة المحاولة
-                </button>
-            </div>`;
-        }
-    }
+            grid.innerHTML = '<div class="text-center py-8 text-red-400 text-xs">تعذر الاتصال بالسيرفر</div>';
         }
     }
 }
