@@ -10,12 +10,8 @@ import uuid
 
 app = Flask(__name__)
 
-# تقييد CORS لموقعك فقط
-CORS(app, origins=[
-    "https://xzervzxs-wq.github.io",
-    "http://localhost:*",
-    "http://127.0.0.1:*"
-])
+# CORS - السماح لجميع الطلبات (مؤقتاً للتشخيص)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Rate Limiting - منع الإغراق
 limiter = Limiter(
