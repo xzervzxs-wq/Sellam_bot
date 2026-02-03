@@ -487,7 +487,18 @@ async function loadProjectsList() {
     } else {
         // Load from Server
         try {
-            const response = await fetch(`${API_URL}/api/projects/${user.id}`);
+            const response = await fetch(`${API_URL}/api/projects/${user.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                mode: 'cors',
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            
             const result = await response.json();
             
             if (result.success) {
@@ -511,7 +522,12 @@ async function loadProjectsList() {
                 if (countDetail) countDetail.textContent = `0 من ${user.limit}`;
             }
         } catch(e) {
-            grid.innerHTML = '<div class="text-center py-8 text-red-400 text-xs">تعذر الاتصال بالسيرفر</div>';
+            console.error('Server connection error:', e);
+            grid.innerHTML = `<div class="text-center py-8 text-red-400 text-xs">
+                <i class="fas fa-exclamation-triangle mb-2"></i><br>
+                تعذر الاتصال بالسيرفر<br>
+                <span class="text-[10px] opacity-60">${e.message}</span>
+            </div>`;
         }
     }
 }
