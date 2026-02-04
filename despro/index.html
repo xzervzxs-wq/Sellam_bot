@@ -1953,7 +1953,7 @@
     <!-- ============================================ -->
     <!-- === Mobile Bottom Bar - ستايل Canva === -->
     <!-- ============================================ -->
-    <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] lg:hidden transition-transform duration-300" style="transform: translateY(0);">
+    <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] md:hidden transition-transform duration-300" style="transform: translateY(0);">
         <!-- Handle للسحب (للأسفل) -->
         <div id="mobile-bar-handle" class="flex justify-center py-1.5 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
             <div class="w-8 h-1 bg-slate-500 rounded-full"></div>
@@ -2349,8 +2349,8 @@
             animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
-        /* تحسينات وضع الجوال */
-        @media (max-width: 1023px) {
+        /* تحسينات وضع الجوال فقط (شاشات أقل من 768px) */
+        @media (max-width: 767px) {
             body {
                 padding-bottom: 120px !important;
             }
