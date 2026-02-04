@@ -2071,106 +2071,83 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- === Mobile Text Edit Modal (تحرير نص موجود) === -->
+    <!-- === Mobile Text Edit Popup (تحرير نص - popup صغير) === -->
     <!-- ============================================ -->
     <div id="mobile-text-edit-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileTextEditModal()">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[80vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
-            <!-- Header -->
-            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fas fa-pen-to-square text-indigo-600"></i> تنسيق النص
-                </h3>
-                <button onclick="closeMobileTextEditModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-times text-sm"></i>
+        <div class="absolute inset-0 bg-black/30"></div>
+        <!-- Popup Container - يتموضع حسب النص -->
+        <div id="mobile-text-popup" class="absolute bg-white rounded-2xl shadow-2xl w-[280px] overflow-hidden border border-slate-200" style="top:50%;left:50%;transform:translate(-50%,-50%);" onclick="event.stopPropagation()">
+            <!-- Header صغير -->
+            <div class="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-indigo-500 to-purple-500">
+                <span class="text-white text-xs font-bold"><i class="fas fa-pen-to-square ml-1"></i> تنسيق</span>
+                <button onclick="closeMobileTextEditModal()" class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-white text-[10px]">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <!-- Content -->
-            <div class="p-4 space-y-3 overflow-y-auto max-h-[60vh]">
+            
+            <!-- Content مدمج -->
+            <div class="p-2 space-y-2">
                 
-                <!-- نوع الخط -->
-                <div class="p-3 bg-slate-50 rounded-xl">
-                    <label class="text-xs font-bold text-slate-600 mb-2 block">
-                        <i class="fas fa-font text-indigo-500 ml-1"></i> نوع الخط
-                    </label>
-                    <select id="mobile-font-select" onchange="applyMobileFontChange(this.value)" class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm bg-white focus:border-indigo-500 outline-none font-bold text-right" dir="rtl">
-                        <option value="Almarai" style="font-family: Almarai">المراعي</option>
-                        <option value="Cairo" style="font-family: Cairo">كايرو</option>
-                        <option value="Tajawal" style="font-family: Tajawal">تجول</option>
-                        <option value="Changa" style="font-family: Changa">شنجا</option>
-                        <option value="El Messiri" style="font-family: El Messiri">المسيري</option>
-                        <option value="Amiri" style="font-family: Amiri">أميري</option>
-                        <option value="Lateef" style="font-family: Lateef">لطيف</option>
-                        <option value="Scheherazade New" style="font-family: Scheherazade New">شهرزاد</option>
-                        <option value="Noto Naskh Arabic" style="font-family: Noto Naskh Arabic">نوتو نسخ</option>
-                        <option value="Noto Kufi Arabic" style="font-family: Noto Kufi Arabic">نوتو كوفي</option>
-                        <option value="Reem Kufi" style="font-family: Reem Kufi">ريم كوفي</option>
-                        <option value="Harmattan" style="font-family: Harmattan">هرمتان</option>
-                        <option value="Aref Ruqaa" style="font-family: Aref Ruqaa">عارف رقعة</option>
-                        <option value="Lemonada" style="font-family: Lemonada">ليموناضة</option>
-                        <option value="Mada" style="font-family: Mada">مدى</option>
-                        <option value="Mirza" style="font-family: Mirza">ميرزا</option>
-                        <option value="Rakkas" style="font-family: Rakkas">رقاص</option>
-                        <option value="Vibes" style="font-family: Vibes">فايبس</option>
+                <!-- صف 1: الخط + الحجم -->
+                <div class="flex gap-2">
+                    <select id="mobile-font-select" onchange="applyMobileFontChange(this.value)" class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-white outline-none font-bold text-right" dir="rtl">
+                        <option value="Almarai">المراعي</option>
+                        <option value="Cairo">كايرو</option>
+                        <option value="Tajawal">تجول</option>
+                        <option value="Changa">شنجا</option>
+                        <option value="El Messiri">المسيري</option>
+                        <option value="Amiri">أميري</option>
+                        <option value="Noto Naskh Arabic">نوتو نسخ</option>
+                        <option value="Aref Ruqaa">عارف رقعة</option>
                     </select>
+                    <input type="number" id="mobile-edit-text-size" value="35" min="10" max="200" onchange="applyMobileSizeChange(this.value)" class="w-16 p-2 border border-slate-200 rounded-lg text-center text-xs font-bold">
                 </div>
                 
-                <!-- صف اللون والحجم -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="p-3 bg-slate-50 rounded-xl">
-                        <label class="text-xs font-bold text-slate-600 mb-2 block">
-                            <i class="fas fa-palette text-pink-500 ml-1"></i> اللون
-                        </label>
-                        <input type="color" id="mobile-edit-text-color" value="#1e293b" onchange="applyMobileColorChange(this.value)" class="w-full h-12 rounded-lg cursor-pointer border-2 border-slate-200">
+                <!-- صف 2: اللون + المحاذاة -->
+                <div class="flex gap-2 items-center">
+                    <!-- اللون -->
+                    <div class="relative">
+                        <input type="color" id="mobile-edit-text-color" value="#1e293b" onchange="applyMobileColorChange(this.value)" class="w-8 h-8 rounded-full cursor-pointer border-2 border-slate-200" style="-webkit-appearance:none;padding:0;">
                     </div>
-                    <div class="p-3 bg-slate-50 rounded-xl">
-                        <label class="text-xs font-bold text-slate-600 mb-2 block">
-                            <i class="fas fa-text-height text-emerald-500 ml-1"></i> الحجم
-                        </label>
-                        <input type="number" id="mobile-edit-text-size" value="35" min="10" max="200" onchange="applyMobileSizeChange(this.value)" class="w-full h-12 p-2 border-2 border-slate-200 rounded-lg text-center text-base font-bold">
-                    </div>
-                </div>
-                
-                <!-- شريط الحجم السريع -->
-                <div class="p-3 bg-slate-50 rounded-xl">
-                    <div class="flex justify-between items-center gap-2">
-                        <button onclick="applyMobileSizeChange(20)" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 active:scale-95 transition-all">صغير</button>
-                        <button onclick="applyMobileSizeChange(35)" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 active:scale-95 transition-all">متوسط</button>
-                        <button onclick="applyMobileSizeChange(50)" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 active:scale-95 transition-all">كبير</button>
-                        <button onclick="applyMobileSizeChange(80)" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 active:scale-95 transition-all">ضخم</button>
-                    </div>
-                </div>
-                
-                <!-- أزرار التنسيق السريع (عريض، مائل، تحته خط) -->
-                <div class="p-3 bg-slate-50 rounded-xl">
-                    <label class="text-xs font-bold text-slate-600 mb-2 block">
-                        <i class="fas fa-bold text-blue-500 ml-1"></i> التنسيق
-                    </label>
-                    <div class="flex gap-2">
-                        <button onclick="toggleMobileBold()" class="flex-1 py-3 bg-white border border-slate-200 rounded-lg font-bold text-slate-700 active:scale-95 transition-all text-base">
-                            <i class="fas fa-bold"></i>
+                    <!-- المحاذاة -->
+                    <div class="flex-1 flex gap-1 bg-slate-100 rounded-lg p-1">
+                        <button onclick="applyMobileAlign('right')" class="flex-1 py-1.5 rounded text-slate-600 hover:bg-white active:scale-95 transition-all text-sm">
+                            <i class="fas fa-align-right"></i>
                         </button>
-                        <button onclick="toggleMobileItalic()" class="flex-1 py-3 bg-white border border-slate-200 rounded-lg font-bold text-slate-700 active:scale-95 transition-all text-base">
-                            <i class="fas fa-italic"></i>
+                        <button onclick="applyMobileAlign('center')" class="flex-1 py-1.5 rounded text-slate-600 hover:bg-white active:scale-95 transition-all text-sm">
+                            <i class="fas fa-align-center"></i>
                         </button>
-                        <button onclick="toggleMobileUnderline()" class="flex-1 py-3 bg-white border border-slate-200 rounded-lg font-bold text-slate-700 active:scale-95 transition-all text-base">
-                            <i class="fas fa-underline"></i>
-                        </button>
-                        <button onclick="toggleMobileStrike()" class="flex-1 py-3 bg-white border border-slate-200 rounded-lg font-bold text-slate-700 active:scale-95 transition-all text-base">
-                            <i class="fas fa-strikethrough"></i>
+                        <button onclick="applyMobileAlign('left')" class="flex-1 py-1.5 rounded text-slate-600 hover:bg-white active:scale-95 transition-all text-sm">
+                            <i class="fas fa-align-left"></i>
                         </button>
                     </div>
                 </div>
                 
-                <!-- زر التدرج -->
-                <button onclick="toggleMobileGradient();" class="w-full py-3.5 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg">
-                    <i class="fas fa-fill-drip"></i> تدرج لوني
-                </button>
+                <!-- صف 3: التنسيق (عريض، مائل، تحته خط، يتوسطه) -->
+                <div class="flex gap-1 bg-slate-100 rounded-lg p-1">
+                    <button onclick="toggleMobileBold()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm font-bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button onclick="toggleMobileItalic()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button onclick="toggleMobileUnderline()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <button onclick="toggleMobileStrike()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm">
+                        <i class="fas fa-strikethrough"></i>
+                    </button>
+                </div>
                 
-                <!-- زر تغيير المحتوى -->
-                <button onclick="openMobileEditContentModal()" class="w-full py-3 bg-indigo-100 text-indigo-700 rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
-                    <i class="fas fa-edit"></i> تعديل محتوى النص
-                </button>
+                <!-- صف 4: التدرج + تعديل النص -->
+                <div class="flex gap-2">
+                    <button onclick="toggleMobileGradient();" class="flex-1 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+                        <i class="fas fa-fill-drip"></i> التدرج
+                    </button>
+                    <button onclick="openMobileEditContentModal()" class="flex-1 py-2 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+                        <i class="fas fa-edit"></i> تعديل
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2676,8 +2653,48 @@
                     if (sizeInput) {
                         sizeInput.value = parseInt(selectedEl.style.fontSize) || 35;
                     }
+                    
+                    // موضع الـ popup بجانب النص
+                    positionTextPopup(selectedEl);
                 }
             }
+        }
+        
+        // تموضع الـ popup بجانب النص المحدد
+        function positionTextPopup(textEl) {
+            const popup = document.getElementById('mobile-text-popup');
+            if (!popup || !textEl) return;
+            
+            const card = document.getElementById('card');
+            const cardRect = card.getBoundingClientRect();
+            const textRect = textEl.getBoundingClientRect();
+            const popupWidth = 280;
+            const popupHeight = popup.offsetHeight || 200;
+            
+            // حساب الموضع الأفضل
+            let top = textRect.top - 10;
+            let left = textRect.right + 10;
+            
+            // إذا خرج من الشاشة من اليمين
+            if (left + popupWidth > window.innerWidth) {
+                left = textRect.left - popupWidth - 10;
+            }
+            // إذا خرج من اليسار
+            if (left < 10) {
+                left = (window.innerWidth - popupWidth) / 2;
+            }
+            // إذا خرج من الأعلى
+            if (top < 10) {
+                top = textRect.bottom + 10;
+            }
+            // إذا خرج من الأسفل
+            if (top + popupHeight > window.innerHeight - 80) {
+                top = window.innerHeight - popupHeight - 90;
+            }
+            
+            popup.style.top = top + 'px';
+            popup.style.left = left + 'px';
+            popup.style.transform = 'none';
         }
         
         function closeMobileTextEditModal() {
@@ -2712,6 +2729,14 @@
                 selectedEl.style.backgroundImage = 'none';
                 selectedEl.style.webkitBackgroundClip = 'unset';
                 selectedEl.style.webkitTextFillColor = color;
+            }
+        }
+        
+        // دالة المحاذاة
+        function applyMobileAlign(align) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
+                selectedEl.style.textAlign = align;
             }
         }
         
