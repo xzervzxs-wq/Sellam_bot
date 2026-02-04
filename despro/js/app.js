@@ -7031,7 +7031,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 10000;
+                z-index: 999999;
                 backdrop-filter: blur(8px);
                 transition: all 0.3s;
             `;
