@@ -42,7 +42,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=FAV_LAST_1770239618">
+    <link rel="stylesheet" href="css/style.css?v=FAV_INSIDE_1770239896">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -941,6 +941,21 @@
                     
                     <!-- Universal File Input: Supports All Formats -->
                     <input type="file" onchange="handleUniversalFile(this)" class="hidden" accept=".tif,.tiff,.pdf,.psd,.ai,.eps,.svg,.png,.jpg,.jpeg,.webp,.bmp">
+                    
+                    <!-- الألوان المفضلة - داخل الصف الأول -->
+                    <div id="fav-colors-row" class="w-full bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mt-2">
+                        <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
+                        <div id="fav-colors-container" class="flex items-center gap-1.5 flex-wrap">
+                            <!-- سيتم تعبئتها بواسطة JS -->
+                        </div>
+                        <div class="w-px h-4 bg-[#e2e8f0] mx-1"></div>
+                        <div class="relative" title="إضافة لون جديد">
+                            <label for="add-fav-color" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
+                                <i class="fas fa-plus text-[8px]"></i>
+                            </label>
+                            <input type="color" id="add-fav-color" class="absolute opacity-0 w-0 h-0" onchange="addFavoriteColor(this.value)">
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- لوحات التحكم -->
@@ -1021,21 +1036,6 @@
                         <button onclick="toggleGradient()" class="px-2 py-0.5 bg-red-500 text-white rounded text-[9px] font-bold hover:bg-red-600 transition" title="إزالة التدرج">
                             <i class="fas fa-times"></i> إلغاء
                         </button>
-                    </div>
-                </div>
-
-                <!-- الألوان المفضلة - مستقلة تماماً -->
-                <div id="fav-colors-row" class="w-full basis-full bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2" style="order: 999; flex-basis: 100% !important;">
-                    <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
-                    <div id="fav-colors-container" class="flex items-center gap-1.5 flex-wrap">
-                        <!-- سيتم تعبئتها بواسطة JS -->
-                    </div>
-                    <div class="w-px h-4 bg-[#e2e8f0] mx-1"></div>
-                    <div class="relative" title="إضافة لون جديد">
-                        <label for="add-fav-color" class="w-5 h-5 rounded-full bg-white border border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:border-[#6366f1] text-gray-400 hover:text-[#6366f1] transition shadow-sm">
-                            <i class="fas fa-plus text-[8px]"></i>
-                        </label>
-                        <input type="color" id="add-fav-color" class="absolute opacity-0 w-0 h-0" onchange="addFavoriteColor(this.value)">
                     </div>
                 </div>
 
