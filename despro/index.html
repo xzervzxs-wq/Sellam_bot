@@ -2398,10 +2398,6 @@
             #background-section {
                 display: none !important;
             }
-            /* إخفاء قسم إضافة النصوص في الجوال */
-            #add-text-container {
-                display: none !important;
-            }
             /* إخفاء أدوات الإضافة في الجوال (صورة، جديد، إطار، شكل) */
             #insert-tools-container {
                 display: none !important;
@@ -2667,12 +2663,33 @@
             const mobileGrid = document.getElementById('mobile-assets-grid');
             const index = mobileSelect.value;
             
-            if (index === '' || !window.officialAssetsLibrary || !window.officialAssetsLibrary[index]) {
+            // الحصول على المكتبة من window أو من الشبكة الأصلية
+            let library = window.officialAssetsLibrary;
+            
+            // إذا لم تكن موجودة، حاول تحميلها
+            if (!library || library.length === 0) {
+                mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div>';
+                
+                // تحميل المكتبة مباشرة
+                fetch('./Official.json?t=' + Date.now())
+                    .then(r => r.json())
+                    .then(data => {
+                        window.officialAssetsLibrary = data;
+                        // إعادة التحميل
+                        loadMobileAssetsCategory();
+                    })
+                    .catch(e => {
+                        mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-red-400 py-8">خطأ في التحميل</div>';
+                    });
+                return;
+            }
+            
+            if (index === '' || !library[index]) {
                 mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
                 return;
             }
             
-            const category = window.officialAssetsLibrary[index];
+            const category = library[index];
             mobileGrid.innerHTML = '';
             
             if (!category.items || category.items.length === 0) {
