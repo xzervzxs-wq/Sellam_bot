@@ -2043,6 +2043,54 @@
     </div>
 
     <!-- ============================================ -->
+    <!-- === Mobile Text Edit Modal (ثابتة) === -->
+    <!-- ============================================ -->
+    <div id="mobile-text-edit-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileTextEditModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[70vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fas fa-font text-indigo-600"></i> تحرير النص
+                </h3>
+                <button onclick="closeMobileTextEditModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-4 space-y-3">
+                <!-- مربع النص -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 mb-1 block">النص:</label>
+                    <textarea id="mobile-edit-text-area" class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm resize-none focus:border-indigo-500 outline-none" rows="2" dir="rtl" placeholder="اكتب النص هنا..."></textarea>
+                </div>
+                
+                <!-- صف اللون والحجم -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl">
+                        <label class="text-[10px] font-bold text-slate-500 mb-1 block">اللون</label>
+                        <input type="color" id="mobile-edit-text-color" value="#1e293b" class="w-full h-10 rounded-lg cursor-pointer border border-slate-300">
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl">
+                        <label class="text-[10px] font-bold text-slate-500 mb-1 block">الحجم</label>
+                        <input type="number" id="mobile-edit-text-size" value="35" min="10" max="200" class="w-full p-2 border border-slate-300 rounded-lg text-center text-sm font-bold">
+                    </div>
+                </div>
+                
+                <!-- زر التدرج -->
+                <button onclick="toggleMobileGradient(); closeMobileTextEditModal();" class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i class="fas fa-fill-drip"></i> تدرج النص
+                </button>
+                
+                <!-- زر التطبيق -->
+                <button onclick="applyMobileTextChanges()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i class="fas fa-check"></i> تطبيق التغييرات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
     <!-- === Mobile Business Tools Modal === -->
     <!-- ============================================ -->
     <div id="mobile-business-tools-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileBusinessToolsModal()">
@@ -2234,6 +2282,10 @@
             body {
                 padding-bottom: 120px !important;
             }
+            /* إخفاء النافذة العائمة في الجوال */
+            #floating-context-toolbar {
+                display: none !important;
+            }
             /* إخفاء قسم التصدير في الجوال */
             #style-panel {
                 display: none !important;
@@ -2343,24 +2395,88 @@
             const selectedEl = window.activeEl || window.selectedElement;
             
             if (selectedEl && selectedEl.classList.contains('text-layer')) {
-                // نص محدد - إظهار النافذة العائمة
-                const floatToolbar = document.getElementById('floating-context-toolbar');
-                if (floatToolbar) {
-                    floatToolbar.classList.remove('hidden');
-                    // إظهار أدوات النص
-                    document.getElementById('gradient-toggle-row').classList.remove('hidden');
-                    document.getElementById('gradient-toggle-row').classList.add('flex');
-                    document.getElementById('top-font-controls').classList.remove('hidden');
-                    document.getElementById('top-font-controls').classList.add('flex');
-                }
+                // نص محدد - فتح نافذة تحرير النص
+                openMobileTextEditModal();
             } else {
                 // لا يوجد نص محدد - إضافة نص جديد
                 if (typeof addTextElement === 'function') {
                     addTextElement('نص جديد');
                 } else if (typeof window.addTextElement === 'function') {
                     window.addTextElement('نص جديد');
+                } else {
+                    alert('جاري تحميل الصفحة...');
                 }
             }
+        }
+        
+        // فتح نافذة تحرير النص
+        function openMobileTextEditModal() {
+            const modal = document.getElementById('mobile-text-edit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                // تعبئة البيانات الحالية
+                const selectedEl = window.activeEl || window.selectedElement;
+                if (selectedEl && selectedEl.classList.contains('text-layer')) {
+                    const textDiv = selectedEl.querySelector('.user-text') || selectedEl;
+                    const textarea = document.getElementById('mobile-edit-text-area');
+                    const colorInput = document.getElementById('mobile-edit-text-color');
+                    const sizeInput = document.getElementById('mobile-edit-text-size');
+                    
+                    if (textarea) textarea.value = textDiv.innerText || '';
+                    if (colorInput) {
+                        const color = selectedEl.style.color || '#1e293b';
+                        colorInput.value = rgbToHex(color);
+                    }
+                    if (sizeInput) {
+                        sizeInput.value = parseInt(selectedEl.style.fontSize) || 35;
+                    }
+                }
+            }
+        }
+        
+        function closeMobileTextEditModal() {
+            const modal = document.getElementById('mobile-text-edit-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        
+        function applyMobileTextChanges() {
+            const selectedEl = window.activeEl || window.selectedElement;
+            if (!selectedEl || !selectedEl.classList.contains('text-layer')) {
+                alert('لا يوجد نص محدد');
+                return;
+            }
+            
+            const textarea = document.getElementById('mobile-edit-text-area');
+            const colorInput = document.getElementById('mobile-edit-text-color');
+            const sizeInput = document.getElementById('mobile-edit-text-size');
+            
+            const textDiv = selectedEl.querySelector('.user-text') || selectedEl;
+            
+            if (textarea && textarea.value.trim()) {
+                textDiv.innerText = textarea.value;
+            }
+            if (colorInput) {
+                selectedEl.style.color = colorInput.value;
+            }
+            if (sizeInput && sizeInput.value) {
+                selectedEl.style.fontSize = sizeInput.value + 'px';
+            }
+            
+            closeMobileTextEditModal();
+        }
+        
+        function toggleMobileGradient() {
+            if (typeof toggleGradientMode === 'function') {
+                toggleGradientMode();
+            }
+        }
+        
+        function rgbToHex(rgb) {
+            if (!rgb) return '#1e293b';
+            if (rgb.startsWith('#')) return rgb;
+            const match = rgb.match(/\d+/g);
+            if (!match || match.length < 3) return '#1e293b';
+            return '#' + match.slice(0, 3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
         }
         
         // تحديث لون زر النص حسب التحديد
@@ -2393,18 +2509,51 @@
         
         function loadMobileAssetsCategory() {
             const mobileSelect = document.getElementById('mobile-assets-category-select');
-            const mainSelect = document.getElementById('assets-category-select');
-            if (mainSelect && mobileSelect) {
-                mainSelect.value = mobileSelect.value;
-                loadAssetsCategory();
-                setTimeout(() => {
-                    const mainGrid = document.getElementById('assets-grid');
-                    const mobileGrid = document.getElementById('mobile-assets-grid');
-                    if (mainGrid && mobileGrid) {
-                        mobileGrid.innerHTML = mainGrid.innerHTML;
-                    }
-                }, 300);
+            const mobileGrid = document.getElementById('mobile-assets-grid');
+            const index = mobileSelect.value;
+            
+            if (index === '' || !window.officialAssetsLibrary || !window.officialAssetsLibrary[index]) {
+                mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
+                return;
             }
+            
+            const category = window.officialAssetsLibrary[index];
+            mobileGrid.innerHTML = '';
+            
+            if (!category.items || category.items.length === 0) {
+                mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8">لا توجد عناصر</div>';
+                return;
+            }
+            
+            category.items.forEach((item, idx) => {
+                const freeCount = category.freeCount !== undefined ? category.freeCount : 4;
+                const isLocked = idx >= freeCount && window.userTier === 'free';
+                
+                const div = document.createElement('div');
+                div.className = 'bg-slate-100 rounded-lg p-1.5 cursor-pointer hover:bg-slate-200 active:scale-95 transition-all';
+                if (isLocked) div.style.opacity = '0.5';
+                
+                const img = document.createElement('img');
+                img.src = item.src;
+                img.className = 'w-full h-12 object-contain rounded';
+                img.draggable = false;
+                
+                div.appendChild(img);
+                
+                div.onclick = function() {
+                    if (isLocked) {
+                        if (typeof showPremiumModal === 'function') showPremiumModal('عناصر إضافية');
+                        return;
+                    }
+                    // إضافة العنصر
+                    if (typeof addAssetToCanvas === 'function') {
+                        addAssetToCanvas(item.src, item.colorable);
+                        closeMobileAssetsModal();
+                    }
+                };
+                
+                mobileGrid.appendChild(div);
+            });
         }
         
         // مزامنة الأبعاد من الجوال للأصلي
