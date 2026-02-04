@@ -2071,88 +2071,6 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- === Mobile Text Edit Popup (تحرير نص - popup صغير) === -->
-    <!-- ============================================ -->
-    <div id="mobile-text-edit-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileTextEditModal()">
-        <div class="absolute inset-0 bg-black/30"></div>
-        <!-- Popup Container - يتموضع حسب النص -->
-        <div id="mobile-text-popup" class="absolute bg-white rounded-2xl shadow-2xl w-[280px] overflow-hidden border border-slate-200" style="top:50%;left:50%;transform:translate(-50%,-50%);" onclick="event.stopPropagation()">
-            <!-- Header صغير -->
-            <div class="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-indigo-500 to-purple-500">
-                <span class="text-white text-xs font-bold"><i class="fas fa-pen-to-square ml-1"></i> تنسيق</span>
-                <button onclick="closeMobileTextEditModal()" class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-white text-[10px]">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <!-- Content مدمج -->
-            <div class="p-2 space-y-2">
-                
-                <!-- صف 1: الخط + الحجم -->
-                <div class="flex gap-2">
-                    <select id="mobile-font-select" onchange="applyMobileFontChange(this.value)" class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-white outline-none font-bold text-right" dir="rtl">
-                        <option value="Almarai">المراعي</option>
-                        <option value="Cairo">كايرو</option>
-                        <option value="Tajawal">تجول</option>
-                        <option value="Changa">شنجا</option>
-                        <option value="El Messiri">المسيري</option>
-                        <option value="Amiri">أميري</option>
-                        <option value="Noto Naskh Arabic">نوتو نسخ</option>
-                        <option value="Aref Ruqaa">عارف رقعة</option>
-                    </select>
-                    <input type="number" id="mobile-edit-text-size" value="35" min="10" max="200" onchange="applyMobileSizeChange(this.value)" class="w-16 p-2 border border-slate-200 rounded-lg text-center text-xs font-bold">
-                </div>
-                
-                <!-- صف 2: اللون + المحاذاة -->
-                <div class="flex gap-2 items-center">
-                    <!-- اللون -->
-                    <div class="relative">
-                        <input type="color" id="mobile-edit-text-color" value="#1e293b" onchange="applyMobileColorChange(this.value)" class="w-8 h-8 rounded-full cursor-pointer border-2 border-slate-200" style="-webkit-appearance:none;padding:0;">
-                    </div>
-                    <!-- المحاذاة -->
-                    <div class="flex-1 flex gap-1 bg-slate-100 rounded-lg p-1">
-                        <button onclick="applyMobileAlign('right')" class="flex-1 py-1.5 rounded text-slate-600 hover:bg-white active:scale-95 transition-all text-sm">
-                            <i class="fas fa-align-right"></i>
-                        </button>
-                        <button onclick="applyMobileAlign('center')" class="flex-1 py-1.5 rounded text-slate-600 hover:bg-white active:scale-95 transition-all text-sm">
-                            <i class="fas fa-align-center"></i>
-                        </button>
-                        <button onclick="applyMobileAlign('left')" class="flex-1 py-1.5 rounded text-slate-600 hover:bg-white active:scale-95 transition-all text-sm">
-                            <i class="fas fa-align-left"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- صف 3: التنسيق (عريض، مائل، تحته خط، يتوسطه) -->
-                <div class="flex gap-1 bg-slate-100 rounded-lg p-1">
-                    <button onclick="toggleMobileBold()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm font-bold">
-                        <i class="fas fa-bold"></i>
-                    </button>
-                    <button onclick="toggleMobileItalic()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm">
-                        <i class="fas fa-italic"></i>
-                    </button>
-                    <button onclick="toggleMobileUnderline()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm">
-                        <i class="fas fa-underline"></i>
-                    </button>
-                    <button onclick="toggleMobileStrike()" class="flex-1 py-2 rounded text-slate-700 hover:bg-white active:scale-95 transition-all text-sm">
-                        <i class="fas fa-strikethrough"></i>
-                    </button>
-                </div>
-                
-                <!-- صف 4: التدرج + تعديل النص -->
-                <div class="flex gap-2">
-                    <button onclick="toggleMobileGradient();" class="flex-1 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
-                        <i class="fas fa-fill-drip"></i> التدرج
-                    </button>
-                    <button onclick="openMobileEditContentModal()" class="flex-1 py-2 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
-                        <i class="fas fa-edit"></i> تعديل
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
     <!-- === Mobile Insert Modal (إدراج) === -->
     <!-- ============================================ -->
     <div id="mobile-insert-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileInsertModal()">
@@ -2436,9 +2354,15 @@
             body {
                 padding-bottom: 120px !important;
             }
-            /* إخفاء النافذة العائمة في الجوال */
+            /* النافذة العائمة - تظهر عند الضغط على زر النص */
             #floating-context-toolbar {
-                display: none !important;
+                /* تظل مخفية افتراضياً وتظهر بالجافاسكربت */
+                top: 10% !important;
+                max-height: 70vh !important;
+                width: 90% !important;
+                max-width: 320px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
             }
             /* إخفاء قسم التصدير في الجوال */
             #style-panel {
@@ -2564,11 +2488,28 @@
             const selectedTextEl = document.querySelector('#card .text-layer.selected');
             
             if (selectedTextEl) {
-                // نص محدد - فتح نافذة تنسيق النص (كل أدوات التولبار العائم)
-                openMobileTextEditModal();
+                // نص محدد - إظهار النافذة العائمة الأصلية مع كل الخيارات (التدرج، الألوان، الخط...)
+                showFloatingToolbarForMobile();
             } else {
                 // لا يوجد نص محدد - فتح نافذة إضافة نص جديد
                 openMobileAddTextModal();
+            }
+        }
+        
+        // إظهار النافذة العائمة الأصلية في الموبايل
+        function showFloatingToolbarForMobile() {
+            const floatToolbar = document.getElementById('floating-context-toolbar');
+            const gradientRow = document.getElementById('gradient-toggle-row');
+            const fontControls = document.getElementById('top-font-controls');
+            
+            if (floatToolbar) {
+                floatToolbar.classList.remove('hidden');
+                floatToolbar.style.display = 'flex';
+            }
+            if (gradientRow) gradientRow.classList.remove('hidden');
+            if (fontControls) {
+                fontControls.classList.remove('hidden');
+                fontControls.classList.add('flex');
             }
         }
         
@@ -2626,180 +2567,6 @@
             }
             
             closeMobileAddTextModal();
-        }
-        
-        // ============ نافذة تنسيق النص الموجود ============
-        function openMobileTextEditModal() {
-            const modal = document.getElementById('mobile-text-edit-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                // تعبئة البيانات الحالية - استخدام العنصر المحدد مباشرة من DOM
-                const selectedEl = document.querySelector('#card .text-layer.selected');
-                if (selectedEl) {
-                    // تحديث نوع الخط
-                    const fontSelect = document.getElementById('mobile-font-select');
-                    if (fontSelect) {
-                        const currentFont = selectedEl.style.fontFamily || 'Almarai';
-                        fontSelect.value = currentFont.replace(/"/g, '');
-                    }
-                    // تحديث اللون
-                    const colorInput = document.getElementById('mobile-edit-text-color');
-                    if (colorInput) {
-                        const color = selectedEl.style.color || '#1e293b';
-                        colorInput.value = rgbToHex(color);
-                    }
-                    // تحديث الحجم
-                    const sizeInput = document.getElementById('mobile-edit-text-size');
-                    if (sizeInput) {
-                        sizeInput.value = parseInt(selectedEl.style.fontSize) || 35;
-                    }
-                    
-                    // موضع الـ popup بجانب النص
-                    positionTextPopup(selectedEl);
-                }
-            }
-        }
-        
-        // تموضع الـ popup بجانب النص المحدد
-        function positionTextPopup(textEl) {
-            const popup = document.getElementById('mobile-text-popup');
-            if (!popup || !textEl) return;
-            
-            const card = document.getElementById('card');
-            const cardRect = card.getBoundingClientRect();
-            const textRect = textEl.getBoundingClientRect();
-            const popupWidth = 280;
-            const popupHeight = popup.offsetHeight || 200;
-            
-            // حساب الموضع الأفضل
-            let top = textRect.top - 10;
-            let left = textRect.right + 10;
-            
-            // إذا خرج من الشاشة من اليمين
-            if (left + popupWidth > window.innerWidth) {
-                left = textRect.left - popupWidth - 10;
-            }
-            // إذا خرج من اليسار
-            if (left < 10) {
-                left = (window.innerWidth - popupWidth) / 2;
-            }
-            // إذا خرج من الأعلى
-            if (top < 10) {
-                top = textRect.bottom + 10;
-            }
-            // إذا خرج من الأسفل
-            if (top + popupHeight > window.innerHeight - 80) {
-                top = window.innerHeight - popupHeight - 90;
-            }
-            
-            popup.style.top = top + 'px';
-            popup.style.left = left + 'px';
-            popup.style.transform = 'none';
-        }
-        
-        function closeMobileTextEditModal() {
-            const modal = document.getElementById('mobile-text-edit-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-        
-        function toggleMobileGradient() {
-            if (typeof toggleGradientMode === 'function') {
-                toggleGradientMode();
-            }
-            closeMobileTextEditModal();
-        }
-        
-        // دوال تطبيق التنسيقات على النص المحدد
-        function getSelectedTextElement() {
-            return document.querySelector('#card .text-layer.selected');
-        }
-        
-        function applyMobileFontChange(fontFamily) {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                selectedEl.style.fontFamily = fontFamily;
-            }
-        }
-        
-        function applyMobileColorChange(color) {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                selectedEl.style.color = color;
-                // إزالة التدرج إذا موجود
-                selectedEl.style.backgroundImage = 'none';
-                selectedEl.style.webkitBackgroundClip = 'unset';
-                selectedEl.style.webkitTextFillColor = color;
-            }
-        }
-        
-        // دالة المحاذاة
-        function applyMobileAlign(align) {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                selectedEl.style.textAlign = align;
-            }
-        }
-        
-        function applyMobileSizeChange(size) {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                selectedEl.style.fontSize = size + 'px';
-                // تحديث حقل الحجم
-                const sizeInput = document.getElementById('mobile-edit-text-size');
-                if (sizeInput) sizeInput.value = size;
-            }
-        }
-        
-        function toggleMobileBold() {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                const current = selectedEl.style.fontWeight;
-                selectedEl.style.fontWeight = (current === 'bold' || current >= 700) ? 'normal' : 'bold';
-            }
-        }
-        
-        function toggleMobileItalic() {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                selectedEl.style.fontStyle = selectedEl.style.fontStyle === 'italic' ? 'normal' : 'italic';
-            }
-        }
-        
-        function toggleMobileUnderline() {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                const current = selectedEl.style.textDecoration;
-                if (current.includes('underline')) {
-                    selectedEl.style.textDecoration = current.replace('underline', '').trim() || 'none';
-                } else {
-                    selectedEl.style.textDecoration = 'underline';
-                }
-            }
-        }
-        
-        function toggleMobileStrike() {
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                const current = selectedEl.style.textDecoration;
-                if (current.includes('line-through')) {
-                    selectedEl.style.textDecoration = current.replace('line-through', '').trim() || 'none';
-                } else {
-                    selectedEl.style.textDecoration = 'line-through';
-                }
-            }
-        }
-        
-        // دالة تعديل محتوى النص
-        function openMobileEditContentModal() {
-            closeMobileTextEditModal();
-            const selectedEl = getSelectedTextElement();
-            if (selectedEl) {
-                const textDiv = selectedEl.querySelector('.user-text') || selectedEl;
-                const newText = prompt('أدخل النص الجديد:', textDiv.innerText);
-                if (newText !== null && newText.trim() !== '') {
-                    textDiv.innerText = newText;
-                }
-            }
         }
         
         function rgbToHex(rgb) {
