@@ -668,17 +668,6 @@
                 </div>
             </div>
 
-            <!-- إضافة النصوص -->
-            <div id="add-text-container" class="space-y-2 bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
-                <label class="text-xs font-bold text-[#1e293b]">إضافة نصوص</label>
-                <div class="flex flex-col gap-2">
-                    <textarea id="user-text-input" rows="2" placeholder="اكتب النص هنا..." class="w-full p-2 bg-white border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-[#1e293b] resize-none"></textarea>
-                    <button onclick="addUserText()" class="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] flex items-center justify-center border border-[#6366f1] text-sm font-bold shadow-sm w-full">
-                        <i class="fas fa-plus ml-2"></i> إضافة النص
-                    </button>
-                </div>
-            </div>
-
             <!-- أدوات الإضافة -->
             <div id="insert-tools-container" class="grid grid-cols-3 gap-2">
                 <label class="col-span-2 bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition group">
@@ -775,20 +764,6 @@
                     <span id="size-display" class="text-[10px] font-bold text-[#64748b] bg-white px-2 py-1 rounded border border-[#e2e8f0]">1181 × 1181 px</span>
                 </div>
                 
-                <!-- التحكم بـ Zoom -->
-                <div id="zoom-container" class="mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-[9px] text-[#0c4a6e] font-bold">🔍 مستوى الزوم</label>
-                        <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">30%</span>
-                    </div>
-                    <input type="range" id="zoom-slider" min="10" max="100" value="30" class="w-full cursor-pointer" oninput="setCustomZoom(this.value)">
-                    <div class="flex gap-1 mt-2">
-                        <button onclick="setCustomZoom(30)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">30%</button>
-                        <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">50%</button>
-                        <button onclick="setCustomZoom(75)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">75%</button>
-                        <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">100%</button>
-                    </div>
-                </div>
             </div>
 
             <!-- قسم مكتبة العناصر الرسمية -->
@@ -1099,102 +1074,102 @@
 
             </div>
 
-            <!-- شريط الملاحظات الجديد (قابل للفتح) -->
-            <div id="info-bar-placeholder" class="bg-[#f1f5f9] dark-mode:bg-[#1a1a2e] p-3 rounded text-[11px] text-[#1e293b] dark-mode:text-[#e8e8e8] border border-[#e2e8f0] dark-mode:border-[#2a2a3e] flex items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] dark-mode:hover:bg-[#252545] transition" onclick="openDesignerPanel()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-notebook" style="flex-shrink: 0; color: #6366f1;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18" /><path d="M13 8l2 0" /><path d="M13 12l2 0" /></svg> <span>اضغط هنا لكتابة ملاحظاتك - write your notes</span>
+            <!-- شريط الزوم المدمج -->
+            <div id="zoom-bar" class="bg-gradient-to-r from-[#f0f9ff] to-[#e0f2fe] p-2 rounded-lg border border-[#7dd3fc] flex items-center gap-2">
+                <i class="fas fa-search-plus text-[#0c4a6e] text-xs"></i>
+                <input type="range" id="zoom-slider" min="10" max="100" value="30" class="flex-1 h-1.5 cursor-pointer accent-[#6366f1]" oninput="setCustomZoom(this.value)">
+                <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-1.5 py-0.5 rounded min-w-[32px] text-center">30%</span>
+                <div class="flex gap-1">
+                    <button onclick="setCustomZoom(25)" class="bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[8px] font-bold px-1.5 py-0.5 rounded hover:bg-[#e0f2fe]">25</button>
+                    <button onclick="setCustomZoom(50)" class="bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[8px] font-bold px-1.5 py-0.5 rounded hover:bg-[#e0f2fe]">50</button>
+                    <button onclick="setCustomZoom(100)" class="bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[8px] font-bold px-1.5 py-0.5 rounded hover:bg-[#e0f2fe]">100</button>
+                </div>
             </div>
 
             <!-- نافذة لوحة المصمم (Collapsible Designer Panel) -->
         <!-- نافذة لوحة المصمم (Tiny Toast Style) -->
         <!-- نافذة لوحة المصمم (Toast Style - Expanded) -->
         <div id="designer-panel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
-            <div class="relative w-[400px] rounded-[2.2rem] overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transform transition-all duration-300 scale-100" 
+            <div class="relative w-[340px] max-w-[92vw] rounded-2xl overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transform transition-all duration-300 scale-100" 
                  onclick="event.stopPropagation()"
                  style="background: white; border: 1px solid rgba(243, 244, 246, 1);">
                  
                 <!-- زينة خلفية -->
-                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-100/40 to-purple-100/40 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-100/30 to-rose-100/30 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-100/40 to-yellow-100/40 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                 <!-- Header -->
-                <div class="px-5 pt-5 pb-3 flex items-center justify-between relative z-10 border-b border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg ring-1 ring-white/50" 
-                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                            <i class="fas fa-palette text-white text-lg"></i>
+                <div class="px-4 pt-4 pb-2 flex items-center justify-between relative z-10 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" 
+                             style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                            <i class="fas fa-sticky-note text-white text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-slate-800 font-bold text-base tracking-tight">لوحة المصمم</h2>
-                            <p class="text-slate-400 text-[10px] font-medium">مساحتك الإبداعية الخاصة ✨</p>
+                            <h2 class="text-slate-800 font-bold text-sm tracking-tight">Notes</h2>
+                            <p class="text-slate-400 text-[9px] font-medium">ملاحظاتك الخاصة ✨</p>
                         </div>
                     </div>
-                    <button onclick="closeDesignerPanel()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center transition text-slate-400 hover:text-red-500 hover:rotate-90">
-                        <i class="fas fa-times text-sm"></i>
+                    <button onclick="closeDesignerPanel()" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 flex items-center justify-center transition text-slate-400 hover:text-red-500">
+                        <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
 
                 <!-- Content -->
-                <div class="p-5 space-y-4 relative z-10">
-                    <!-- Notes (Yellow Box - Big & Square) -->
-                    <div class="bg-[#fef3c7] p-4 rounded-xl shadow-sm border-l-4 border-[#f59e0b] group relative">
-                        <!-- Header for Notes -->
-                        <h3 class="font-bold text-[#92400e] mb-3 flex items-center justify-between text-xs relative z-10">
-                            <span class="flex items-center gap-2">
-                                <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
-                            </span>
-                            <span class="text-[10px] bg-[#f59e0b] text-white px-2 py-0.5 rounded-full shadow-sm" id="char-count">0/140</span>
-                        </h3>
+                <div class="p-4 space-y-3 relative z-10">
+                    <!-- Notes (Yellow Box - Compact) -->
+                    <div class="bg-[#fef3c7] p-3 rounded-xl shadow-sm border-l-4 border-[#f59e0b]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold text-[#92400e]">📝 ملاحظاتك</span>
+                            <span class="text-[9px] bg-[#f59e0b] text-white px-1.5 py-0.5 rounded-full" id="char-count">0/140</span>
+                        </div>
                         
-                        <!-- Big Area -->
                         <textarea 
                             id="designer-notes" 
-                            class="w-full h-20 p-3 bg-white/60 border border-[#f59e0b]/10 rounded-lg text-[#78350f] text-xs resize-none focus:outline-none focus:bg-white/90 focus:border-[#f59e0b]/30 transition-all placeholder:text-[#92400e]/50 leading-relaxed"
-                            placeholder="هنا مساحتك الخاصة.. دوّن أفكارك، تعليقاتك على التصميم، أو أي تفاصيل إبداعية تخطر ببالك لتذكرها لاحقاً"
+                            class="w-full h-16 p-2 bg-white/70 border border-[#f59e0b]/20 rounded-lg text-[#78350f] text-[11px] resize-none focus:outline-none focus:bg-white focus:border-[#f59e0b]/40 transition-all placeholder:text-[#92400e]/40 leading-relaxed"
+                            placeholder="دوّن أفكارك وملاحظاتك هنا..."
                             maxlength="140"
                             onchange="updateDesignerNotes()"
                             oninput="updateCharCount()"
-                        style="background-image: repeating-linear-gradient(to bottom, transparent, transparent 19px, #f59e0b15 19px, #f59e0b15 20px); background-size: 100% 20px; padding-top: 4px;"
                         ></textarea>
                         
-                        <!-- Premium Promo - يُخفى للبريميوم عبر JS -->
-                        <div id="premium-notes-promo" class="flex justify-between items-center mt-3 pt-2 border-t border-[#f59e0b]/10">
-                            <span class="text-[9px] text-[#92400e]/60">نسخة مجانية: 140 حرف فقط</span>
-                            <div class="flex items-center gap-1.5 cursor-pointer group/promo" onclick="showPremiumModal('زيادة حد الملاحظات')">
-                                <i class="fas fa-crown text-[10px] text-yellow-500 group-hover/promo:scale-110 transition-transform"></i>
-                                <span class="text-[10px] font-bold text-yellow-600 group-hover/promo:text-yellow-700 transition-colors">ترقية لـ 1000 كلمة</span>
+                        <!-- Premium Promo -->
+                        <div id="premium-notes-promo" class="flex justify-between items-center mt-2 pt-2 border-t border-[#f59e0b]/10">
+                            <span class="text-[8px] text-[#92400e]/60">140 حرف</span>
+                            <div class="flex items-center gap-1 cursor-pointer" onclick="showPremiumModal('زيادة حد الملاحظات')">
+                                <i class="fas fa-crown text-[9px] text-yellow-500"></i>
+                                <span class="text-[9px] font-bold text-yellow-600">ترقية</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Statistics (Light Mode) -->
-                    <div class="bg-gradient-to-br from-slate-50 to-slate-100/80 p-4 rounded-xl border border-slate-200/60 shadow-sm">
-                        <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2 text-xs">
-                            <i class="fas fa-chart-pie text-indigo-500"></i> الإحصائيات
-                        </h3>
+                    <!-- Statistics (Compact) -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-chart-pie text-indigo-500 text-xs"></i>
+                            <span class="font-bold text-slate-700 text-[10px]">إحصائيات</span>
+                        </div>
                         
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <div class="flex flex-col items-center bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
-                                <span class="text-slate-500 text-[10px] mb-1">عدد العناصر</span>
-                                <p class="font-bold text-slate-800 text-sm" id="element-count">0</p>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                                <span class="text-slate-500 text-[9px]">العناصر</span>
+                                <p class="font-bold text-slate-800 text-xs" id="element-count">0</p>
                             </div>
-                            <div class="flex flex-col items-center bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
-                                <span class="text-slate-500 text-[10px] mb-1">حجم التصميم</span>
-                                <p class="font-mono font-bold text-slate-800 text-[11px] mt-1" id="canvas-size" dir="ltr">-</p>
+                            <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                                <span class="text-slate-500 text-[9px]">الحجم</span>
+                                <p class="font-mono font-bold text-slate-800 text-[10px]" id="canvas-size" dir="ltr">-</p>
                             </div>
                         </div>
                         
-                         <!-- Colors (No Border) -->
-                         <div class="pt-3 border-t border-slate-200/60">
-                            <span class="text-slate-500 text-[10px] font-bold block mb-2">الألوان المستخدمة:</span>
-                            <div id="used-colors-palette" class="flex flex-wrap gap-2 min-h-[20px]">
-                                <!-- Colors injected here -->
+                        <div class="pt-2 border-t border-slate-200">
+                            <span class="text-slate-500 text-[9px] font-bold block mb-1">الألوان:</span>
+                            <div id="used-colors-palette" class="flex flex-wrap gap-1.5 min-h-[16px]">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Close Button Bottom -->
-                    <button onclick="closeDesignerPanel()" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fas fa-check"></i> إغلاق
+                    <!-- Close Button -->
+                    <button onclick="closeDesignerPanel()" class="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-check"></i> تم
                     </button>
                 </div>
             </div>
@@ -1990,52 +1965,62 @@
         <div id="mobile-bar-handle" class="flex justify-center py-1.5 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
             <div class="w-8 h-1 bg-slate-500 rounded-full"></div>
         </div>
-        <!-- الأزرار سطرين -->
+        <!-- الأزرار سطرين 5+5 -->
         <div class="bg-slate-800 px-2 pb-[max(8px,env(safe-area-inset-bottom))]">
-            <!-- السطر الأول: 4 أزرار -->
-            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
+            <!-- السطر الأول: 5 أزرار -->
+            <div class="grid grid-cols-5 gap-1 mb-1">
                 <!-- زر العناصر - وردي -->
-                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-pink-500/80 hover:bg-pink-500 active:scale-95 transition-all">
-                    <i class="fas fa-shapes text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-white">العناصر</span>
+                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-pink-500/80 hover:bg-pink-500 active:scale-95 transition-all">
+                    <i class="fas fa-shapes text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-white">العناصر</span>
+                </button>
+                <!-- زر إدراج -->
+                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-plus-circle text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-slate-300">إدراج</span>
                 </button>
                 <!-- زر الطبقات -->
-                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-layer-group text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">الطبقات</span>
+                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-layer-group text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-slate-300">الطبقات</span>
                 </button>
                 <!-- زر تحرير النص -->
-                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-font text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">النص</span>
+                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-font text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-slate-300">النص</span>
                 </button>
                 <!-- زر الخلفية -->
-                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-fill-drip text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">خلفية</span>
+                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-fill-drip text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-slate-300">خلفية</span>
                 </button>
             </div>
-            <!-- السطر الثاني: 4 أزرار -->
-            <div class="grid grid-cols-4 gap-1.5">
-                <!-- زر إدراج -->
-                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-plus-circle text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">إدراج</span>
+            <!-- السطر الثاني: 5 أزرار -->
+            <div class="grid grid-cols-5 gap-1">
+                <!-- زر Notes -->
+                <button onclick="openDesignerPanel()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-amber-500/80 hover:bg-amber-500 active:scale-95 transition-all">
+                    <i class="fas fa-sticky-note text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-white">Notes</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
-                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-magic text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">ذكي</span>
+                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-magic text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-slate-300">ذكي</span>
                 </button>
                 <!-- زر بزنس تولز -->
-                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-briefcase text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">أعمال</span>
+                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-briefcase text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-slate-300">أعمال</span>
                 </button>
                 <!-- زر التصدير -->
-                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
-                    <i class="fas fa-download text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-white">تصدير</span>
+                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
+                    <i class="fas fa-download text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-white">تصدير</span>
+                </button>
+                <!-- زر طباعة A4 -->
+                <button onclick="exportForA4()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-emerald-500/80 hover:bg-emerald-500 active:scale-95 transition-all">
+                    <i class="fas fa-print text-white text-xs"></i>
+                    <span class="text-[7px] font-bold text-white">A4</span>
                 </button>
             </div>
         </div>
