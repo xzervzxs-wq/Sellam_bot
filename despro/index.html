@@ -42,7 +42,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=MOBILE_FIX_1770238089">
+    <link rel="stylesheet" href="css/style.css?v=UI_FIX_1770238726">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -1024,7 +1024,7 @@
                     </div>
                 </div>
 
-                <!-- الألوان المفضلة -->
+                <!-- الألوان المفضلة - مستقلة تماماً -->
                 <div id="fav-colors-row" class="bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] flex items-center gap-2 overflow-x-auto mb-2" style="order: 2;">
                     <span class="text-[9px] font-bold text-[#1e293b] whitespace-nowrap">مفضلة:</span>
                     <div id="fav-colors-container" class="flex items-center gap-1.5 flex-wrap">
@@ -1037,30 +1037,30 @@
                         </label>
                         <input type="color" id="add-fav-color" class="absolute opacity-0 w-0 h-0" onchange="addFavoriteColor(this.value)">
                     </div>
+                </div>
 
-                    <!-- خصائص العنصر المحدد (شفافية الصورة) -->
-                    <div id="quick-props" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
-                        <span class="text-[9px] text-[#1e293b] font-bold whitespace-nowrap">شفافية:</span>
-                        <input type="range" id="layer-opacity" min="0" max="100" value="100" oninput="updateLayerOpacity(this.value)" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1] cursor-pointer">
-                        <span id="opacity-value" class="text-[9px] font-bold text-[#6366f1] w-6">100%</span>
-                        
-                        <!-- عناصر مخفية للاستخدام الداخلي -->
-                        <span id="text-color-section" class="hidden">
-                             <input type="color" id="quick-color" oninput="updateStyle('color', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-                        </span>
-                    </div>
+                <!-- خصائص العنصر المحدد (شفافية الصورة) - منفصلة -->
+                <div id="quick-props" class="hidden bg-[#f0f4ff] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 flex items-center gap-2 mb-2" style="order: 3;">
+                    <span class="text-[9px] text-[#1e293b] font-bold whitespace-nowrap">شفافية:</span>
+                    <input type="range" id="layer-opacity" min="0" max="100" value="100" oninput="updateLayerOpacity(this.value)" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1] cursor-pointer">
+                    <span id="opacity-value" class="text-[9px] font-bold text-[#6366f1] w-6">100%</span>
+                    
+                    <!-- عناصر مخفية للاستخدام الداخلي -->
+                    <span id="text-color-section" class="hidden">
+                         <input type="color" id="quick-color" oninput="updateStyle('color', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                    </span>
+                </div>
 
-                    <!-- إعدادات الإطار (تم نقلها هنا) -->
-                    <div id="frame-controls-toolbar" class="hidden flex items-center gap-1 border-r border-[#e2e8f0] pr-2 mr-2">
-                        <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
-                        <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#1e293b]">سمك:</span>
-                        <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
-                        <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
-                        <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
-                        <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
-                    </div>
+                <!-- إعدادات الإطار - منفصلة -->
+                <div id="frame-controls-toolbar" class="hidden bg-[#faf5ff] px-2 py-1.5 rounded-lg border border-[#8b5cf6]/30 flex items-center gap-2 mb-2" style="order: 4;">
+                    <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
+                    <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
+                    <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
+                    <span class="text-[9px] font-bold text-[#1e293b]">سمك:</span>
+                    <input type="range" id="border-width" min="0" max="20" value="1" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1]">
+                    <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>
+                    <span class="text-[9px] font-bold text-[#1e293b]">لون:</span>
+                    <input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
                 </div>
 
                 <!-- تم نقل أدوات التحكم بالنصوص والأطر إلى نافذة عائمة -->
@@ -1955,52 +1955,55 @@
     <!-- ============================================ -->
     <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] md:hidden transition-transform duration-300" style="transform: translateY(0);">
         <!-- Handle للسحب (للأسفل) -->
-        <div id="mobile-bar-handle" class="flex justify-center py-1 bg-slate-800/95 rounded-t-xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
-            <div class="w-6 h-0.5 bg-slate-500 rounded-full"></div>
+        <div id="mobile-bar-handle" class="flex justify-center py-1.5 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
+            <div class="w-8 h-1 bg-slate-500 rounded-full"></div>
         </div>
-        <!-- الأزرار في صف واحد مدمج -->
-        <div class="bg-slate-800/95 backdrop-blur-sm px-1.5 pb-[max(3px,env(safe-area-inset-bottom))]">
-            <!-- صف واحد: 8 أزرار مدمجة -->
-            <div class="grid grid-cols-8 gap-0.5">
+        <!-- الأزرار سطرين -->
+        <div class="bg-slate-800 px-2 pb-[max(8px,env(safe-area-inset-bottom))]">
+            <!-- السطر الأول: 4 أزرار -->
+            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
                 <!-- زر العناصر -->
-                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-shapes text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">عناصر</span>
+                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-shapes text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">العناصر</span>
                 </button>
                 <!-- زر الخلفية -->
-                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-fill-drip text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">خلفية</span>
+                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-fill-drip text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">الخلفية</span>
                 </button>
                 <!-- زر تحرير النص -->
-                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-font text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">نص</span>
+                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-font text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">النص</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
-                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-magic text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">ذكية</span>
+                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-magic text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">ذكية</span>
                 </button>
+            </div>
+            <!-- السطر الثاني: 4 أزرار -->
+            <div class="grid grid-cols-4 gap-1.5">
                 <!-- زر إدراج -->
-                <button onclick="openMobileInsertModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-plus text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">إدراج</span>
+                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-plus-circle text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">إدراج</span>
                 </button>
                 <!-- زر بزنس تولز -->
-                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-briefcase text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">بزنس</span>
+                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-briefcase text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">بزنس</span>
                 </button>
                 <!-- زر أعمالي -->
-                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-folder text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">أعمالي</span>
+                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-folder-open text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">أعمالي</span>
                 </button>
                 <!-- زر التصدير -->
-                <button onclick="openMobileExportModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-indigo-500 active:bg-indigo-600 active:scale-95 transition-all">
-                    <i class="fas fa-download text-white text-[10px]"></i>
-                    <span class="text-[6px] font-bold text-white mt-0.5">تصدير</span>
+                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
+                    <i class="fas fa-download text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-white">تصدير</span>
                 </button>
             </div>
         </div>
@@ -2097,12 +2100,12 @@
                         <span class="text-xs font-bold text-slate-700">جديد</span>
                     </button>
                     <!-- إطار -->
-                    <button onclick="openMobileFrameOptions()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                    <button onclick="openMobileFrameModal()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
                         <i class="far fa-square text-purple-600 text-2xl"></i>
                         <span class="text-xs font-bold text-slate-700">إطار</span>
                     </button>
                     <!-- شكل -->
-                    <button onclick="openMobileShapeOptions()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                    <button onclick="openMobileShapeModal()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
                         <i class="fas fa-shapes text-pink-600 text-2xl"></i>
                         <span class="text-xs font-bold text-slate-700">شكل</span>
                     </button>
@@ -2113,48 +2116,76 @@
                         <input type="file" onchange="handleUniversalFile(this); closeMobileInsertModal();" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
                     </label>
                 </div>
-                
-                <!-- خيارات الإطارات (مخفية) -->
-                <div id="mobile-frame-options" class="hidden mt-3 p-3 bg-slate-50 rounded-xl">
-                    <p class="text-xs font-bold text-slate-600 mb-2">اختر نوع الإطار:</p>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="addFrameType('square'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95">
-                            <i class="far fa-square text-lg text-indigo-600"></i>
-                            <p class="text-[10px] font-bold text-slate-600 mt-1">مربع</p>
-                        </button>
-                        <button onclick="addFrameType('rounded'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95">
-                            <i class="far fa-square text-lg text-indigo-600" style="border-radius:4px"></i>
-                            <p class="text-[10px] font-bold text-slate-600 mt-1">منحني</p>
-                        </button>
-                        <button onclick="addFrameType('circle'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95">
-                            <i class="far fa-circle text-lg text-indigo-600"></i>
-                            <p class="text-[10px] font-bold text-slate-600 mt-1">دائرة</p>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- خيارات الأشكال (مخفية) -->
-                <div id="mobile-shape-options" class="hidden mt-3 p-3 bg-slate-50 rounded-xl">
-                    <p class="text-xs font-bold text-slate-600 mb-2">اختر نوع الشكل:</p>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button onclick="addShapeType('square'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
-                            <div class="w-5 h-5 bg-indigo-600 rounded-sm"></div>
-                            <p class="text-[9px] font-bold text-slate-600 mt-1">مربع</p>
-                        </button>
-                        <button onclick="addShapeType('circle'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
-                            <div class="w-5 h-5 bg-indigo-600 rounded-full"></div>
-                            <p class="text-[9px] font-bold text-slate-600 mt-1">دائرة</p>
-                        </button>
-                        <button onclick="addShapeType('line'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
-                            <div class="w-5 h-0.5 bg-indigo-600 mt-2"></div>
-                            <p class="text-[9px] font-bold text-slate-600 mt-1">خط</p>
-                        </button>
-                        <button onclick="addShapeType('rounded'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
-                            <div class="w-5 h-5 bg-indigo-600 rounded-lg"></div>
-                            <p class="text-[9px] font-bold text-slate-600 mt-1">منحنى</p>
-                        </button>
-                    </div>
-                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Frame Modal (نافذة الإطارات) === -->
+    <!-- ============================================ -->
+    <div id="mobile-frame-modal" class="fixed inset-0 z-[100000] hidden flex items-center justify-center" onclick="closeMobileFrameModal()">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-2xl p-5 w-[85%] max-w-[300px] shadow-2xl animate-scale-in" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="far fa-square text-purple-600"></i> اختر نوع الإطار
+                </h3>
+                <button onclick="closeMobileFrameModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="addFrameType('square'); closeMobileFrameModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-indigo-50 active:border-indigo-300 transition-all">
+                    <i class="far fa-square text-2xl text-indigo-600"></i>
+                    <span class="text-[11px] font-bold text-slate-700">مربع</span>
+                </button>
+                <button onclick="addFrameType('rounded'); closeMobileFrameModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-indigo-50 active:border-indigo-300 transition-all">
+                    <i class="far fa-square text-2xl text-indigo-600" style="border-radius:6px"></i>
+                    <span class="text-[11px] font-bold text-slate-700">منحني</span>
+                </button>
+                <button onclick="addFrameType('circle'); closeMobileFrameModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-indigo-50 active:border-indigo-300 transition-all">
+                    <i class="far fa-circle text-2xl text-indigo-600"></i>
+                    <span class="text-[11px] font-bold text-slate-700">دائرة</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Shape Modal (نافذة الأشكال) === -->
+    <!-- ============================================ -->
+    <div id="mobile-shape-modal" class="fixed inset-0 z-[100000] hidden flex items-center justify-center" onclick="closeMobileShapeModal()">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-2xl p-5 w-[85%] max-w-[320px] shadow-2xl animate-scale-in" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fas fa-shapes text-pink-600"></i> اختر نوع الشكل
+                </h3>
+                <button onclick="closeMobileShapeModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="addShapeType('square'); closeMobileShapeModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-pink-50 active:border-pink-300 transition-all">
+                    <div class="w-6 h-6 bg-indigo-600 rounded-sm"></div>
+                    <span class="text-[10px] font-bold text-slate-700">مربع</span>
+                </button>
+                <button onclick="addShapeType('circle'); closeMobileShapeModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-pink-50 active:border-pink-300 transition-all">
+                    <div class="w-6 h-6 bg-indigo-600 rounded-full"></div>
+                    <span class="text-[10px] font-bold text-slate-700">دائرة</span>
+                </button>
+                <button onclick="addShapeType('line'); closeMobileShapeModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-pink-50 active:border-pink-300 transition-all">
+                    <div class="w-6 h-0.5 bg-indigo-600 mt-2.5"></div>
+                    <span class="text-[10px] font-bold text-slate-700">خط</span>
+                </button>
+                <button onclick="addShapeType('rounded'); closeMobileShapeModal(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95 active:bg-pink-50 active:border-pink-300 transition-all">
+                    <div class="w-6 h-6 bg-indigo-600 rounded-lg"></div>
+                    <span class="text-[10px] font-bold text-slate-700">منحنى</span>
+                </button>
             </div>
         </div>
     </div>
@@ -2346,10 +2377,19 @@
             animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
+        /* Scale In Animation for centered modals */
+        @keyframes scale-in {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .animate-scale-in {
+            animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
         /* تحسينات وضع الجوال فقط (شاشات أقل من 768px) */
         @media (max-width: 767px) {
             body {
-                padding-bottom: 55px !important;
+                padding-bottom: 120px !important;
                 overflow-x: hidden !important;
                 min-height: 100vh !important;
             }
@@ -2363,9 +2403,9 @@
             /* منطقة العمل - إصلاح التمرير */
             .max-w-7xl {
                 height: auto !important;
-                min-height: calc(100vh - 55px) !important;
+                min-height: calc(100vh - 120px) !important;
                 overflow-y: auto !important;
-                padding-bottom: 70px !important;
+                padding-bottom: 130px !important;
             }
             
             /* منطقة المعاينة */
@@ -2375,45 +2415,6 @@
                 margin-bottom: 20px !important;
                 overflow: auto !important;
                 touch-action: pan-x pan-y !important;
-            }
-            
-            /* شريط الجوال السفلي - مدمج وصغير */
-            #mobile-bottom-bar {
-                padding: 0 !important;
-            }
-            
-            #mobile-bar-handle {
-                padding: 3px 0 !important;
-            }
-            
-            #mobile-bar-handle div {
-                width: 24px !important;
-                height: 2px !important;
-            }
-            
-            /* الأزرار السفلية - أصغر */
-            #mobile-bottom-bar .grid {
-                gap: 2px !important;
-            }
-            
-            #mobile-bottom-bar button {
-                padding: 4px 1px !important;
-                border-radius: 4px !important;
-            }
-            
-            #mobile-bottom-bar button i {
-                font-size: 10px !important;
-            }
-            
-            #mobile-bottom-bar button span {
-                font-size: 6px !important;
-                margin-top: 1px !important;
-            }
-            
-            /* خلفية الشريط السفلي */
-            #mobile-bottom-bar > div:last-child {
-                padding: 3px 4px !important;
-                padding-bottom: max(3px, env(safe-area-inset-bottom)) !important;
             }
             
             /* النافذة العائمة - تظهر عند الضغط على زر النص */
@@ -2738,14 +2739,20 @@
             if (modal) modal.classList.add('hidden');
         }
         
-        function openMobileFrameOptions() {
-            document.getElementById('mobile-frame-options').classList.toggle('hidden');
-            document.getElementById('mobile-shape-options').classList.add('hidden');
+        function openMobileFrameModal() {
+            document.getElementById('mobile-frame-modal').classList.remove('hidden');
         }
         
-        function openMobileShapeOptions() {
-            document.getElementById('mobile-shape-options').classList.toggle('hidden');
-            document.getElementById('mobile-frame-options').classList.add('hidden');
+        function closeMobileFrameModal() {
+            document.getElementById('mobile-frame-modal').classList.add('hidden');
+        }
+        
+        function openMobileShapeModal() {
+            document.getElementById('mobile-shape-modal').classList.remove('hidden');
+        }
+        
+        function closeMobileShapeModal() {
+            document.getElementById('mobile-shape-modal').classList.add('hidden');
         }
         
         function syncMobileAssetsCategories() {
