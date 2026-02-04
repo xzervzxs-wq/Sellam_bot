@@ -1930,6 +1930,125 @@
         </div>
     </div>
     
+    <!-- ============================================ -->
+    <!-- === Mobile Bottom Bar - للجوال فقط === -->
+    <!-- ============================================ -->
+    <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] bg-white/95 backdrop-blur-lg border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] p-2 pb-[max(8px,env(safe-area-inset-bottom))] lg:hidden">
+        <div class="flex justify-around items-center gap-2 max-w-md mx-auto">
+            <!-- زر العناصر -->
+            <button onclick="openMobileAssetsModal()" class="flex-1 flex flex-col items-center gap-1 py-2 px-3 rounded-xl bg-gradient-to-b from-indigo-50 to-white border border-indigo-100 active:scale-95 transition-all">
+                <i class="fas fa-shapes text-indigo-600 text-lg"></i>
+                <span class="text-[10px] font-bold text-indigo-700">العناصر</span>
+            </button>
+            <!-- زر الأدوات الذكية -->
+            <button onclick="openMobileSmartToolsModal()" class="flex-1 flex flex-col items-center gap-1 py-2 px-3 rounded-xl bg-gradient-to-b from-purple-50 to-white border border-purple-100 active:scale-95 transition-all">
+                <i class="fas fa-magic text-purple-600 text-lg"></i>
+                <span class="text-[10px] font-bold text-purple-700">الأدوات</span>
+            </button>
+            <!-- زر أعمالي -->
+            <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex-1 flex flex-col items-center gap-1 py-2 px-3 rounded-xl bg-gradient-to-b from-amber-50 to-white border border-amber-100 active:scale-95 transition-all">
+                <i class="fas fa-palette text-amber-600 text-lg"></i>
+                <span class="text-[10px] font-bold text-amber-700">أعمالي</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Assets Modal === -->
+    <!-- ============================================ -->
+    <div id="mobile-assets-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileAssetsModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[70vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-shapes text-indigo-600"></i> مكتبة العناصر
+                </h3>
+                <button onclick="closeMobileAssetsModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-4 overflow-y-auto max-h-[calc(70vh-60px)]">
+                <!-- القائمة المنسدلة للتصنيفات -->
+                <div class="w-full mb-3">
+                    <select id="mobile-assets-category-select" class="w-full p-3 text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500" onchange="loadMobileAssetsCategory()">
+                        <option value="">📂 اختر تصنيفاً...</option>
+                    </select>
+                </div>
+                <!-- شبكة العناصر -->
+                <div id="mobile-assets-grid" class="grid grid-cols-4 gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 min-h-[150px]">
+                    <div class="col-span-4 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Smart Tools Modal === -->
+    <!-- ============================================ -->
+    <div id="mobile-smart-tools-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileSmartToolsModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[60vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-magic text-purple-600"></i> الأدوات الذكية
+                </h3>
+                <button onclick="closeMobileSmartToolsModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-4 space-y-4">
+                <!-- SMART TOOLS -->
+                <div class="bg-gradient-to-b from-indigo-50 to-white p-4 rounded-2xl border border-indigo-100">
+                    <h4 class="text-xs font-bold text-indigo-700 mb-3 flex items-center gap-2">
+                        <i class="fas fa-wand-magic-sparkles"></i> SMART TOOLS
+                    </h4>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="toggleLassoMode(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fas fa-cut text-indigo-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">قص ذكي</span>
+                        </button>
+                        <button onclick="toggleSmartEraserMode(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fas fa-eraser text-indigo-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">ممحاة</span>
+                        </button>
+                        <button onclick="toggleSmartFillMode(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fas fa-fill-drip text-indigo-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">تلوين</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- EDIT TOOLS -->
+                <div class="bg-gradient-to-b from-purple-50 to-white p-4 rounded-2xl border border-purple-100">
+                    <h4 class="text-xs font-bold text-purple-700 mb-3 flex items-center gap-2">
+                        <i class="fas fa-pen-ruler"></i> EDIT TOOLS
+                    </h4>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="toggleGradient(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fas fa-adjust text-purple-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">تدرج</span>
+                        </button>
+                        <button onclick="toggleEraserMode(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fas fa-eraser text-purple-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">ممحاة</span>
+                        </button>
+                        <button onclick="toggleCropMode(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fas fa-crop text-purple-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">قص</span>
+                        </button>
+                        <button onclick="toggleHandMode(); closeMobileSmartToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                            <i class="fa-regular fa-hand text-purple-600 text-lg"></i>
+                            <span class="text-[10px] font-bold text-slate-700">تحريك</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <style>
         .discount-modal-animate {
             animation: discountIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -1943,6 +2062,69 @@
             background-color: #eef2ff !important;
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
+        
+        /* Mobile Bottom Bar Animations */
+        @keyframes slide-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* Add padding to body on mobile to account for bottom bar */
+        @media (max-width: 1023px) {
+            body {
+                padding-bottom: 80px !important;
+            }
+        }
     </style>
+    
+    <script>
+        // Mobile Bottom Bar Functions
+        function openMobileAssetsModal() {
+            const modal = document.getElementById('mobile-assets-modal');
+            modal.classList.remove('hidden');
+            // Sync categories from main select
+            syncMobileAssetsCategories();
+        }
+        
+        function closeMobileAssetsModal() {
+            document.getElementById('mobile-assets-modal').classList.add('hidden');
+        }
+        
+        function openMobileSmartToolsModal() {
+            document.getElementById('mobile-smart-tools-modal').classList.remove('hidden');
+        }
+        
+        function closeMobileSmartToolsModal() {
+            document.getElementById('mobile-smart-tools-modal').classList.add('hidden');
+        }
+        
+        function syncMobileAssetsCategories() {
+            const mainSelect = document.getElementById('assets-category-select');
+            const mobileSelect = document.getElementById('mobile-assets-category-select');
+            if (mainSelect && mobileSelect) {
+                mobileSelect.innerHTML = mainSelect.innerHTML;
+            }
+        }
+        
+        function loadMobileAssetsCategory() {
+            const mobileSelect = document.getElementById('mobile-assets-category-select');
+            const mainSelect = document.getElementById('assets-category-select');
+            if (mainSelect && mobileSelect) {
+                mainSelect.value = mobileSelect.value;
+                loadAssetsCategory();
+                // Copy grid content
+                setTimeout(() => {
+                    const mainGrid = document.getElementById('assets-grid');
+                    const mobileGrid = document.getElementById('mobile-assets-grid');
+                    if (mainGrid && mobileGrid) {
+                        mobileGrid.innerHTML = mainGrid.innerHTML;
+                    }
+                }, 300);
+            }
+        }
+    </script>
 </body>
 </html>
