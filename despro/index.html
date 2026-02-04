@@ -860,7 +860,7 @@
                     </div>
                     
                     <!-- قسم الخلفية - BACKGROUND -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#8b5cf6]/20 min-h-[52px]">
+                    <div id="background-section" class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#8b5cf6]/20 min-h-[52px]">
                         <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-purple-600 w-full text-center">
                             BACKGROUND
                         </span>
@@ -1954,38 +1954,135 @@
     <!-- === Mobile Bottom Bar - ستايل Canva === -->
     <!-- ============================================ -->
     <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] lg:hidden transition-transform duration-300" style="transform: translateY(0);">
-        <!-- Handle للسحب -->
-        <div id="mobile-bar-handle" class="flex justify-center py-2 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
-            <div class="w-10 h-1 bg-slate-500 rounded-full"></div>
+        <!-- Handle للسحب (للأسفل) -->
+        <div id="mobile-bar-handle" class="flex justify-center py-1.5 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
+            <div class="w-8 h-1 bg-slate-500 rounded-full"></div>
         </div>
-        <!-- الأزرار -->
-        <div class="bg-slate-800 px-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-            <div class="flex justify-between items-center gap-2">
+        <!-- الأزرار سطرين -->
+        <div class="bg-slate-800 px-2 pb-[max(8px,env(safe-area-inset-bottom))]">
+            <!-- السطر الأول: 4 أزرار -->
+            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
                 <!-- زر العناصر -->
-                <button onclick="openMobileAssetsModal()" class="flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-shapes text-white text-base"></i>
-                    <span class="text-[9px] font-bold text-slate-300">العناصر</span>
+                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-shapes text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">العناصر</span>
                 </button>
-                <!-- زر بزنس تولز -->
-                <button onclick="openMobileBusinessToolsModal()" class="flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-briefcase text-white text-base"></i>
-                    <span class="text-[9px] font-bold text-slate-300">بزنس</span>
+                <!-- زر الخلفية -->
+                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-fill-drip text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">الخلفية</span>
+                </button>
+                <!-- زر تحرير النص -->
+                <button onclick="openMobileTextEditorModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-font text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">النص</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
-                <button onclick="openMobileSmartToolsModal()" class="flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-magic text-white text-base"></i>
-                    <span class="text-[9px] font-bold text-slate-300">ذكية</span>
+                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-magic text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">ذكية</span>
+                </button>
+            </div>
+            <!-- السطر الثاني: 4 أزرار -->
+            <div class="grid grid-cols-4 gap-1.5">
+                <!-- زر بزنس تولز -->
+                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-briefcase text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">بزنس</span>
                 </button>
                 <!-- زر أعمالي -->
-                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-folder-open text-white text-base"></i>
-                    <span class="text-[9px] font-bold text-slate-300">أعمالي</span>
+                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-folder-open text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">أعمالي</span>
                 </button>
                 <!-- زر التصدير -->
-                <button onclick="openMobileExportModal()" class="flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
-                    <i class="fas fa-download text-white text-base"></i>
-                    <span class="text-[9px] font-bold text-white">تصدير</span>
+                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
+                    <i class="fas fa-download text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-white">تصدير</span>
                 </button>
+                <!-- زر الطباعة -->
+                <button onclick="generateA4Sheet()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-pink-500 hover:bg-pink-600 active:scale-95 transition-all">
+                    <i class="fas fa-print text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-white">طباعة</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Background Modal === -->
+    <!-- ============================================ -->
+    <div id="mobile-background-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileBackgroundModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[50vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fas fa-fill-drip text-violet-600"></i> الخلفية
+                </h3>
+                <button onclick="closeMobileBackgroundModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-4 space-y-3">
+                <!-- لون الخلفية -->
+                <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <label class="flex items-center gap-2 flex-1">
+                        <i class="fas fa-palette text-indigo-500"></i>
+                        <span class="text-sm font-bold text-slate-700">لون الخلفية</span>
+                    </label>
+                    <input type="color" id="mobile-bg-color" value="#ffffff" onchange="setCardBackgroundColor(this.value); syncBgColor(this.value);" class="w-10 h-10 rounded-lg cursor-pointer border-2 border-slate-300">
+                </div>
+                <!-- زر الشفافية -->
+                <button onclick="toggleTransparentMode(); closeMobileBackgroundModal();" class="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-bold text-sm active:scale-95 transition-all">
+                    <i class="fas fa-chess-board"></i> تفعيل الشفافية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Text Editor Modal === -->
+    <!-- ============================================ -->
+    <div id="mobile-text-editor-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileTextEditorModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[70vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fas fa-font text-blue-600"></i> تحرير النص
+                </h3>
+                <button onclick="closeMobileTextEditorModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-4 space-y-3">
+                <!-- مربع النص -->
+                <textarea id="mobile-text-editor-area" class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm resize-none focus:border-indigo-500 outline-none" rows="3" dir="rtl" placeholder="اكتب النص هنا..."></textarea>
+                
+                <!-- لون النص وحجمه -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 flex-1 p-2 bg-slate-50 rounded-lg">
+                        <span class="text-xs font-bold text-slate-600">اللون:</span>
+                        <input type="color" id="mobile-text-color" value="#1e293b" class="w-8 h-8 rounded cursor-pointer border border-slate-300">
+                    </div>
+                    <div class="flex items-center gap-2 flex-1 p-2 bg-slate-50 rounded-lg">
+                        <span class="text-xs font-bold text-slate-600">الحجم:</span>
+                        <input type="number" id="mobile-text-size" value="35" min="10" max="200" class="w-14 p-1 border border-slate-300 rounded text-center text-sm font-bold">
+                    </div>
+                </div>
+                
+                <!-- أزرار التحكم -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="addMobileText()" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm active:scale-95 transition-all">
+                        <i class="fas fa-plus"></i> إضافة نص جديد
+                    </button>
+                    <button onclick="applyMobileTextEdit()" class="py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm active:scale-95 transition-all">
+                        <i class="fas fa-check"></i> تطبيق التعديل
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2180,7 +2277,30 @@
         /* تحسينات وضع الجوال */
         @media (max-width: 1023px) {
             body {
-                padding-bottom: 60px !important;
+                padding-bottom: 120px !important;
+            }
+            /* إصلاح مربع العمل - إزالة المسافة الزائدة */
+            .preview-area {
+                padding: 5px !important;
+                min-height: auto !important;
+                max-height: calc(100vh - 180px) !important;
+                height: calc(100vh - 180px) !important;
+                overflow: hidden !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                margin-bottom: 0 !important;
+            }
+            #card-wrapper {
+                margin: 0 auto !important;
+                max-width: calc(100vw - 20px) !important;
+                max-height: calc(100vh - 200px) !important;
+                transform-origin: center center !important;
+            }
+            /* ضبط الكارت ليبقى داخل الشاشة */
+            #card {
+                max-width: 100% !important;
+                max-height: 100% !important;
             }
             /* إخفاء قسم التصدير في الجوال */
             #style-panel {
@@ -2196,6 +2316,10 @@
             }
             /* إخفاء Business Tools من الشريط العلوي */
             #business-tools-section {
+                display: none !important;
+            }
+            /* إخفاء قسم الخلفية من الشريط العلوي */
+            #background-section {
                 display: none !important;
             }
             /* إخفاء قسم الأبعاد الأصلي في الجوال واستبداله بالمدمج */
@@ -2259,6 +2383,96 @@
             document.getElementById('mobile-export-modal').classList.add('hidden');
         }
         
+        // دوال نافذة الخلفية للجوال
+        function openMobileBackgroundModal() {
+            document.getElementById('mobile-background-modal').classList.remove('hidden');
+            // مزامنة لون الخلفية
+            const mainBgColor = document.getElementById('main-bg-color');
+            const mobileBgColor = document.getElementById('mobile-bg-color');
+            if (mainBgColor && mobileBgColor) {
+                mobileBgColor.value = mainBgColor.value;
+            }
+        }
+        
+        function closeMobileBackgroundModal() {
+            document.getElementById('mobile-background-modal').classList.add('hidden');
+        }
+        
+        function syncBgColor(color) {
+            const mainBgColor = document.getElementById('main-bg-color');
+            const bgPreview = document.getElementById('bg-color-preview');
+            if (mainBgColor) mainBgColor.value = color;
+            if (bgPreview) bgPreview.style.backgroundColor = color;
+        }
+        
+        // دوال نافذة تحرير النص للجوال
+        function openMobileTextEditorModal() {
+            document.getElementById('mobile-text-editor-modal').classList.remove('hidden');
+            // إذا كان هناك عنصر نص محدد، نعرض محتواه
+            if (window.selectedElement && window.selectedElement.classList.contains('text-layer')) {
+                const textArea = document.getElementById('mobile-text-editor-area');
+                const colorInput = document.getElementById('mobile-text-color');
+                const sizeInput = document.getElementById('mobile-text-size');
+                if (textArea) textArea.value = window.selectedElement.innerText || '';
+                if (colorInput) colorInput.value = rgbToHex(window.selectedElement.style.color) || '#1e293b';
+                if (sizeInput) sizeInput.value = parseInt(window.selectedElement.style.fontSize) || 35;
+            }
+        }
+        
+        function closeMobileTextEditorModal() {
+            document.getElementById('mobile-text-editor-modal').classList.add('hidden');
+        }
+        
+        function addMobileText() {
+            const textArea = document.getElementById('mobile-text-editor-area');
+            const colorInput = document.getElementById('mobile-text-color');
+            const sizeInput = document.getElementById('mobile-text-size');
+            const text = textArea ? textArea.value.trim() : 'نص جديد';
+            const color = colorInput ? colorInput.value : '#1e293b';
+            const size = sizeInput ? sizeInput.value : '35';
+            
+            if (typeof addTextElement === 'function') {
+                addTextElement(text || 'نص جديد');
+                // تطبيق اللون والحجم
+                setTimeout(() => {
+                    if (window.selectedElement) {
+                        window.selectedElement.style.color = color;
+                        window.selectedElement.style.fontSize = size + 'px';
+                    }
+                }, 100);
+            }
+            closeMobileTextEditorModal();
+        }
+        
+        function applyMobileTextEdit() {
+            if (!window.selectedElement || !window.selectedElement.classList.contains('text-layer')) {
+                alert('اختر نصاً أولاً للتعديل عليه');
+                return;
+            }
+            const textArea = document.getElementById('mobile-text-editor-area');
+            const colorInput = document.getElementById('mobile-text-color');
+            const sizeInput = document.getElementById('mobile-text-size');
+            
+            if (textArea && textArea.value.trim()) {
+                window.selectedElement.innerText = textArea.value;
+            }
+            if (colorInput) {
+                window.selectedElement.style.color = colorInput.value;
+            }
+            if (sizeInput) {
+                window.selectedElement.style.fontSize = sizeInput.value + 'px';
+            }
+            closeMobileTextEditorModal();
+        }
+        
+        function rgbToHex(rgb) {
+            if (!rgb) return '#1e293b';
+            if (rgb.startsWith('#')) return rgb;
+            const match = rgb.match(/\d+/g);
+            if (!match || match.length < 3) return '#1e293b';
+            return '#' + match.slice(0, 3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+        }
+        
         function syncMobileAssetsCategories() {
             const mainSelect = document.getElementById('assets-category-select');
             const mobileSelect = document.getElementById('mobile-assets-category-select');
@@ -2310,15 +2524,20 @@
             }
         };
         
-        // تبديل توسيع البار السفلي
-        let mobileBarExpanded = false;
+        // تبديل إخفاء البار السفلي (للأسفل)
+        let mobileBarHidden = false;
         function toggleMobileBarExpand() {
             const bar = document.getElementById('mobile-bottom-bar');
-            mobileBarExpanded = !mobileBarExpanded;
-            if (mobileBarExpanded) {
-                bar.style.transform = 'translateY(-50px)';
+            const handle = document.getElementById('mobile-bar-handle');
+            mobileBarHidden = !mobileBarHidden;
+            if (mobileBarHidden) {
+                // إخفاء البار للأسفل (يبقى فقط الـ handle ظاهر)
+                bar.style.transform = 'translateY(calc(100% - 20px))';
+                handle.innerHTML = '<div class="w-8 h-1 bg-indigo-400 rounded-full"></div><i class="fas fa-chevron-up text-indigo-400 text-xs absolute"></i>';
             } else {
+                // إظهار البار كامل
                 bar.style.transform = 'translateY(0)';
+                handle.innerHTML = '<div class="w-8 h-1 bg-slate-500 rounded-full"></div>';
             }
         }
         
