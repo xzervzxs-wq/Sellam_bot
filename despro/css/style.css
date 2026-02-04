@@ -887,14 +887,15 @@
            ========================================== */
         
         .locked-item {
-            position: relative;
+            position: relative !important;
             transition: all 0.3s ease;
             cursor: pointer !important;
-            opacity: 0.7 !important;
+            opacity: 0.6 !important;
+            overflow: visible !important;
         }
 
         .locked-item:hover {
-            opacity: 0.9 !important;
+            opacity: 0.8 !important;
             transform: scale(1.02);
         }
 
@@ -903,13 +904,22 @@
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
-            top: 6px;
-            right: 6px;
-            font-size: 14px;
+            top: 4px;
+            right: 4px;
+            font-size: 16px;
             pointer-events: none;
-            color: #6366f1;
-            opacity: 0.7;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            color: #ffffff;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
+            z-index: 10;
         }
 
         /* أيقونة تبديل الوضع الليلي والنهاري */
@@ -978,9 +988,8 @@
         }
 
         .locked-item:hover::after {
-            opacity: 0.9;
-            color: #4f46e5;
-            background: rgba(99, 102, 241, 0.15);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.6);
         }
         /* تنسيق الخيارات المعطلة في الـ Select */
         select option:disabled {
