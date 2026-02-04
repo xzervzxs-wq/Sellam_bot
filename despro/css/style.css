@@ -1176,3 +1176,10 @@
     background: linear-gradient(180deg, transparent 0%, #94a3b8 10%, #94a3b8 90%, transparent 100%);
     box-shadow: 0 0 2px rgba(148, 163, 184, 0.5);
 }
+
+/* إصلاح مفضلة الألوان على الموبايل */
+#fav-colors-row {
+    flex-basis: 100% !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+}
