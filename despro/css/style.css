@@ -1183,28 +1183,3 @@
     width: 100% !important;
     flex-shrink: 0 !important;
 }
-
-/* === إصلاح منطقة العمل على الموبايل === */
-@media (max-width: 768px) {
-    .preview-area {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 10px !important;
-        min-height: auto !important;
-        border-radius: 0 !important;
-        overflow: visible !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-    
-    #card-wrapper {
-        margin: 0 auto !important;
-    }
-    
-    /* إخفاء المساطر على الموبايل */
-    .ruler {
-        display: none !important;
-    }
-}
