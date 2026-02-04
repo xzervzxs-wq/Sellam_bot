@@ -42,7 +42,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=RESET_1770237597">
+    <link rel="stylesheet" href="css/style.css?v=MOBILE_FIX_1770238089">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -1955,55 +1955,52 @@
     <!-- ============================================ -->
     <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] md:hidden transition-transform duration-300" style="transform: translateY(0);">
         <!-- Handle للسحب (للأسفل) -->
-        <div id="mobile-bar-handle" class="flex justify-center py-1.5 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
-            <div class="w-8 h-1 bg-slate-500 rounded-full"></div>
+        <div id="mobile-bar-handle" class="flex justify-center py-1 bg-slate-800/95 rounded-t-xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
+            <div class="w-6 h-0.5 bg-slate-500 rounded-full"></div>
         </div>
-        <!-- الأزرار سطرين -->
-        <div class="bg-slate-800 px-2 pb-[max(8px,env(safe-area-inset-bottom))]">
-            <!-- السطر الأول: 4 أزرار -->
-            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
+        <!-- الأزرار في صف واحد مدمج -->
+        <div class="bg-slate-800/95 backdrop-blur-sm px-1.5 pb-[max(3px,env(safe-area-inset-bottom))]">
+            <!-- صف واحد: 8 أزرار مدمجة -->
+            <div class="grid grid-cols-8 gap-0.5">
                 <!-- زر العناصر -->
-                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-shapes text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">العناصر</span>
+                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-shapes text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">عناصر</span>
                 </button>
                 <!-- زر الخلفية -->
-                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-fill-drip text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">الخلفية</span>
+                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-fill-drip text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">خلفية</span>
                 </button>
                 <!-- زر تحرير النص -->
-                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-font text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">النص</span>
+                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-font text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">نص</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
-                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-magic text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">ذكية</span>
+                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-magic text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">ذكية</span>
                 </button>
-            </div>
-            <!-- السطر الثاني: 4 أزرار -->
-            <div class="grid grid-cols-4 gap-1.5">
                 <!-- زر إدراج -->
-                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-plus-circle text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">إدراج</span>
+                <button onclick="openMobileInsertModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-plus text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">إدراج</span>
                 </button>
                 <!-- زر بزنس تولز -->
-                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-briefcase text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">بزنس</span>
+                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-briefcase text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">بزنس</span>
                 </button>
                 <!-- زر أعمالي -->
-                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-folder-open text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">أعمالي</span>
+                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex flex-col items-center justify-center py-1.5 rounded bg-white/10 active:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-folder text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-slate-400 mt-0.5">أعمالي</span>
                 </button>
                 <!-- زر التصدير -->
-                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
-                    <i class="fas fa-download text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-white">تصدير</span>
+                <button onclick="openMobileExportModal()" class="flex flex-col items-center justify-center py-1.5 rounded bg-indigo-500 active:bg-indigo-600 active:scale-95 transition-all">
+                    <i class="fas fa-download text-white text-[10px]"></i>
+                    <span class="text-[6px] font-bold text-white mt-0.5">تصدير</span>
                 </button>
             </div>
         </div>
@@ -2352,8 +2349,73 @@
         /* تحسينات وضع الجوال فقط (شاشات أقل من 768px) */
         @media (max-width: 767px) {
             body {
-                padding-bottom: 120px !important;
+                padding-bottom: 55px !important;
+                overflow-x: hidden !important;
+                min-height: 100vh !important;
             }
+            
+            /* إصلاح التمرير للصفحة الرئيسية */
+            html {
+                overflow-y: auto !important;
+                height: auto !important;
+            }
+            
+            /* منطقة العمل - إصلاح التمرير */
+            .max-w-7xl {
+                height: auto !important;
+                min-height: calc(100vh - 55px) !important;
+                overflow-y: auto !important;
+                padding-bottom: 70px !important;
+            }
+            
+            /* منطقة المعاينة */
+            .preview-area {
+                min-height: 350px !important;
+                padding: 20px !important;
+                margin-bottom: 20px !important;
+                overflow: auto !important;
+                touch-action: pan-x pan-y !important;
+            }
+            
+            /* شريط الجوال السفلي - مدمج وصغير */
+            #mobile-bottom-bar {
+                padding: 0 !important;
+            }
+            
+            #mobile-bar-handle {
+                padding: 3px 0 !important;
+            }
+            
+            #mobile-bar-handle div {
+                width: 24px !important;
+                height: 2px !important;
+            }
+            
+            /* الأزرار السفلية - أصغر */
+            #mobile-bottom-bar .grid {
+                gap: 2px !important;
+            }
+            
+            #mobile-bottom-bar button {
+                padding: 4px 1px !important;
+                border-radius: 4px !important;
+            }
+            
+            #mobile-bottom-bar button i {
+                font-size: 10px !important;
+            }
+            
+            #mobile-bottom-bar button span {
+                font-size: 6px !important;
+                margin-top: 1px !important;
+            }
+            
+            /* خلفية الشريط السفلي */
+            #mobile-bottom-bar > div:last-child {
+                padding: 3px 4px !important;
+                padding-bottom: max(3px, env(safe-area-inset-bottom)) !important;
+            }
+            
             /* النافذة العائمة - تظهر عند الضغط على زر النص */
             #floating-context-toolbar {
                 /* تظل مخفية افتراضياً وتظهر بالجافاسكربت */
@@ -2364,6 +2426,69 @@
                 left: 50% !important;
                 transform: translateX(-50%) !important;
             }
+            
+            /* الأدوات الفرعية - أصغر كمربعات */
+            .controls-row {
+                padding: 4px 6px !important;
+                gap: 4px !important;
+                font-size: 8px !important;
+                border-radius: 6px !important;
+                margin-bottom: 4px !important;
+            }
+            
+            .controls-row button {
+                padding: 3px 6px !important;
+                font-size: 8px !important;
+                border-radius: 4px !important;
+                height: auto !important;
+                min-height: 22px !important;
+            }
+            
+            .controls-row input[type="range"] {
+                width: 40px !important;
+                height: 6px !important;
+            }
+            
+            .controls-row input[type="color"] {
+                width: 18px !important;
+                height: 18px !important;
+            }
+            
+            .controls-row span {
+                font-size: 7px !important;
+            }
+            
+            /* شريط الأدوات العلوي - مدمج ومخفي جزئياً */
+            .flex.flex-wrap.items-center.bg-white.p-2 {
+                padding: 4px !important;
+                gap: 3px !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* أقسام الأدوات العلوية */
+            #background-section,
+            #smart-tools-section,
+            .flex.flex-col.items-center.gap-1 {
+                padding: 3px 4px !important;
+                min-height: 36px !important;
+                flex-shrink: 0 !important;
+            }
+            
+            #background-section button,
+            #smart-tools-section button,
+            .flex.flex-col.items-center button {
+                height: 22px !important;
+                padding: 2px 5px !important;
+                font-size: 7px !important;
+            }
+            
+            #background-section span:first-child,
+            #smart-tools-section span:first-child {
+                font-size: 6px !important;
+            }
+            
             /* إخفاء قسم التصدير في الجوال */
             #style-panel {
                 display: none !important;
