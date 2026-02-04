@@ -42,7 +42,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=REVERT_AREA_1770242031">
+    <link rel="stylesheet" href="css/style.css?v=ASSETS_GRID_1770242378">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -2303,15 +2303,22 @@
             </div>
             <!-- Content -->
             <div class="p-4 overflow-y-auto max-h-[calc(70vh-60px)]">
+                <!-- شريط التحميل -->
+                <div id="mobile-assets-loading" class="mb-3 hidden">
+                    <div class="flex items-center gap-2 p-2 bg-indigo-50 rounded-lg border border-indigo-100">
+                        <div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-xs font-bold text-indigo-600">جاري تحميل العناصر...</span>
+                    </div>
+                </div>
                 <!-- القائمة المنسدلة للتصنيفات -->
                 <div class="w-full mb-3">
                     <select id="mobile-assets-category-select" class="w-full p-3 text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500" onchange="loadMobileAssetsCategory()">
-                        <option value="">📂 اختر تصنيفاً...</option>
+                        <option value="">🎨 اختر تصنيفاً...</option>
                     </select>
                 </div>
                 <!-- شبكة العناصر -->
-                <div id="mobile-assets-grid" class="grid grid-cols-4 gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 min-h-[150px]">
-                    <div class="col-span-4 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>
+                <div id="mobile-assets-grid" class="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 min-h-[200px]">
+                    <div class="col-span-3 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>
                 </div>
             </div>
         </div>
@@ -2563,18 +2570,29 @@
         // Mobile Bottom Bar Functions
         function openMobileAssetsModal() {
             const modal = document.getElementById('mobile-assets-modal');
+            const loadingBar = document.getElementById('mobile-assets-loading');
+            const grid = document.getElementById('mobile-assets-grid');
             modal.classList.remove('hidden');
             
             // تحميل المكتبة إذا لم تكن محملة
             if (!window.officialAssetsLibrary || window.officialAssetsLibrary.length === 0) {
+                // إظهار شريط التحميل
+                if (loadingBar) loadingBar.classList.remove('hidden');
+                grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-indigo-500"></i></div>';
+                
                 // محاولة تحميل المكتبة
                 if (typeof loadAssetsLibraryFromGitHub === 'function') {
                     loadAssetsLibraryFromGitHub();
                 }
                 // انتظار التحميل ثم المزامنة
-                setTimeout(syncMobileAssetsCategories, 500);
+                setTimeout(() => {
+                    syncMobileAssetsCategories();
+                    if (loadingBar) loadingBar.classList.add('hidden');
+                    grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
+                }, 1500);
             } else {
                 syncMobileAssetsCategories();
+                if (loadingBar) loadingBar.classList.add('hidden');
             }
         }
         
@@ -2893,7 +2911,15 @@
             const mainSelect = document.getElementById('assets-category-select');
             const mobileSelect = document.getElementById('mobile-assets-category-select');
             if (mainSelect && mobileSelect) {
-                mobileSelect.innerHTML = mainSelect.innerHTML;
+                // نسخ الخيارات مع تغيير الخيار الأول
+                let html = mainSelect.innerHTML;
+                // استبدال أي أيقونة في الخيار الأول بأيقونة الباليت
+                html = html.replace(/📂|🎨/, '🎨');
+                mobileSelect.innerHTML = html;
+                // التأكد من أن الخيار الأول يحتوي على الأيقونة الصحيحة
+                if (mobileSelect.options[0]) {
+                    mobileSelect.options[0].text = '🎨 اختر تصنيفاً...';
+                }
             }
         }
         
@@ -2907,7 +2933,7 @@
             
             // إذا لم تكن موجودة، حاول تحميلها
             if (!library || library.length === 0) {
-                mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div>';
+                mobileGrid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-indigo-500"></i> جاري التحميل...</div>';
                 
                 // تحميل المكتبة مباشرة
                 fetch('./Official.json?t=' + Date.now())
@@ -2918,13 +2944,13 @@
                         loadMobileAssetsCategory();
                     })
                     .catch(e => {
-                        mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-red-400 py-8">خطأ في التحميل</div>';
+                        mobileGrid.innerHTML = '<div class="col-span-3 text-center text-xs text-red-400 py-8">خطأ في التحميل</div>';
                     });
                 return;
             }
             
             if (index === '' || !library[index]) {
-                mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
+                mobileGrid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
                 return;
             }
             
@@ -2932,7 +2958,7 @@
             mobileGrid.innerHTML = '';
             
             if (!category.items || category.items.length === 0) {
-                mobileGrid.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-400 py-8">لا توجد عناصر</div>';
+                mobileGrid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8">لا توجد عناصر</div>';
                 return;
             }
             
@@ -2941,12 +2967,12 @@
                 const isLocked = idx >= freeCount && window.userTier === 'free';
                 
                 const div = document.createElement('div');
-                div.className = 'bg-slate-100 rounded-lg p-1.5 cursor-pointer hover:bg-slate-200 active:scale-95 transition-all';
+                div.className = 'bg-white rounded-xl p-2 cursor-pointer hover:bg-indigo-50 active:scale-95 transition-all border border-slate-200 shadow-sm';
                 if (isLocked) div.style.opacity = '0.5';
                 
                 const img = document.createElement('img');
                 img.src = item.src;
-                img.className = 'w-full h-12 object-contain rounded';
+                img.className = 'w-full h-20 object-contain rounded-lg';
                 img.draggable = false;
                 
                 div.appendChild(img);
