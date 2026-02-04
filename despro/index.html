@@ -42,7 +42,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=AUTO_ZOOM_1770240710">
+    <link rel="stylesheet" href="css/style.css?v=LAYERS_MODAL_1770241664">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -777,8 +777,8 @@
                 </div>
             </div>
 
-            <!-- قسم الطبقات الجديد -->
-            <div id="layers-container" class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+            <!-- قسم الطبقات الجديد - مخفي على الموبايل -->
+            <div id="layers-container" class="bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0] hidden md:block">
                 <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayersPanel()">
                     <label class="text-xs font-bold text-[#1e293b] flex items-center gap-2 cursor-pointer">
                         <i class="fas fa-layer-group text-[#ec4899]"></i> الطبقات
@@ -1657,7 +1657,7 @@
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
     </style>
 
-    <script src="js/app.js?v=AUTO_ZOOM_1770240710"></script>
+    <script src="js/app.js?v=LAYERS_MODAL_1770241664"></script>
     <script src="js/social_media.js?v=20260202_99"></script>
     <script src="js/discount_maker.js?v=20260202_99"></script>
     <script src="js/my_projects.js?v=20260203_v2_FORCE"></script>
@@ -1968,7 +1968,7 @@
                     <span class="text-[8px] font-bold text-white">العناصر</span>
                 </button>
                 <!-- زر الطبقات -->
-                <button onclick="toggleLayersPanel()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-layer-group text-white text-sm"></i>
                     <span class="text-[8px] font-bold text-slate-300">الطبقات</span>
                 </button>
@@ -2223,6 +2223,30 @@
                         <i class="fas fa-tags text-amber-500 text-xl"></i>
                         <span class="text-[10px] font-bold text-slate-700">خصومات</span>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Layers Modal === -->
+    <!-- ============================================ -->
+    <div id="mobile-layers-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileLayersModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[60vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fas fa-layer-group text-pink-600"></i> الطبقات
+                </h3>
+                <button onclick="closeMobileLayersModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-3 overflow-y-auto max-h-[calc(60vh-50px)]">
+                <div id="mobile-layers-list" class="space-y-2">
+                    <div class="text-center text-xs text-slate-400 py-8">لا توجد عناصر في منطقة العمل</div>
                 </div>
             </div>
         </div>
@@ -2588,6 +2612,112 @@
         
         function closeMobileExportModal() {
             document.getElementById('mobile-export-modal').classList.add('hidden');
+        }
+        
+        // دوال نافذة الطبقات للجوال
+        function openMobileLayersModal() {
+            document.getElementById('mobile-layers-modal').classList.remove('hidden');
+            updateMobileLayersList();
+        }
+        
+        function closeMobileLayersModal() {
+            document.getElementById('mobile-layers-modal').classList.add('hidden');
+        }
+        
+        // تحديث قائمة الطبقات في نافذة الموبايل
+        function updateMobileLayersList() {
+            const layersList = document.getElementById('mobile-layers-list');
+            const card = document.getElementById('card');
+            if (!layersList || !card) return;
+            
+            const elements = Array.from(card.querySelectorAll('.draggable-el'));
+            
+            if (elements.length === 0) {
+                layersList.innerHTML = '<div class="text-center text-xs text-slate-400 py-8">لا توجد عناصر في منطقة العمل</div>';
+                return;
+            }
+            
+            // ترتيب العناصر حسب z-index (الأعلى أولاً)
+            elements.sort((a, b) => {
+                const zA = parseInt(a.style.zIndex) || 0;
+                const zB = parseInt(b.style.zIndex) || 0;
+                return zB - zA;
+            });
+            
+            layersList.innerHTML = '';
+            
+            elements.forEach((el, index) => {
+                const id = el.dataset.elementId || el.id || `element-${index}`;
+                const isText = el.classList.contains('text-layer');
+                const isImage = el.tagName === 'IMG' || el.classList.contains('image-layer');
+                const isShape = el.classList.contains('shape-layer');
+                const isHidden = el.style.display === 'none';
+                const isSelected = el.classList.contains('selected');
+                
+                // تحديد الأيقونة والاسم
+                let icon = 'fas fa-cube';
+                let name = 'عنصر';
+                
+                if (isText) {
+                    icon = 'fas fa-font';
+                    name = el.innerText?.substring(0, 15) || 'نص';
+                    if (name.length > 15) name += '...';
+                } else if (isImage) {
+                    icon = 'fas fa-image';
+                    name = 'صورة';
+                } else if (isShape) {
+                    icon = 'fas fa-shapes';
+                    name = 'شكل';
+                }
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `flex items-center gap-2 p-2.5 rounded-xl border transition-all ${isSelected ? 'bg-indigo-50 border-indigo-300' : 'bg-slate-50 border-slate-200'}`;
+                itemDiv.innerHTML = `
+                    <div class="flex items-center gap-2 flex-1 cursor-pointer" onclick="selectLayerFromMobile('${id}')">
+                        <i class="${icon} text-sm ${isSelected ? 'text-indigo-600' : 'text-slate-500'}"></i>
+                        <span class="text-xs font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'} truncate max-w-[120px]">${name}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="toggleMobileLayerVisibility('${id}')" class="w-7 h-7 rounded-lg ${isHidden ? 'bg-slate-200' : 'bg-white'} border border-slate-200 flex items-center justify-center text-slate-500 active:scale-95">
+                            <i class="fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'} text-xs"></i>
+                        </button>
+                        <button onclick="deleteMobileLayer('${id}')" class="w-7 h-7 rounded-lg bg-white border border-red-200 flex items-center justify-center text-red-500 active:scale-95">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                layersList.appendChild(itemDiv);
+            });
+        }
+        
+        // تحديد طبقة من نافذة الموبايل
+        function selectLayerFromMobile(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element && typeof selectEl === 'function') {
+                selectEl(element);
+                updateMobileLayersList();
+            }
+        }
+        
+        // إخفاء/إظهار طبقة من الموبايل
+        function toggleMobileLayerVisibility(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element) {
+                element.style.display = element.style.display === 'none' ? '' : 'none';
+                updateMobileLayersList();
+            }
+        }
+        
+        // حذف طبقة من الموبايل
+        function deleteMobileLayer(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element && typeof removeEl === 'function') {
+                removeEl(element);
+                updateMobileLayersList();
+            }
         }
         
         // دوال نافذة الخلفية للجوال
