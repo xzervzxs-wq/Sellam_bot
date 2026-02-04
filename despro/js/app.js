@@ -4826,6 +4826,7 @@
 
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
+            window.activeEl = null;
 
             // إلغاء وضع الممحاة عند إزالة التحديد
             if(eraserMode) exitEraserMode();
@@ -4833,8 +4834,15 @@
             // إخفاء النافذة العائمة
             const floatToolbar = document.getElementById('floating-context-toolbar');
             const closeFloatBtn = document.getElementById('close-floating-toolbar');
-            if(floatToolbar) floatToolbar.classList.add('hidden');
+            if(floatToolbar) {
+                floatToolbar.classList.add('hidden');
+                floatToolbar.style.display = 'none';
+            }
             if(closeFloatBtn) closeFloatBtn.classList.add('hidden');
+            
+            // إخفاء لوحة تحرير النص
+            const textEditorPanel = document.getElementById('text-editor-panel');
+            if(textEditorPanel) textEditorPanel.style.display = 'none';
 
             document.getElementById('quick-props').classList.add('hidden');
             document.getElementById('quick-props').classList.remove('active');
@@ -4889,6 +4897,7 @@
             // إلغاء التحديد
             if(activeEl) activeEl.classList.remove('selected');
             activeEl = null;
+            window.activeEl = null;
 
             // إلغاء وضع الممحاة عند إزالة التحديد
             if(eraserMode) exitEraserMode();
@@ -4896,8 +4905,15 @@
             // إخفاء النافذة العائمة
             const floatToolbar = document.getElementById('floating-context-toolbar');
             const closeFloatBtn = document.getElementById('close-floating-toolbar');
-            if(floatToolbar) floatToolbar.classList.add('hidden');
+            if(floatToolbar) {
+                floatToolbar.classList.add('hidden');
+                floatToolbar.style.display = 'none';
+            }
             if(closeFloatBtn) closeFloatBtn.classList.add('hidden');
+            
+            // إخفاء لوحة تحرير النص
+            const textEditorPanel = document.getElementById('text-editor-panel');
+            if(textEditorPanel) textEditorPanel.style.display = 'none';
 
             document.getElementById('quick-props').classList.add('hidden');
             document.getElementById('quick-props').classList.remove('active');
@@ -6639,18 +6655,54 @@
         // ==========================================
         function closeFloatingToolbar() {
             const toolbar = document.getElementById('floating-context-toolbar');
-            if (toolbar) toolbar.classList.add('hidden');
-
-            // إلغاء تحديد العنصر النشط
+            if (toolbar) {
+                toolbar.classList.add('hidden');
+                toolbar.style.display = 'none';
+            }
+            
+            const gradientRow = document.getElementById('gradient-toggle-row');
+            const fontControls = document.getElementById('top-font-controls');
+            const textEditorPanel = document.getElementById('text-editor-panel');
+            const gradControls = document.getElementById('grad-controls');
+            
+            if (gradientRow) gradientRow.classList.add('hidden');
+            if (fontControls) {
+                fontControls.classList.add('hidden');
+                fontControls.classList.remove('flex');
+            }
+            if (textEditorPanel) textEditorPanel.style.display = 'none';
+            
+            if (gradControls && gradControls.classList.contains('active')) {
+                const elementGradInputs = document.getElementById('element-grad-inputs');
+                const globalGradInputs = document.getElementById('global-grad-inputs');
+                const btnGrad = document.getElementById('btn-grad');
+                
+                if (elementGradInputs) {
+                    elementGradInputs.classList.add('hidden');
+                    elementGradInputs.classList.remove('flex');
+                }
+                if (globalGradInputs) {
+                    globalGradInputs.classList.remove('hidden');
+                    globalGradInputs.classList.add('flex');
+                }
+                if (!hasGradient && btnGrad) {
+                    gradControls.classList.remove('active');
+                    btnGrad.classList.remove('bg-[#6366f1]', 'text-white');
+                    btnGrad.classList.add('bg-[#f8fafc]', 'text-[#1e293b]');
+                }
+            }
+            
             if (activeEl) {
                 activeEl.classList.remove('selected');
                 activeEl.querySelectorAll('.resize-handle').forEach(h => h.style.display = 'none');
                 activeEl = null;
-
-                // إخفاء لوحة الأنماط الجانبية
-                document.getElementById('style-panel').classList.remove('open');
+                window.activeEl = null;
+                
+                const stylePanel = document.getElementById('style-panel');
+                if (stylePanel) stylePanel.classList.remove('open');
             }
         }
+        window.closeFloatingToolbar = closeFloatingToolbar;
 
         // دالة تحديث حالة واجهة التدرج بناءً على العنصر المحدد
         function updateGradientUIState(el) {
