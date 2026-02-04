@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- الدائرة الخلفية -->
+  <circle cx="50" cy="50" r="48" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- الريال R -->
+  <text x="50" y="65" font-family="Arial, sans-serif" font-size="55" font-weight="bold" text-anchor="middle" fill="currentColor" letter-spacing="-2">﷼</text>
+</svg>

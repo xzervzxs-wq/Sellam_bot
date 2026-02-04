@@ -42,7 +42,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=UI_FIX_1770242814">
+    <link rel="stylesheet" href="css/style.css?v=MobileFix_1770243505">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -596,7 +596,7 @@
 
 
     <!-- واجهة التطبيق -->
-    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
+    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:min-h-screen relative">
         
         <!-- اللوحة الجانبية -->
         <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
@@ -1386,7 +1386,7 @@
     <div id="close-floating-toolbar" class="hidden"></div>
 
     <!-- Footer -->
-    <footer class="relative bg-gradient-to-r from-[#1e1b4b] to-[#312e81] text-white py-4 mt-auto border-t border-[#4338ca]/50 shadow-lg">
+    <footer class="relative bg-gradient-to-r from-[#1e1b4b] to-[#312e81] text-white py-4 lg:mt-auto border-t border-[#4338ca]/50 shadow-lg mb-[60px] md:mb-0 transition-all">
         <div class="max-w-7xl mx-auto px-4">
             <!-- الصف الرئيسي -->
             <div class="flex flex-wrap items-center justify-between gap-4">
