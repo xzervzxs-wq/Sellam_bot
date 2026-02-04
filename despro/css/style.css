@@ -137,6 +137,28 @@
             border-color: #334155 !important;
         }
         
+        /* أبعاد القياسات المدمجة للجوال - الوضع الليلي */
+        :root.dark-mode #mobile-dimensions-compact {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        :root.dark-mode #mobile-dimensions-compact input {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+        }
+        :root.dark-mode #mobile-dimensions-compact span {
+            color: #94a3b8 !important;
+        }
+        :root.dark-mode #mobile-dimensions-compact button {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #818cf8 !important;
+        }
+        :root.dark-mode #mobile-dimensions-compact button:hover {
+            background-color: #1e293b !important;
+        }
+        
         /* تأكيد إضافي لمربع إضافة النصوص */
         :root.dark-mode #add-text-container {
             background-color: #0f172a !important;
@@ -678,7 +700,7 @@
         .asset-item {
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            overflow: hidden;
+            overflow: visible;
             cursor: pointer;
             transition: all 0.2s;
             height: 80px;
@@ -686,6 +708,7 @@
             align-items: center;
             justify-content: center;
             background: #f8fafc;
+            position: relative;
         }
         .asset-item:hover {
             border-color: #6366f1;
