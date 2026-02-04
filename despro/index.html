@@ -2583,10 +2583,10 @@
         
         // دالة زر النص في البار السفلي
         function handleMobileTextButton() {
-            // التحقق إذا كان هناك نص محدد
-            const selectedEl = window.activeEl || window.selectedElement;
+            // التحقق إذا كان هناك نص محدد (له class selected وهو text-layer)
+            const selectedTextEl = document.querySelector('#card .text-layer.selected');
             
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            if (selectedTextEl) {
                 // نص محدد - فتح نافذة تنسيق النص (كل أدوات التولبار العائم)
                 openMobileTextEditModal();
             } else {
@@ -2656,9 +2656,9 @@
             const modal = document.getElementById('mobile-text-edit-modal');
             if (modal) {
                 modal.classList.remove('hidden');
-                // تعبئة البيانات الحالية
-                const selectedEl = window.activeEl || window.selectedElement;
-                if (selectedEl && selectedEl.classList.contains('text-layer')) {
+                // تعبئة البيانات الحالية - استخدام العنصر المحدد مباشرة من DOM
+                const selectedEl = document.querySelector('#card .text-layer.selected');
+                if (selectedEl) {
                     // تحديث نوع الخط
                     const fontSelect = document.getElementById('mobile-font-select');
                     if (fontSelect) {
@@ -2693,16 +2693,20 @@
         }
         
         // دوال تطبيق التنسيقات على النص المحدد
+        function getSelectedTextElement() {
+            return document.querySelector('#card .text-layer.selected');
+        }
+        
         function applyMobileFontChange(fontFamily) {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 selectedEl.style.fontFamily = fontFamily;
             }
         }
         
         function applyMobileColorChange(color) {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 selectedEl.style.color = color;
                 // إزالة التدرج إذا موجود
                 selectedEl.style.backgroundImage = 'none';
@@ -2712,8 +2716,8 @@
         }
         
         function applyMobileSizeChange(size) {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 selectedEl.style.fontSize = size + 'px';
                 // تحديث حقل الحجم
                 const sizeInput = document.getElementById('mobile-edit-text-size');
@@ -2722,23 +2726,23 @@
         }
         
         function toggleMobileBold() {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 const current = selectedEl.style.fontWeight;
                 selectedEl.style.fontWeight = (current === 'bold' || current >= 700) ? 'normal' : 'bold';
             }
         }
         
         function toggleMobileItalic() {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 selectedEl.style.fontStyle = selectedEl.style.fontStyle === 'italic' ? 'normal' : 'italic';
             }
         }
         
         function toggleMobileUnderline() {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 const current = selectedEl.style.textDecoration;
                 if (current.includes('underline')) {
                     selectedEl.style.textDecoration = current.replace('underline', '').trim() || 'none';
@@ -2749,8 +2753,8 @@
         }
         
         function toggleMobileStrike() {
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 const current = selectedEl.style.textDecoration;
                 if (current.includes('line-through')) {
                     selectedEl.style.textDecoration = current.replace('line-through', '').trim() || 'none';
@@ -2763,8 +2767,8 @@
         // دالة تعديل محتوى النص
         function openMobileEditContentModal() {
             closeMobileTextEditModal();
-            const selectedEl = window.activeEl || window.selectedElement;
-            if (selectedEl && selectedEl.classList.contains('text-layer')) {
+            const selectedEl = getSelectedTextElement();
+            if (selectedEl) {
                 const textDiv = selectedEl.querySelector('.user-text') || selectedEl;
                 const newText = prompt('أدخل النص الجديد:', textDiv.innerText);
                 if (newText !== null && newText.trim() !== '') {
