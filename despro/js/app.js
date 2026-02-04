@@ -406,6 +406,10 @@
             }
         }
 
+        // Promise لتتبع حالة تحميل المكتبة
+        let assetsLoadingPromise = null;
+        window.assetsLoadingPromise = null;
+        
         function loadAssetsLibraryFromGitHub() {
             const grid = document.getElementById('assets-grid');
             const select = document.getElementById('assets-category-select');
@@ -418,20 +422,25 @@
             // التحقق من وجود البيانات المحملة مسبقاً
             if (officialAssetsLibrary && officialAssetsLibrary.length > 0) {
                 // ملء قائمة التصنيفات
-                select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
-                officialAssetsLibrary.forEach((category, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = category.name;
-                    select.appendChild(option);
-                });
+                if (select) {
+                    select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
+                    officialAssetsLibrary.forEach((category, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = category.name;
+                        select.appendChild(option);
+                    });
+                    select.value = 0;
+                    loadAssetsCategory();
+                }
 
-                // اختيار أول تصنيف تلقائياً
-                select.value = 0;
-                loadAssetsCategory();
-
-                console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
-                return;
+                console.log('✅ المكتبة جاهزة:', officialAssetsLibrary.length, 'تصنيف');
+                return Promise.resolve(officialAssetsLibrary);
+            }
+            
+            // إذا كان التحميل جاري بالفعل، ارجع نفس الـ Promise
+            if (assetsLoadingPromise) {
+                return assetsLoadingPromise;
             }
 
             // عرض رسالة تحميل
@@ -444,7 +453,7 @@
                 </div>`;
 
             // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
-            fetch('./Official.json?t=' + Date.now())
+            assetsLoadingPromise = fetch('./Official.json?t=' + Date.now())
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('فشل تحميل الملف');
@@ -472,11 +481,19 @@
                     }
 
                     console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
+                    return data;
                 })
                 .catch(error => {
                     console.error('خطأ في تحميل المكتبة:', error);
-                    grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
+                    if (grid) {
+                        grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
+                    }
+                    assetsLoadingPromise = null; // السماح بإعادة المحاولة
+                    throw error;
                 });
+            
+            window.assetsLoadingPromise = assetsLoadingPromise;
+            return assetsLoadingPromise;
         }
 
         function loadAssetsCategory() {
