@@ -2638,7 +2638,7 @@
     
     <script>
         // Mobile Bottom Bar Functions
-        function openMobileAssetsModal() {
+        async function openMobileAssetsModal() {
             const modal = document.getElementById('mobile-assets-modal');
             const loadingBar = document.getElementById('mobile-assets-loading');
             const grid = document.getElementById('mobile-assets-grid');
@@ -2648,18 +2648,26 @@
             if (!window.officialAssetsLibrary || window.officialAssetsLibrary.length === 0) {
                 // إظهار شريط التحميل
                 if (loadingBar) loadingBar.classList.remove('hidden');
-                grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-indigo-500"></i></div>';
+                grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-indigo-500"></i> جاري تحميل العناصر...</div>';
                 
-                // محاولة تحميل المكتبة
-                if (typeof loadAssetsLibraryFromGitHub === 'function') {
-                    loadAssetsLibraryFromGitHub();
-                }
-                // انتظار التحميل ثم المزامنة
-                setTimeout(() => {
+                try {
+                    // انتظار التحميل فعلياً
+                    if (window.assetsLoadingPromise) {
+                        await window.assetsLoadingPromise;
+                    } else if (typeof loadAssetsLibraryFromGitHub === 'function') {
+                        await loadAssetsLibraryFromGitHub();
+                    }
+                    
+                    // التحميل نجح - مزامنة التصنيفات
                     syncMobileAssetsCategories();
                     if (loadingBar) loadingBar.classList.add('hidden');
                     grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
-                }, 1500);
+                } catch (error) {
+                    // التحميل فشل
+                    console.error('فشل تحميل العناصر:', error);
+                    if (loadingBar) loadingBar.classList.add('hidden');
+                    grid.innerHTML = '<div class="col-span-3 text-center text-xs text-red-400 py-8"><i class="fas fa-exclamation-triangle"></i> فشل التحميل - تأكد من الانترنت</div>';
+                }
             } else {
                 syncMobileAssetsCategories();
                 if (loadingBar) loadingBar.classList.add('hidden');
