@@ -4434,10 +4434,16 @@
             const closeFloatBtn = document.getElementById('close-floating-toolbar');
 
             if (el.classList.contains('image-layer') || el.classList.contains('frame-layer')) {
-                 if(floatToolbar) floatToolbar.classList.add('hidden');
+                 if(floatToolbar) {
+                     floatToolbar.classList.add('hidden');
+                     floatToolbar.style.display = 'none';
+                 }
                  if(closeFloatBtn) closeFloatBtn.classList.add('hidden');
             } else {
-                 if(floatToolbar) floatToolbar.classList.remove('hidden');
+                 if(floatToolbar) {
+                     floatToolbar.classList.remove('hidden');
+                     floatToolbar.style.display = 'flex'; // إعادة تعيين display بعد إلغاء التحديد السابق
+                 }
                  if(closeFloatBtn) closeFloatBtn.classList.remove('hidden');
             }
 
