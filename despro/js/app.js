@@ -86,10 +86,12 @@
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
+        window.userTier = window.userTier || 'free'; // إذا لم يُحدد من قبل في head
         const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
 
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
+            window.userTier = userTier;
             localStorage.setItem('userTier', userTier);
             applyTierRestrictions();
         }
@@ -7230,6 +7232,8 @@ function checkSession() {
             if (expiryDate >= today) {
                 // الجلسة صالحة
                 userTier = 'premium';
+                window.userTier = 'premium';
+                localStorage.setItem('userTier', 'premium');
                 document.documentElement.setAttribute('data-tier', 'premium');
                 updateStudioName(session.name);
                 updateFooterForUser(session.name);
