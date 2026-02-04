@@ -860,7 +860,7 @@
                     </div>
                     
                     <!-- قسم الأدوات الذكية - SMART TOOLS -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
+                    <div id="smart-tools-section" class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
                         <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
                             SMART TOOLS
                         </span>
@@ -900,7 +900,7 @@
                     </div>
 
                     <!-- قسم أدوات الأعمال - BUSINESS TOOLS -->
-                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
+                    <div id="business-tools-section" class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
                         <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
                             BUSINESS TOOLS
                         </span>
@@ -1936,87 +1936,65 @@
     <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] bg-white/95 backdrop-blur-lg border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] px-1 py-1.5 pb-[max(6px,env(safe-area-inset-bottom))] lg:hidden">
         <div class="flex justify-around items-center gap-1 max-w-lg mx-auto">
             <!-- زر العناصر -->
-            <button onclick="openMobileAssetsModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg bg-gradient-to-b from-indigo-50 to-white border border-indigo-100 active:scale-95 transition-all">
-                <i class="fas fa-shapes text-indigo-600 text-sm"></i>
-                <span class="text-[8px] font-bold text-indigo-700">العناصر</span>
+            <button onclick="openMobileAssetsModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-lg bg-gradient-to-b from-indigo-50 to-white border border-indigo-100 active:scale-95 transition-all">
+                <i class="fas fa-shapes text-indigo-600 text-xs"></i>
+                <span class="text-[7px] font-bold text-indigo-700">العناصر</span>
             </button>
-            <!-- زر أدوات الأعمال -->
-            <button onclick="openMobileWorkToolsModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg bg-gradient-to-b from-emerald-50 to-white border border-emerald-100 active:scale-95 transition-all">
-                <i class="fas fa-tools text-emerald-600 text-sm"></i>
-                <span class="text-[8px] font-bold text-emerald-700">أدوات</span>
+            <!-- زر بزنس تولز -->
+            <button onclick="openMobileBusinessToolsModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-lg bg-gradient-to-b from-emerald-50 to-white border border-emerald-100 active:scale-95 transition-all">
+                <i class="fas fa-briefcase text-emerald-600 text-xs"></i>
+                <span class="text-[7px] font-bold text-emerald-700">بزنس</span>
             </button>
             <!-- زر الأدوات الذكية -->
-            <button onclick="openMobileSmartToolsModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg bg-gradient-to-b from-purple-50 to-white border border-purple-100 active:scale-95 transition-all">
-                <i class="fas fa-magic text-purple-600 text-sm"></i>
-                <span class="text-[8px] font-bold text-purple-700">ذكية</span>
+            <button onclick="openMobileSmartToolsModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-lg bg-gradient-to-b from-purple-50 to-white border border-purple-100 active:scale-95 transition-all">
+                <i class="fas fa-magic text-purple-600 text-xs"></i>
+                <span class="text-[7px] font-bold text-purple-700">ذكية</span>
             </button>
             <!-- زر أعمالي -->
-            <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg bg-gradient-to-b from-amber-50 to-white border border-amber-100 active:scale-95 transition-all">
-                <i class="fas fa-palette text-amber-600 text-sm"></i>
-                <span class="text-[8px] font-bold text-amber-700">أعمالي</span>
+            <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...')" class="flex-1 flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-lg bg-gradient-to-b from-amber-50 to-white border border-amber-100 active:scale-95 transition-all">
+                <i class="fas fa-palette text-amber-600 text-xs"></i>
+                <span class="text-[7px] font-bold text-amber-700">أعمالي</span>
             </button>
             <!-- زر التصدير -->
-            <button onclick="openMobileExportModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg bg-gradient-to-b from-pink-50 to-white border border-pink-100 active:scale-95 transition-all">
-                <i class="fas fa-download text-pink-600 text-sm"></i>
-                <span class="text-[8px] font-bold text-pink-700">تصدير</span>
+            <button onclick="openMobileExportModal()" class="flex-1 flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-lg bg-gradient-to-b from-pink-50 to-white border border-pink-100 active:scale-95 transition-all">
+                <i class="fas fa-download text-pink-600 text-xs"></i>
+                <span class="text-[7px] font-bold text-pink-700">تصدير</span>
             </button>
         </div>
     </div>
 
     <!-- ============================================ -->
-    <!-- === Mobile Work Tools Modal === -->
+    <!-- === Mobile Business Tools Modal === -->
     <!-- ============================================ -->
-    <div id="mobile-work-tools-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileWorkToolsModal()">
+    <div id="mobile-business-tools-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileBusinessToolsModal()">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[70vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[50vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
                 <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fas fa-tools text-emerald-600"></i> أدوات الأعمال
+                    <i class="fas fa-briefcase text-emerald-600"></i> BUSINESS TOOLS
                 </h3>
-                <button onclick="closeMobileWorkToolsModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                <button onclick="closeMobileBusinessToolsModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
             <!-- Content -->
-            <div class="p-3 space-y-3 overflow-y-auto max-h-[calc(70vh-50px)]">
-                <!-- إضافة نص -->
-                <div class="bg-gradient-to-b from-slate-50 to-white p-3 rounded-xl border border-slate-200">
-                    <h4 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-2">
-                        <i class="fas fa-font text-indigo-500"></i> إضافة نص
-                    </h4>
-                    <textarea id="mobile-user-text-input" rows="2" placeholder="اكتب النص هنا..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500 text-slate-800 resize-none mb-2"></textarea>
-                    <button onclick="addMobileUserText(); closeMobileWorkToolsModal();" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-bold active:scale-95 transition-all">
-                        <i class="fas fa-plus ml-1"></i> إضافة النص
-                    </button>
-                </div>
-                <!-- أزرار الأدوات -->
+            <div class="p-3">
                 <div class="grid grid-cols-3 gap-2">
-                    <label class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
-                        <i class="fas fa-image text-indigo-600 text-lg"></i>
-                        <span class="text-[9px] font-bold text-slate-700">صورة</span>
-                        <input type="file" onchange="addRegularImage(this); closeMobileWorkToolsModal();" class="hidden" accept="image/*">
-                    </label>
-                    <button onclick="createNewProject(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-file-circle-plus text-emerald-600 text-lg"></i>
-                        <span class="text-[9px] font-bold text-slate-700">مشروع جديد</span>
+                    <button onclick="openQRModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-qrcode text-indigo-600 text-xl"></i>
+                        <span class="text-[10px] font-bold text-slate-700">باركود</span>
                     </button>
-                    <button onclick="openMobileFramesMenu()" class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="far fa-square text-purple-600 text-lg"></i>
-                        <span class="text-[9px] font-bold text-slate-700">إطار</span>
+                    <button onclick="openSocialModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <div class="flex gap-1">
+                            <i class="fab fa-instagram text-pink-500 text-lg"></i>
+                            <i class="fab fa-tiktok text-slate-800 text-lg"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-700">سوشيال</span>
                     </button>
-                    <button onclick="openMobileShapesMenu()" class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-square-full text-pink-600 text-lg"></i>
-                        <span class="text-[9px] font-bold text-slate-700">شكل</span>
-                    </button>
-                    <label class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
-                        <i class="fas fa-folder-open text-amber-600 text-lg"></i>
-                        <span class="text-[9px] font-bold text-slate-700">فتح ملف</span>
-                        <input type="file" onchange="handleUniversalFile(this); closeMobileWorkToolsModal();" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
-                    </label>
-                    <button onclick="openMobileBackgroundMenu()" class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-fill-drip text-cyan-600 text-lg"></i>
-                        <span class="text-[9px] font-bold text-slate-700">خلفية</span>
+                    <button onclick="openDiscountModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-tags text-amber-500 text-xl"></i>
+                        <span class="text-[10px] font-bold text-slate-700">خصومات</span>
                     </button>
                 </div>
             </div>
@@ -2048,94 +2026,6 @@
                 </button>
                 <button onclick="generateA4Sheet(); closeMobileExportModal();" class="w-full bg-pink-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
                     <i class="fas fa-print"></i> طباعة A4
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- === Mobile Frames Menu === -->
-    <!-- ============================================ -->
-    <div id="mobile-frames-menu" class="fixed inset-0 z-[100000] hidden" onclick="closeMobileFramesMenu()">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
-            <div class="p-3 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-slate-800 text-sm">اختر نوع الإطار</h3>
-                <button onclick="closeMobileFramesMenu()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-            </div>
-            <div class="p-3 grid grid-cols-3 gap-2">
-                <button onclick="addFrameType('square'); closeMobileFramesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <i class="far fa-square text-indigo-600 text-xl"></i>
-                    <span class="text-[10px] font-bold text-slate-700">مربع</span>
-                </button>
-                <button onclick="addFrameType('rounded'); closeMobileFramesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <i class="far fa-square text-indigo-600 text-xl" style="border-radius: 6px;"></i>
-                    <span class="text-[10px] font-bold text-slate-700">منحني</span>
-                </button>
-                <button onclick="addFrameType('circle'); closeMobileFramesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <i class="far fa-circle text-indigo-600 text-xl"></i>
-                    <span class="text-[10px] font-bold text-slate-700">دائرة</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- === Mobile Shapes Menu === -->
-    <!-- ============================================ -->
-    <div id="mobile-shapes-menu" class="fixed inset-0 z-[100000] hidden" onclick="closeMobileShapesMenu()">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
-            <div class="p-3 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-slate-800 text-sm">اختر نوع الشكل</h3>
-                <button onclick="closeMobileShapesMenu()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-            </div>
-            <div class="p-3 grid grid-cols-4 gap-2">
-                <button onclick="addShapeType('square'); closeMobileShapesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <div class="w-5 h-5 bg-indigo-600 rounded" style="border-radius: 2px;"></div>
-                    <span class="text-[9px] font-bold text-slate-700">مربع</span>
-                </button>
-                <button onclick="addShapeType('circle'); closeMobileShapesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <div class="w-5 h-5 bg-indigo-600 rounded-full"></div>
-                    <span class="text-[9px] font-bold text-slate-700">دائرة</span>
-                </button>
-                <button onclick="addShapeType('line'); closeMobileShapesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <div class="w-5 h-0.5 bg-indigo-600"></div>
-                    <span class="text-[9px] font-bold text-slate-700">خط</span>
-                </button>
-                <button onclick="addShapeType('rounded'); closeMobileShapesMenu(); closeMobileWorkToolsModal();" class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 rounded-xl border border-slate-200 active:scale-95">
-                    <div class="w-5 h-5 bg-indigo-600 rounded-lg" style="border-radius: 4px;"></div>
-                    <span class="text-[9px] font-bold text-slate-700">منحنى</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- === Mobile Background Menu === -->
-    <!-- ============================================ -->
-    <div id="mobile-background-menu" class="fixed inset-0 z-[100000] hidden" onclick="closeMobileBackgroundMenu()">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
-            <div class="p-3 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-slate-800 text-sm">لون الخلفية</h3>
-                <button onclick="closeMobileBackgroundMenu()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-            </div>
-            <div class="p-4 space-y-3">
-                <div class="flex items-center gap-3">
-                    <label class="flex-1 flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
-                        <input type="color" id="mobile-bg-color" value="#ffffff" onchange="setCardBackgroundColor(this.value)" class="w-10 h-10 rounded-lg cursor-pointer border-0">
-                        <span class="text-sm font-bold text-slate-700">اختر اللون</span>
-                    </label>
-                </div>
-                <button onclick="toggleTransparentMode(); closeMobileBackgroundMenu(); closeMobileWorkToolsModal();" class="w-full flex items-center justify-center gap-2 p-3 bg-slate-100 rounded-xl text-slate-700 font-bold text-sm active:scale-95 transition-all">
-                    <i class="fas fa-chess-board"></i> خلفية شفافة
                 </button>
             </div>
         </div>
@@ -2260,14 +2150,72 @@
             animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
-        /* Add padding to body on mobile to account for bottom bar */
+        /* تحسينات وضع الجوال */
         @media (max-width: 1023px) {
             body {
-                padding-bottom: 70px !important;
+                padding-bottom: 60px !important;
             }
             /* إخفاء قسم التصدير في الجوال */
             #style-panel {
                 display: none !important;
+            }
+            /* إخفاء مكتبة العناصر من فوق */
+            #assets-library-container {
+                display: none !important;
+            }
+            /* إخفاء Smart Tools من الشريط العلوي */
+            #smart-tools-section {
+                display: none !important;
+            }
+            /* إخفاء Business Tools من الشريط العلوي */
+            #business-tools-section {
+                display: none !important;
+            }
+            /* تصغير قسم أبعاد التصميم */
+            #dimensions-container {
+                padding: 6px !important;
+            }
+            #dimensions-container > label:first-child {
+                font-size: 9px !important;
+                margin-bottom: 4px !important;
+            }
+            #dimensions-container input[type="text"] {
+                padding: 3px 4px !important;
+                font-size: 10px !important;
+                height: 28px !important;
+            }
+            #dimensions-container .grid {
+                gap: 4px !important;
+            }
+            #dimensions-container .text-\[9px\] {
+                font-size: 7px !important;
+            }
+            #dimensions-container span.absolute {
+                font-size: 9px !important;
+                top: 22px !important;
+            }
+            #size-display {
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+            }
+            /* تصغير قسم الزوم */
+            #zoom-container {
+                padding: 6px !important;
+                margin-top: 6px !important;
+            }
+            #zoom-container label {
+                font-size: 7px !important;
+            }
+            #zoom-container #zoom-display {
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+            }
+            #zoom-container input[type="range"] {
+                height: 4px !important;
+            }
+            #zoom-container .flex.gap-1 button {
+                font-size: 7px !important;
+                padding: 3px !important;
             }
         }
     </style>
@@ -2293,11 +2241,19 @@
         }
         
         function openMobileWorkToolsModal() {
-            document.getElementById('mobile-work-tools-modal').classList.remove('hidden');
+            document.getElementById('mobile-business-tools-modal').classList.remove('hidden');
         }
         
         function closeMobileWorkToolsModal() {
-            document.getElementById('mobile-work-tools-modal').classList.add('hidden');
+            document.getElementById('mobile-business-tools-modal').classList.add('hidden');
+        }
+        
+        function openMobileBusinessToolsModal() {
+            document.getElementById('mobile-business-tools-modal').classList.remove('hidden');
+        }
+        
+        function closeMobileBusinessToolsModal() {
+            document.getElementById('mobile-business-tools-modal').classList.add('hidden');
         }
         
         function openMobileExportModal() {
@@ -2306,40 +2262,6 @@
         
         function closeMobileExportModal() {
             document.getElementById('mobile-export-modal').classList.add('hidden');
-        }
-        
-        function openMobileFramesMenu() {
-            document.getElementById('mobile-frames-menu').classList.remove('hidden');
-        }
-        
-        function closeMobileFramesMenu() {
-            document.getElementById('mobile-frames-menu').classList.add('hidden');
-        }
-        
-        function openMobileShapesMenu() {
-            document.getElementById('mobile-shapes-menu').classList.remove('hidden');
-        }
-        
-        function closeMobileShapesMenu() {
-            document.getElementById('mobile-shapes-menu').classList.add('hidden');
-        }
-        
-        function openMobileBackgroundMenu() {
-            document.getElementById('mobile-background-menu').classList.remove('hidden');
-        }
-        
-        function closeMobileBackgroundMenu() {
-            document.getElementById('mobile-background-menu').classList.add('hidden');
-        }
-        
-        function addMobileUserText() {
-            const input = document.getElementById('mobile-user-text-input');
-            const mainInput = document.getElementById('user-text-input');
-            if (input && mainInput) {
-                mainInput.value = input.value;
-                addUserText();
-                input.value = '';
-            }
         }
         
         function syncMobileAssetsCategories() {
