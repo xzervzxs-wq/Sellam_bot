@@ -1562,63 +1562,46 @@
                     card.style.backgroundImage = 'none';
                 }
                 
-                // 4. التقاط البطاقة مباشرة مع Warm-up (لإصلاح الخطوط العربية)
+                // 4. التقاط البطاقة مباشرة
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Starting capture with warm-up technique...');
-                    
-                    if (typeof htmlToImage !== 'undefined') {
-                        // === WARM-UP CAPTURE (يُرمى - لإيقاظ رسم الخطوط العربية) ===
-                        if (loadingText) loadingText.innerText = "جاري تجهيز الخطوط...";
-                        
-                        await htmlToImage.toPng(card, {
-                            pixelRatio: 1,
-                            quality: 0.5,
-                            cacheBust: true,
-                            backgroundColor: isTransparent ? null : '#ffffff'
-                        });
-                        console.log('iOS: Warm-up capture done (discarded)');
-                        
-                        // انتظار بعد warm-up
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        // === FINAL CAPTURE (الصورة النهائية - جودة عالية) ===
-                        if (loadingText) loadingText.innerText = "جاري إنشاء الصورة النهائية...";
-                        
-                        cardDataUrl = await htmlToImage.toPng(card, {
-                            pixelRatio: 3,
-                            quality: 1.0,
-                            cacheBust: true,
+                    console.log('iOS: Trying html2canvas...');
+                    if (typeof html2canvas !== 'undefined') {
+                        const canvas = await html2canvas(card, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: true,
                             width: card.offsetWidth,
                             height: card.offsetHeight,
-                            backgroundColor: isTransparent ? null : '#ffffff'
+                            // تحسينات للنص العربي
+                            letterRendering: true,
+                            foreignObjectRendering: false,
+                            removeContainer: true
                         });
-                        console.log('iOS: Final capture success! Length: ' + cardDataUrl.length);
+                        cardDataUrl = canvas.toDataURL('image/png');
+                        console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
                     }
                 } catch (e) {
-                    console.error('iOS: htmlToImage failed', e);
+                    console.error('iOS: html2canvas failed', e);
                 }
                 
-                // Fallback to html2canvas
+                // Fallback to htmlToImage
                 if (!cardDataUrl || cardDataUrl.length < 1000) {
                     try {
-                        console.log('iOS: Fallback to html2canvas...');
-                        if (typeof html2canvas !== 'undefined') {
-                            const canvas = await html2canvas(card, {
-                                scale: 3,
-                                useCORS: true,
-                                allowTaint: true,
-                                backgroundColor: isTransparent ? null : '#ffffff',
-                                logging: false,
-                                width: card.offsetWidth,
-                                height: card.offsetHeight
+                        console.log('iOS: Trying htmlToImage...');
+                        if (typeof htmlToImage !== 'undefined') {
+                            cardDataUrl = await htmlToImage.toPng(card, {
+                                pixelRatio: 2,
+                                cacheBust: true,
+                                backgroundColor: isTransparent ? null : '#ffffff'
                             });
-                            cardDataUrl = canvas.toDataURL('image/png', 1.0);
-                            console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
+                            console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
                         }
                     } catch (e2) {
-                        console.error('iOS: html2canvas failed', e2);
+                        console.error('iOS: htmlToImage failed', e2);
                     }
                 }
                 
