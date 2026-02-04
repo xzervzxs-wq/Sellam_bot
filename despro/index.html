@@ -642,7 +642,7 @@
             </div>
 
             <!-- أدوات الإضافة -->
-            <div class="grid grid-cols-3 gap-2">
+            <div id="insert-tools-container" class="grid grid-cols-3 gap-2">
                 <label class="col-span-2 bg-white border border-dashed border-[#6366f1] py-3 rounded-lg text-[#1e293b] hover:bg-[#f8fafc] text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition group">
                     <i class="fas fa-image text-lg text-[#6366f1] group-hover:scale-110 transition-transform"></i> صورة
                     <input type="file" onchange="addRegularImage(this)" class="hidden" accept="image/*">
@@ -1985,6 +1985,11 @@
             </div>
             <!-- السطر الثاني: 4 أزرار -->
             <div class="grid grid-cols-4 gap-1.5">
+                <!-- زر إدراج -->
+                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-plus-circle text-white text-sm"></i>
+                    <span class="text-[8px] font-bold text-slate-300">إدراج</span>
+                </button>
                 <!-- زر بزنس تولز -->
                 <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-briefcase text-white text-sm"></i>
@@ -1999,11 +2004,6 @@
                 <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
                     <i class="fas fa-download text-white text-sm"></i>
                     <span class="text-[8px] font-bold text-white">تصدير</span>
-                </button>
-                <!-- زر الطباعة -->
-                <button onclick="generateA4Sheet()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-pink-500 hover:bg-pink-600 active:scale-95 transition-all">
-                    <i class="fas fa-print text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-white">طباعة</span>
                 </button>
             </div>
         </div>
@@ -2086,6 +2086,98 @@
                 <button onclick="applyMobileTextChanges()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
                     <i class="fas fa-check"></i> تطبيق التغييرات
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- === Mobile Insert Modal (إدراج) === -->
+    <!-- ============================================ -->
+    <div id="mobile-insert-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileInsertModal()">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[60vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-indigo-600"></i> إدراج عنصر
+                </h3>
+                <button onclick="closeMobileInsertModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- إضافة صورة -->
+                    <label class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border-2 border-dashed border-indigo-300 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-image text-indigo-600 text-2xl"></i>
+                        <span class="text-xs font-bold text-slate-700">صورة</span>
+                        <input type="file" onchange="addRegularImage(this); closeMobileInsertModal();" class="hidden" accept="image/*">
+                    </label>
+                    <!-- مشروع جديد -->
+                    <button onclick="createNewProject(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-file-circle-plus text-emerald-600 text-2xl"></i>
+                        <span class="text-xs font-bold text-slate-700">جديد</span>
+                    </button>
+                    <!-- إطار -->
+                    <button onclick="openMobileFrameOptions()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="far fa-square text-purple-600 text-2xl"></i>
+                        <span class="text-xs font-bold text-slate-700">إطار</span>
+                    </button>
+                    <!-- شكل -->
+                    <button onclick="openMobileShapeOptions()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-shapes text-pink-600 text-2xl"></i>
+                        <span class="text-xs font-bold text-slate-700">شكل</span>
+                    </button>
+                    <!-- فتح ملف -->
+                    <label class="col-span-2 flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-amber-50 to-white rounded-xl border border-amber-200 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-folder-open text-amber-600 text-2xl"></i>
+                        <span class="text-xs font-bold text-slate-700">فتح ملف</span>
+                        <input type="file" onchange="handleUniversalFile(this); closeMobileInsertModal();" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
+                    </label>
+                </div>
+                
+                <!-- خيارات الإطارات (مخفية) -->
+                <div id="mobile-frame-options" class="hidden mt-3 p-3 bg-slate-50 rounded-xl">
+                    <p class="text-xs font-bold text-slate-600 mb-2">اختر نوع الإطار:</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="addFrameType('square'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95">
+                            <i class="far fa-square text-lg text-indigo-600"></i>
+                            <p class="text-[10px] font-bold text-slate-600 mt-1">مربع</p>
+                        </button>
+                        <button onclick="addFrameType('rounded'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95">
+                            <i class="far fa-square text-lg text-indigo-600" style="border-radius:4px"></i>
+                            <p class="text-[10px] font-bold text-slate-600 mt-1">منحني</p>
+                        </button>
+                        <button onclick="addFrameType('circle'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95">
+                            <i class="far fa-circle text-lg text-indigo-600"></i>
+                            <p class="text-[10px] font-bold text-slate-600 mt-1">دائرة</p>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- خيارات الأشكال (مخفية) -->
+                <div id="mobile-shape-options" class="hidden mt-3 p-3 bg-slate-50 rounded-xl">
+                    <p class="text-xs font-bold text-slate-600 mb-2">اختر نوع الشكل:</p>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="addShapeType('square'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
+                            <div class="w-5 h-5 bg-indigo-600 rounded-sm"></div>
+                            <p class="text-[9px] font-bold text-slate-600 mt-1">مربع</p>
+                        </button>
+                        <button onclick="addShapeType('circle'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
+                            <div class="w-5 h-5 bg-indigo-600 rounded-full"></div>
+                            <p class="text-[9px] font-bold text-slate-600 mt-1">دائرة</p>
+                        </button>
+                        <button onclick="addShapeType('line'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
+                            <div class="w-5 h-0.5 bg-indigo-600 mt-2"></div>
+                            <p class="text-[9px] font-bold text-slate-600 mt-1">خط</p>
+                        </button>
+                        <button onclick="addShapeType('rounded'); closeMobileInsertModal();" class="p-3 bg-white rounded-lg border border-slate-200 active:scale-95 flex flex-col items-center">
+                            <div class="w-5 h-5 bg-indigo-600 rounded-lg"></div>
+                            <p class="text-[9px] font-bold text-slate-600 mt-1">منحنى</p>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2306,6 +2398,14 @@
             #background-section {
                 display: none !important;
             }
+            /* إخفاء قسم إضافة النصوص في الجوال */
+            #add-text-container {
+                display: none !important;
+            }
+            /* إخفاء أدوات الإضافة في الجوال (صورة، جديد، إطار، شكل) */
+            #insert-tools-container {
+                display: none !important;
+            }
             /* إخفاء قسم الأبعاد الأصلي في الجوال واستبداله بالمدمج */
             #dimensions-container {
                 display: none !important;
@@ -2328,7 +2428,18 @@
         function openMobileAssetsModal() {
             const modal = document.getElementById('mobile-assets-modal');
             modal.classList.remove('hidden');
-            syncMobileAssetsCategories();
+            
+            // تحميل المكتبة إذا لم تكن محملة
+            if (!window.officialAssetsLibrary || window.officialAssetsLibrary.length === 0) {
+                // محاولة تحميل المكتبة
+                if (typeof loadAssetsLibraryFromGitHub === 'function') {
+                    loadAssetsLibraryFromGitHub();
+                }
+                // انتظار التحميل ثم المزامنة
+                setTimeout(syncMobileAssetsCategories, 500);
+            } else {
+                syncMobileAssetsCategories();
+            }
         }
         
         function closeMobileAssetsModal() {
@@ -2399,12 +2510,30 @@
                 openMobileTextEditModal();
             } else {
                 // لا يوجد نص محدد - إضافة نص جديد
-                if (typeof addTextElement === 'function') {
-                    addTextElement('نص جديد');
-                } else if (typeof window.addTextElement === 'function') {
-                    window.addTextElement('نص جديد');
-                } else {
-                    alert('جاري تحميل الصفحة...');
+                // استخدام الطريقة نفسها المستخدمة في الزر الأصلي
+                try {
+                    if (typeof window.addTextElement === 'function') {
+                        window.addTextElement('نص جديد');
+                    } else if (typeof addTextElement === 'function') {
+                        addTextElement('نص جديد');
+                    } else if (typeof addUserText === 'function') {
+                        // استخدم textarea الأصلي
+                        const input = document.getElementById('user-text-input');
+                        if (input) {
+                            input.value = 'نص جديد';
+                            addUserText();
+                        }
+                    } else {
+                        // أخر محاولة - استدعاء من app.js
+                        const input = document.getElementById('user-text-input');
+                        if (input) {
+                            input.value = 'نص جديد';
+                            const btn = document.querySelector('[onclick="addUserText()"]');
+                            if (btn) btn.click();
+                        }
+                    }
+                } catch(e) {
+                    console.error('Error adding text:', e);
                 }
             }
         }
@@ -2498,6 +2627,32 @@
         
         // مراقبة تغيير التحديد
         setInterval(updateMobileTextButtonState, 300);
+        
+        // دوال نافذة الإدراج
+        function openMobileInsertModal() {
+            const modal = document.getElementById('mobile-insert-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                // إخفاء خيارات الإطار والشكل
+                document.getElementById('mobile-frame-options').classList.add('hidden');
+                document.getElementById('mobile-shape-options').classList.add('hidden');
+            }
+        }
+        
+        function closeMobileInsertModal() {
+            const modal = document.getElementById('mobile-insert-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        
+        function openMobileFrameOptions() {
+            document.getElementById('mobile-frame-options').classList.toggle('hidden');
+            document.getElementById('mobile-shape-options').classList.add('hidden');
+        }
+        
+        function openMobileShapeOptions() {
+            document.getElementById('mobile-shape-options').classList.toggle('hidden');
+            document.getElementById('mobile-frame-options').classList.add('hidden');
+        }
         
         function syncMobileAssetsCategories() {
             const mainSelect = document.getElementById('assets-category-select');
