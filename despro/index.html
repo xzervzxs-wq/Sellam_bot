@@ -69,7 +69,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=1770250040">
+    <link rel="stylesheet" href="css/style.css?v=1770250259">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -2887,10 +2887,18 @@
             
             // إضافة النص
             try {
-                if (typeof window.addTextElement === 'function') {
-                    window.addTextElement(text);
-                } else if (typeof addTextElement === 'function') {
-                    addTextElement(text);
+                if (typeof window.addTextToCanvas === 'function') {
+                    window.addTextToCanvas(text, false);
+                    if (typeof window.saveState === 'function') window.saveState();
+                } else if (typeof addTextToCanvas === 'function') {
+                    addTextToCanvas(text, false);
+                    if (typeof saveState === 'function') saveState();
+                } else if (typeof window.addUserText === 'function') {
+                    const input = document.getElementById('user-text-input');
+                    if (input) {
+                        input.value = text;
+                        window.addUserText();
+                    }
                 } else if (typeof addUserText === 'function') {
                     const input = document.getElementById('user-text-input');
                     if (input) {
@@ -2898,14 +2906,30 @@
                         addUserText();
                     }
                 } else {
-                    // أخر محاولة
-                    const input = document.getElementById('user-text-input');
-                    if (input) {
-                        input.value = text;
-                        const btn = document.querySelector('[onclick="addUserText()"]');
-                        if (btn) btn.click();
+                    // أخر محاولة - إنشاء النص مباشرة
+                    const card = document.getElementById('card');
+                    if (card) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'draggable-item text-layer';
+                        wrapper.style.cssText = 'position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #1e293b; font-size: 50px; font-family: "Cairo", sans-serif; font-weight: 600; cursor: move; z-index: 100;';
+                        
+                        const textDiv = document.createElement('div');
+                        textDiv.className = 'user-text';
+                        textDiv.contentEditable = true;
+                        textDiv.innerText = text;
+                        
+                        wrapper.appendChild(textDiv);
+                        card.appendChild(wrapper);
+                        
+                        if (typeof window.selectEl === 'function') window.selectEl(wrapper);
+                        if (typeof window.setupInteract === 'function') window.setupInteract(wrapper, 'text');
+                        if (typeof window.saveState === 'function') window.saveState();
                     }
                 }
+                
+                // مسح حقل النص
+                if (textarea) textarea.value = '';
+                
             } catch(e) {
                 console.error('Error adding text:', e);
             }
