@@ -1336,4 +1336,33 @@
     #auth-container {
         width: 100% !important;
     }
+    
+    /* ستايل النوافذ الفرعية - خط IBM Plex Sans Arabic */
+    #mobile-background-modal,
+    #mobile-add-text-modal,
+    #mobile-insert-modal,
+    #mobile-frame-modal,
+    #mobile-shape-modal,
+    #mobile-layers-modal,
+    #mobile-export-modal,
+    #mobile-smart-tools-modal,
+    #mobile-business-tools-modal,
+    #mobile-assets-modal,
+    #designer-panel-modal {
+        font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+    }
+    
+    /* النوافذ الفرعية - الخلفية فاتحة */
+    #mobile-background-modal > div:last-child,
+    #mobile-add-text-modal > div:last-child,
+    #mobile-insert-modal > div:last-child,
+    #mobile-frame-modal > div:last-child,
+    #mobile-shape-modal > div:last-child,
+    #mobile-layers-modal > div:last-child,
+    #mobile-export-modal > div:last-child,
+    #mobile-smart-tools-modal > div:last-child,
+    #mobile-business-tools-modal > div:last-child,
+    #mobile-assets-modal > div:last-child {
+        background: linear-gradient(to bottom, #ffffff, #f8fafc) !important;
+    }
 }
