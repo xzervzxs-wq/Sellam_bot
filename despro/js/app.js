@@ -1590,23 +1590,48 @@
                 
                 // 2. انتظار decode للصور (مهم جداً!)
                 if (loadingText) loadingText.innerText = "جاري معالجة الصور...";
-                const imgDecodePromises = Array.from(images).map(img => {
-                    if (img.complete && img.src.startsWith('data:')) {
-                        if (img.decode) return img.decode().catch(() => {});
-                        return Promise.resolve();
+                
+                // إعادة تعيين src لإجبار إعادة التحميل
+                for (const img of images) {
+                    if (img.src && img.src.startsWith('data:')) {
+                        const tempSrc = img.src;
+                        img.src = '';
+                        await new Promise(r => setTimeout(r, 50));
+                        img.src = tempSrc;
                     }
+                }
+                
+                // انتظار طويل لتحميل الصور
+                await new Promise(r => setTimeout(r, 1500));
+                
+                // التأكد من اكتمال تحميل كل صورة
+                const imgDecodePromises = Array.from(images).map(img => {
                     return new Promise(resolve => {
-                        img.onload = () => {
-                            if (img.decode) img.decode().catch(() => {});
-                            resolve();
-                        };
-                        img.onerror = resolve;
+                        if (img.complete && img.naturalWidth > 0) {
+                            if (img.decode) {
+                                img.decode().then(resolve).catch(resolve);
+                            } else {
+                                resolve();
+                            }
+                        } else {
+                            img.onload = () => {
+                                if (img.decode) {
+                                    img.decode().then(resolve).catch(resolve);
+                                } else {
+                                    resolve();
+                                }
+                            };
+                            img.onerror = resolve;
+                            // timeout للصور البطيئة
+                            setTimeout(resolve, 3000);
+                        }
                     });
                 });
                 await Promise.all(imgDecodePromises);
-                console.log('iOS: All images decoded');
+                console.log('iOS: All images decoded and ready');
                 
-                await new Promise(r => setTimeout(r, 500));
+                // انتظار إضافي للتأكد
+                await new Promise(r => setTimeout(r, 1000));
                 
                 if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
                 
@@ -1655,15 +1680,26 @@
                 try {
                     console.log('iOS: Using htmlToImage for Arabic text...');
                     if (typeof htmlToImage !== 'undefined') {
-                        // Warm-up capture (يُرمى - لإيقاظ رسم الخطوط)
+                        // Warm-up 1: لتحميل الصور والخطوط
+                        console.log('iOS: Warm-up 1...');
+                        await htmlToImage.toPng(card, { 
+                            quality: 0.3, 
+                            pixelRatio: 1,
+                            cacheBust: true
+                        });
+                        await new Promise(r => setTimeout(r, 1000));
+                        
+                        // Warm-up 2: لتثبيت الصور
+                        console.log('iOS: Warm-up 2...');
                         await htmlToImage.toPng(card, { 
                             quality: 0.5, 
-                            pixelRatio: 1
+                            pixelRatio: 2,
+                            cacheBust: true
                         });
+                        await new Promise(r => setTimeout(r, 1000));
                         
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        // التقاط نهائي بجودة عالية (htmlToImage أفضل للعربية)
+                        // التقاط نهائي بجودة عالية
+                        console.log('iOS: Final capture...');
                         cardDataUrl = await htmlToImage.toPng(card, {
                             quality: 1.0,
                             pixelRatio: 3,
