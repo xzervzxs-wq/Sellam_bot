@@ -1492,6 +1492,7 @@
             // استعادة الزوم إلى ما كان عليه قبل فتح المودال
             if (savedZoomBeforeA4 !== null) {
                 setCustomZoom(savedZoomBeforeA4);
+                savedZoomBeforeA4 = null;
             }
         }
 
@@ -1914,6 +1915,7 @@
 
                     // استعادة الزوم بعد النجاح
                     setCustomZoom(savedZoomBeforeA4);
+                    savedZoomBeforeA4 = null;
                 };
                 img.onerror = () => { throw new Error("فشل تحميل الصورة المنشأة"); };
                 img.src = cardDataUrl;
@@ -1923,6 +1925,7 @@
                 overlay.style.display = 'none';
                 // استعادة الزوم عند الفشل
                 setCustomZoom(savedZoomBeforeA4);
+                savedZoomBeforeA4 = null;
                 showInfoModal('حدثت مشكلة أثناء المعالجة. حاول تقليل عدد العناصر أو جودة الصور.', 'عذراً', '⚠️');
             }
         }
