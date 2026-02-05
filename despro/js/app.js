@@ -1426,7 +1426,7 @@
             });
         }
 
-        // --- وظائف الحفظ الجديدة المباشرة ---
+                // --- وظائف الحفظ الجديدة المباشرة ---
 
         async function saveWorkDirectly() {
              const overlay = document.getElementById('export-overlay');
@@ -1438,9 +1438,43 @@
                 deselect();
                 const card = document.getElementById('card');
                 
-                // تحويل الصور إلى Base64 (مهم للصور الخارجية)
-                if (typeof convertAllImagesToDataURL === 'function') {
-                    await convertAllImagesToDataURL(card);
+                // كشف iOS
+                const isIOSDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
+                                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                
+                // تحويل الصور الخارجية للآيفون عبر Proxy
+                const images = card.querySelectorAll('img');
+                const originalImageSrcs = new Map();
+                
+                if (isIOSDevice && images.length > 0) {
+                    if(loadingText) loadingText.innerText = "جاري تحويل الصور...";
+                    
+                    for (let i = 0; i < images.length; i++) {
+                        const img = images[i];
+                        const src = img.src || img.currentSrc;
+                        
+                        if (!src || src.startsWith('data:')) continue;
+                        
+                        // حفظ الأصلي
+                        originalImageSrcs.set(img, src);
+                        
+                        if(loadingText) loadingText.innerText = "جاري تحميل صورة " + (i+1) + " من " + images.length + "...";
+                        
+                        // جلب عبر Proxy
+                        try {
+                            if (typeof fetchImageViaProxy === 'function') {
+                                const dataUrl = await fetchImageViaProxy(src);
+                                if (dataUrl) {
+                                    img.src = dataUrl;
+                                    img.removeAttribute('srcset');
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('Failed to fetch image via proxy:', e);
+                        }
+                    }
+                    
+                    await new Promise(r => setTimeout(r, 500));
                 }
                 
                 await new Promise(r => setTimeout(r, 200));
@@ -1456,30 +1490,92 @@
                 const actualWidth = parseInt(card.getAttribute('data-card-width')) || card.offsetWidth;
                 const actualHeight = parseInt(card.getAttribute('data-card-height')) || card.offsetHeight;
                 
-                const pixelRatio = 4; // جودة عالية
+                // جودة مختلفة للآيفون والديسكتوب
+                const pixelRatio = isIOSDevice ? 3 : 4;
                 
-                // إعدادات التصدير
-                const options = {
-                    pixelRatio: pixelRatio,
-                    cacheBust: false,
-                    skipAutoScale: false,
-                    width: actualWidth,
-                    height: actualHeight,
-                    style: {
-                        transform: 'none',
-                        boxShadow: 'none',
-                        margin: '0',
-                        border: 'none',
-                        backgroundImage: 'none'
+                let dataUrl;
+                
+                if (isIOSDevice) {
+                    // === معالجة خاصة للآيفون ===
+                    if(loadingText) loadingText.innerText = "جاري تجهيز الخطوط...";
+                    
+                    // إصلاح الخطوط العربية
+                    const textElements = card.querySelectorAll('*');
+                    const originalStyles = new Map();
+                    
+                    textElements.forEach(el => {
+                        if (el.innerText && el.innerText.trim() && /[\u0600-\u06FF]/.test(el.innerText)) {
+                            originalStyles.set(el, {
+                                letterSpacing: el.style.letterSpacing,
+                                wordSpacing: el.style.wordSpacing
+                            });
+                            el.style.letterSpacing = '0';
+                            el.style.wordSpacing = 'normal';
+                            el.style.textRendering = 'optimizeLegibility';
+                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1';
+                        }
+                    });
+                    
+                    // انتظار تحميل الخطوط
+                    await document.fonts.ready;
+                    await new Promise(r => setTimeout(r, 300));
+                    
+                    // Warm-up captures للآيفون (مهم جداً!)
+                    for (let i = 0; i < 4; i++) {
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: i < 2 ? 1 : pixelRatio,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        await new Promise(r => setTimeout(r, 400));
                     }
-                };
+                    
+                    // إجبار المتصفح على إكمال الرسم
+                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
+                    await new Promise(r => setTimeout(r, 500));
+                    
+                    if(loadingText) loadingText.innerText = "جاري إنشاء الصورة...";
+                    
+                    // الالتقاط النهائي باستخدام toCanvas
+                    const canvas = await htmlToImage.toCanvas(card, {
+                        pixelRatio: pixelRatio,
+                        cacheBust: true,
+                        backgroundColor: isTransparent ? null : '#ffffff',
+                        width: actualWidth,
+                        height: actualHeight,
+                        skipAutoScale: true
+                    });
+                    dataUrl = canvas.toDataURL('image/png', 1.0);
+                    
+                    // استعادة الأنماط الأصلية
+                    originalStyles.forEach((styles, el) => {
+                        el.style.letterSpacing = styles.letterSpacing;
+                        el.style.wordSpacing = styles.wordSpacing;
+                    });
+                    
+                } else {
+                    // === الطريقة العادية للديسكتوب ===
+                    const options = {
+                        pixelRatio: pixelRatio,
+                        cacheBust: false,
+                        skipAutoScale: false,
+                        width: actualWidth,
+                        height: actualHeight,
+                        style: {
+                            transform: 'none',
+                            boxShadow: 'none',
+                            margin: '0',
+                            border: 'none',
+                            backgroundImage: 'none'
+                        }
+                    };
 
-                // إذا لم يكن شفافاً، نضيف خلفية بيضاء
-                if (!isTransparent) {
-                    options.backgroundColor = '#ffffff';
+                    if (!isTransparent) {
+                        options.backgroundColor = '#ffffff';
+                    }
+
+                    dataUrl = await htmlToImage.toPng(card, options);
                 }
-
-                const dataUrl = await htmlToImage.toPng(card, options);
 
                 // إعادة نمط الشطرنج
                 if (hadTransparentPattern) {
@@ -1488,16 +1584,72 @@
                     card.style.backgroundColor = 'transparent';
                 }
 
-                const link = document.createElement('a');
-                link.download = `design-${Date.now()}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // === حفظ/تنزيل الصورة ===
+                if (isIOSDevice) {
+                    // للآيفون: فتح نافذة جديدة للحفظ اليدوي
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                        newWindow.document.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>احفظ الصورة</title>
+                                <style>
+                                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                                    body { 
+                                        background: #1e293b; 
+                                        min-height: 100vh; 
+                                        display: flex; 
+                                        flex-direction: column; 
+                                        align-items: center; 
+                                        padding: 20px;
+                                        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                                    }
+                                    .tip {
+                                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                                        color: white;
+                                        padding: 15px 25px;
+                                        border-radius: 15px;
+                                        margin-bottom: 20px;
+                                        text-align: center;
+                                        font-size: 14px;
+                                        font-weight: bold;
+                                    }
+                                    img { 
+                                        max-width: 100%; 
+                                        height: auto; 
+                                        border-radius: 10px;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="tip">📱 اضغط مطولاً على الصورة ثم اختر "حفظ الصورة"</div>
+                                <img src="\${dataUrl}" alt="التصميم">
+                            </body>
+                            </html>
+                        `);
+                        newWindow.document.close();
+                    }
+                } else {
+                    // للديسكتوب والأندرويد: تنزيل مباشر
+                    const link = document.createElement('a');
+                    link.download = `design-${Date.now()}.png`;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                
+                // استعادة الصور الأصلية
+                originalImageSrcs.forEach((originalSrc, img) => {
+                    img.src = originalSrc;
+                });
 
              } catch (err) {
                  console.error(err);
-                 alert("حدث خطأ أثناء الحفظ");
+                 alert("حدث خطأ أثناء الحفظ: " + err.message);
              } finally {
                  overlay.style.display = 'none';
              }
