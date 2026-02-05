@@ -1660,17 +1660,20 @@
                             foreignObjectRendering: false,
                             removeContainer: true,
                             onclone: (clonedDoc) => {
-                                // تطبيق إصلاحات إضافية على النسخة المستنسخة
-                                const clonedCard = clonedDoc.querySelector('#card');
-                                if (clonedCard) {
-                                    clonedCard.querySelectorAll('*').forEach(el => {
-                                        if (el.innerText && /[؀-ۿ]/.test(el.innerText)) {
-                                            el.style.letterSpacing = '0';
-                                            el.style.wordSpacing = 'normal';
-                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1';
-                                        }
-                                    });
-                                }
+                                // إضافة CSS مباشرة للـ document المستنسخ
+                                const style = clonedDoc.createElement('style');
+                                style.textContent = `
+                                    * {
+                                        letter-spacing: 0 !important;
+                                        word-spacing: normal !important;
+                                        font-feature-settings: "liga" 1, "calt" 1, "rlig" 1, "clig" 1 !important;
+                                        font-kerning: normal !important;
+                                        text-rendering: optimizeLegibility !important;
+                                        -webkit-font-smoothing: antialiased !important;
+                                    }
+                                `;
+                                clonedDoc.head.appendChild(style);
+                                console.log('iOS onclone: Injected Arabic CSS fixes');
                             }
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
