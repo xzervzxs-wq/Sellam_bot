@@ -1610,43 +1610,65 @@
                             letterSpacing: el.style.letterSpacing,
                             wordSpacing: el.style.wordSpacing,
                             textRendering: el.style.textRendering,
-                            fontFeatureSettings: el.style.fontFeatureSettings,
-                            whiteSpace: el.style.whiteSpace
+                            fontFeatureSettings: el.style.fontFeatureSettings
                         });
-                        // إصلاحات شاملة للخطوط العربية
-                        el.style.letterSpacing = '0px';
-                        el.style.wordSpacing = '0px';
-                        el.style.textRendering = 'geometricPrecision';
-                        el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1, "kern" 1';
+                        el.style.letterSpacing = '0';
+                        el.style.wordSpacing = 'normal';
+                        el.style.textRendering = 'optimizeLegibility';
+                        el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1';
                         el.style.fontKerning = 'normal';
                         el.style.webkitFontSmoothing = 'antialiased';
-                        el.style.MozOsxFontSmoothing = 'grayscale';
-                        el.style.fontVariantLigatures = 'common-ligatures contextual';
-                        el.style.textSpacingTrim = 'space-all';
-                        el.style.whiteSpace = 'pre-wrap';
-                        el.style.unicodeBidi = 'embed';
-                        el.style.direction = 'rtl';
                     }
                 });
                 
                 console.log('iOS: Applied Arabic font fixes to', originalStyles.size, 'elements');
                 await new Promise(r => setTimeout(r, 500));
                 
-                // 5. التقاط البطاقة مع تحميل الخطوط بشكل كامل
+                // 5. تحميل الخطوط بالكامل قبل الالتقاط
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Trying html2canvas with Arabic fixes...');
+                    console.log('iOS: Starting font preload...');
                     if (typeof html2canvas !== 'undefined') {
                         
-                        // === انتظار تحميل الخطوط ===
+                        // === تحميل الخطوط مسبقاً بطريقة مضمونة ===
                         await document.fonts.ready;
-                        console.log('iOS: Fonts ready');
+                        console.log('iOS: document.fonts.ready');
                         
-                        // === Warm-up #1 - لإيقاظ محرك الخطوط ===
+                        // تحميل خط Cairo بشكل صريح
+                        try {
+                            await document.fonts.load('400 48px Cairo');
+                            await document.fonts.load('700 48px Cairo');
+                            console.log('iOS: Cairo font loaded explicitly');
+                        } catch(e) {
+                            console.log('iOS: Font load error (continuing):', e);
+                        }
+                        
+                        // إنشاء عنصر مخفي يحتوي على كل الحروف العربية بأشكالها المختلفة
+                        const fontLoader = document.createElement('div');
+                        fontLoader.style.cssText = 'position:absolute;left:-9999px;top:-9999px;font-size:72px;font-family:Cairo,sans-serif;visibility:hidden;';
+                        // كل الحروف العربية بأشكالها: معزولة، بداية، وسط، نهاية
+                        fontLoader.innerHTML = `
+                            <div>أبتثجحخدذرزسشصضطظعغفقكلمنهوي ء آ إ ؤ ئ ى ة</div>
+                            <div>ـأـ ـبـ ـتـ ـثـ ـجـ ـحـ ـخـ ـدـ ـذـ ـرـ ـزـ ـسـ ـشـ</div>
+                            <div>بسم الله الرحمن الرحيم</div>
+                            <div>مرحبا بكم في التطبيق</div>
+                            <div style="letter-spacing:0">اختبار النص العربي المتصل</div>
+                        `;
+                        document.body.appendChild(fontLoader);
+                        
+                        // انتظار الرسم الفعلي
+                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                        await new Promise(r => setTimeout(r, 500));
+                        
+                        // إزالة عنصر التحميل
+                        document.body.removeChild(fontLoader);
+                        console.log('iOS: Font preload complete');
+                        
                         console.log('iOS: Warm-up #1...');
+                        // Warm-up #1
                         await html2canvas(card, {
-                            scale: 1,
+                            scale: 2,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
@@ -1655,12 +1677,12 @@
                             height: card.offsetHeight
                         });
                         
-                        await new Promise(r => setTimeout(r, 500));
+                        await new Promise(r => setTimeout(r, 800));
                         
-                        // === Warm-up #2 - لضمان تحميل جميع الحروف ===
                         console.log('iOS: Warm-up #2...');
+                        // Warm-up #2
                         await html2canvas(card, {
-                            scale: 1,
+                            scale: 2,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
@@ -1669,12 +1691,12 @@
                             height: card.offsetHeight
                         });
                         
-                        await new Promise(r => setTimeout(r, 500));
+                        await new Promise(r => setTimeout(r, 800));
                         
-                        // === Warm-up #3 - للتأكد النهائي ===
                         console.log('iOS: Warm-up #3...');
+                        // Warm-up #3
                         await html2canvas(card, {
-                            scale: 1,
+                            scale: 2,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
@@ -1683,19 +1705,55 @@
                             height: card.offsetHeight
                         });
                         
-                        // انتظار إضافي للسماح للمتصفح برسم الخطوط بشكل كامل
-                        await new Promise(r => setTimeout(r, 1000));
+                        await new Promise(r => setTimeout(r, 800));
                         
-                        // Force repaint
-                        card.style.display = 'none';
-                        void card.offsetHeight;
-                        card.style.display = '';
-                        await new Promise(r => setTimeout(r, 300));
+                        console.log('iOS: Warm-up #4...');
+                        // Warm-up #4
+                        await html2canvas(card, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: false,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
+                        });
+                        
+                        await new Promise(r => setTimeout(r, 800));
+                        
+                        console.log('iOS: Warm-up #5...');
+                        // Warm-up #5
+                        await html2canvas(card, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: false,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
+                        });
+                        
+                        await new Promise(r => setTimeout(r, 800));
+                        
+                        console.log('iOS: Warm-up #6...');
+                        // Warm-up #6
+                        await html2canvas(card, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: false,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
+                        });
+                        
+                        // انتظار طويل قبل الالتقاط النهائي
+                        await new Promise(r => setTimeout(r, 1500));
                         
                         console.log('iOS: Final capture...');
                         // Final capture
                         const canvas = await html2canvas(card, {
-                            scale: 2,
+                            scale: 3,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
@@ -1710,15 +1768,9 @@
                                 if (clonedCard) {
                                     clonedCard.querySelectorAll('*').forEach(el => {
                                         if (el.innerText && /[؀-ۿ]/.test(el.innerText)) {
-                                            el.style.letterSpacing = '0px';
-                                            el.style.wordSpacing = '0px';
-                                            el.style.textRendering = 'geometricPrecision';
-                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1, "kern" 1';
-                                            el.style.fontKerning = 'normal';
-                                            el.style.fontVariantLigatures = 'common-ligatures contextual';
-                                            el.style.whiteSpace = 'pre-wrap';
-                                            el.style.unicodeBidi = 'embed';
-                                            el.style.direction = 'rtl';
+                                            el.style.letterSpacing = '0';
+                                            el.style.wordSpacing = 'normal';
+                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1';
                                         }
                                     });
                                 }
