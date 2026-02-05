@@ -408,19 +408,19 @@
                  <div class="flex-1 overflow-y-auto p-6 space-y-6">
                      
                      <!-- إعدادات النسخ -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50">
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-700/50">
                          <div class="flex items-center justify-between mb-3">
                              <label class="text-slate-200 text-xs font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
                              <span class="text-sm text-slate-200 font-bold bg-slate-600/70 px-3 py-1 rounded-full" id="a4-max-text"></span>
                          </div>
                          
                          <div class="flex items-center gap-2">
-                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-600 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
+                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-700 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
                          </div>
                      </div>
 
                      <!-- خيارات إضافية -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 space-y-3">
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-700/50 space-y-3">
                          <label class="flex items-center justify-between cursor-pointer group select-none">
                              <div class="flex items-center gap-2">
                                  <div class="w-8 h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
@@ -468,13 +468,13 @@
                          </button>
                      </div>
 
-                     <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-xs font-bold py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-600 hover:border-slate-500">
+                     <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-xs font-bold py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-700 hover:border-slate-500">
                          إغلاق النافذة
                      </button>
                      
                      <!-- زر Premium لغير المشتركين -->
                      <div id="premium-upgrade-btn">
-                         <a href="subscriptions.html" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-[#0f172a] px-4 py-3 rounded-xl border border-slate-600 hover:border-slate-500 transition-all shadow-md group">
+                         <a href="subscriptions.html" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-[#0f172a] px-4 py-3 rounded-xl border border-slate-700 hover:border-slate-500 transition-all shadow-md group">
                              <i class="fas fa-crown text-[#fbbf24] text-xs group-hover:scale-110 transition-transform"></i>
                              <span class="text-[10px] font-black tracking-[0.25em] bg-gradient-to-r from-[#fbbf24] via-[#fcd34d] to-[#fbbf24] bg-clip-text text-transparent">
                                  PREMIUM
@@ -879,7 +879,7 @@
                 <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
                     
                     <!-- أزرار التراجع والإعادة -->
-                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
+                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-700">
                         <button onclick="undoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
                         <div class="w-px h-4 bg-[#e2e8f0] dark:bg-slate-600"></div>
                         <button onclick="redoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
@@ -1637,7 +1637,7 @@
                     <i class="fas fa-plus-circle"></i>
                     <span>حفظ مشروع جديد</span>
                 </button>
-                <button onclick="closeMyProjectsModal()" class="flex-1 py-2.5 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all">
+                <button onclick="closeMyProjectsModal()" class="flex-1 py-2.5 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all">
                     إغلاق
                 </button>
             </div>
@@ -1994,27 +1994,27 @@
             <!-- السطر الأول: 5 أزرار -->
             <div class="grid grid-cols-5 gap-1.5 mb-1.5">
                 <!-- زر العناصر -->
-                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-shapes text-indigo-400 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">العناصر</span>
                 </button>
                 <!-- زر إدراج -->
-                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-plus-circle text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">إدراج</span>
                 </button>
                 <!-- زر الطبقات -->
-                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-layer-group text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">الطبقات</span>
                 </button>
                 <!-- زر تحرير النص -->
-                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-font text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">النص</span>
                 </button>
                 <!-- زر الخلفية -->
-                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-fill-drip text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">خلفية</span>
                 </button>
@@ -2022,27 +2022,27 @@
             <!-- السطر الثاني: 5 أزرار -->
             <div class="grid grid-cols-5 gap-1.5">
                 <!-- زر Notes -->
-                <button onclick="openDesignerPanel()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openDesignerPanel()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-sticky-note text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">ملاحظات</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
-                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-magic text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">ذكي</span>
                 </button>
                 <!-- زر بزنس تولز -->
-                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-briefcase text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">أعمال</span>
                 </button>
                 <!-- زر سحابتي -->
-                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...');" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...');" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-cloud text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">سحابتي</span>
                 </button>
                 <!-- زر التصدير -->
-                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all border border-slate-600">
+                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all border border-slate-700">
                     <i class="fas fa-download text-slate-300 text-sm"></i>
                     <span class="text-[9px] font-bold text-white">تصدير</span>
                 </button>
