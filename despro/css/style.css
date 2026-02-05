@@ -1231,3 +1231,62 @@
     width: 100% !important;
     flex-shrink: 0 !important;
 }
+
+/* ============================================ */
+/* === إصلاحات الجوال فقط - Mobile Only Fixes === */
+/* ============================================ */
+@media (max-width: 767px) {
+    /* إعدادات التدرج - سطر كامل أسفل EDIT TOOLS */
+    #grad-controls {
+        flex-basis: 100% !important;
+        width: 100% !important;
+        order: 50 !important;
+        display: none;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 4px !important;
+        margin-top: 8px !important;
+    }
+    #grad-controls.active {
+        display: flex !important;
+    }
+    #grad-controls #global-grad-inputs,
+    #grad-controls #element-grad-inputs {
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        width: 100% !important;
+    }
+    
+    /* خصائص الشفافية - سطر كامل */
+    #quick-props {
+        flex-basis: 100% !important;
+        width: 100% !important;
+        order: 51 !important;
+        margin-top: 8px !important;
+    }
+    
+    /* إعدادات الممحاة - سطر كامل */
+    #eraser-controls {
+        flex-basis: 100% !important;
+        width: 100% !important;
+        order: 49 !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }
+    #eraser-controls.active {
+        display: flex !important;
+    }
+    
+    /* إعدادات الإطار - سطر كامل */
+    #frame-controls-toolbar {
+        flex-basis: 100% !important;
+        width: 100% !important;
+        order: 52 !important;
+        flex-wrap: wrap !important;
+    }
+    
+    /* ضمان أن مفضلة الألوان تبقى في الأسفل */
+    #fav-colors-row {
+        order: 100 !important;
+    }
+}
