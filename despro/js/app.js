@@ -6126,6 +6126,12 @@
                 displayEl.textContent = `${Math.round(currentZoom)}%`;
             }
 
+            // تحديث عرض الزوم للجوال
+            const mobileDisplayEl = document.getElementById('mobile-zoom-display');
+            if (mobileDisplayEl) {
+                mobileDisplayEl.textContent = `${Math.round(currentZoom)}%`;
+            }
+
             // تحديث قيمة الـ slider
             const slider = document.getElementById('zoom-slider');
             if (slider) {
