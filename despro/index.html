@@ -2120,46 +2120,46 @@
     <!-- ============================================ -->
     <!-- === Mobile Insert Modal (إدراج) === -->
     <!-- ============================================ -->
-    <div id="mobile-insert-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileInsertModal()">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[60vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+    <div id="mobile-insert-modal" class="fixed inset-0 z-[99999] hidden flex items-end justify-center" onclick="closeMobileInsertModal()">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-t-2xl w-full mx-2 mb-0 overflow-hidden animate-slide-up" style="font-family: 'IBM Plex Sans Arabic', sans-serif;" onclick="event.stopPropagation()">
             <!-- Header -->
-            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fas fa-plus-circle text-indigo-600"></i> إدراج عنصر
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-slate-700 text-xs flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-indigo-500 text-sm"></i> إدراج
                 </h3>
-                <button onclick="closeMobileInsertModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-times text-sm"></i>
+                <button onclick="closeMobileInsertModal()" class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 active:scale-90 transition">
+                    <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
             <!-- Content -->
             <div class="p-3">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-5 gap-2">
                     <!-- إضافة صورة -->
-                    <label class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
-                        <i class="fas fa-image text-slate-700 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">صورة</span>
+                    <label class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-image text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">صورة</span>
                         <input type="file" onchange="addRegularImage(this); closeMobileInsertModal();" class="hidden" accept="image/*">
                     </label>
                     <!-- مشروع جديد -->
-                    <button onclick="createNewProject(); closeMobileInsertModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-file-circle-plus text-slate-700 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">جديد</span>
+                    <button onclick="createNewProject(); closeMobileInsertModal();" class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-file-circle-plus text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">جديد</span>
                     </button>
                     <!-- إطار -->
-                    <button onclick="openMobileFrameModal()" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="far fa-square text-slate-700 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">إطار</span>
+                    <button onclick="openMobileFrameModal()" class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="far fa-square text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">إطار</span>
                     </button>
                     <!-- شكل -->
-                    <button onclick="openMobileShapeModal()" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-shapes text-slate-700 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">شكل</span>
+                    <button onclick="openMobileShapeModal()" class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-shapes text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">شكل</span>
                     </button>
                     <!-- فتح ملف -->
-                    <label class="col-span-2 flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
-                        <i class="fas fa-folder-open text-slate-700 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">فتح ملف</span>
+                    <label class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-folder-open text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">ملف</span>
                         <input type="file" onchange="handleUniversalFile(this); closeMobileInsertModal();" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
                     </label>
                 </div>
@@ -2324,6 +2324,9 @@
                 </button>
                 <button onclick="generateA4Sheet(); closeMobileExportModal();" class="w-full bg-pink-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
                     <i class="fas fa-print"></i> طباعة A4
+                </button>
+                <button onclick="downloadImage(); closeMobileExportModal();" class="w-full bg-emerald-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i class="fas fa-file-image"></i> حفظ A4 صورة
                 </button>
             </div>
         </div>

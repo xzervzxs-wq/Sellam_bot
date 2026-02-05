@@ -1315,21 +1315,40 @@
     }
     
     /* إصلاح الفوتر للجوال - إزالة المسافة الزائدة */
-    html, body {
+    html {
         height: auto !important;
-        min-height: auto !important;
+        min-height: 100% !important;
         overflow-x: hidden;
     }
     
-    body.min-h-screen {
+    body, body.min-h-screen {
         min-height: auto !important;
+        height: auto !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
     }
     
     /* الفوتر - مسافة فقط للأزرار السفلية */
     footer {
-        margin-bottom: 70px !important;
+        margin-bottom: 65px !important;
         margin-top: 0 !important;
-        padding-bottom: 0.5rem !important;
+        padding-bottom: 8px !important;
+    }
+    
+    /* شريط الزوم - الوضع الليلي */
+    :root.dark-mode #mobile-zoom-bar {
+        background: linear-gradient(to right, #1e293b, #0f172a) !important;
+        border-color: #334155 !important;
+    }
+    :root.dark-mode #mobile-zoom-bar span,
+    :root.dark-mode #mobile-zoom-bar #mobile-zoom-display {
+        color: #94a3b8 !important;
+        background-color: transparent !important;
+    }
+    :root.dark-mode #mobile-zoom-bar button {
+        background-color: #334155 !important;
+        border-color: #475569 !important;
+        color: #cbd5e1 !important;
     }
     
     /* توسيع زر تسجيل الدخول للجوال */
