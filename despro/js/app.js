@@ -1588,8 +1588,25 @@
                     }
                 }
                 
-                // 2. انتظار
-                await new Promise(r => setTimeout(r, 1000));
+                // 2. انتظار decode للصور (مهم جداً!)
+                if (loadingText) loadingText.innerText = "جاري معالجة الصور...";
+                const imgDecodePromises = Array.from(images).map(img => {
+                    if (img.complete && img.src.startsWith('data:')) {
+                        if (img.decode) return img.decode().catch(() => {});
+                        return Promise.resolve();
+                    }
+                    return new Promise(resolve => {
+                        img.onload = () => {
+                            if (img.decode) img.decode().catch(() => {});
+                            resolve();
+                        };
+                        img.onerror = resolve;
+                    });
+                });
+                await Promise.all(imgDecodePromises);
+                console.log('iOS: All images decoded');
+                
+                await new Promise(r => setTimeout(r, 500));
                 
                 if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
                 
