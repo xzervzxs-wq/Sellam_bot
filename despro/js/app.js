@@ -1887,6 +1887,8 @@
                     throw new Error('فشل التقاط الصورة');
                 }
                 
+                // رسالة للجوال
+                if (loadingText) loadingText.innerText = "جاري تجهيز ملف جاهز للطباعة...";
                 // 7. إعداد A4
                 currentCardData = cardDataUrl;
                 
