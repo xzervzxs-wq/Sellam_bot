@@ -86,10 +86,12 @@
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
+        window.userTier = window.userTier || 'free'; // إذا لم يُحدد من قبل في head
         const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
 
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
+            window.userTier = userTier;
             localStorage.setItem('userTier', userTier);
             applyTierRestrictions();
         }
@@ -138,6 +140,7 @@
         let magicTolerance = 30;
         let isSnappingEnabled = false;
         let currentZoom = 50; // متغير التحكم بـ zoom (الافتراضي 50%)
+        window.currentZoom = currentZoom; // تصدير القيمة الأولية للعالم
 
         // Crop variables
         let cropStartX = 0, cropStartY = 0;
@@ -253,8 +256,9 @@
             setCardSize(defaultSize, defaultSize);
 
             
-            // تعيين الزووم الافتراضي 50%
-            setCustomZoom(50);
+            // تعيين الزووم الافتراضي - 25% للجوال و 50% للآيباد
+            const isMobileOnStartup = window.innerWidth < 768;
+            setCustomZoom(isMobileOnStartup ? 25 : 50);
             // إخفاء التدرج عند البدء
             hasGradient = false;
             const grad = document.getElementById('card-gradient');
@@ -404,6 +408,10 @@
             }
         }
 
+        // Promise لتتبع حالة تحميل المكتبة
+        let assetsLoadingPromise = null;
+        window.assetsLoadingPromise = null;
+        
         function loadAssetsLibraryFromGitHub() {
             const grid = document.getElementById('assets-grid');
             const select = document.getElementById('assets-category-select');
@@ -416,20 +424,25 @@
             // التحقق من وجود البيانات المحملة مسبقاً
             if (officialAssetsLibrary && officialAssetsLibrary.length > 0) {
                 // ملء قائمة التصنيفات
-                select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
-                officialAssetsLibrary.forEach((category, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = category.name;
-                    select.appendChild(option);
-                });
+                if (select) {
+                    select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
+                    officialAssetsLibrary.forEach((category, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = category.name;
+                        select.appendChild(option);
+                    });
+                    select.value = 0;
+                    loadAssetsCategory();
+                }
 
-                // اختيار أول تصنيف تلقائياً
-                select.value = 0;
-                loadAssetsCategory();
-
-                console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
-                return;
+                console.log('✅ المكتبة جاهزة:', officialAssetsLibrary.length, 'تصنيف');
+                return Promise.resolve(officialAssetsLibrary);
+            }
+            
+            // إذا كان التحميل جاري بالفعل، ارجع نفس الـ Promise
+            if (assetsLoadingPromise) {
+                return assetsLoadingPromise;
             }
 
             // عرض رسالة تحميل
@@ -442,7 +455,7 @@
                 </div>`;
 
             // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
-            fetch('./Official.json?t=' + Date.now())
+            assetsLoadingPromise = fetch('./Official.json?t=' + Date.now())
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('فشل تحميل الملف');
@@ -470,11 +483,19 @@
                     }
 
                     console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
+                    return data;
                 })
                 .catch(error => {
                     console.error('خطأ في تحميل المكتبة:', error);
-                    grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
+                    if (grid) {
+                        grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
+                    }
+                    assetsLoadingPromise = null; // السماح بإعادة المحاولة
+                    throw error;
                 });
+            
+            window.assetsLoadingPromise = assetsLoadingPromise;
+            return assetsLoadingPromise;
         }
 
         function loadAssetsCategory() {
@@ -539,7 +560,7 @@
             });
         }
 
-        function addAssetToCanvas(src, colorable, categoryName) {
+        function addAssetToCanvas(src, colorable, categoryNameOrSizeRatio) {
             const img = new Image();
             img.onload = function() {
                 const card = document.getElementById('card');
@@ -548,17 +569,32 @@
                 // حساب الحجم المناسب
                 let w = img.naturalWidth;
                 let h = img.naturalHeight;
-                const maxSize = 250;
-
-                if (w > maxSize || h > maxSize) {
-                    const ratio = Math.min(maxSize / w, maxSize / h);
+                // استخدام الأبعاد الفعلية من data attributes (بالبكسل)
+                const cardW = parseInt(card.getAttribute('data-card-width')) || parseFloat(card.style.width) || card.offsetWidth;
+                const cardH = parseInt(card.getAttribute('data-card-height')) || parseFloat(card.style.height) || card.offsetHeight;
+                
+                // تحديد إذا كان البارامتر الثالث نسبة حجم (رقم) أو اسم فئة (نص)
+                const isNumericRatio = typeof categoryNameOrSizeRatio === 'number' && categoryNameOrSizeRatio > 0 && categoryNameOrSizeRatio <= 1;
+                const categoryName = !isNumericRatio ? categoryNameOrSizeRatio : null;
+                
+                if (isNumericRatio) {
+                    // حساب الحجم كنسبة من البطاقة (مثل ثلثين لبطاقات الخصومات)
+                    const targetW = cardW * categoryNameOrSizeRatio;
+                    const targetH = cardH * categoryNameOrSizeRatio;
+                    const ratio = Math.min(targetW / w, targetH / h);
                     w = Math.round(w * ratio);
                     h = Math.round(h * ratio);
+                } else {
+                    // الحجم الافتراضي للعناصر العادية
+                    const maxSize = 250;
+                    if (w > maxSize || h > maxSize) {
+                        const ratio = Math.min(maxSize / w, maxSize / h);
+                        w = Math.round(w * ratio);
+                        h = Math.round(h * ratio);
+                    }
                 }
 
                 // حساب موقع في وسط البطاقة
-                const cardW = parseFloat(card.style.width) || card.offsetWidth;
-                const cardH = parseFloat(card.style.height) || card.offsetHeight;
                 const centerX = (cardW - w) / 2;
                 const centerY = (cardH - h) / 2;
 
@@ -566,8 +602,8 @@
                 const wrapper = createWrapper('image-layer');
                 wrapper.style.width = w + 'px';
                 wrapper.style.height = h + 'px';
-                wrapper.style.left = Math.max(10, centerX) + 'px';
-                wrapper.style.top = Math.max(10, centerY) + 'px';
+                wrapper.style.left = Math.max(0, centerX) + 'px';
+                wrapper.style.top = Math.max(0, centerY) + 'px';
 
                 const imgEl = document.createElement('img');
                 imgEl.src = src;
@@ -1067,8 +1103,9 @@
                         btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                     }
 
-                    // ضبط الزوم على 50% دائماً عند فتح ملف
-                    setCustomZoom(50);
+                    // ضبط الزوم على 50% للآيباد و 25% للجوال عند فتح ملف
+                    const isMobileOnLoad = window.innerWidth < 768;
+                    setCustomZoom(isMobileOnLoad ? 25 : 50);
 
                     // استعادة الملاحظات من الملف
                     const notesField = document.getElementById('designer-notes');
@@ -1471,6 +1508,7 @@
             // استعادة الزوم إلى ما كان عليه قبل فتح المودال
             if (savedZoomBeforeA4 !== null) {
                 setCustomZoom(savedZoomBeforeA4);
+                savedZoomBeforeA4 = null;
             }
         }
 
@@ -1893,6 +1931,7 @@
 
                     // استعادة الزوم بعد النجاح
                     setCustomZoom(savedZoomBeforeA4);
+                    savedZoomBeforeA4 = null;
                 };
                 img.onerror = () => { throw new Error("فشل تحميل الصورة المنشأة"); };
                 img.src = cardDataUrl;
@@ -1902,6 +1941,7 @@
                 overlay.style.display = 'none';
                 // استعادة الزوم عند الفشل
                 setCustomZoom(savedZoomBeforeA4);
+                savedZoomBeforeA4 = null;
                 showInfoModal('حدثت مشكلة أثناء المعالجة. حاول تقليل عدد العناصر أو جودة الصور.', 'عذراً', '⚠️');
             }
         }
@@ -6021,8 +6061,9 @@
             const zoomByHeight = (maxHeight / h) * 100;
             const autoZoom = Math.min(zoomByWidth, zoomByHeight, 200); // حد أقصى 200%
 
-            // تطبيق الـ zoom الأمثل
-            const optimalZoom = Math.max(25, Math.min(autoZoom, 200));
+            // تطبيق الـ zoom الأمثل - للجوال دائماً 25%
+            const isMobileDevice = window.innerWidth < 768;
+            const optimalZoom = isMobileDevice ? 25 : Math.max(25, Math.min(autoZoom, 200));
             setCustomZoom(optimalZoom);
 
             // تحديث عرض المقاس على الشاشة
@@ -6097,6 +6138,7 @@
 
         function setCustomZoom(zoomValue) {
             currentZoom = Math.max(25, Math.min(zoomValue, 200)); // بين 25% و 200%
+            window.currentZoom = currentZoom; // تصدير للاستخدام العام
             const zoomDecimal = currentZoom / 100;
 
             document.documentElement.style.setProperty('--card-zoom', zoomDecimal);
@@ -6105,6 +6147,12 @@
             const displayEl = document.getElementById('zoom-display');
             if (displayEl) {
                 displayEl.textContent = `${Math.round(currentZoom)}%`;
+            }
+
+            // تحديث عرض الزوم للجوال
+            const mobileDisplayEl = document.getElementById('mobile-zoom-display');
+            if (mobileDisplayEl) {
+                mobileDisplayEl.textContent = `${Math.round(currentZoom)}%`;
             }
 
             // تحديث قيمة الـ slider
@@ -7029,7 +7077,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 10000;
+                z-index: 999999;
                 backdrop-filter: blur(8px);
                 transition: all 0.3s;
             `;
@@ -7230,6 +7278,8 @@ function checkSession() {
             if (expiryDate >= today) {
                 // الجلسة صالحة
                 userTier = 'premium';
+                window.userTier = 'premium';
+                localStorage.setItem('userTier', 'premium');
                 document.documentElement.setAttribute('data-tier', 'premium');
                 updateStudioName(session.name);
                 updateFooterForUser(session.name);
@@ -7715,3 +7765,10 @@ function updateLayersList() {
         window.generateQR = generateQR;
 
 // ==========================================
+// === تصدير الدوال للاستخدام الخارجي ===
+window.addTextToCanvas = addTextToCanvas;
+window.addUserText = addUserText;
+window.saveState = saveState;
+window.selectEl = selectEl;
+window.setupInteract = setupInteract;
+window.createWrapper = createWrapper;

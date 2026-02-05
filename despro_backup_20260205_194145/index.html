@@ -6,7 +6,34 @@
     <title>أستوديو Despro</title>
     
     <!-- تحقق سريع من الجلسة - سطر واحد فقط -->
-    <script>try{if(JSON.parse(localStorage.getItem('despro_session')))document.documentElement.classList.add('logged-in');}catch(e){}</script>
+    <script>
+        // تعريف userTier افتراضياً
+        window.userTier = 'free';
+        try {
+            const session = JSON.parse(localStorage.getItem('despro_session'));
+            if(session) {
+                document.documentElement.classList.add('logged-in');
+                // التحقق من صلاحية الجلسة
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                let expiryDate = null;
+                const dateStr = session.expiryDate ? session.expiryDate.trim() : '';
+                if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                    const [day, month, year] = dateStr.split('-');
+                    expiryDate = new Date(year + '-' + month + '-' + day);
+                } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    expiryDate = new Date(dateStr);
+                }
+                if(expiryDate) {
+                    expiryDate.setHours(0, 0, 0, 0);
+                    if(expiryDate >= today) {
+                        window.userTier = 'premium';
+                        localStorage.setItem('userTier', 'premium');
+                    }
+                }
+            }
+        } catch(e) {}
+    </script>
     <style>.logged-in #studio-default-display{display:none!important}.logged-in #studio-name-display{display:block!important}</style>
     
     <!-- مكتبات التنسيق والخطوط -->
@@ -42,7 +69,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=UI_FIX_1770242814">
+    <link rel="stylesheet" href="css/style.css?v=1770250835">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -381,19 +408,19 @@
                  <div class="flex-1 overflow-y-auto p-6 space-y-6">
                      
                      <!-- إعدادات النسخ -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50">
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-700/50">
                          <div class="flex items-center justify-between mb-3">
                              <label class="text-slate-200 text-xs font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
                              <span class="text-sm text-slate-200 font-bold bg-slate-600/70 px-3 py-1 rounded-full" id="a4-max-text"></span>
                          </div>
                          
                          <div class="flex items-center gap-2">
-                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-600 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
+                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-700 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
                          </div>
                      </div>
 
                      <!-- خيارات إضافية -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 space-y-3">
+                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-700/50 space-y-3">
                          <label class="flex items-center justify-between cursor-pointer group select-none">
                              <div class="flex items-center gap-2">
                                  <div class="w-8 h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
@@ -441,13 +468,13 @@
                          </button>
                      </div>
 
-                     <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-xs font-bold py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-600 hover:border-slate-500">
+                     <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-xs font-bold py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-700 hover:border-slate-500">
                          إغلاق النافذة
                      </button>
                      
                      <!-- زر Premium لغير المشتركين -->
                      <div id="premium-upgrade-btn">
-                         <a href="subscriptions.html" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-[#0f172a] px-4 py-3 rounded-xl border border-slate-600 hover:border-slate-500 transition-all shadow-md group">
+                         <a href="subscriptions.html" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-[#0f172a] px-4 py-3 rounded-xl border border-slate-700 hover:border-slate-500 transition-all shadow-md group">
                              <i class="fas fa-crown text-[#fbbf24] text-xs group-hover:scale-110 transition-transform"></i>
                              <span class="text-[10px] font-black tracking-[0.25em] bg-gradient-to-r from-[#fbbf24] via-[#fcd34d] to-[#fbbf24] bg-clip-text text-transparent">
                                  PREMIUM
@@ -596,14 +623,20 @@
 
 
     <!-- واجهة التطبيق -->
-    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-screen-lg">
+    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:min-h-screen relative">
         
         <!-- اللوحة الجانبية -->
-        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit" onclick="event.stopPropagation()">
+        <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-md border border-[#cbd5e1] flex flex-col gap-4 h-fit relative" onclick="event.stopPropagation()">
+            
+            <!-- زر الدارك مود - للآيباد والكمبيوتر فقط - الزاوية اليسرى العليا -->
+            <button id="theme-toggle-toolbar" onclick="toggleDarkMode()" class="theme-toggle-btn hidden md:flex absolute top-3 left-3 z-20" title="تبديل الوضع الليلي">
+                <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
+                <i class="fas fa-moon theme-moon"></i>
+            </button>
             
             <div class="flex items-center justify-center border-b border-[#e2e8f0] pb-3 relative">
-                <!-- زر الدارك مود - في الهيدر -->
-                <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn absolute top-0 left-0 z-10" title="تبديل الوضع الليلي">
+                <!-- زر الدارك مود - في الهيدر للجوال فقط -->
+                <button id="theme-toggle-btn" onclick="toggleDarkMode()" class="theme-toggle-btn absolute top-0 left-0 z-10 md:hidden" title="تبديل الوضع الليلي">
                     <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color: #6366f1; border-radius: 50%; padding: 4px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.173 14.83a4 4 0 1 1 5.657 -5.657" /><path d="M11.294 12.707l.174 .247a7.5 7.5 0 0 0 8.845 2.492a9 9 0 0 1 -14.671 2.914" /><path d="M3 12h1" /><path d="M12 3v1" /><path d="M5.6 5.6l.7 .7" /><path d="M3 21l18 -18" /></svg>
                     <i class="fas fa-moon theme-moon"></i>
                 </button>
@@ -635,8 +668,8 @@
                 </div>
             </div>
 
-            <!-- إضافة النصوص -->
-            <div id="add-text-container" class="space-y-2 bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
+            <!-- إضافة النصوص - تظهر على الآيباد والكمبيوتر فقط -->
+            <div id="add-text-container" class="hidden md:block space-y-2 bg-[#f8fafc] p-3 rounded-xl border border-[#e2e8f0]">
                 <label class="text-xs font-bold text-[#1e293b]">إضافة نصوص</label>
                 <div class="flex flex-col gap-2">
                     <textarea id="user-text-input" rows="2" placeholder="اكتب النص هنا..." class="w-full p-2 bg-white border border-[#cbd5e1] rounded-lg text-sm outline-none focus:border-[#6366f1] text-[#1e293b] resize-none"></textarea>
@@ -710,12 +743,6 @@
                         <input type="text" inputmode="decimal" id="mobile-height" value="10" class="w-12 px-1 py-1 bg-white border border-indigo-200 rounded text-xs text-center font-bold text-slate-700 outline-none focus:border-indigo-400" onfocus="this.select()" oninput="syncMobileDimensions()">
                         <span class="text-indigo-500 text-[10px] font-bold">سم</span>
                     </div>
-                    <div class="h-4 w-px bg-indigo-200"></div>
-                    <div class="flex items-center gap-1">
-                        <button onclick="setCustomZoom(Math.max(25, parseInt(document.getElementById('zoom-slider').value) - 25))" class="w-6 h-6 bg-white border border-indigo-200 rounded text-indigo-600 text-xs font-bold hover:bg-indigo-100">-</button>
-                        <span id="mobile-zoom-display" class="text-indigo-600 text-[10px] font-bold w-8 text-center">50%</span>
-                        <button onclick="setCustomZoom(Math.min(200, parseInt(document.getElementById('zoom-slider').value) + 25))" class="w-6 h-6 bg-white border border-indigo-200 rounded text-indigo-600 text-xs font-bold hover:bg-indigo-100">+</button>
-                    </div>
                 </div>
             </div>
 
@@ -742,18 +769,18 @@
                     <span id="size-display" class="text-[10px] font-bold text-[#64748b] bg-white px-2 py-1 rounded border border-[#e2e8f0]">1181 × 1181 px</span>
                 </div>
                 
-                <!-- التحكم بـ Zoom -->
-                <div id="zoom-container" class="mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
+                <!-- التحكم بـ Zoom - مخفي على الجوال -->
+                <div id="zoom-container" class="hidden md:block mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
                     <div class="flex justify-between items-center mb-2">
                         <label class="text-[9px] text-[#0c4a6e] font-bold">🔍 مستوى الزوم</label>
-                        <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">50%</span>
+                        <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">30%</span>
                     </div>
-                    <input type="range" id="zoom-slider" min="25" max="200" value="50" class="w-full cursor-pointer" oninput="setCustomZoom(this.value)">
+                    <input type="range" id="zoom-slider" min="10" max="100" value="30" class="w-full cursor-pointer" oninput="setCustomZoom(this.value)">
                     <div class="flex gap-1 mt-2">
+                        <button onclick="setCustomZoom(30)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">30%</button>
                         <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">50%</button>
                         <button onclick="setCustomZoom(75)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">75%</button>
                         <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">100%</button>
-                        <button onclick="setCustomZoom(150)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[9px] font-bold py-1 rounded hover:bg-[#e0f2fe]">150%</button>
                     </div>
                 </div>
             </div>
@@ -852,7 +879,7 @@
                 <div class="w-full flex flex-wrap items-center gap-2 mb-2 pb-2 border-b border-[#e2e8f0]">
                     
                     <!-- أزرار التراجع والإعادة -->
-                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-600">
+                    <div class="flex items-center gap-1 bg-[#f8fafc] dark:bg-slate-700 px-2 py-1 rounded-lg border border-[#e2e8f0] dark:border-slate-700">
                         <button onclick="undoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="تراجع"><i class="fas fa-undo"></i></button>
                         <div class="w-px h-4 bg-[#e2e8f0] dark:bg-slate-600"></div>
                         <button onclick="redoAction()" class="p-1.5 text-[#64748b] dark:text-slate-300 hover:text-[#6366f1] transition" title="إعادة"><i class="fas fa-redo"></i></button>
@@ -908,7 +935,7 @@
                                 <i class="fas fa-eraser text-sm"></i> الممحاة
                             </button>
                             <button onclick="toggleCropMode()" id="btn-crop" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="قص الصورة">
-                                <i class="fas fa-crop text-sm"></i> قص
+                                <i class="fas fa-crop text-sm"></i> crop
                             </button>
                             <button onclick="toggleHandMode()" id="btn-hand" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="أداة اليد">
                                 <i class="fa-regular fa-hand text-sm"></i> تحريك
@@ -1066,8 +1093,19 @@
 
             </div>
 
-            <!-- شريط الملاحظات الجديد (قابل للفتح) -->
-            <div id="info-bar-placeholder" class="bg-[#f1f5f9] dark-mode:bg-[#1a1a2e] p-3 rounded text-[11px] text-[#1e293b] dark-mode:text-[#e8e8e8] border border-[#e2e8f0] dark-mode:border-[#2a2a3e] flex items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] dark-mode:hover:bg-[#252545] transition" onclick="openDesignerPanel()">
+            <!-- شريط الزوم للجوال فقط -->
+            <div id="mobile-zoom-bar" class="md:hidden bg-gradient-to-r from-[#f0f9ff] to-[#e0f2fe] p-2 rounded-lg border border-[#7dd3fc] flex items-center justify-between gap-2">
+                <span class="text-[10px] font-bold text-[#0c4a6e]">🔍</span>
+                <span id="mobile-zoom-display" class="text-[11px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded min-w-[40px] text-center">30%</span>
+                <div class="flex gap-1 flex-1">
+                    <button onclick="setCustomZoom(25)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[10px] font-bold py-1.5 rounded hover:bg-[#e0f2fe] active:scale-95 transition">25%</button>
+                    <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[10px] font-bold py-1.5 rounded hover:bg-[#e0f2fe] active:scale-95 transition">50%</button>
+                    <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[10px] font-bold py-1.5 rounded hover:bg-[#e0f2fe] active:scale-95 transition">100%</button>
+                </div>
+            </div>
+            
+            <!-- شريط الملاحظات للآيباد والكمبيوتر فقط -->
+            <div id="info-bar-placeholder" class="hidden md:flex bg-[#f1f5f9] dark-mode:bg-[#1a1a2e] p-3 rounded text-[11px] text-[#1e293b] dark-mode:text-[#e8e8e8] border border-[#e2e8f0] dark-mode:border-[#2a2a3e] items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] dark-mode:hover:bg-[#252545] transition" onclick="openDesignerPanel()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-notebook" style="flex-shrink: 0; color: #6366f1;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18" /><path d="M13 8l2 0" /><path d="M13 12l2 0" /></svg> <span>اضغط هنا لكتابة ملاحظاتك - write your notes</span>
             </div>
 
@@ -1075,93 +1113,86 @@
         <!-- نافذة لوحة المصمم (Tiny Toast Style) -->
         <!-- نافذة لوحة المصمم (Toast Style - Expanded) -->
         <div id="designer-panel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md" onclick="if(event.target.id === 'designer-panel') closeDesignerPanel()">
-            <div class="relative w-[400px] rounded-[2.2rem] overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transform transition-all duration-300 scale-100" 
+            <div class="relative w-[340px] max-w-[92vw] rounded-2xl overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transform transition-all duration-300 scale-100" 
                  onclick="event.stopPropagation()"
                  style="background: white; border: 1px solid rgba(243, 244, 246, 1);">
                  
                 <!-- زينة خلفية -->
-                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-100/40 to-purple-100/40 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-100/30 to-rose-100/30 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-100/40 to-yellow-100/40 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                 <!-- Header -->
-                <div class="px-5 pt-5 pb-3 flex items-center justify-between relative z-10 border-b border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg ring-1 ring-white/50" 
-                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                            <i class="fas fa-palette text-white text-lg"></i>
+                <div class="px-4 pt-4 pb-2 flex items-center justify-between relative z-10 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" 
+                             style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                            <i class="fas fa-sticky-note text-white text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-slate-800 font-bold text-base tracking-tight">لوحة المصمم</h2>
-                            <p class="text-slate-400 text-[10px] font-medium">مساحتك الإبداعية الخاصة ✨</p>
+                            <h2 class="text-slate-800 font-bold text-sm tracking-tight">Notes</h2>
+                            <p class="text-slate-400 text-[9px] font-medium">ملاحظاتك الخاصة ✨</p>
                         </div>
                     </div>
-                    <button onclick="closeDesignerPanel()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center transition text-slate-400 hover:text-red-500 hover:rotate-90">
-                        <i class="fas fa-times text-sm"></i>
+                    <button onclick="closeDesignerPanel()" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 flex items-center justify-center transition text-slate-400 hover:text-red-500">
+                        <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
 
                 <!-- Content -->
-                <div class="p-5 space-y-4 relative z-10">
-                    <!-- Notes (Yellow Box - Big & Square) -->
-                    <div class="bg-[#fef3c7] p-4 rounded-xl shadow-sm border-l-4 border-[#f59e0b] group relative">
-                        <!-- Header for Notes -->
-                        <h3 class="font-bold text-[#92400e] mb-3 flex items-center justify-between text-xs relative z-10">
-                            <span class="flex items-center gap-2">
-                                <i class="fas fa-sticky-note text-[#f59e0b]"></i> ملاحظات التصميم
-                            </span>
-                            <span class="text-[10px] bg-[#f59e0b] text-white px-2 py-0.5 rounded-full shadow-sm" id="char-count">0/140</span>
-                        </h3>
+                <div class="p-4 space-y-3 relative z-10">
+                    <!-- Notes (Yellow Box - Compact) -->
+                    <div class="bg-[#fef3c7] p-3 rounded-xl shadow-sm border-l-4 border-[#f59e0b]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold text-[#92400e]">📝 ملاحظاتك</span>
+                            <span class="text-[9px] bg-[#f59e0b] text-white px-1.5 py-0.5 rounded-full" id="char-count">0/140</span>
+                        </div>
                         
-                        <!-- Big Area -->
                         <textarea 
                             id="designer-notes" 
-                            class="w-full h-20 p-3 bg-white/60 border border-[#f59e0b]/10 rounded-lg text-[#78350f] text-xs resize-none focus:outline-none focus:bg-white/90 focus:border-[#f59e0b]/30 transition-all placeholder:text-[#92400e]/50 leading-relaxed"
-                            placeholder="هنا مساحتك الخاصة.. دوّن أفكارك، تعليقاتك على التصميم، أو أي تفاصيل إبداعية تخطر ببالك لتذكرها لاحقاً"
+                            class="w-full h-16 p-2 bg-white/70 border border-[#f59e0b]/20 rounded-lg text-[#78350f] text-[11px] resize-none focus:outline-none focus:bg-white focus:border-[#f59e0b]/40 transition-all placeholder:text-[#92400e]/40 leading-relaxed"
+                            placeholder="دوّن أفكارك وملاحظاتك هنا..."
                             maxlength="140"
                             onchange="updateDesignerNotes()"
                             oninput="updateCharCount()"
-                        style="background-image: repeating-linear-gradient(to bottom, transparent, transparent 19px, #f59e0b15 19px, #f59e0b15 20px); background-size: 100% 20px; padding-top: 4px;"
                         ></textarea>
                         
-                        <!-- Premium Promo - يُخفى للبريميوم عبر JS -->
-                        <div id="premium-notes-promo" class="flex justify-between items-center mt-3 pt-2 border-t border-[#f59e0b]/10">
-                            <span class="text-[9px] text-[#92400e]/60">نسخة مجانية: 140 حرف فقط</span>
-                            <div class="flex items-center gap-1.5 cursor-pointer group/promo" onclick="showPremiumModal('زيادة حد الملاحظات')">
-                                <i class="fas fa-crown text-[10px] text-yellow-500 group-hover/promo:scale-110 transition-transform"></i>
-                                <span class="text-[10px] font-bold text-yellow-600 group-hover/promo:text-yellow-700 transition-colors">ترقية لـ 1000 كلمة</span>
+                        <!-- Premium Promo -->
+                        <div id="premium-notes-promo" class="flex justify-between items-center mt-2 pt-2 border-t border-[#f59e0b]/10">
+                            <span class="text-[8px] text-[#92400e]/60">140 حرف</span>
+                            <div class="flex items-center gap-1 cursor-pointer" onclick="showPremiumModal('زيادة حد الملاحظات')">
+                                <i class="fas fa-crown text-[9px] text-yellow-500"></i>
+                                <span class="text-[9px] font-bold text-yellow-600">ترقية</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Statistics (Light Mode) -->
-                    <div class="bg-gradient-to-br from-slate-50 to-slate-100/80 p-4 rounded-xl border border-slate-200/60 shadow-sm">
-                        <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2 text-xs">
-                            <i class="fas fa-chart-pie text-indigo-500"></i> الإحصائيات
-                        </h3>
+                    <!-- Statistics (Compact) -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-chart-pie text-indigo-500 text-xs"></i>
+                            <span class="font-bold text-slate-700 text-[10px]">إحصائيات</span>
+                        </div>
                         
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <div class="flex flex-col items-center bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
-                                <span class="text-slate-500 text-[10px] mb-1">عدد العناصر</span>
-                                <p class="font-bold text-slate-800 text-sm" id="element-count">0</p>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                                <span class="text-slate-500 text-[9px]">العناصر</span>
+                                <p class="font-bold text-slate-800 text-xs" id="element-count">0</p>
                             </div>
-                            <div class="flex flex-col items-center bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
-                                <span class="text-slate-500 text-[10px] mb-1">حجم التصميم</span>
-                                <p class="font-mono font-bold text-slate-800 text-[11px] mt-1" id="canvas-size" dir="ltr">-</p>
+                            <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                                <span class="text-slate-500 text-[9px]">الحجم</span>
+                                <p class="font-mono font-bold text-slate-800 text-[10px]" id="canvas-size" dir="ltr">-</p>
                             </div>
                         </div>
                         
-                         <!-- Colors (No Border) -->
-                         <div class="pt-3 border-t border-slate-200/60">
-                            <span class="text-slate-500 text-[10px] font-bold block mb-2">الألوان المستخدمة:</span>
-                            <div id="used-colors-palette" class="flex flex-wrap gap-2 min-h-[20px]">
-                                <!-- Colors injected here -->
+                        <div class="pt-2 border-t border-slate-200">
+                            <span class="text-slate-500 text-[9px] font-bold block mb-1">الألوان المستخدمة بالتصميم:</span>
+                            <div id="used-colors-palette" class="flex flex-wrap gap-1.5 min-h-[16px]">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Close Button Bottom -->
-                    <button onclick="closeDesignerPanel()" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fas fa-check"></i> إغلاق
+                    <!-- Close Button -->
+                    <button onclick="closeDesignerPanel()" class="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-check"></i> تم
                     </button>
                 </div>
             </div>
@@ -1386,7 +1417,7 @@
     <div id="close-floating-toolbar" class="hidden"></div>
 
     <!-- Footer -->
-    <footer class="relative bg-gradient-to-r from-[#1e1b4b] to-[#312e81] text-white py-4 mt-auto border-t border-[#4338ca]/50 shadow-lg">
+    <footer class="relative bg-gradient-to-r from-[#1e1b4b] to-[#312e81] text-white py-4 lg:mt-auto border-t border-[#4338ca]/50 shadow-lg mb-[60px] md:mb-0 transition-all">
         <div class="max-w-7xl mx-auto px-4">
             <!-- الصف الرئيسي -->
             <div class="flex flex-wrap items-center justify-between gap-4">
@@ -1606,7 +1637,7 @@
                     <i class="fas fa-plus-circle"></i>
                     <span>حفظ مشروع جديد</span>
                 </button>
-                <button onclick="closeMyProjectsModal()" class="flex-1 py-2.5 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all">
+                <button onclick="closeMyProjectsModal()" class="flex-1 py-2.5 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all">
                     إغلاق
                 </button>
             </div>
@@ -1656,7 +1687,7 @@
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
     </style>
 
-    <script src="js/app.js?v=REVERT_AREA_1770242031"></script>
+    <script src="js/app.js?v=1770246416"></script>
     <script src="js/social_media.js?v=20260202_99"></script>
     <script src="js/discount_maker.js?v=20260202_99"></script>
     <script src="js/my_projects.js?v=20260203_v2_FORCE"></script>
@@ -1950,59 +1981,69 @@
     <!-- ============================================ -->
     <!-- === Mobile Bottom Bar - للجوال فقط === -->
     <!-- ============================================ -->
-    <!-- === Mobile Bottom Bar - ستايل Canva === -->
+    <!-- === Mobile Bottom Bar - الستايل الأصلي === -->
     <!-- ============================================ -->
     <div id="mobile-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[99998] md:hidden transition-transform duration-300" style="transform: translateY(0);">
         <!-- Handle للسحب (للأسفل) -->
         <div id="mobile-bar-handle" class="flex justify-center py-1.5 bg-slate-800 rounded-t-2xl cursor-grab active:cursor-grabbing" onclick="toggleMobileBarExpand()">
             <div class="w-8 h-1 bg-slate-500 rounded-full"></div>
         </div>
-        <!-- الأزرار سطرين -->
+        <!-- الأزرار سطرين 5+5 -->
         <div class="bg-slate-800 px-2 pb-[max(8px,env(safe-area-inset-bottom))]">
-            <!-- السطر الأول: 4 أزرار -->
-            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
+            <!-- السطر الأول: 5 أزرار -->
+            <div class="grid grid-cols-5 gap-1 mb-1">
                 <!-- زر العناصر - وردي -->
-                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-pink-500/80 hover:bg-pink-500 active:scale-95 transition-all">
+                <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-pink-500/80 hover:bg-pink-500 active:scale-95 transition-all">
                     <i class="fas fa-shapes text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-white">العناصر</span>
+                    <span class="text-[9px] font-bold text-white">العناصر</span>
+                </button>
+                <!-- زر إدراج -->
+                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-plus-circle text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">إدراج</span>
                 </button>
                 <!-- زر الطبقات -->
-                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-layer-group text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">الطبقات</span>
+                    <span class="text-[9px] font-bold text-slate-300">الطبقات</span>
                 </button>
                 <!-- زر تحرير النص -->
-                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-font text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">النص</span>
+                    <span class="text-[9px] font-bold text-slate-300">النص</span>
                 </button>
                 <!-- زر الخلفية -->
-                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-fill-drip text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">خلفية</span>
+                    <span class="text-[9px] font-bold text-slate-300">خلفية</span>
                 </button>
             </div>
-            <!-- السطر الثاني: 4 أزرار -->
-            <div class="grid grid-cols-4 gap-1.5">
-                <!-- زر إدراج -->
-                <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-plus-circle text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">إدراج</span>
+            <!-- السطر الثاني: 5 أزرار -->
+            <div class="grid grid-cols-5 gap-1">
+                <!-- زر Notes -->
+                <button onclick="openDesignerPanel()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-sticky-note text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">ملاحظات</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
-                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-magic text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">ذكي</span>
+                    <span class="text-[9px] font-bold text-slate-300">ذكي</span>
                 </button>
                 <!-- زر بزنس تولز -->
-                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-briefcase text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-slate-300">أعمال</span>
+                    <span class="text-[9px] font-bold text-slate-300">أعمال</span>
+                </button>
+                <!-- زر سحابتي -->
+                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...');" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+                    <i class="fas fa-cloud text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">سحابتي</span>
                 </button>
                 <!-- زر التصدير -->
-                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
+                <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fas fa-download text-white text-sm"></i>
-                    <span class="text-[8px] font-bold text-white">تصدير</span>
+                    <span class="text-[9px] font-bold text-slate-300">تصدير</span>
                 </button>
             </div>
         </div>
@@ -2062,7 +2103,7 @@
                 <textarea id="mobile-new-text-area" class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm resize-none focus:border-indigo-500 outline-none" rows="3" dir="rtl" placeholder="اكتب النص هنا..."></textarea>
                 
                 <!-- زر الإدراج -->
-                <button onclick="insertNewMobileText()" class="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg">
+                <button onclick="insertNewMobileText()" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg">
                     <i class="fas fa-plus"></i> إدراج النص
                 </button>
             </div>
@@ -2072,46 +2113,46 @@
     <!-- ============================================ -->
     <!-- === Mobile Insert Modal (إدراج) === -->
     <!-- ============================================ -->
-    <div id="mobile-insert-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileInsertModal()">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[60vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+    <div id="mobile-insert-modal" class="fixed inset-0 z-[99999] hidden flex items-end justify-center" onclick="closeMobileInsertModal()">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-t-2xl w-full mx-2 mb-0 overflow-hidden animate-slide-up" style="font-family: 'IBM Plex Sans Arabic', sans-serif;" onclick="event.stopPropagation()">
             <!-- Header -->
-            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fas fa-plus-circle text-indigo-600"></i> إدراج عنصر
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-slate-700 text-xs flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-indigo-500 text-sm"></i> إدراج
                 </h3>
-                <button onclick="closeMobileInsertModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fas fa-times text-sm"></i>
+                <button onclick="closeMobileInsertModal()" class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 active:scale-90 transition">
+                    <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
             <!-- Content -->
-            <div class="p-4">
-                <div class="grid grid-cols-2 gap-3">
+            <div class="p-3">
+                <div class="grid grid-cols-5 gap-2">
                     <!-- إضافة صورة -->
-                    <label class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border-2 border-dashed border-indigo-300 active:scale-95 transition-all cursor-pointer">
-                        <i class="fas fa-image text-indigo-600 text-2xl"></i>
-                        <span class="text-xs font-bold text-slate-700">صورة</span>
+                    <label class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-image text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">صورة</span>
                         <input type="file" onchange="addRegularImage(this); closeMobileInsertModal();" class="hidden" accept="image/*">
                     </label>
                     <!-- مشروع جديد -->
-                    <button onclick="createNewProject(); closeMobileInsertModal();" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-file-circle-plus text-emerald-600 text-2xl"></i>
-                        <span class="text-xs font-bold text-slate-700">جديد</span>
+                    <button onclick="createNewProject(); closeMobileInsertModal();" class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-file-circle-plus text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">جديد</span>
                     </button>
                     <!-- إطار -->
-                    <button onclick="openMobileFrameModal()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="far fa-square text-purple-600 text-2xl"></i>
-                        <span class="text-xs font-bold text-slate-700">إطار</span>
+                    <button onclick="openMobileFrameModal()" class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="far fa-square text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">إطار</span>
                     </button>
                     <!-- شكل -->
-                    <button onclick="openMobileShapeModal()" class="flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-shapes text-pink-600 text-2xl"></i>
-                        <span class="text-xs font-bold text-slate-700">شكل</span>
+                    <button onclick="openMobileShapeModal()" class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-shapes text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">شكل</span>
                     </button>
                     <!-- فتح ملف -->
-                    <label class="col-span-2 flex flex-col items-center gap-2 p-4 bg-gradient-to-b from-amber-50 to-white rounded-xl border border-amber-200 active:scale-95 transition-all cursor-pointer">
-                        <i class="fas fa-folder-open text-amber-600 text-2xl"></i>
-                        <span class="text-xs font-bold text-slate-700">فتح ملف</span>
+                    <label class="flex flex-col items-center gap-1 py-2.5 px-1 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-folder-open text-slate-600 text-base"></i>
+                        <span class="text-[8px] font-bold text-slate-600">ملف</span>
                         <input type="file" onchange="handleUniversalFile(this); closeMobileInsertModal();" class="hidden" accept=".template,.json,.pdf,.tif,.tiff,.psd,.png,.jpg,.jpeg,.webp,.gif">
                     </label>
                 </div>
@@ -2194,33 +2235,33 @@
     <!-- ============================================ -->
     <div id="mobile-business-tools-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileBusinessToolsModal()">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[50vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
             <!-- Header -->
-            <div class="flex items-center justify-between p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fas fa-briefcase text-emerald-600"></i> BUSINESS TOOLS
+            <div class="flex items-center justify-between p-2 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-slate-800 text-xs flex items-center gap-2">
+                    <i class="fas fa-briefcase text-emerald-600 text-sm"></i> BUSINESS TOOLS
                 </h3>
-                <button onclick="closeMobileBusinessToolsModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                <button onclick="closeMobileBusinessToolsModal()" class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
             <!-- Content -->
-            <div class="p-3">
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="openQRModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-qrcode text-indigo-600 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">باركود</span>
+            <div class="p-2 pb-[max(8px,env(safe-area-inset-bottom))]">
+                <div class="grid grid-cols-3 gap-1.5">
+                    <button onclick="openQRModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1 p-3 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-qrcode text-slate-700 text-lg"></i>
+                        <span class="text-[9px] font-bold text-slate-700">باركود</span>
                     </button>
-                    <button onclick="openSocialModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <div class="flex gap-1">
-                            <i class="fab fa-instagram text-pink-500 text-lg"></i>
-                            <i class="fab fa-tiktok text-slate-800 text-lg"></i>
+                    <button onclick="openSocialModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1 p-3 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <div class="flex gap-0.5">
+                            <i class="fab fa-instagram text-slate-700 text-base"></i>
+                            <i class="fab fa-tiktok text-slate-700 text-base"></i>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-700">سوشيال</span>
+                        <span class="text-[9px] font-bold text-slate-700">سوشيال</span>
                     </button>
-                    <button onclick="openDiscountModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1.5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
-                        <i class="fas fa-tags text-amber-500 text-xl"></i>
-                        <span class="text-[10px] font-bold text-slate-700">خصومات</span>
+                    <button onclick="openDiscountModal(); closeMobileBusinessToolsModal();" class="flex flex-col items-center gap-1 p-3 bg-gradient-to-b from-slate-50 to-white rounded-xl border border-slate-200 active:scale-95 transition-all">
+                        <i class="fas fa-tags text-slate-700 text-lg"></i>
+                        <span class="text-[9px] font-bold text-slate-700">خصومات</span>
                     </button>
                 </div>
             </div>
@@ -2268,10 +2309,6 @@
             </div>
             <!-- Content -->
             <div class="p-3 space-y-2">
-                <!-- زر أعمالي -->
-                <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...'); closeMobileExportModal();" class="w-full bg-violet-600 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
-                    <i class="fas fa-folder-open"></i> أعمالي
-                </button>
                 <button onclick="saveWorkDirectly(); closeMobileExportModal();" class="w-full bg-indigo-600 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
                     <i class="fas fa-image"></i> حفظ كصورة
                 </button>
@@ -2280,6 +2317,9 @@
                 </button>
                 <button onclick="generateA4Sheet(); closeMobileExportModal();" class="w-full bg-pink-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
                     <i class="fas fa-print"></i> طباعة A4
+                </button>
+                <button onclick="downloadImage(); closeMobileExportModal();" class="w-full bg-emerald-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i class="fas fa-file-image"></i> حفظ A4 صورة
                 </button>
             </div>
         </div>
@@ -2290,7 +2330,7 @@
     <!-- ============================================ -->
     <div id="mobile-assets-modal" class="fixed inset-0 z-[99999] hidden" onclick="closeMobileAssetsModal()">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[70vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
+        <div class="absolute bottom-0 left-2 right-2 bg-white rounded-t-3xl max-h-[65vh] overflow-hidden animate-slide-up" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="flex items-center justify-between p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -2448,7 +2488,38 @@
                 padding: 20px !important;
                 margin-bottom: 20px !important;
                 overflow: auto !important;
-                touch-action: pan-x pan-y !important;
+                touch-action: pinch-zoom pan-x pan-y !important;
+            }
+            
+            /* تكبير المقابض والأزرار للجوال */
+            .handle {
+                width: 32px !important;
+                height: 32px !important;
+            }
+            .resize-nw { top: -16px !important; left: -16px !important; }
+            .resize-ne { top: -16px !important; right: -16px !important; }
+            .resize-sw { bottom: -16px !important; left: -16px !important; }
+            .resize-se { bottom: -16px !important; right: -16px !important; }
+            .resize-n { top: -16px !important; }
+            .resize-e { right: -16px !important; }
+            .resize-s { bottom: -16px !important; }
+            .resize-w { left: -16px !important; }
+            
+            .control-btn {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 13px !important;
+            }
+            .delete-btn { top: -42px !important; left: 0px !important; }
+            .duplicate-btn { top: -42px !important; left: 34px !important; }
+            .rotate-btn { top: -42px !important; left: 68px !important; }
+            .layer-up-btn { top: -42px !important; left: 102px !important; }
+            .layer-down-btn { top: -42px !important; left: 136px !important; }
+            
+            .move-handle {
+                width: 44px !important;
+                height: 30px !important;
+                font-size: 13px !important;
             }
             
             /* النافذة العائمة - تظهر عند الضغط على زر النص */
@@ -2556,6 +2627,13 @@
             #mobile-dimensions-compact {
                 display: block !important;
             }
+            
+            /* تكبير زر Premium في الفوتر للجوال */
+            #footer-login-btn {
+                width: 100% !important;
+                padding: 14px 24px !important;
+                font-size: 15px !important;
+            }
         }
         /* إخفاء قسم الأبعاد المدمج على الشاشات الكبيرة */
         @media (min-width: 1024px) {
@@ -2567,7 +2645,7 @@
     
     <script>
         // Mobile Bottom Bar Functions
-        function openMobileAssetsModal() {
+        async function openMobileAssetsModal() {
             const modal = document.getElementById('mobile-assets-modal');
             const loadingBar = document.getElementById('mobile-assets-loading');
             const grid = document.getElementById('mobile-assets-grid');
@@ -2577,18 +2655,26 @@
             if (!window.officialAssetsLibrary || window.officialAssetsLibrary.length === 0) {
                 // إظهار شريط التحميل
                 if (loadingBar) loadingBar.classList.remove('hidden');
-                grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-indigo-500"></i></div>';
+                grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-indigo-500"></i> جاري تحميل العناصر...</div>';
                 
-                // محاولة تحميل المكتبة
-                if (typeof loadAssetsLibraryFromGitHub === 'function') {
-                    loadAssetsLibraryFromGitHub();
-                }
-                // انتظار التحميل ثم المزامنة
-                setTimeout(() => {
+                try {
+                    // انتظار التحميل فعلياً
+                    if (window.assetsLoadingPromise) {
+                        await window.assetsLoadingPromise;
+                    } else if (typeof loadAssetsLibraryFromGitHub === 'function') {
+                        await loadAssetsLibraryFromGitHub();
+                    }
+                    
+                    // التحميل نجح - مزامنة التصنيفات
                     syncMobileAssetsCategories();
                     if (loadingBar) loadingBar.classList.add('hidden');
                     grid.innerHTML = '<div class="col-span-3 text-center text-xs text-slate-400 py-8">اختر تصنيفاً لعرض العناصر</div>';
-                }, 1500);
+                } catch (error) {
+                    // التحميل فشل
+                    console.error('فشل تحميل العناصر:', error);
+                    if (loadingBar) loadingBar.classList.add('hidden');
+                    grid.innerHTML = '<div class="col-span-3 text-center text-xs text-red-400 py-8"><i class="fas fa-exclamation-triangle"></i> فشل التحميل - تأكد من الانترنت</div>';
+                }
             } else {
                 syncMobileAssetsCategories();
                 if (loadingBar) loadingBar.classList.add('hidden');
@@ -2692,9 +2778,15 @@
                 itemDiv.innerHTML = `
                     <div class="flex items-center gap-2 flex-1 cursor-pointer" onclick="selectLayerFromMobile('${id}')">
                         <i class="${icon} text-sm ${isSelected ? 'text-indigo-600' : 'text-slate-500'}"></i>
-                        <span class="text-xs font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'} truncate max-w-[120px]">${name}</span>
+                        <span class="text-xs font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'} truncate max-w-[100px]">${name}</span>
                     </div>
                     <div class="flex items-center gap-1">
+                        <button onclick="moveLayerUp('${id}')" class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-indigo-500 active:scale-95">
+                            <i class="fas fa-arrow-up text-xs"></i>
+                        </button>
+                        <button onclick="moveLayerDown('${id}')" class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-indigo-500 active:scale-95">
+                            <i class="fas fa-arrow-down text-xs"></i>
+                        </button>
                         <button onclick="toggleMobileLayerVisibility('${id}')" class="w-7 h-7 rounded-lg ${isHidden ? 'bg-slate-200' : 'bg-white'} border border-slate-200 flex items-center justify-center text-slate-500 active:scale-95">
                             <i class="fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'} text-xs"></i>
                         </button>
@@ -2705,6 +2797,26 @@
                 `;
                 layersList.appendChild(itemDiv);
             });
+        }
+        
+        // تحريك طبقة للأعلى (للأمام)
+        function moveLayerUp(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element && typeof bringToFront === 'function') {
+                bringToFront(element);
+                updateMobileLayersList();
+            }
+        }
+        
+        // تحريك طبقة للأسفل (للخلف)
+        function moveLayerDown(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element && typeof sendToBack === 'function') {
+                sendToBack(element);
+                updateMobileLayersList();
+            }
         }
         
         // تحديد طبقة من نافذة الموبايل
@@ -2820,10 +2932,18 @@
             
             // إضافة النص
             try {
-                if (typeof window.addTextElement === 'function') {
-                    window.addTextElement(text);
-                } else if (typeof addTextElement === 'function') {
-                    addTextElement(text);
+                if (typeof window.addTextToCanvas === 'function') {
+                    window.addTextToCanvas(text, false);
+                    if (typeof window.saveState === 'function') window.saveState();
+                } else if (typeof addTextToCanvas === 'function') {
+                    addTextToCanvas(text, false);
+                    if (typeof saveState === 'function') saveState();
+                } else if (typeof window.addUserText === 'function') {
+                    const input = document.getElementById('user-text-input');
+                    if (input) {
+                        input.value = text;
+                        window.addUserText();
+                    }
                 } else if (typeof addUserText === 'function') {
                     const input = document.getElementById('user-text-input');
                     if (input) {
@@ -2831,14 +2951,30 @@
                         addUserText();
                     }
                 } else {
-                    // أخر محاولة
-                    const input = document.getElementById('user-text-input');
-                    if (input) {
-                        input.value = text;
-                        const btn = document.querySelector('[onclick="addUserText()"]');
-                        if (btn) btn.click();
+                    // أخر محاولة - إنشاء النص مباشرة
+                    const card = document.getElementById('card');
+                    if (card) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'draggable-item text-layer';
+                        wrapper.style.cssText = 'position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #1e293b; font-size: 50px; font-family: "Cairo", sans-serif; font-weight: 600; cursor: move; z-index: 100;';
+                        
+                        const textDiv = document.createElement('div');
+                        textDiv.className = 'user-text';
+                        textDiv.contentEditable = true;
+                        textDiv.innerText = text;
+                        
+                        wrapper.appendChild(textDiv);
+                        card.appendChild(wrapper);
+                        
+                        if (typeof window.selectEl === 'function') window.selectEl(wrapper);
+                        if (typeof window.setupInteract === 'function') window.setupInteract(wrapper, 'text');
+                        if (typeof window.saveState === 'function') window.saveState();
                     }
                 }
+                
+                // مسح حقل النص
+                if (textarea) textarea.value = '';
+                
             } catch(e) {
                 console.error('Error adding text:', e);
             }
@@ -2966,8 +3102,8 @@
                 const isLocked = idx >= freeCount && window.userTier === 'free';
                 
                 const div = document.createElement('div');
-                div.className = 'bg-white rounded-xl p-2 cursor-pointer hover:bg-indigo-50 active:scale-95 transition-all border border-slate-200 shadow-sm';
-                if (isLocked) div.style.opacity = '0.5';
+                div.className = 'bg-white rounded-xl p-2 cursor-pointer hover:bg-indigo-50 active:scale-95 transition-all border border-slate-200 shadow-sm relative';
+                if (isLocked) div.style.opacity = '0.6';
                 
                 const img = document.createElement('img');
                 img.src = item.src;
@@ -2975,6 +3111,14 @@
                 img.draggable = false;
                 
                 div.appendChild(img);
+                
+                // إضافة أيقونة القفل كعنصر HTML
+                if (isLocked) {
+                    const lockBadge = document.createElement('div');
+                    lockBadge.className = 'lock-badge';
+                    lockBadge.innerHTML = '<i class="fas fa-lock"></i>';
+                    div.appendChild(lockBadge);
+                }
                 
                 div.onclick = function() {
                     if (isLocked) {
@@ -3016,6 +3160,10 @@
             const mobileZoomDisplay = document.getElementById('mobile-zoom-display');
             if (mobileZoomDisplay) {
                 mobileZoomDisplay.textContent = value + '%';
+            }
+            const mobileHeaderZoomDisplay = document.getElementById('mobile-header-zoom-display');
+            if (mobileHeaderZoomDisplay) {
+                mobileHeaderZoomDisplay.textContent = value + '%';
             }
         };
         
