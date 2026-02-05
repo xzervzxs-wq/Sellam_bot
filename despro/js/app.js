@@ -1588,50 +1588,19 @@
                     }
                 }
                 
-                // 2. انتظار decode للصور (مهم جداً!)
-                if (loadingText) loadingText.innerText = "جاري معالجة الصور...";
+                // 2. انتظار decode للصور
+                if (loadingText) loadingText.innerText = "جاري تثبيت الصور...";
                 
-                // إعادة تعيين src لإجبار إعادة التحميل
+                // انتظار decode لكل صورة
                 for (const img of images) {
                     if (img.src && img.src.startsWith('data:')) {
-                        const tempSrc = img.src;
-                        img.src = '';
-                        await new Promise(r => setTimeout(r, 50));
-                        img.src = tempSrc;
+                        try {
+                            if (img.decode) await img.decode();
+                        } catch(e) {}
                     }
                 }
                 
-                // انتظار طويل لتحميل الصور
-                await new Promise(r => setTimeout(r, 1500));
-                
-                // التأكد من اكتمال تحميل كل صورة
-                const imgDecodePromises = Array.from(images).map(img => {
-                    return new Promise(resolve => {
-                        if (img.complete && img.naturalWidth > 0) {
-                            if (img.decode) {
-                                img.decode().then(resolve).catch(resolve);
-                            } else {
-                                resolve();
-                            }
-                        } else {
-                            img.onload = () => {
-                                if (img.decode) {
-                                    img.decode().then(resolve).catch(resolve);
-                                } else {
-                                    resolve();
-                                }
-                            };
-                            img.onerror = resolve;
-                            // timeout للصور البطيئة
-                            setTimeout(resolve, 3000);
-                        }
-                    });
-                });
-                await Promise.all(imgDecodePromises);
-                console.log('iOS: All images decoded and ready');
-                
-                // انتظار إضافي للتأكد
-                await new Promise(r => setTimeout(r, 1000));
+                await new Promise(r => setTimeout(r, 2000));
                 
                 if (loadingText) loadingText.innerText = "جاري التقاط الصورة...";
                 
@@ -1680,26 +1649,15 @@
                 try {
                     console.log('iOS: Using htmlToImage for Arabic text...');
                     if (typeof htmlToImage !== 'undefined') {
-                        // Warm-up 1: لتحميل الصور والخطوط
-                        console.log('iOS: Warm-up 1...');
-                        await htmlToImage.toPng(card, { 
-                            quality: 0.3, 
-                            pixelRatio: 1,
-                            cacheBust: true
-                        });
-                        await new Promise(r => setTimeout(r, 1000));
-                        
-                        // Warm-up 2: لتثبيت الصور
-                        console.log('iOS: Warm-up 2...');
+                        // Warm-up capture (يُرمى - لإيقاظ رسم الخطوط)
                         await htmlToImage.toPng(card, { 
                             quality: 0.5, 
-                            pixelRatio: 2,
-                            cacheBust: true
+                            pixelRatio: 1
                         });
-                        await new Promise(r => setTimeout(r, 1000));
                         
-                        // التقاط نهائي بجودة عالية
-                        console.log('iOS: Final capture...');
+                        await new Promise(r => setTimeout(r, 800));
+                        
+                        // التقاط نهائي بجودة عالية (htmlToImage أفضل للعربية)
                         cardDataUrl = await htmlToImage.toPng(card, {
                             quality: 1.0,
                             pixelRatio: 3,
