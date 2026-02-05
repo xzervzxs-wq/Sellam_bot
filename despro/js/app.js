@@ -1651,7 +1651,7 @@
                         
                         // Warm-up #3 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 2,
+                            pixelRatio: 3,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1659,7 +1659,7 @@
                         
                         // Warm-up #4 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 2,
+                            pixelRatio: 3,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1667,7 +1667,7 @@
                         
                         // Warm-up #3 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 2,
+                            pixelRatio: 3,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1675,7 +1675,7 @@
                         
                         // Warm-up #4 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 2,
+                            pixelRatio: 3,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1698,7 +1698,7 @@
                         
                         // الالتقاط النهائي باستخدام toCanvas
                         const canvas = await htmlToImage.toCanvas(card, {
-                            pixelRatio: 2,
+                            pixelRatio: 3,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
                             skipAutoScale: true
@@ -1724,7 +1724,7 @@
                         console.log('iOS: Trying htmlToImage...');
                         if (typeof htmlToImage !== 'undefined') {
                             cardDataUrl = await htmlToImage.toPng(card, {
-                                pixelRatio: 2,
+                                pixelRatio: 3,
                                 cacheBust: true,
                                 backgroundColor: isTransparent ? null : '#ffffff'
                             });
