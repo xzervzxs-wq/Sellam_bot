@@ -1643,34 +1643,50 @@
                 void card.offsetHeight;
                 await new Promise(r => setTimeout(r, 500));
                 
-                // 6. التقاط البطاقة باستخدام htmlToImage (أفضل للعربية)
+                // 6. نظام الالتقاط الذكي مع إعادة المحاولة
                 let cardDataUrl = null;
+                const MAX_ATTEMPTS = 5;
+                const MIN_VALID_SIZE = 50000; // الصورة الصحيحة لازم أكبر من 50KB
                 
-                try {
-                    console.log('iOS: Using htmlToImage for Arabic text...');
-                    if (typeof htmlToImage !== 'undefined') {
-                        // Warm-up capture (يُرمى - لإيقاظ رسم الخطوط)
-                        await htmlToImage.toPng(card, { 
-                            quality: 0.5, 
-                            pixelRatio: 1
-                        });
-                        
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        // التقاط نهائي بجودة عالية (htmlToImage أفضل للعربية)
-                        cardDataUrl = await htmlToImage.toPng(card, {
-                            quality: 1.0,
-                            pixelRatio: 3,
-                            cacheBust: true,
-                            style: { transform: 'none', margin: '0' }
-                        });
-                        console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
-                    }
-                } catch (e) {
-                    console.error('iOS: htmlToImage failed', e);
-                    // Fallback to html2canvas في حالة فشل htmlToImage
+                for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
                     try {
-                        console.log('iOS: Fallback to html2canvas...');
+                        if (loadingText) loadingText.innerText = "محاولة " + attempt + " من " + MAX_ATTEMPTS + "...";
+                        console.log('iOS: Attempt ' + attempt + '/' + MAX_ATTEMPTS);
+                        
+                        if (typeof htmlToImage !== 'undefined') {
+                            // Warm-up
+                            await htmlToImage.toPng(card, { quality: 0.3, pixelRatio: 1 });
+                            await new Promise(r => setTimeout(r, 500));
+                            
+                            // الالتقاط الفعلي
+                            cardDataUrl = await htmlToImage.toPng(card, {
+                                quality: 1.0,
+                                pixelRatio: 3,
+                                cacheBust: true,
+                                style: { transform: 'none', margin: '0' }
+                            });
+                            
+                            // التحقق من حجم الصورة (إذا الصور موجودة الحجم يكون كبير)
+                            if (cardDataUrl && cardDataUrl.length > MIN_VALID_SIZE) {
+                                console.log('iOS: SUCCESS! Valid image captured, size: ' + cardDataUrl.length);
+                                break; // نجاح! خروج من الـ loop
+                            } else {
+                                console.log('iOS: Image too small (' + (cardDataUrl ? cardDataUrl.length : 0) + '), retrying...');
+                                cardDataUrl = null;
+                                await new Promise(r => setTimeout(r, 1500)); // انتظار قبل المحاولة التالية
+                            }
+                        }
+                    } catch (e) {
+                        console.error('iOS: Attempt ' + attempt + ' failed:', e);
+                        await new Promise(r => setTimeout(r, 1000));
+                    }
+                }
+                
+                // إذا فشلت كل المحاولات، جرب html2canvas
+                if (!cardDataUrl || cardDataUrl.length < MIN_VALID_SIZE) {
+                    try {
+                        console.log('iOS: All htmlToImage attempts failed, trying html2canvas...');
+                        if (loadingText) loadingText.innerText = "جاري المحاولة البديلة...";
                         const canvas = await html2canvas(card, {
                             scale: 2,
                             useCORS: true,
