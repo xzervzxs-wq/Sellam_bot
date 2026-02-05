@@ -69,7 +69,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=1770250504">
+    <link rel="stylesheet" href="css/style.css?v=1770250835">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -775,8 +775,8 @@
                     <span id="size-display" class="text-[10px] font-bold text-[#64748b] bg-white px-2 py-1 rounded border border-[#e2e8f0]">1181 × 1181 px</span>
                 </div>
                 
-                <!-- التحكم بـ Zoom -->
-                <div id="zoom-container" class="mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
+                <!-- التحكم بـ Zoom - مخفي على الجوال -->
+                <div id="zoom-container" class="hidden md:block mt-4 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] p-3 rounded-lg border border-[#7dd3fc]">
                     <div class="flex justify-between items-center mb-2">
                         <label class="text-[9px] text-[#0c4a6e] font-bold">🔍 مستوى الزوم</label>
                         <span id="zoom-display" class="text-[10px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded">30%</span>
@@ -1099,8 +1099,19 @@
 
             </div>
 
-            <!-- شريط الملاحظات الجديد (قابل للفتح) -->
-            <div id="info-bar-placeholder" class="bg-[#f1f5f9] dark-mode:bg-[#1a1a2e] p-3 rounded text-[11px] text-[#1e293b] dark-mode:text-[#e8e8e8] border border-[#e2e8f0] dark-mode:border-[#2a2a3e] flex items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] dark-mode:hover:bg-[#252545] transition" onclick="openDesignerPanel()">
+            <!-- شريط الزوم للجوال فقط -->
+            <div id="mobile-zoom-bar" class="md:hidden bg-gradient-to-r from-[#f0f9ff] to-[#e0f2fe] p-2 rounded-lg border border-[#7dd3fc] flex items-center justify-between gap-2">
+                <span class="text-[10px] font-bold text-[#0c4a6e]">🔍</span>
+                <span id="mobile-zoom-display" class="text-[11px] font-bold text-[#0c4a6e] bg-white px-2 py-0.5 rounded min-w-[40px] text-center">30%</span>
+                <div class="flex gap-1 flex-1">
+                    <button onclick="setCustomZoom(25)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[10px] font-bold py-1.5 rounded hover:bg-[#e0f2fe] active:scale-95 transition">25%</button>
+                    <button onclick="setCustomZoom(50)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[10px] font-bold py-1.5 rounded hover:bg-[#e0f2fe] active:scale-95 transition">50%</button>
+                    <button onclick="setCustomZoom(100)" class="flex-1 bg-white border border-[#7dd3fc] text-[#0c4a6e] text-[10px] font-bold py-1.5 rounded hover:bg-[#e0f2fe] active:scale-95 transition">100%</button>
+                </div>
+            </div>
+            
+            <!-- شريط الملاحظات للآيباد والكمبيوتر فقط -->
+            <div id="info-bar-placeholder" class="hidden md:flex bg-[#f1f5f9] dark-mode:bg-[#1a1a2e] p-3 rounded text-[11px] text-[#1e293b] dark-mode:text-[#e8e8e8] border border-[#e2e8f0] dark-mode:border-[#2a2a3e] items-center gap-2 font-bold cursor-pointer hover:bg-[#e8f0fe] dark-mode:hover:bg-[#252545] transition" onclick="openDesignerPanel()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-notebook" style="flex-shrink: 0; color: #6366f1;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18" /><path d="M13 8l2 0" /><path d="M13 12l2 0" /></svg> <span>اضغط هنا لكتابة ملاحظاتك - write your notes</span>
             </div>
 
@@ -1989,56 +2000,56 @@
             <div class="grid grid-cols-5 gap-1 mb-1">
                 <!-- زر العناصر - وردي -->
                 <button onclick="openMobileAssetsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-pink-500/80 hover:bg-pink-500 active:scale-95 transition-all">
-                    <i class="fas fa-shapes text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-white">العناصر</span>
+                    <i class="fas fa-shapes text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-white">العناصر</span>
                 </button>
                 <!-- زر إدراج -->
                 <button onclick="openMobileInsertModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-plus-circle text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">إدراج</span>
+                    <i class="fas fa-plus-circle text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">إدراج</span>
                 </button>
                 <!-- زر الطبقات -->
                 <button onclick="openMobileLayersModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-layer-group text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">الطبقات</span>
+                    <i class="fas fa-layer-group text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">الطبقات</span>
                 </button>
                 <!-- زر تحرير النص -->
                 <button id="mobile-text-btn" onclick="handleMobileTextButton()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-font text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">النص</span>
+                    <i class="fas fa-font text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">النص</span>
                 </button>
                 <!-- زر الخلفية -->
                 <button onclick="openMobileBackgroundModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-fill-drip text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">خلفية</span>
+                    <i class="fas fa-fill-drip text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">خلفية</span>
                 </button>
             </div>
             <!-- السطر الثاني: 5 أزرار -->
             <div class="grid grid-cols-5 gap-1">
                 <!-- زر Notes -->
                 <button onclick="openDesignerPanel()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-sticky-note text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">Notes</span>
+                    <i class="fas fa-sticky-note text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">ملاحظات</span>
                 </button>
                 <!-- زر الأدوات الذكية -->
                 <button onclick="openMobileSmartToolsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-magic text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">ذكي</span>
+                    <i class="fas fa-magic text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">ذكي</span>
                 </button>
                 <!-- زر بزنس تولز -->
                 <button onclick="openMobileBusinessToolsModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
-                    <i class="fas fa-briefcase text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-slate-300">أعمال</span>
+                    <i class="fas fa-briefcase text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-slate-300">أعمال</span>
                 </button>
                 <!-- زر سحابتي - ذهبي -->
                 <button onclick="window.openMyProjectsModal ? window.openMyProjectsModal() : alert('جاري التحميل...');" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-amber-500/80 hover:bg-amber-500 active:scale-95 transition-all">
-                    <i class="fas fa-cloud text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-white">سحابتي</span>
+                    <i class="fas fa-cloud text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-white">سحابتي</span>
                 </button>
                 <!-- زر التصدير -->
                 <button onclick="openMobileExportModal()" class="flex flex-col items-center gap-0.5 py-1.5 px-0.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all">
-                    <i class="fas fa-download text-white text-xs"></i>
-                    <span class="text-[7px] font-bold text-white">تصدير</span>
+                    <i class="fas fa-download text-white text-sm"></i>
+                    <span class="text-[9px] font-bold text-white">تصدير</span>
                 </button>
             </div>
         </div>
