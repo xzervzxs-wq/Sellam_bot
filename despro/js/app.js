@@ -1600,85 +1600,31 @@
                     card.style.backgroundImage = 'none';
                 }
                 
-                // 4. إصلاح الخطوط العربية قبل التقاط الصورة
-                const textElements = card.querySelectorAll('*');
-                const originalStyles = new Map();
-                
-                textElements.forEach(el => {
-                    if (el.innerText && el.innerText.trim() && /[؀-ۿ]/.test(el.innerText)) {
-                        // حفظ الأنماط الأصلية
-                        originalStyles.set(el, {
-                            letterSpacing: el.style.letterSpacing,
-                            wordSpacing: el.style.wordSpacing,
-                            textRendering: el.style.textRendering,
-                            fontFeatureSettings: el.style.fontFeatureSettings
-                        });
-                        // تطبيق إصلاحات الخطوط العربية
-                        el.style.letterSpacing = '0';
-                        el.style.wordSpacing = 'normal';
-                        el.style.textRendering = 'optimizeLegibility';
-                        el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1';
-                        el.style.fontKerning = 'normal';
-                        el.style.webkitFontSmoothing = 'antialiased';
-                    }
-                });
-                
-                console.log('iOS: Applied Arabic font fixes to', originalStyles.size, 'elements');
-                
-                // انتظار إضافي لتطبيق الأنماط
-                await new Promise(r => setTimeout(r, 500));
-                
-                // 5. Force Layout Thrash (مهم للخطوط العربية)
-                void card.offsetHeight;
-                await new Promise(r => setTimeout(r, 500));
-                
-                // 6. التقاط البطاقة باستخدام htmlToImage (أفضل للعربية)
+                // 4. التقاط البطاقة مباشرة
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Using htmlToImage for Arabic text...');
-                    if (typeof htmlToImage !== 'undefined') {
-                        // Warm-up capture (يُرمى - لإيقاظ رسم الخطوط)
-                        await htmlToImage.toPng(card, { 
-                            quality: 0.5, 
-                            pixelRatio: 1
-                        });
-                        
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        // التقاط نهائي بجودة عالية (htmlToImage أفضل للعربية)
-                        cardDataUrl = await htmlToImage.toPng(card, {
-                            quality: 1.0,
-                            pixelRatio: 3,
-                            cacheBust: true,
-                            style: { transform: 'none', margin: '0' }
-                        });
-                        console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
-                    }
-                } catch (e) {
-                    console.error('iOS: htmlToImage failed', e);
-                    // Fallback to html2canvas في حالة فشل htmlToImage
-                    try {
-                        console.log('iOS: Fallback to html2canvas...');
+                    console.log('iOS: Trying html2canvas...');
+                    if (typeof html2canvas !== 'undefined') {
                         const canvas = await html2canvas(card, {
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff'
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: true,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight,
+                            // تحسينات للنص العربي
+                            letterRendering: true,
+                            foreignObjectRendering: false,
+                            removeContainer: true
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
-                    } catch (e2) {
-                        console.error('iOS: html2canvas also failed', e2);
+                        console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
                     }
+                } catch (e) {
+                    console.error('iOS: html2canvas failed', e);
                 }
-                
-                // استعادة الأنماط الأصلية
-                originalStyles.forEach((styles, el) => {
-                    el.style.letterSpacing = styles.letterSpacing;
-                    el.style.wordSpacing = styles.wordSpacing;
-                    el.style.textRendering = styles.textRendering;
-                    el.style.fontFeatureSettings = styles.fontFeatureSettings;
-                });
                 
                 // Fallback to htmlToImage
                 if (!cardDataUrl || cardDataUrl.length < 1000) {
