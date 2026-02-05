@@ -69,7 +69,7 @@
     </script>
 
     <!-- Stylesheet خارجي -->
-    <link rel="stylesheet" href="css/style.css?v=1770249439">
+    <link rel="stylesheet" href="css/style.css?v=1770246636">
     
     <!-- Dark mode fixes - inline للتأكد من التطبيق -->
     <style>
@@ -918,21 +918,21 @@
                     </div>
                     
                     <!-- قسم أدوات التحرير - EDIT TOOLS -->
-                    <div class="flex flex-row md:flex-col items-center gap-1 md:bg-[#000000]/5 px-0 md:px-3 py-0 md:py-1.5 rounded-xl md:border md:border-[#6366f1]/20 min-h-[40px] md:min-h-[52px] relative w-full md:w-auto mt-1 md:mt-0">
-                        <span class="hidden md:block text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
+                    <div class="flex flex-col items-center gap-1 bg-[#000000]/5 px-3 py-1.5 rounded-xl border border-[#6366f1]/20 min-h-[52px] relative">
+                        <span class="text-[8px] font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 w-full text-center">
                             EDIT TOOLS
                         </span>
-                        <div class="flex items-center w-full justify-between md:justify-center md:w-auto gap-1.5">
-                           <button onclick="toggleGradient()" id="btn-grad" class="flex-1 md:flex-none justify-center h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
+                        <div class="flex items-center gap-1.5">
+                           <button onclick="toggleGradient()" id="btn-grad" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
                                 <i class="fas fa-adjust text-sm"></i> التدرج
                             </button>
-                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="flex-1 md:flex-none justify-center h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
+                            <button onclick="event.stopPropagation(); toggleEraserMode()" id="btn-eraser" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500">
                                 <i class="fas fa-eraser text-sm"></i> الممحاة
                             </button>
-                            <button onclick="toggleCropMode()" id="btn-crop" class="flex-1 md:flex-none justify-center h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="قص الصورة">
+                            <button onclick="toggleCropMode()" id="btn-crop" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="قص الصورة">
                                 <i class="fas fa-crop text-sm"></i> قص
                             </button>
-                            <button onclick="toggleHandMode()" id="btn-hand" class="flex-1 md:flex-none justify-center h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="أداة اليد">
+                            <button onclick="toggleHandMode()" id="btn-hand" class="h-9 px-3 rounded-lg text-[10px] font-bold bg-white/80 dark:bg-slate-600 text-[#374151] dark:text-slate-200 hover:bg-[#6366f1] hover:text-white transition flex items-center gap-1.5 border border-[#e2e8f0] dark:border-slate-500" title="أداة اليد">
                                 <i class="fa-regular fa-hand text-sm"></i> تحريك
                             </button>
                         </div>
@@ -982,7 +982,7 @@
                 <!-- لوحات التحكم -->
                 
                 <!-- إعدادات الممحاة - تظهر فوق الألوان -->
-                <div id="eraser-controls" class="controls-row w-full bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 mb-2" style="order: 1 !important;">
+                <div id="eraser-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 mb-2" style="order: 1 !important;">
                     <div class="flex items-center gap-1 pl-2">
                         <label class="flex items-center gap-1 cursor-pointer">
                             <input type="checkbox" id="eraser-protect-bg" checked class="w-3 h-3 accent-[#6366f1]">
@@ -1021,7 +1021,7 @@
                 </div>
 
                 <!-- إعدادات التدرج -->
-                <div id="grad-controls" class="controls-row w-full bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] mb-2" style="order: 2;">
+                <div id="grad-controls" class="controls-row bg-[#f8fafc] px-2 py-1.5 rounded-lg border border-[#e2e8f0] mb-2">
                     <!-- Global Overlay Controls -->
                     <div id="global-grad-inputs" class="flex items-center gap-2">
                         <span class="text-[9px] font-bold text-[#1e293b]">تدرج:</span>
@@ -1061,7 +1061,7 @@
                 </div>
 
                 <!-- خصائص العنصر المحدد (شفافية الصورة) - تحت الألوان -->
-                <div id="quick-props" class="hidden w-full basis-full bg-[#f0f4ff] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 flex items-center gap-2 mb-2" style="order: 1000;">
+                <div id="quick-props" class="hidden w-full bg-[#f0f4ff] px-2 py-1.5 rounded-lg border border-[#6366f1]/30 flex items-center gap-2 mb-2" style="order: 1000;">
                     <span class="text-[9px] text-[#1e293b] font-bold whitespace-nowrap">شفافية:</span>
                     <input type="range" id="layer-opacity" min="0" max="100" value="100" oninput="updateLayerOpacity(this.value)" class="w-16 h-1.5 bg-[#e2e8f0] rounded-lg accent-[#6366f1] cursor-pointer">
                     <span id="opacity-value" class="text-[9px] font-bold text-[#6366f1] w-6">100%</span>
@@ -1073,7 +1073,7 @@
                 </div>
 
                 <!-- إعدادات الإطار - منفصلة -->
-                <div id="frame-controls-toolbar" class="hidden w-full bg-[#faf5ff] px-2 py-1.5 rounded-lg border border-[#8b5cf6]/30 flex items-center gap-2 mb-2" style="order: 4;">
+                <div id="frame-controls-toolbar" class="hidden bg-[#faf5ff] px-2 py-1.5 rounded-lg border border-[#8b5cf6]/30 flex items-center gap-2 mb-2" style="order: 4;">
                     <span class="text-[9px] font-bold text-[#1e293b]">لون الحد:</span>
                     <input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-5 h-5 rounded cursor-pointer border border-[#cbd5e1]">
                     <div class="w-px h-4 bg-[#cbd5e1] mx-1"></div>

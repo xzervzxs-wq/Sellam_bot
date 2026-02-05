@@ -86,12 +86,10 @@
         //  نظام الـ Free Tier vs Premium
         // ==========================================
         let userTier = 'free'; // 'free' أو 'premium'
-        window.userTier = window.userTier || 'free'; // إذا لم يُحدد من قبل في head
         const ITEMS_PER_CATEGORY_FREE = 10; // عدد العناصر المفتوحة في المجاني
 
         function updateUserTier(isPremium) {
             userTier = isPremium ? 'premium' : 'free';
-            window.userTier = userTier;
             localStorage.setItem('userTier', userTier);
             applyTierRestrictions();
         }
@@ -406,10 +404,6 @@
             }
         }
 
-        // Promise لتتبع حالة تحميل المكتبة
-        let assetsLoadingPromise = null;
-        window.assetsLoadingPromise = null;
-        
         function loadAssetsLibraryFromGitHub() {
             const grid = document.getElementById('assets-grid');
             const select = document.getElementById('assets-category-select');
@@ -422,25 +416,20 @@
             // التحقق من وجود البيانات المحملة مسبقاً
             if (officialAssetsLibrary && officialAssetsLibrary.length > 0) {
                 // ملء قائمة التصنيفات
-                if (select) {
-                    select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
-                    officialAssetsLibrary.forEach((category, index) => {
-                        const option = document.createElement('option');
-                        option.value = index;
-                        option.textContent = category.name;
-                        select.appendChild(option);
-                    });
-                    select.value = 0;
-                    loadAssetsCategory();
-                }
+                select.innerHTML = '<option value="">📂 اختر تصنيفاً...</option>';
+                officialAssetsLibrary.forEach((category, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = category.name;
+                    select.appendChild(option);
+                });
 
-                console.log('✅ المكتبة جاهزة:', officialAssetsLibrary.length, 'تصنيف');
-                return Promise.resolve(officialAssetsLibrary);
-            }
-            
-            // إذا كان التحميل جاري بالفعل، ارجع نفس الـ Promise
-            if (assetsLoadingPromise) {
-                return assetsLoadingPromise;
+                // اختيار أول تصنيف تلقائياً
+                select.value = 0;
+                loadAssetsCategory();
+
+                console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
+                return;
             }
 
             // عرض رسالة تحميل
@@ -453,7 +442,7 @@
                 </div>`;
 
             // تحميل ملف JSON من نفس المخادم (بدلاً من GitHub)
-            assetsLoadingPromise = fetch('./Official.json?t=' + Date.now())
+            fetch('./Official.json?t=' + Date.now())
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('فشل تحميل الملف');
@@ -481,19 +470,11 @@
                     }
 
                     console.log('✅ تم تحميل المكتبة:', officialAssetsLibrary.length, 'تصنيف');
-                    return data;
                 })
                 .catch(error => {
                     console.error('خطأ في تحميل المكتبة:', error);
-                    if (grid) {
-                        grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
-                    }
-                    assetsLoadingPromise = null; // السماح بإعادة المحاولة
-                    throw error;
+                    grid.innerHTML = '<p class="text-red-500 text-[10px] col-span-3 text-center py-4"><i class="fas fa-exclamation-triangle ml-2"></i>خطأ في الاتصال - تأكد من الانترنت</p>';
                 });
-            
-            window.assetsLoadingPromise = assetsLoadingPromise;
-            return assetsLoadingPromise;
         }
 
         function loadAssetsCategory() {
@@ -7048,7 +7029,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 999999;
+                z-index: 10000;
                 backdrop-filter: blur(8px);
                 transition: all 0.3s;
             `;
@@ -7249,8 +7230,6 @@ function checkSession() {
             if (expiryDate >= today) {
                 // الجلسة صالحة
                 userTier = 'premium';
-                window.userTier = 'premium';
-                localStorage.setItem('userTier', 'premium');
                 document.documentElement.setAttribute('data-tier', 'premium');
                 updateStudioName(session.name);
                 updateFooterForUser(session.name);

@@ -277,8 +277,7 @@ async function generateDiscountCard() {
     
     setTimeout(() => {
         if (typeof addAssetToCanvas === 'function') {
-            // تمرير نسبة 0.66 (ثلثين) ليكون التصميم كبير
-            addAssetToCanvas(finalCardUrl, false, 0.66);
+            addAssetToCanvas(finalCardUrl, false);
         } else {
             alert('خطأ: لم يتم تحميل النظام');
         }
