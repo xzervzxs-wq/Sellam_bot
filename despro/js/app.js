@@ -1610,27 +1610,41 @@
                             letterSpacing: el.style.letterSpacing,
                             wordSpacing: el.style.wordSpacing,
                             textRendering: el.style.textRendering,
-                            fontFeatureSettings: el.style.fontFeatureSettings
+                            fontFeatureSettings: el.style.fontFeatureSettings,
+                            whiteSpace: el.style.whiteSpace
                         });
-                        el.style.letterSpacing = '0';
-                        el.style.wordSpacing = 'normal';
-                        el.style.textRendering = 'optimizeLegibility';
-                        el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1';
+                        // إصلاحات شاملة للخطوط العربية
+                        el.style.letterSpacing = '0px';
+                        el.style.wordSpacing = '0px';
+                        el.style.textRendering = 'geometricPrecision';
+                        el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1, "kern" 1';
                         el.style.fontKerning = 'normal';
                         el.style.webkitFontSmoothing = 'antialiased';
+                        el.style.MozOsxFontSmoothing = 'grayscale';
+                        el.style.fontVariantLigatures = 'common-ligatures contextual';
+                        el.style.textSpacingTrim = 'space-all';
+                        el.style.whiteSpace = 'pre-wrap';
+                        el.style.unicodeBidi = 'embed';
+                        el.style.direction = 'rtl';
                     }
                 });
                 
                 console.log('iOS: Applied Arabic font fixes to', originalStyles.size, 'elements');
                 await new Promise(r => setTimeout(r, 500));
                 
-                // 5. التقاط البطاقة 
+                // 5. التقاط البطاقة مع تحميل الخطوط بشكل كامل
                 let cardDataUrl = null;
                 
                 try {
                     console.log('iOS: Trying html2canvas with Arabic fixes...');
                     if (typeof html2canvas !== 'undefined') {
-                        // Warm-up capture
+                        
+                        // === انتظار تحميل الخطوط ===
+                        await document.fonts.ready;
+                        console.log('iOS: Fonts ready');
+                        
+                        // === Warm-up #1 - لإيقاظ محرك الخطوط ===
+                        console.log('iOS: Warm-up #1...');
                         await html2canvas(card, {
                             scale: 1,
                             useCORS: true,
@@ -1641,8 +1655,44 @@
                             height: card.offsetHeight
                         });
                         
-                        await new Promise(r => setTimeout(r, 800));
+                        await new Promise(r => setTimeout(r, 500));
                         
+                        // === Warm-up #2 - لضمان تحميل جميع الحروف ===
+                        console.log('iOS: Warm-up #2...');
+                        await html2canvas(card, {
+                            scale: 1,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: false,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
+                        });
+                        
+                        await new Promise(r => setTimeout(r, 500));
+                        
+                        // === Warm-up #3 - للتأكد النهائي ===
+                        console.log('iOS: Warm-up #3...');
+                        await html2canvas(card, {
+                            scale: 1,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: false,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
+                        });
+                        
+                        // انتظار إضافي للسماح للمتصفح برسم الخطوط بشكل كامل
+                        await new Promise(r => setTimeout(r, 1000));
+                        
+                        // Force repaint
+                        card.style.display = 'none';
+                        void card.offsetHeight;
+                        card.style.display = '';
+                        await new Promise(r => setTimeout(r, 300));
+                        
+                        console.log('iOS: Final capture...');
                         // Final capture
                         const canvas = await html2canvas(card, {
                             scale: 2,
@@ -1660,9 +1710,15 @@
                                 if (clonedCard) {
                                     clonedCard.querySelectorAll('*').forEach(el => {
                                         if (el.innerText && /[؀-ۿ]/.test(el.innerText)) {
-                                            el.style.letterSpacing = '0';
-                                            el.style.wordSpacing = 'normal';
-                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1';
+                                            el.style.letterSpacing = '0px';
+                                            el.style.wordSpacing = '0px';
+                                            el.style.textRendering = 'geometricPrecision';
+                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1, "kern" 1';
+                                            el.style.fontKerning = 'normal';
+                                            el.style.fontVariantLigatures = 'common-ligatures contextual';
+                                            el.style.whiteSpace = 'pre-wrap';
+                                            el.style.unicodeBidi = 'embed';
+                                            el.style.direction = 'rtl';
                                         }
                                     });
                                 }
