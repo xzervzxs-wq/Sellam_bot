@@ -560,7 +560,7 @@
             });
         }
 
-        function addAssetToCanvas(src, colorable, categoryName) {
+        function addAssetToCanvas(src, colorable, categoryNameOrSizeRatio) {
             const img = new Image();
             img.onload = function() {
                 const card = document.getElementById('card');
@@ -569,17 +569,31 @@
                 // حساب الحجم المناسب
                 let w = img.naturalWidth;
                 let h = img.naturalHeight;
-                const maxSize = 250;
-
-                if (w > maxSize || h > maxSize) {
-                    const ratio = Math.min(maxSize / w, maxSize / h);
+                const cardW = parseFloat(card.style.width) || card.offsetWidth;
+                const cardH = parseFloat(card.style.height) || card.offsetHeight;
+                
+                // تحديد إذا كان البارامتر الثالث نسبة حجم (رقم) أو اسم فئة (نص)
+                const isNumericRatio = typeof categoryNameOrSizeRatio === 'number' && categoryNameOrSizeRatio > 0 && categoryNameOrSizeRatio <= 1;
+                const categoryName = !isNumericRatio ? categoryNameOrSizeRatio : null;
+                
+                if (isNumericRatio) {
+                    // حساب الحجم كنسبة من البطاقة (مثل ثلثين لبطاقات الخصومات)
+                    const targetW = cardW * categoryNameOrSizeRatio;
+                    const targetH = cardH * categoryNameOrSizeRatio;
+                    const ratio = Math.min(targetW / w, targetH / h);
                     w = Math.round(w * ratio);
                     h = Math.round(h * ratio);
+                } else {
+                    // الحجم الافتراضي للعناصر العادية
+                    const maxSize = 250;
+                    if (w > maxSize || h > maxSize) {
+                        const ratio = Math.min(maxSize / w, maxSize / h);
+                        w = Math.round(w * ratio);
+                        h = Math.round(h * ratio);
+                    }
                 }
 
                 // حساب موقع في وسط البطاقة
-                const cardW = parseFloat(card.style.width) || card.offsetWidth;
-                const cardH = parseFloat(card.style.height) || card.offsetHeight;
                 const centerX = (cardW - w) / 2;
                 const centerY = (cardH - h) / 2;
 
