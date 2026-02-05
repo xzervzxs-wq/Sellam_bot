@@ -1628,51 +1628,52 @@
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Trying html2canvas with Arabic fixes...');
-                    if (typeof html2canvas !== 'undefined') {
-                        // Warm-up capture
-                        await html2canvas(card, {
-                            scale: 1,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
+                    console.log('iOS: Using htmlToImage for Arabic text...');
+                    if (typeof htmlToImage !== 'undefined') {
+                        // انتظار تحميل الخطوط
+                        await document.fonts.ready;
+                        
+                        // Warm-up #1
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: 1,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
                         });
+                        await new Promise(r => setTimeout(r, 500));
                         
-                        await new Promise(r => setTimeout(r, 800));
+                        // Warm-up #2
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: 1,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        await new Promise(r => setTimeout(r, 500));
                         
-                        // Final capture
-                        const canvas = await html2canvas(card, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: true,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight,
-                            letterRendering: true,
-                            foreignObjectRendering: true,
-                            removeContainer: true,
-                            onclone: (clonedDoc) => {
-                                const clonedCard = clonedDoc.getElementById('card');
-                                if (clonedCard) {
-                                    clonedCard.querySelectorAll('*').forEach(el => {
-                                        if (el.innerText && /[؀-ۿ]/.test(el.innerText)) {
-                                            el.style.letterSpacing = '0';
-                                            el.style.wordSpacing = 'normal';
-                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1';
-                                        }
-                                    });
-                                }
+                        // إجبار المتصفح على إكمال الرسم
+                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
+                        
+                        // تطبيق الستايل على كل عنصر نصي عربي مرة أخرى
+                        card.querySelectorAll('*').forEach(el => {
+                            if (el.innerText && /[؀-ۿ]/.test(el.innerText)) {
+                                el.style.letterSpacing = '0';
+                                el.style.wordSpacing = 'normal';
                             }
                         });
-                        cardDataUrl = canvas.toDataURL('image/png');
-                        console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
+                        
+                        // انتظار الرسم
+                        await new Promise(r => setTimeout(r, 300));
+                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                        
+                        // الالتقاط النهائي
+                        cardDataUrl = await htmlToImage.toPng(card, {
+                            pixelRatio: 2,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
                     }
                 } catch (e) {
-                    console.error('iOS: html2canvas failed', e);
+                    console.error('iOS: htmlToImage failed', e);
                 }
                 
                 // استعادة الأنماط الأصلية
