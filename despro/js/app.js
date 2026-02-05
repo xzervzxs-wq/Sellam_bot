@@ -1628,59 +1628,48 @@
                 // انتظار إضافي لتطبيق الأنماط
                 await new Promise(r => setTimeout(r, 500));
                 
-                // 5. التقاط البطاقة مباشرة
+                // 5. Force Layout Thrash (مهم للخطوط العربية)
+                void card.offsetHeight;
+                await new Promise(r => setTimeout(r, 500));
+                
+                // 6. التقاط البطاقة باستخدام htmlToImage (أفضل للعربية)
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Trying html2canvas with Arabic fixes...');
-                    if (typeof html2canvas !== 'undefined') {
-                        // Warm-up capture لتحميل الخطوط
-                        await html2canvas(card, {
-                            scale: 1,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
+                    console.log('iOS: Using htmlToImage for Arabic text...');
+                    if (typeof htmlToImage !== 'undefined') {
+                        // Warm-up capture (يُرمى - لإيقاظ رسم الخطوط)
+                        await htmlToImage.toPng(card, { 
+                            quality: 0.5, 
+                            pixelRatio: 1
                         });
                         
                         await new Promise(r => setTimeout(r, 800));
                         
-                        // التقاط نهائي بجودة عالية
+                        // التقاط نهائي بجودة عالية (htmlToImage أفضل للعربية)
+                        cardDataUrl = await htmlToImage.toPng(card, {
+                            quality: 1.0,
+                            pixelRatio: 3,
+                            cacheBust: true,
+                            style: { transform: 'none', margin: '0' }
+                        });
+                        console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
+                    }
+                } catch (e) {
+                    console.error('iOS: htmlToImage failed', e);
+                    // Fallback to html2canvas في حالة فشل htmlToImage
+                    try {
+                        console.log('iOS: Fallback to html2canvas...');
                         const canvas = await html2canvas(card, {
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: true,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight,
-                            letterRendering: true,
-                            foreignObjectRendering: false,
-                            removeContainer: true,
-                            onclone: (clonedDoc) => {
-                                // إضافة CSS مباشرة للـ document المستنسخ
-                                const style = clonedDoc.createElement('style');
-                                style.textContent = `
-                                    * {
-                                        letter-spacing: 0 !important;
-                                        word-spacing: normal !important;
-                                        font-feature-settings: "liga" 1, "calt" 1, "rlig" 1, "clig" 1 !important;
-                                        font-kerning: normal !important;
-                                        text-rendering: optimizeLegibility !important;
-                                        -webkit-font-smoothing: antialiased !important;
-                                    }
-                                `;
-                                clonedDoc.head.appendChild(style);
-                                console.log('iOS onclone: Injected Arabic CSS fixes');
-                            }
+                            backgroundColor: isTransparent ? null : '#ffffff'
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
-                        console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
+                    } catch (e2) {
+                        console.error('iOS: html2canvas also failed', e2);
                     }
-                } catch (e) {
-                    console.error('iOS: html2canvas failed', e);
                 }
                 
                 // استعادة الأنماط الأصلية
