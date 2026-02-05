@@ -1553,7 +1553,7 @@
                 card.style.display = 'none';
                 card.offsetHeight; // Force reflow
                 card.style.display = '';
-                await new Promise(r => setTimeout(r, 300));
+                await new Promise(r => setTimeout(r, 800));
                 
                 // 1. تحويل الصور في البطاقة الأصلية
                 if (loadingText) loadingText.innerText = "جاري تحويل الصور...";
@@ -1649,6 +1649,38 @@
                         });
                         await new Promise(r => setTimeout(r, 500));
                         
+                        // Warm-up #3 بـ pixelRatio: 2
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: 2,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        await new Promise(r => setTimeout(r, 500));
+                        
+                        // Warm-up #4 بـ pixelRatio: 2
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: 2,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        await new Promise(r => setTimeout(r, 500));
+                        
+                        // Warm-up #3 بـ pixelRatio: 2
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: 2,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        await new Promise(r => setTimeout(r, 500));
+                        
+                        // Warm-up #4 بـ pixelRatio: 2
+                        await htmlToImage.toPng(card, {
+                            pixelRatio: 2,
+                            cacheBust: true,
+                            backgroundColor: isTransparent ? null : '#ffffff'
+                        });
+                        await new Promise(r => setTimeout(r, 500));
+                        
                         // إجبار المتصفح على إكمال الرسم
                         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
                         
@@ -1661,15 +1693,17 @@
                         });
                         
                         // انتظار الرسم
-                        await new Promise(r => setTimeout(r, 300));
+                        await new Promise(r => setTimeout(r, 800));
                         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
                         
-                        // الالتقاط النهائي
-                        cardDataUrl = await htmlToImage.toPng(card, {
+                        // الالتقاط النهائي باستخدام toCanvas
+                        const canvas = await htmlToImage.toCanvas(card, {
                             pixelRatio: 2,
                             cacheBust: true,
-                            backgroundColor: isTransparent ? null : '#ffffff'
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            skipAutoScale: true
                         });
+                        cardDataUrl = canvas.toDataURL('image/png', 1.0);
                         console.log('iOS: htmlToImage success! Length: ' + cardDataUrl.length);
                     }
                 } catch (e) {
