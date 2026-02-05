@@ -1314,16 +1314,22 @@
         color: #e2e8f0 !important;
     }
     
-    /* إزالة المسافة الزائدة تحت الفوتر - الجوال فقط */
-    body, body.min-h-screen {
-        min-height: auto !important;
+    /* إصلاح الفوتر للجوال - إزالة المسافة الزائدة */
+    html, body {
         height: auto !important;
+        min-height: auto !important;
+        overflow-x: hidden;
     }
     
-    /* الفوتر ملتصق بالمحتوى */
+    body.min-h-screen {
+        min-height: auto !important;
+    }
+    
+    /* الفوتر - مسافة فقط للأزرار السفلية */
     footer {
-        margin-bottom: 60px !important;
+        margin-bottom: 70px !important;
         margin-top: 0 !important;
+        padding-bottom: 0.5rem !important;
     }
     
     /* توسيع زر تسجيل الدخول للجوال */
