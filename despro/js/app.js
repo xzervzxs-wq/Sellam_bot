@@ -1624,51 +1624,15 @@
                 console.log('iOS: Applied Arabic font fixes to', originalStyles.size, 'elements');
                 await new Promise(r => setTimeout(r, 500));
                 
-                // 5. تحميل الخطوط بالكامل قبل الالتقاط
+                // 5. التقاط البطاقة 
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Starting font preload...');
+                    console.log('iOS: Trying html2canvas with Arabic fixes...');
                     if (typeof html2canvas !== 'undefined') {
-                        
-                        // === تحميل الخطوط مسبقاً بطريقة مضمونة ===
-                        await document.fonts.ready;
-                        console.log('iOS: document.fonts.ready');
-                        
-                        // تحميل خط Cairo بشكل صريح
-                        try {
-                            await document.fonts.load('400 48px Cairo');
-                            await document.fonts.load('700 48px Cairo');
-                            console.log('iOS: Cairo font loaded explicitly');
-                        } catch(e) {
-                            console.log('iOS: Font load error (continuing):', e);
-                        }
-                        
-                        // إنشاء عنصر مخفي يحتوي على كل الحروف العربية بأشكالها المختلفة
-                        const fontLoader = document.createElement('div');
-                        fontLoader.style.cssText = 'position:absolute;left:-9999px;top:-9999px;font-size:72px;font-family:Cairo,sans-serif;visibility:hidden;';
-                        // كل الحروف العربية بأشكالها: معزولة، بداية، وسط، نهاية
-                        fontLoader.innerHTML = `
-                            <div>أبتثجحخدذرزسشصضطظعغفقكلمنهوي ء آ إ ؤ ئ ى ة</div>
-                            <div>ـأـ ـبـ ـتـ ـثـ ـجـ ـحـ ـخـ ـدـ ـذـ ـرـ ـزـ ـسـ ـشـ</div>
-                            <div>بسم الله الرحمن الرحيم</div>
-                            <div>مرحبا بكم في التطبيق</div>
-                            <div style="letter-spacing:0">اختبار النص العربي المتصل</div>
-                        `;
-                        document.body.appendChild(fontLoader);
-                        
-                        // انتظار الرسم الفعلي
-                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-                        await new Promise(r => setTimeout(r, 500));
-                        
-                        // إزالة عنصر التحميل
-                        document.body.removeChild(fontLoader);
-                        console.log('iOS: Font preload complete');
-                        
-                        console.log('iOS: Warm-up #1...');
-                        // Warm-up #1
+                        // Warm-up capture
                         await html2canvas(card, {
-                            scale: 2,
+                            scale: 1,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
@@ -1679,81 +1643,9 @@
                         
                         await new Promise(r => setTimeout(r, 800));
                         
-                        console.log('iOS: Warm-up #2...');
-                        // Warm-up #2
-                        await html2canvas(card, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
-                        });
-                        
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        console.log('iOS: Warm-up #3...');
-                        // Warm-up #3
-                        await html2canvas(card, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
-                        });
-                        
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        console.log('iOS: Warm-up #4...');
-                        // Warm-up #4
-                        await html2canvas(card, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
-                        });
-                        
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        console.log('iOS: Warm-up #5...');
-                        // Warm-up #5
-                        await html2canvas(card, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
-                        });
-                        
-                        await new Promise(r => setTimeout(r, 800));
-                        
-                        console.log('iOS: Warm-up #6...');
-                        // Warm-up #6
-                        await html2canvas(card, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: isTransparent ? null : '#ffffff',
-                            logging: false,
-                            width: card.offsetWidth,
-                            height: card.offsetHeight
-                        });
-                        
-                        // انتظار طويل قبل الالتقاط النهائي
-                        await new Promise(r => setTimeout(r, 1500));
-                        
-                        console.log('iOS: Final capture...');
                         // Final capture
                         const canvas = await html2canvas(card, {
-                            scale: 3,
+                            scale: 2,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
@@ -1761,7 +1653,7 @@
                             width: card.offsetWidth,
                             height: card.offsetHeight,
                             letterRendering: true,
-                            foreignObjectRendering: false,
+                            foreignObjectRendering: true,
                             removeContainer: true,
                             onclone: (clonedDoc) => {
                                 const clonedCard = clonedDoc.getElementById('card');
