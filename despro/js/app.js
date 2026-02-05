@@ -7736,3 +7736,10 @@ function updateLayersList() {
         window.generateQR = generateQR;
 
 // ==========================================
+// === تصدير الدوال للاستخدام الخارجي ===
+window.addTextToCanvas = addTextToCanvas;
+window.addUserText = addUserText;
+window.saveState = saveState;
+window.selectEl = selectEl;
+window.setupInteract = setupInteract;
+window.createWrapper = createWrapper;
