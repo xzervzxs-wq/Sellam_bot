@@ -1586,52 +1586,33 @@
 
                 // === حفظ/تنزيل الصورة ===
                 if (isIOSDevice) {
-                    // للآيفون: فتح نافذة جديدة للحفظ اليدوي
-                    const newWindow = window.open('', '_blank');
-                    if (newWindow) {
-                        newWindow.document.write(`
-                            <!DOCTYPE html>
-                            <html>
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>احفظ الصورة</title>
-                                <style>
-                                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                                    body { 
-                                        background: #1e293b; 
-                                        min-height: 100vh; 
-                                        display: flex; 
-                                        flex-direction: column; 
-                                        align-items: center; 
-                                        padding: 20px;
-                                        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                                    }
-                                    .tip {
-                                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-                                        color: white;
-                                        padding: 15px 25px;
-                                        border-radius: 15px;
-                                        margin-bottom: 20px;
-                                        text-align: center;
-                                        font-size: 14px;
-                                        font-weight: bold;
-                                    }
-                                    img { 
-                                        max-width: 100%; 
-                                        height: auto; 
-                                        border-radius: 10px;
-                                    }
-                                </style>
-                            </head>
-                            <body>
-                                <div class="tip">📱 اضغط مطولاً على الصورة ثم اختر "حفظ الصورة"</div>
-                                <img src="\${dataUrl}" alt="التصميم">
-                            </body>
-                            </html>
-                        `);
-                        newWindow.document.close();
-                    }
+                    // للآيفون: عرض modal داخلي للحفظ اليدوي
+                    // (window.open يُحظر بعد async operations)
+                    const existingModal = document.getElementById('ios-image-save-modal');
+                    if (existingModal) existingModal.remove();
+                    
+                    const modal = document.createElement('div');
+                    modal.id = 'ios-image-save-modal';
+                    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:99999;display:flex;flex-direction:column;align-items:center;padding:20px;overflow:auto;';
+                    
+                    const closeBtn = document.createElement('button');
+                    closeBtn.innerHTML = '✕';
+                    closeBtn.style.cssText = 'position:fixed;top:15px;right:15px;background:#ef4444;color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:24px;cursor:pointer;z-index:100000;';
+                    closeBtn.onclick = function() { modal.remove(); };
+                    
+                    const tip = document.createElement('div');
+                    tip.innerHTML = '📱 اضغط مطولاً على الصورة ثم اختر "حفظ الصورة"';
+                    tip.style.cssText = 'background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:15px 25px;border-radius:15px;margin:60px 0 20px 0;text-align:center;font-size:16px;font-weight:bold;max-width:90%;';
+                    
+                    const img = document.createElement('img');
+                    img.src = dataUrl;
+                    img.alt = 'التصميم';
+                    img.style.cssText = 'max-width:95%;height:auto;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.5);';
+                    
+                    modal.appendChild(closeBtn);
+                    modal.appendChild(tip);
+                    modal.appendChild(img);
+                    document.body.appendChild(modal);
                 } else {
                     // للديسكتوب والأندرويد: تنزيل مباشر
                     const link = document.createElement('a');
