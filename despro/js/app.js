@@ -569,8 +569,9 @@
                 // حساب الحجم المناسب
                 let w = img.naturalWidth;
                 let h = img.naturalHeight;
-                const cardW = parseFloat(card.style.width) || card.offsetWidth;
-                const cardH = parseFloat(card.style.height) || card.offsetHeight;
+                // استخدام الأبعاد الفعلية من data attributes (بالبكسل)
+                const cardW = parseInt(card.getAttribute('data-card-width')) || parseFloat(card.style.width) || card.offsetWidth;
+                const cardH = parseInt(card.getAttribute('data-card-height')) || parseFloat(card.style.height) || card.offsetHeight;
                 
                 // تحديد إذا كان البارامتر الثالث نسبة حجم (رقم) أو اسم فئة (نص)
                 const isNumericRatio = typeof categoryNameOrSizeRatio === 'number' && categoryNameOrSizeRatio > 0 && categoryNameOrSizeRatio <= 1;
@@ -601,8 +602,8 @@
                 const wrapper = createWrapper('image-layer');
                 wrapper.style.width = w + 'px';
                 wrapper.style.height = h + 'px';
-                wrapper.style.left = Math.max(10, centerX) + 'px';
-                wrapper.style.top = Math.max(10, centerY) + 'px';
+                wrapper.style.left = Math.max(0, centerX) + 'px';
+                wrapper.style.top = Math.max(0, centerY) + 'px';
 
                 const imgEl = document.createElement('img');
                 imgEl.src = src;
