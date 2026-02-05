@@ -1313,4 +1313,9 @@
         background-color: #334155 !important;
         color: #e2e8f0 !important;
     }
+    
+    /* إزالة المسافة الزائدة تحت الفوتر - الجوال فقط */
+    body.min-h-screen, body {
+        min-height: auto !important;
+    }
 }
