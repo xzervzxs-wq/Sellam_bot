@@ -2778,9 +2778,15 @@
                 itemDiv.innerHTML = `
                     <div class="flex items-center gap-2 flex-1 cursor-pointer" onclick="selectLayerFromMobile('${id}')">
                         <i class="${icon} text-sm ${isSelected ? 'text-indigo-600' : 'text-slate-500'}"></i>
-                        <span class="text-xs font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'} truncate max-w-[120px]">${name}</span>
+                        <span class="text-xs font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'} truncate max-w-[100px]">${name}</span>
                     </div>
                     <div class="flex items-center gap-1">
+                        <button onclick="moveLayerUp('${id}')" class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-indigo-500 active:scale-95">
+                            <i class="fas fa-arrow-up text-xs"></i>
+                        </button>
+                        <button onclick="moveLayerDown('${id}')" class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-indigo-500 active:scale-95">
+                            <i class="fas fa-arrow-down text-xs"></i>
+                        </button>
                         <button onclick="toggleMobileLayerVisibility('${id}')" class="w-7 h-7 rounded-lg ${isHidden ? 'bg-slate-200' : 'bg-white'} border border-slate-200 flex items-center justify-center text-slate-500 active:scale-95">
                             <i class="fas ${isHidden ? 'fa-eye-slash' : 'fa-eye'} text-xs"></i>
                         </button>
@@ -2791,6 +2797,26 @@
                 `;
                 layersList.appendChild(itemDiv);
             });
+        }
+        
+        // تحريك طبقة للأعلى (للأمام)
+        function moveLayerUp(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element && typeof bringToFront === 'function') {
+                bringToFront(element);
+                updateMobileLayersList();
+            }
+        }
+        
+        // تحريك طبقة للأسفل (للخلف)
+        function moveLayerDown(elementId) {
+            const card = document.getElementById('card');
+            const element = card?.querySelector(`[data-element-id="${elementId}"]`);
+            if (element && typeof sendToBack === 'function') {
+                sendToBack(element);
+                updateMobileLayersList();
+            }
         }
         
         // تحديد طبقة من نافذة الموبايل
