@@ -255,8 +255,9 @@
             setCardSize(defaultSize, defaultSize);
 
             
-            // تعيين الزووم الافتراضي 50%
-            setCustomZoom(50);
+            // تعيين الزووم الافتراضي - 25% للجوال و 50% للآيباد
+            const isMobileOnStartup = window.innerWidth < 768;
+            setCustomZoom(isMobileOnStartup ? 25 : 50);
             // إخفاء التدرج عند البدء
             hasGradient = false;
             const grad = document.getElementById('card-gradient');
@@ -1086,8 +1087,9 @@
                         btn.classList.add('bg-[#f1f5f9]', 'text-[#475569]');
                     }
 
-                    // ضبط الزوم على 50% دائماً عند فتح ملف
-                    setCustomZoom(50);
+                    // ضبط الزوم على 50% للآيباد و 25% للجوال عند فتح ملف
+                    const isMobileOnLoad = window.innerWidth < 768;
+                    setCustomZoom(isMobileOnLoad ? 25 : 50);
 
                     // استعادة الملاحظات من الملف
                     const notesField = document.getElementById('designer-notes');
@@ -6040,8 +6042,9 @@
             const zoomByHeight = (maxHeight / h) * 100;
             const autoZoom = Math.min(zoomByWidth, zoomByHeight, 200); // حد أقصى 200%
 
-            // تطبيق الـ zoom الأمثل
-            const optimalZoom = Math.max(25, Math.min(autoZoom, 200));
+            // تطبيق الـ zoom الأمثل - للجوال دائماً 25%
+            const isMobileDevice = window.innerWidth < 768;
+            const optimalZoom = isMobileDevice ? 25 : Math.max(25, Math.min(autoZoom, 200));
             setCustomZoom(optimalZoom);
 
             // تحديث عرض المقاس على الشاشة
