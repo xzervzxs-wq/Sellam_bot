@@ -1600,12 +1600,54 @@
                     card.style.backgroundImage = 'none';
                 }
                 
-                // 4. التقاط البطاقة مباشرة
+                // 4. إصلاح الخطوط العربية قبل التقاط الصورة
+                const textElements = card.querySelectorAll('*');
+                const originalStyles = new Map();
+                
+                textElements.forEach(el => {
+                    if (el.innerText && el.innerText.trim() && /[؀-ۿ]/.test(el.innerText)) {
+                        // حفظ الأنماط الأصلية
+                        originalStyles.set(el, {
+                            letterSpacing: el.style.letterSpacing,
+                            wordSpacing: el.style.wordSpacing,
+                            textRendering: el.style.textRendering,
+                            fontFeatureSettings: el.style.fontFeatureSettings
+                        });
+                        // تطبيق إصلاحات الخطوط العربية
+                        el.style.letterSpacing = '0';
+                        el.style.wordSpacing = 'normal';
+                        el.style.textRendering = 'optimizeLegibility';
+                        el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1, "clig" 1';
+                        el.style.fontKerning = 'normal';
+                        el.style.webkitFontSmoothing = 'antialiased';
+                    }
+                });
+                
+                console.log('iOS: Applied Arabic font fixes to', originalStyles.size, 'elements');
+                
+                // انتظار إضافي لتطبيق الأنماط
+                await new Promise(r => setTimeout(r, 500));
+                
+                // 5. التقاط البطاقة مباشرة
                 let cardDataUrl = null;
                 
                 try {
-                    console.log('iOS: Trying html2canvas...');
+                    console.log('iOS: Trying html2canvas with Arabic fixes...');
                     if (typeof html2canvas !== 'undefined') {
+                        // Warm-up capture لتحميل الخطوط
+                        await html2canvas(card, {
+                            scale: 1,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: isTransparent ? null : '#ffffff',
+                            logging: false,
+                            width: card.offsetWidth,
+                            height: card.offsetHeight
+                        });
+                        
+                        await new Promise(r => setTimeout(r, 800));
+                        
+                        // التقاط نهائي بجودة عالية
                         const canvas = await html2canvas(card, {
                             scale: 2,
                             useCORS: true,
@@ -1614,10 +1656,22 @@
                             logging: true,
                             width: card.offsetWidth,
                             height: card.offsetHeight,
-                            // تحسينات للنص العربي
                             letterRendering: true,
                             foreignObjectRendering: false,
-                            removeContainer: true
+                            removeContainer: true,
+                            onclone: (clonedDoc) => {
+                                // تطبيق إصلاحات إضافية على النسخة المستنسخة
+                                const clonedCard = clonedDoc.querySelector('#card');
+                                if (clonedCard) {
+                                    clonedCard.querySelectorAll('*').forEach(el => {
+                                        if (el.innerText && /[؀-ۿ]/.test(el.innerText)) {
+                                            el.style.letterSpacing = '0';
+                                            el.style.wordSpacing = 'normal';
+                                            el.style.fontFeatureSettings = '"liga" 1, "calt" 1, "rlig" 1';
+                                        }
+                                    });
+                                }
+                            }
                         });
                         cardDataUrl = canvas.toDataURL('image/png');
                         console.log('iOS: html2canvas success! Length: ' + cardDataUrl.length);
@@ -1625,6 +1679,14 @@
                 } catch (e) {
                     console.error('iOS: html2canvas failed', e);
                 }
+                
+                // استعادة الأنماط الأصلية
+                originalStyles.forEach((styles, el) => {
+                    el.style.letterSpacing = styles.letterSpacing;
+                    el.style.wordSpacing = styles.wordSpacing;
+                    el.style.textRendering = styles.textRendering;
+                    el.style.fontFeatureSettings = styles.fontFeatureSettings;
+                });
                 
                 // Fallback to htmlToImage
                 if (!cardDataUrl || cardDataUrl.length < 1000) {
