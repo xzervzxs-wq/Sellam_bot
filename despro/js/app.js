@@ -140,6 +140,7 @@
         let magicTolerance = 30;
         let isSnappingEnabled = false;
         let currentZoom = 50; // متغير التحكم بـ zoom (الافتراضي 50%)
+        window.currentZoom = currentZoom; // تصدير القيمة الأولية للعالم
 
         // Crop variables
         let cropStartX = 0, cropStartY = 0;
@@ -6122,6 +6123,7 @@
 
         function setCustomZoom(zoomValue) {
             currentZoom = Math.max(25, Math.min(zoomValue, 200)); // بين 25% و 200%
+            window.currentZoom = currentZoom; // تصدير للاستخدام العام
             const zoomDecimal = currentZoom / 100;
 
             document.documentElement.style.setProperty('--card-zoom', zoomDecimal);
