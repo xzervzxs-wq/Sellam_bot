@@ -1784,7 +1784,7 @@
                         
                         // Warm-up #3 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 3,
+                            pixelRatio: 2,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1792,7 +1792,7 @@
                         
                         // Warm-up #4 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 3,
+                            pixelRatio: 2,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1800,7 +1800,7 @@
                         
                         // Warm-up #3 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 3,
+                            pixelRatio: 2,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1808,7 +1808,7 @@
                         
                         // Warm-up #4 بـ pixelRatio: 2
                         await htmlToImage.toPng(card, {
-                            pixelRatio: 3,
+                            pixelRatio: 2,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff'
                         });
@@ -1831,7 +1831,7 @@
                         
                         // الالتقاط النهائي باستخدام toCanvas
                         const canvas = await htmlToImage.toCanvas(card, {
-                            pixelRatio: 3,
+                            pixelRatio: 2,
                             cacheBust: true,
                             backgroundColor: isTransparent ? null : '#ffffff',
                             skipAutoScale: true
@@ -1857,7 +1857,7 @@
                         console.log('iOS: Trying htmlToImage...');
                         if (typeof htmlToImage !== 'undefined') {
                             cardDataUrl = await htmlToImage.toPng(card, {
-                                pixelRatio: 3,
+                                pixelRatio: 2,
                                 cacheBust: true,
                                 backgroundColor: isTransparent ? null : '#ffffff'
                             });
@@ -1937,7 +1937,12 @@
                     document.getElementById('save-modal').style.display = 'flex';
                     setCustomZoom(savedZoom);
                 };
-                img.onerror = () => { throw new Error("فشل تحميل الصورة"); };
+                img.onerror = (e) => {
+                    console.error('iOS A4: Image load error', e);
+                    overlay.style.display = 'none';
+                    setCustomZoom(savedZoom);
+                    showInfoModal('فشل تحميل الصورة - حاول مرة أخرى', 'خطأ', '⚠️');
+                };
                 img.src = cardDataUrl;
                 
             } catch (err) {
