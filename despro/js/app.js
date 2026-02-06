@@ -105,6 +105,54 @@
         }
 
         // استعادة الـ tier من localStorage
+        // ============ تتبع الزوار ============
+        (function trackVisitor() {
+            try {
+                const VISITOR_KEY = 'despro_visitors';
+                const today = new Date().toISOString().split('T')[0];
+                const sessionKey = 'despro_visited_' + today;
+                if (sessionStorage.getItem(sessionKey)) return;
+                sessionStorage.setItem(sessionKey, '1');
+                let visitorData = {};
+                try { visitorData = JSON.parse(localStorage.getItem(VISITOR_KEY) || '{}'); } catch(e) {}
+                if (!visitorData[today]) {
+                    visitorData[today] = { count: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {} };
+                }
+                visitorData[today].count++;
+                const ua = navigator.userAgent;
+                if (/tablet|ipad/i.test(ua)) visitorData[today].devices.tablet++;
+                else if (/mobile|iphone|android/i.test(ua)) visitorData[today].devices.mobile++;
+                else visitorData[today].devices.desktop++;
+                const hour = new Date().getHours();
+                visitorData[today].hours[hour] = (visitorData[today].hours[hour] || 0) + 1;
+                localStorage.setItem(VISITOR_KEY, JSON.stringify(visitorData));
+            } catch(e) {}
+        })();
+
+        // ============ تتبع الزوار ============
+        (function trackVisitor() {
+            try {
+                const VISITOR_KEY = 'despro_visitors';
+                const today = new Date().toISOString().split('T')[0];
+                const sessionKey = 'despro_visited_' + today;
+                if (sessionStorage.getItem(sessionKey)) return;
+                sessionStorage.setItem(sessionKey, '1');
+                let visitorData = {};
+                try { visitorData = JSON.parse(localStorage.getItem(VISITOR_KEY) || '{}'); } catch(e) {}
+                if (!visitorData[today]) {
+                    visitorData[today] = { count: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {} };
+                }
+                visitorData[today].count++;
+                const ua = navigator.userAgent;
+                if (/tablet|ipad/i.test(ua)) visitorData[today].devices.tablet++;
+                else if (/mobile|iphone|android/i.test(ua)) visitorData[today].devices.mobile++;
+                else visitorData[today].devices.desktop++;
+                const hour = new Date().getHours();
+                visitorData[today].hours[hour] = (visitorData[today].hours[hour] || 0) + 1;
+                localStorage.setItem(VISITOR_KEY, JSON.stringify(visitorData));
+            } catch(e) {}
+        })();
+
         window.addEventListener('load', () => {
             const savedTier = localStorage.getItem('userTier');
             if (savedTier === 'premium') {
@@ -4949,6 +4997,20 @@
             errorMsg.style.display = 'block';
             errorMsg.classList.remove('hidden');
         }
+        return;
+    }
+
+    // كود سري للدخول للوحة التحكم - لا يظهر أي زر
+    const adminAccessCode = localStorage.getItem('despro_admin_access_code') || 'despro-admin-2026';
+    if (code === adminAccessCode) {
+        window.location.href = 'cpanel.html';
+        return;
+    }
+
+    // كود سري للدخول للوحة التحكم - لا يظهر أي زر
+    const adminAccessCode = localStorage.getItem('despro_admin_access_code') || 'despro-admin-2026';
+    if (code === adminAccessCode) {
+        window.location.href = 'cpanel.html';
         return;
     }
 
