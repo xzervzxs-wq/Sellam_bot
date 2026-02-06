@@ -520,17 +520,44 @@
 
             <!-- ====== قسم سجل النشاط ====== -->
             <div id="section-activity" class="section fade-in">
-                <div class="data-table overflow-x-auto">
-                    <table class="w-full min-w-[500px]">
-                        <thead>
-                            <tr>
-                                <th>الوقت</th>
-                                <th>الحدث</th>
-                                <th>التفاصيل</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activity-log"></tbody>
-                    </table>
+                <!-- تسجيلات دخول الأعضاء -->
+                <div class="chart-container p-5 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-white"><i class="fas fa-users text-green-400 ml-2"></i>تسجيلات دخول الأعضاء</h3>
+                        <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded-lg" id="logins-count">0 تسجيل</span>
+                    </div>
+                    <div class="data-table overflow-x-auto max-h-64 overflow-y-auto">
+                        <table class="w-full min-w-[500px]">
+                            <thead class="sticky top-0 bg-slate-900">
+                                <tr>
+                                    <th>الوقت</th>
+                                    <th>العضو</th>
+                                    <th>الكود</th>
+                                    <th>الجهاز</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logins-log"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- نشاط الأدمن -->
+                <div class="chart-container p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-white"><i class="fas fa-user-shield text-indigo-400 ml-2"></i>نشاط الأدمن</h3>
+                    </div>
+                    <div class="data-table overflow-x-auto">
+                        <table class="w-full min-w-[500px]">
+                            <thead>
+                                <tr>
+                                    <th>الوقت</th>
+                                    <th>الحدث</th>
+                                    <th>التفاصيل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-log"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1253,6 +1280,37 @@ function renderAlerts() {
 // Activity Log
 // ============================================
 function renderActivityLog() {
+    // 1. عرض تسجيلات دخول الأعضاء
+    const loginsBody = document.getElementById('logins-log');
+    loginsBody.innerHTML = '';
+    
+    const logins = visitorRaw.filter(v => v.type === 'login').reverse();
+    document.getElementById('logins-count').textContent = logins.length + ' تسجيل';
+    
+    if (logins.length > 0) {
+        logins.forEach(log => {
+            const time = new Date(log.timestamp);
+            const timeStr = time.toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' });
+            const member = subscribers.find(s => s.code.toLowerCase() === (log.code || '').toLowerCase());
+            const name = member ? member.name : 'غير معروف';
+            const deviceIcon = log.device === 'mobile' ? 'fa-mobile-alt text-indigo-400' : 
+                              log.device === 'tablet' ? 'fa-tablet text-purple-400' : 'fa-desktop text-blue-400';
+            const deviceName = log.device === 'mobile' ? 'جوال' : log.device === 'tablet' ? 'تابلت' : 'كمبيوتر';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-xs text-slate-500 whitespace-nowrap">${timeStr}</td>
+                <td class="text-xs font-medium text-green-400">${name}</td>
+                <td><code class="bg-slate-800 px-2 py-0.5 rounded text-xs text-cyan-300">${log.code || '-'}</code></td>
+                <td class="text-xs text-slate-400"><i class="fas ${deviceIcon} ml-1"></i>${deviceName}</td>
+            `;
+            loginsBody.appendChild(tr);
+        });
+    } else {
+        loginsBody.innerHTML = '<tr><td colspan="4" class="text-center text-slate-600 py-6 text-xs">لا يوجد تسجيلات دخول بعد</td></tr>';
+    }
+    
+    // 2. عرض نشاط الأدمن
     const tbody = document.getElementById('activity-log');
     tbody.innerHTML = '';
     
@@ -1267,7 +1325,7 @@ function renderActivityLog() {
     });
     
     if (activityLog.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-600 py-8 text-xs">لا يوجد سجل نشاط بعد</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-600 py-6 text-xs">لا يوجد سجل نشاط بعد</td></tr>';
     }
 }
 
