@@ -190,7 +190,7 @@
         let currentZoom = 50; // متغير التحكم بـ zoom (الافتراضي 50%)
         window.currentZoom = currentZoom; // تصدير القيمة الأولية للعالم
         // ============ تتبع الزوار - Google Apps Script ============
-        const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbxy-ZKyvF1Pq1JSiQdRZDJhKUQqT9kFixuFEAOiZRzDqqajfECIesOFrtOHti7p_psXiw/exec';
+        const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbw9qEZ3FOkm33neW77s1dZfos4IZBb2EXoOUkOQSZHxTqThwSHQ9Ig8V8RMcxVE_ROH/exec';
         
         function trackEvent(type, code = '') {
             try {
