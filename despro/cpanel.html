@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | Despro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { font-family: 'Alexandria', sans-serif; }
+        body { background: #0f172a; min-height: 100vh; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        /* Login Screen */
+        .login-screen {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        }
+        .login-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .login-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s;
+        }
+        .login-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Dashboard */
+        .sidebar {
+            background: rgba(15, 23, 42, 0.95);
+            border-left: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .nav-item {
+            transition: all 0.2s;
+            border-radius: 12px;
+        }
+        .nav-item:hover { background: rgba(99, 102, 241, 0.1); }
+        .nav-item.active { 
+            background: rgba(99, 102, 241, 0.15); 
+            border-right: 3px solid #6366f1;
+        }
+        
+        /* Stat Cards */
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Table */
+        .data-table {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .data-table thead { background: rgba(15, 23, 42, 0.6); }
+        .data-table th { 
+            padding: 14px 16px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: #94a3b8;
+            text-align: right;
+        }
+        .data-table td { 
+            padding: 12px 16px; 
+            font-size: 13px; 
+            color: #e2e8f0;
+            border-top: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        .data-table tbody tr:hover { background: rgba(99, 102, 241, 0.05); }
+        
+        /* Status Badge */
+        .badge-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .badge-expiring { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .badge-expired { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        
+        /* Chart Area */
+        .chart-container {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+            border-radius: 16px;
+        }
+        .chart-bar {
+            background: linear-gradient(to top, #6366f1, #818cf8);
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+            min-height: 4px;
+        }
+        .chart-bar:hover { 
+            background: linear-gradient(to top, #4f46e5, #6366f1);
+            transform: scaleY(1.05);
+        }
+
+        /* Alerts */
+        .alert-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(51, 65, 85, 0.3);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .alert-card:hover { border-color: rgba(99, 102, 241, 0.3); }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        
+        @keyframes slideRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .slide-in { animation: slideRight 0.5s ease-out; }
+        
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+        .pulse-ring { animation: pulse-ring 1.5s ease-out infinite; }
+
+        /* Mobile Sidebar */
+        @media (max-width: 768px) {
+            .sidebar { 
+                position: fixed; 
+                right: -280px; 
+                top: 0; 
+                bottom: 0; 
+                z-index: 50;
+                width: 280px;
+                transition: right 0.3s ease;
+            }
+            .sidebar.open { right: 0; }
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 40;
+                display: none;
+            }
+            .sidebar-overlay.show { display: block; }
+        }
+
+        /* Section transition */
+        .section { display: none; }
+        .section.active { display: block; }
+    </style>
+</head>
+<body>
+
+<!-- ============ شاشة الدخول ============ -->
+<div id="admin-login" class="login-screen fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- خلفية متحركة -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+    
+    <div class="login-card relative w-full max-w-md rounded-2xl p-8 fade-in">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                <i class="fas fa-shield-halved text-2xl text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-1">لوحة التحكم</h1>
+            <p class="text-slate-400 text-sm">ادخل بيانات المدير للمتابعة</p>
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <div>
+                <label class="text-xs font-medium text-slate-400 mb-1.5 block">اسم المستخدم</label>
+                <input type="text" id="admin-user" class="login-input w-full rounded-xl px-4 py-3 text-white text-sm outline-none" placeholder="admin" autocomplete="off">
+            </div>
+            <div>
+                <label class="text-xs font-medium text-slate-400 mb-1.5 block">كلمة المرور</label>
+                <input type="password" id="admin-pass" class="login-input w-full rounded-xl px-4 py-3 text-white text-sm outline-none" placeholder="••••••••" onkeypress="if(event.key==='Enter') adminLogin()">
+            </div>
+        </div>
+
+        <button onclick="adminLogin()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-semibold rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-500/25">
+            <i class="fas fa-arrow-right-to-bracket ml-2"></i>
+            تسجيل الدخول
+        </button>
+
+        <p id="admin-error" class="text-red-400 text-xs text-center mt-4 hidden"></p>
+    </div>
+</div>
+
+<!-- ============ لوحة التحكم الرئيسية ============ -->
+<div id="admin-dashboard" class="hidden min-h-screen">
+    
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-30 w-10 h-10 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-white">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar w-64 min-h-screen p-5 flex-shrink-0">
+            <div class="flex items-center gap-3 mb-8 px-2">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <i class="fas fa-palette text-lg text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-white font-bold text-sm">Despro</h2>
+                    <span class="text-slate-500 text-[10px]">لوحة التحكم</span>
+                </div>
+            </div>
+
+            <nav class="space-y-1">
+                <button onclick="showSection('overview')" class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="overview">
+                    <i class="fas fa-chart-pie w-5 text-center text-indigo-400"></i>
+                    <span>نظرة عامة</span>
+                </button>
+                <button onclick="showSection('subscribers')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="subscribers">
+                    <i class="fas fa-users w-5 text-center text-blue-400"></i>
+                    <span>المشتركين</span>
+                </button>
+                <button onclick="showSection('visitors')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="visitors">
+                    <i class="fas fa-eye w-5 text-center text-green-400"></i>
+                    <span>الزوار</span>
+                </button>
+                <button onclick="showSection('alerts')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="alerts">
+                    <i class="fas fa-bell w-5 text-center text-amber-400"></i>
+                    <span>التنبيهات</span>
+                    <span id="alert-count" class="mr-auto bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="showSection('activity')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="activity">
+                    <i class="fas fa-clock-rotate-left w-5 text-center text-purple-400"></i>
+                    <span>سجل النشاط</span>
+                </button>
+                <button onclick="showSection('settings')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="settings">
+                    <i class="fas fa-gear w-5 text-center text-slate-400"></i>
+                    <span>الإعدادات</span>
+                </button>
+            </nav>
+
+            <div class="mt-auto pt-8">
+                <div class="border-t border-slate-800 pt-4">
+                    <button onclick="adminLogout()" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:text-red-400 text-sm">
+                        <i class="fas fa-right-from-bracket w-5 text-center"></i>
+                        <span>تسجيل خروج</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-8 min-h-screen">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8 mr-10 md:mr-0">
+                <div>
+                    <h1 class="text-xl font-bold text-white" id="section-title">نظرة عامة</h1>
+                    <p class="text-slate-500 text-xs mt-1" id="current-date"></p>
+                </div>
+                <button onclick="refreshData()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs rounded-xl transition-all">
+                    <i class="fas fa-arrows-rotate" id="refresh-icon"></i>
+                    <span class="hidden sm:inline">تحديث</span>
+                </button>
+            </div>
+
+            <!-- ====== قسم نظرة عامة ====== -->
+            <div id="section-overview" class="section active fade-in">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                <i class="fas fa-users text-blue-400"></i>
+                            </div>
+                            <span class="text-[10px] text-green-400 font-medium"><i class="fas fa-arrow-up ml-1"></i>جديد</span>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="stat-total-subs">0</p>
+                        <p class="text-[11px] text-slate-500 mt-1">إجمالي المشتركين</p>
+                    </div>
+                    <div class="stat-card p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="stat-active-subs">0</p>
+                        <p class="text-[11px] text-slate-500 mt-1">اشتراك فعال</p>
+                    </div>
+                    <div class="stat-card p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                <i class="fas fa-eye text-amber-400"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="stat-today-visitors">0</p>
+                        <p class="text-[11px] text-slate-500 mt-1">زوار اليوم</p>
+                    </div>
+                    <div class="stat-card p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="stat-expiring">0</p>
+                        <p class="text-[11px] text-slate-500 mt-1">قارب ينتهي (3 أيام)</p>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Visitors Chart -->
+                    <div class="chart-container p-5">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-sm font-semibold text-white">إحصائيات الزوار</h3>
+                            <select id="chart-period" onchange="updateVisitorChart()" class="bg-slate-800 text-slate-300 text-xs border border-slate-700 rounded-lg px-3 py-1.5 outline-none">
+                                <option value="7">آخر 7 أيام</option>
+                                <option value="14">آخر 14 يوم</option>
+                                <option value="30" selected>آخر 30 يوم</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-1.5 h-40" id="visitor-chart"></div>
+                        <div class="flex justify-between mt-2 text-[9px] text-slate-600" id="chart-labels"></div>
+                    </div>
+
+                    <!-- Subscriber Status Pie -->
+                    <div class="chart-container p-5">
+                        <h3 class="text-sm font-semibold text-white mb-5">حالة الاشتراكات</h3>
+                        <div class="flex items-center justify-center gap-8">
+                            <div class="relative w-36 h-36">
+                                <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="#1e293b" stroke-width="3"/>
+                                    <circle id="pie-active" cx="18" cy="18" r="15.5" fill="none" stroke="#4ade80" stroke-width="3" stroke-dasharray="0 100" stroke-linecap="round"/>
+                                    <circle id="pie-expiring" cx="18" cy="18" r="15.5" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0" stroke-linecap="round"/>
+                                    <circle id="pie-expired" cx="18" cy="18" r="15.5" fill="none" stroke="#f87171" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0" stroke-linecap="round"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-lg font-bold text-white" id="pie-total">0</span>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                    <span class="text-xs text-slate-400">فعال <span class="text-white font-semibold" id="pie-active-count">0</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                                    <span class="text-xs text-slate-400">قارب ينتهي <span class="text-white font-semibold" id="pie-expiring-count">0</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                    <span class="text-xs text-slate-400">منتهي <span class="text-white font-semibold" id="pie-expired-count">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts -->
+                <div class="chart-container p-5">
+                    <h3 class="text-sm font-semibold text-white mb-4">
+                        <i class="fas fa-bell text-amber-400 ml-2"></i>
+                        آخر التنبيهات
+                    </h3>
+                    <div id="overview-alerts" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- ====== قسم المشتركين ====== -->
+            <div id="section-subscribers" class="section fade-in">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+                    <div class="relative flex-1 w-full">
+                        <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input type="text" id="sub-search" oninput="filterSubscribers()" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl pr-9 pl-4 py-2.5 text-white text-sm outline-none focus:border-indigo-500 transition" placeholder="ابحث باسم أو كود...">
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="sub-filter" onchange="filterSubscribers()" class="bg-slate-800 text-slate-300 text-xs border border-slate-700 rounded-lg px-3 py-2.5 outline-none">
+                            <option value="all">الكل</option>
+                            <option value="active">فعال</option>
+                            <option value="expiring">قارب ينتهي</option>
+                            <option value="expired">منتهي</option>
+                        </select>
+                        <button onclick="exportSubscribers()" class="flex items-center gap-2 px-4 py-2.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 text-xs rounded-lg transition border border-green-600/20">
+                            <i class="fas fa-file-export"></i>
+                            <span class="hidden sm:inline">تصدير</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="data-table overflow-x-auto">
+                    <table class="w-full min-w-[600px]">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الاسم</th>
+                                <th>الكود</th>
+                                <th>تاريخ الانتهاء</th>
+                                <th>الحالة</th>
+                                <th>المتبقي</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribers-table"></tbody>
+                    </table>
+                </div>
+                <p class="text-center text-slate-600 text-xs mt-4" id="sub-count"></p>
+            </div>
+
+            <!-- ====== قسم الزوار ====== -->
+            <div id="section-visitors" class="section fade-in">
+                <!-- Visitor Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                    <div class="stat-card p-4 text-center">
+                        <p class="text-xs text-slate-500 mb-1">اليوم</p>
+                        <p class="text-xl font-bold text-white" id="v-today">0</p>
+                    </div>
+                    <div class="stat-card p-4 text-center">
+                        <p class="text-xs text-slate-500 mb-1">آخر 3 أيام</p>
+                        <p class="text-xl font-bold text-white" id="v-3days">0</p>
+                    </div>
+                    <div class="stat-card p-4 text-center">
+                        <p class="text-xs text-slate-500 mb-1">آخر 7 أيام</p>
+                        <p class="text-xl font-bold text-white" id="v-7days">0</p>
+                    </div>
+                    <div class="stat-card p-4 text-center">
+                        <p class="text-xs text-slate-500 mb-1">آخر 30 يوم</p>
+                        <p class="text-xl font-bold text-white" id="v-30days">0</p>
+                    </div>
+                    <div class="stat-card p-4 text-center">
+                        <p class="text-xs text-slate-500 mb-1">الإجمالي</p>
+                        <p class="text-xl font-bold text-white" id="v-total">0</p>
+                    </div>
+                </div>
+
+                <!-- Big Chart -->
+                <div class="chart-container p-5 mb-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="text-sm font-semibold text-white">الزيارات اليومية</h3>
+                        <select id="visitor-detail-period" onchange="updateDetailChart()" class="bg-slate-800 text-slate-300 text-xs border border-slate-700 rounded-lg px-3 py-1.5 outline-none">
+                            <option value="7">7 أيام</option>
+                            <option value="14">14 يوم</option>
+                            <option value="30" selected>30 يوم</option>
+                            <option value="90">90 يوم</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-1 h-48" id="detail-chart"></div>
+                    <div class="flex justify-between mt-2 text-[9px] text-slate-600" id="detail-labels"></div>
+                </div>
+
+                <!-- Device & Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">نوع الجهاز</h3>
+                        <div class="space-y-3" id="device-stats">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400"><i class="fas fa-mobile-alt ml-2 text-indigo-400"></i>جوال</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-32 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" id="bar-mobile" style="width:0%"></div></div>
+                                    <span class="text-xs font-semibold text-white w-10 text-left" id="pct-mobile">0%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400"><i class="fas fa-desktop ml-2 text-blue-400"></i>كمبيوتر</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-32 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" id="bar-desktop" style="width:0%"></div></div>
+                                    <span class="text-xs font-semibold text-white w-10 text-left" id="pct-desktop">0%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400"><i class="fas fa-tablet ml-2 text-purple-400"></i>تابلت</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-32 h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-purple-500 rounded-full" id="bar-tablet" style="width:0%"></div></div>
+                                    <span class="text-xs font-semibold text-white w-10 text-left" id="pct-tablet">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">أوقات الذروة</h3>
+                        <div class="grid grid-cols-6 gap-1" id="peak-hours"></div>
+                        <div class="flex justify-between mt-2 text-[9px] text-slate-600">
+                            <span>12 ص</span>
+                            <span>6 ص</span>
+                            <span>12 م</span>
+                            <span>6 م</span>
+                            <span>12 ص</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== قسم التنبيهات ====== -->
+            <div id="section-alerts" class="section fade-in">
+                <div class="space-y-3" id="alerts-list">
+                    <div class="text-center text-slate-600 py-10">
+                        <i class="fas fa-bell-slash text-3xl mb-3"></i>
+                        <p class="text-sm">لا توجد تنبيهات</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== قسم سجل النشاط ====== -->
+            <div id="section-activity" class="section fade-in">
+                <div class="data-table overflow-x-auto">
+                    <table class="w-full min-w-[500px]">
+                        <thead>
+                            <tr>
+                                <th>الوقت</th>
+                                <th>الحدث</th>
+                                <th>التفاصيل</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-log"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ====== قسم الإعدادات ====== -->
+            <div id="section-settings" class="section fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container p-6">
+                        <h3 class="text-sm font-semibold text-white mb-4"><i class="fas fa-key ml-2 text-indigo-400"></i>تغيير كلمة المرور</h3>
+                        <div class="space-y-3">
+                            <input type="password" id="new-pass" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-indigo-500 transition" placeholder="كلمة المرور الجديدة">
+                            <input type="password" id="confirm-pass" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-indigo-500 transition" placeholder="تأكيد كلمة المرور">
+                            <button onclick="changePassword()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-xl transition">حفظ</button>
+                        </div>
+                    </div>
+                    <div class="chart-container p-6">
+                        <h3 class="text-sm font-semibold text-white mb-4"><i class="fas fa-terminal ml-2 text-amber-400"></i>كود الدخول السري</h3>
+                        <p class="text-[11px] text-slate-500 mb-3">هذا الكود تكتبه في خانة الكود بصفحة الدخول عشان يوديك للوحة التحكم</p>
+                        <div class="space-y-3">
+                            <div class="relative">
+                                <input type="text" id="access-code" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-amber-500 transition text-center tracking-widest font-mono" placeholder="الكود السري الجديد" dir="ltr">
+                                <button onclick="toggleCodeVisibility()" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"><i class="fas fa-eye text-xs" id="code-eye"></i></button>
+                            </div>
+                            <div class="flex items-center gap-2 p-2.5 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                                <i class="fas fa-circle-info text-xs text-slate-500"></i>
+                                <span class="text-[10px] text-slate-500">الكود الحالي: <code class="text-amber-400 font-mono" id="current-code-display">---</code></span>
+                            </div>
+                            <button onclick="changeAccessCode()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-sm rounded-xl transition">تحديث الكود</button>
+                        </div>
+                    </div>
+                    <div class="chart-container p-6">
+                        <h3 class="text-sm font-semibold text-white mb-4"><i class="fas fa-link ml-2 text-green-400"></i>رابط Google Sheet</h3>
+                        <div class="space-y-3">
+                            <input type="url" id="sheet-url" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-indigo-500 transition ltr text-left" placeholder="رابط CSV للشيت">
+                            <button onclick="saveSheetUrl()" class="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded-xl transition">حفظ الرابط</button>
+                        </div>
+                    </div>
+                    <div class="chart-container p-6">
+                        <h3 class="text-sm font-semibold text-white mb-4"><i class="fas fa-database ml-2 text-purple-400"></i>البيانات</h3>
+                        <div class="space-y-3">
+                            <button onclick="exportAllData()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fas fa-download"></i> تصدير جميع البيانات
+                            </button>
+                            <button onclick="clearVisitorData()" class="w-full py-2.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-sm rounded-xl transition border border-red-900/30 flex items-center justify-center gap-2">
+                                <i class="fas fa-trash"></i> مسح بيانات الزوار
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container p-6">
+                        <h3 class="text-sm font-semibold text-white mb-4"><i class="fas fa-info-circle ml-2 text-blue-400"></i>معلومات النظام</h3>
+                        <div class="space-y-2 text-xs text-slate-400">
+                            <div class="flex justify-between"><span>الإصدار</span><span class="text-white">1.0.0</span></div>
+                            <div class="flex justify-between"><span>الباكند</span><span class="text-green-400">Railway</span></div>
+                            <div class="flex justify-between"><span>الفرونتند</span><span class="text-blue-400">Vercel</span></div>
+                            <div class="flex justify-between"><span>قاعدة البيانات</span><span class="text-purple-400">Google Sheets</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+// ============================================
+// إعدادات المدير
+// ============================================
+const DEFAULT_ADMIN = { user: 'despro', pass: 'admin2026' };
+const SHEET_CSV_URL = localStorage.getItem('admin_sheet_url') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vTiWBnSkPTGN8S3-QjqwSjpJicszKs2ZuwI40iPph2EWQhgz9F10c7LIjMwa_cdPJr40OoDmqZDbP5F/pub?output=csv";
+const CORS_PROXIES = [
+    "https://api.allorigins.win/raw?url=",
+    "https://thingproxy.freeboard.io/fetch/"
+];
+const VISITOR_KEY = 'despro_visitors';
+const ACTIVITY_KEY = 'despro_activity';
+
+let subscribers = [];
+let visitorData = {};
+let activityLog = [];
+
+// ============================================
+// تسجيل الدخول
+// ============================================
+function adminLogin() {
+    const user = document.getElementById('admin-user').value.trim();
+    const pass = document.getElementById('admin-pass').value.trim();
+    const err = document.getElementById('admin-error');
+    
+    const savedUser = localStorage.getItem('admin_user') || DEFAULT_ADMIN.user;
+    const savedPass = localStorage.getItem('admin_pass') || DEFAULT_ADMIN.pass;
+    
+    if (user === savedUser && pass === savedPass) {
+        sessionStorage.setItem('admin_logged', 'true');
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        logActivity('تسجيل دخول', 'تم تسجيل الدخول للوحة التحكم');
+        initDashboard();
+    } else {
+        err.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+        err.classList.remove('hidden');
+        setTimeout(() => err.classList.add('hidden'), 3000);
+    }
+}
+
+function adminLogout() {
+    sessionStorage.removeItem('admin_logged');
+    location.reload();
+}
+
+// Check session
+if (sessionStorage.getItem('admin_logged') === 'true') {
+    document.getElementById('admin-login').classList.add('hidden');
+    document.getElementById('admin-dashboard').classList.remove('hidden');
+    setTimeout(initDashboard, 100);
+}
+
+// ============================================
+// Navigation
+// ============================================
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    const section = document.getElementById('section-' + name);
+    const navBtn = document.querySelector(`[data-section="${name}"]`);
+    
+    if (section) section.classList.add('active');
+    if (navBtn) navBtn.classList.add('active');
+    
+    const titles = {
+        overview: 'نظرة عامة',
+        subscribers: 'المشتركين',
+        visitors: 'الزوار',
+        alerts: 'التنبيهات',
+        activity: 'سجل النشاط',
+        settings: 'الإعدادات'
+    };
+    document.getElementById('section-title').textContent = titles[name] || '';
+    
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+document.getElementById('mobile-menu-btn').addEventListener('click', toggleSidebar);
+
+// ============================================
+// Initialize Dashboard
+// ============================================
+async function initDashboard() {
+    // Set current date
+    const now = new Date();
+    document.getElementById('current-date').textContent = now.toLocaleDateString('ar-SA', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    
+    // Load data
+    loadVisitorData();
+    loadActivityLog();
+    await loadSubscribers();
+    
+    updateOverview();
+    updateVisitorChart();
+    renderSubscribers();
+    renderAlerts();
+    renderActivityLog();
+    updateVisitorSection();
+}
+
+async function refreshData() {
+    const icon = document.getElementById('refresh-icon');
+    icon.classList.add('fa-spin');
+    await loadSubscribers();
+    updateOverview();
+    updateVisitorChart();
+    renderSubscribers();
+    renderAlerts();
+    updateVisitorSection();
+    setTimeout(() => icon.classList.remove('fa-spin'), 500);
+    logActivity('تحديث', 'تم تحديث البيانات يدوياً');
+}
+
+// ============================================
+// Subscribers Data (Google Sheets)
+// ============================================
+async function loadSubscribers() {
+    subscribers = [];
+    try {
+        let csvText = null;
+        
+        try {
+            const response = await fetch(SHEET_CSV_URL, { mode: 'cors' });
+            if (response.ok) csvText = await response.text();
+        } catch (e) {}
+        
+        if (!csvText) {
+            for (let proxy of CORS_PROXIES) {
+                try {
+                    const response = await fetch(proxy + encodeURIComponent(SHEET_CSV_URL));
+                    if (response.ok) { csvText = await response.text(); break; }
+                } catch (e) { continue; }
+            }
+        }
+        
+        if (csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) return;
+            
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const codeIdx = headers.findIndex(h => h.includes('code'));
+            const nameIdx = headers.findIndex(h => h.includes('name'));
+            const expiryIdx = headers.findIndex(h => h.includes('expiry'));
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const cells = lines[i].split(',').map(c => c.trim());
+                if (codeIdx >= 0 && nameIdx >= 0 && expiryIdx >= 0) {
+                    const code = cells[codeIdx];
+                    const name = cells[nameIdx];
+                    const expiryStr = cells[expiryIdx];
+                    if (code && name && expiryStr) {
+                        let expiryDate = parseDate(expiryStr);
+                        subscribers.push({ code, name, expiryStr, expiryDate });
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Error loading subscribers:', e);
+    }
+}
+
+function parseDate(str) {
+    str = str.trim();
+    if (str.match(/^\d{2}-\d{2}-\d{4}$/)) {
+        const [d, m, y] = str.split('-');
+        return new Date(`${y}-${m}-${d}`);
+    } else if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return new Date(str);
+    } else if (str.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        return new Date(str);
+    }
+    return new Date(str);
+}
+
+function getStatus(expiryDate) {
+    if (!expiryDate || isNaN(expiryDate.getTime())) return 'unknown';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exp = new Date(expiryDate); exp.setHours(0,0,0,0);
+    const diff = Math.ceil((exp - today) / (1000*60*60*24));
+    if (diff < 0) return 'expired';
+    if (diff <= 3) return 'expiring';
+    return 'active';
+}
+
+function getDaysLeft(expiryDate) {
+    if (!expiryDate || isNaN(expiryDate.getTime())) return '-';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exp = new Date(expiryDate); exp.setHours(0,0,0,0);
+    const diff = Math.ceil((exp - today) / (1000*60*60*24));
+    if (diff < 0) return `منتهي منذ ${Math.abs(diff)} يوم`;
+    if (diff === 0) return 'ينتهي اليوم';
+    return `${diff} يوم`;
+}
+
+// ============================================
+// Visitor Tracking
+// ============================================
+function loadVisitorData() {
+    try {
+        visitorData = JSON.parse(localStorage.getItem(VISITOR_KEY) || '{}');
+    } catch (e) { visitorData = {}; }
+}
+
+function recordVisit() {
+    loadVisitorData();
+    const today = new Date().toISOString().split('T')[0];
+    if (!visitorData[today]) {
+        visitorData[today] = { count: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {} };
+    }
+    visitorData[today].count++;
+    
+    // Device detection
+    const ua = navigator.userAgent;
+    if (/tablet|ipad/i.test(ua)) visitorData[today].devices.tablet++;
+    else if (/mobile|iphone|android/i.test(ua)) visitorData[today].devices.mobile++;
+    else visitorData[today].devices.desktop++;
+    
+    // Hour tracking
+    const hour = new Date().getHours();
+    visitorData[today].hours[hour] = (visitorData[today].hours[hour] || 0) + 1;
+    
+    localStorage.setItem(VISITOR_KEY, JSON.stringify(visitorData));
+}
+
+function getVisitorCount(days) {
+    const now = new Date();
+    let total = 0;
+    for (let i = 0; i < days; i++) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        if (visitorData[key]) total += visitorData[key].count;
+    }
+    return total;
+}
+
+// ============================================
+// Activity Log
+// ============================================
+function loadActivityLog() {
+    try {
+        activityLog = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]');
+    } catch (e) { activityLog = []; }
+}
+
+function logActivity(event, detail) {
+    loadActivityLog();
+    activityLog.unshift({
+        time: new Date().toLocaleString('ar-SA'),
+        event,
+        detail
+    });
+    if (activityLog.length > 100) activityLog = activityLog.slice(0, 100);
+    localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activityLog));
+}
+
+// ============================================
+// Update Overview
+// ============================================
+function updateOverview() {
+    const total = subscribers.length;
+    const active = subscribers.filter(s => getStatus(s.expiryDate) === 'active').length;
+    const expiring = subscribers.filter(s => getStatus(s.expiryDate) === 'expiring').length;
+    const expired = subscribers.filter(s => getStatus(s.expiryDate) === 'expired').length;
+    
+    document.getElementById('stat-total-subs').textContent = total;
+    document.getElementById('stat-active-subs').textContent = active;
+    document.getElementById('stat-today-visitors').textContent = getVisitorCount(1);
+    document.getElementById('stat-expiring').textContent = expiring;
+    
+    // Pie chart
+    document.getElementById('pie-total').textContent = total;
+    document.getElementById('pie-active-count').textContent = active;
+    document.getElementById('pie-expiring-count').textContent = expiring;
+    document.getElementById('pie-expired-count').textContent = expired;
+    
+    const circumference = 2 * Math.PI * 15.5; // ~97.4
+    if (total > 0) {
+        const activeP = (active / total) * 100;
+        const expiringP = (expiring / total) * 100;
+        const expiredP = (expired / total) * 100;
+        
+        document.getElementById('pie-active').setAttribute('stroke-dasharray', `${activeP} ${100 - activeP}`);
+        document.getElementById('pie-expiring').setAttribute('stroke-dasharray', `${expiringP} ${100 - expiringP}`);
+        document.getElementById('pie-expiring').setAttribute('stroke-dashoffset', `-${activeP}`);
+        document.getElementById('pie-expired').setAttribute('stroke-dasharray', `${expiredP} ${100 - expiredP}`);
+        document.getElementById('pie-expired').setAttribute('stroke-dashoffset', `-${activeP + expiringP}`);
+    }
+}
+
+// ============================================
+// Visitor Chart
+// ============================================
+function updateVisitorChart() {
+    const period = parseInt(document.getElementById('chart-period').value);
+    const container = document.getElementById('visitor-chart');
+    const labels = document.getElementById('chart-labels');
+    container.innerHTML = '';
+    labels.innerHTML = '';
+    
+    const days = [];
+    for (let i = period - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        days.push({
+            date: d,
+            key,
+            count: visitorData[key] ? visitorData[key].count : 0
+        });
+    }
+    
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+    
+    days.forEach((day, idx) => {
+        const height = Math.max((day.count / maxCount) * 100, 3);
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar flex-1 relative group cursor-pointer';
+        bar.style.height = height + '%';
+        bar.innerHTML = `<div class="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">${day.count}</div>`;
+        container.appendChild(bar);
+        
+        if (period <= 14 || idx % Math.ceil(period / 7) === 0) {
+            const label = document.createElement('span');
+            label.textContent = `${day.date.getDate()}/${day.date.getMonth()+1}`;
+            labels.appendChild(label);
+        }
+    });
+}
+
+function updateDetailChart() {
+    const period = parseInt(document.getElementById('visitor-detail-period').value);
+    const container = document.getElementById('detail-chart');
+    const labels = document.getElementById('detail-labels');
+    container.innerHTML = '';
+    labels.innerHTML = '';
+    
+    const days = [];
+    for (let i = period - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        days.push({
+            date: d,
+            key,
+            count: visitorData[key] ? visitorData[key].count : 0
+        });
+    }
+    
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+    
+    days.forEach((day, idx) => {
+        const height = Math.max((day.count / maxCount) * 100, 2);
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar flex-1 relative group cursor-pointer';
+        bar.style.height = height + '%';
+        bar.innerHTML = `<div class="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">${day.count} زائر<br>${day.date.getDate()}/${day.date.getMonth()+1}</div>`;
+        container.appendChild(bar);
+        
+        const step = Math.max(Math.ceil(period / 10), 1);
+        if (idx % step === 0 || idx === days.length - 1) {
+            const label = document.createElement('span');
+            label.textContent = `${day.date.getDate()}/${day.date.getMonth()+1}`;
+            labels.appendChild(label);
+        }
+    });
+}
+
+function updateVisitorSection() {
+    document.getElementById('v-today').textContent = getVisitorCount(1);
+    document.getElementById('v-3days').textContent = getVisitorCount(3);
+    document.getElementById('v-7days').textContent = getVisitorCount(7);
+    document.getElementById('v-30days').textContent = getVisitorCount(30);
+    
+    let totalAll = 0;
+    Object.values(visitorData).forEach(d => totalAll += d.count);
+    document.getElementById('v-total').textContent = totalAll;
+    
+    // Device stats
+    let mobile = 0, desktop = 0, tablet = 0;
+    Object.values(visitorData).forEach(d => {
+        if (d.devices) {
+            mobile += d.devices.mobile || 0;
+            desktop += d.devices.desktop || 0;
+            tablet += d.devices.tablet || 0;
+        }
+    });
+    const total = mobile + desktop + tablet || 1;
+    document.getElementById('bar-mobile').style.width = ((mobile/total)*100) + '%';
+    document.getElementById('pct-mobile').textContent = Math.round((mobile/total)*100) + '%';
+    document.getElementById('bar-desktop').style.width = ((desktop/total)*100) + '%';
+    document.getElementById('pct-desktop').textContent = Math.round((desktop/total)*100) + '%';
+    document.getElementById('bar-tablet').style.width = ((tablet/total)*100) + '%';
+    document.getElementById('pct-tablet').textContent = Math.round((tablet/total)*100) + '%';
+    
+    // Peak hours
+    const hourData = {};
+    Object.values(visitorData).forEach(d => {
+        if (d.hours) {
+            Object.entries(d.hours).forEach(([h, c]) => {
+                hourData[h] = (hourData[h] || 0) + c;
+            });
+        }
+    });
+    
+    const peakContainer = document.getElementById('peak-hours');
+    peakContainer.innerHTML = '';
+    const maxHour = Math.max(...Object.values(hourData), 1);
+    for (let h = 0; h < 24; h++) {
+        const val = hourData[h] || 0;
+        const intensity = Math.round((val / maxHour) * 100);
+        const cell = document.createElement('div');
+        cell.className = 'h-6 rounded cursor-pointer relative group';
+        cell.style.background = intensity > 0 ? `rgba(99, 102, 241, ${intensity/100 * 0.8 + 0.1})` : 'rgba(30,41,59,0.5)';
+        cell.innerHTML = `<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">${h}:00 - ${val}</div>`;
+        peakContainer.appendChild(cell);
+    }
+    
+    updateDetailChart();
+}
+
+// ============================================
+// Subscribers Table
+// ============================================
+function renderSubscribers(filtered) {
+    const list = filtered || subscribers;
+    const tbody = document.getElementById('subscribers-table');
+    tbody.innerHTML = '';
+    
+    list.forEach((sub, idx) => {
+        const status = getStatus(sub.expiryDate);
+        const statusLabels = { active: 'فعال', expiring: 'قارب ينتهي', expired: 'منتهي', unknown: 'غير معروف' };
+        const badgeClass = { active: 'badge-active', expiring: 'badge-expiring', expired: 'badge-expired', unknown: 'badge-expired' };
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-slate-500 text-xs">${idx + 1}</td>
+            <td class="font-medium">${sub.name}</td>
+            <td><code class="bg-slate-800 px-2 py-0.5 rounded text-xs text-indigo-300">${sub.code}</code></td>
+            <td class="text-xs">${sub.expiryStr}</td>
+            <td><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${badgeClass[status]}">${statusLabels[status]}</span></td>
+            <td class="text-xs">${getDaysLeft(sub.expiryDate)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    document.getElementById('sub-count').textContent = `عرض ${list.length} من ${subscribers.length} مشترك`;
+}
+
+function filterSubscribers() {
+    const search = document.getElementById('sub-search').value.trim().toLowerCase();
+    const filter = document.getElementById('sub-filter').value;
+    
+    let filtered = subscribers;
+    
+    if (search) {
+        filtered = filtered.filter(s => s.name.toLowerCase().includes(search) || s.code.toLowerCase().includes(search));
+    }
+    
+    if (filter !== 'all') {
+        filtered = filtered.filter(s => getStatus(s.expiryDate) === filter);
+    }
+    
+    renderSubscribers(filtered);
+}
+
+function exportSubscribers() {
+    let csv = '\uFEFF' + 'الاسم,الكود,تاريخ الانتهاء,الحالة,المتبقي\n';
+    subscribers.forEach(sub => {
+        const status = getStatus(sub.expiryDate);
+        const statusLabels = { active: 'فعال', expiring: 'قارب ينتهي', expired: 'منتهي', unknown: 'غير معروف' };
+        csv += `${sub.name},${sub.code},${sub.expiryStr},${statusLabels[status]},${getDaysLeft(sub.expiryDate)}\n`;
+    });
+    downloadFile(csv, 'subscribers.csv', 'text/csv');
+    logActivity('تصدير', `تم تصدير ${subscribers.length} مشترك`);
+}
+
+// ============================================
+// Alerts
+// ============================================
+function renderAlerts() {
+    const alertsList = [];
+    const overviewAlerts = [];
+    
+    // Expiring soon
+    subscribers.filter(s => getStatus(s.expiryDate) === 'expiring').forEach(sub => {
+        alertsList.push({
+            icon: 'fas fa-clock',
+            color: 'text-amber-400',
+            bg: 'bg-amber-500/10',
+            title: `اشتراك ${sub.name} قارب ينتهي`,
+            detail: `ينتهي في ${sub.expiryStr} - متبقي ${getDaysLeft(sub.expiryDate)}`,
+            type: 'warning'
+        });
+    });
+    
+    // Expired
+    subscribers.filter(s => getStatus(s.expiryDate) === 'expired').forEach(sub => {
+        alertsList.push({
+            icon: 'fas fa-times-circle',
+            color: 'text-red-400',
+            bg: 'bg-red-500/10',
+            title: `اشتراك ${sub.name} انتهى`,
+            detail: `انتهى في ${sub.expiryStr}`,
+            type: 'danger'
+        });
+    });
+    
+    // Update alert count
+    const expiring = subscribers.filter(s => getStatus(s.expiryDate) === 'expiring').length;
+    const alertCount = document.getElementById('alert-count');
+    if (expiring > 0) {
+        alertCount.textContent = expiring;
+        alertCount.classList.remove('hidden');
+    }
+    
+    // Render alerts section
+    const container = document.getElementById('alerts-list');
+    if (alertsList.length === 0) {
+        container.innerHTML = `<div class="text-center text-slate-600 py-10"><i class="fas fa-check-circle text-3xl mb-3 text-green-500/30"></i><p class="text-sm">كل شي تمام! لا توجد تنبيهات</p></div>`;
+    } else {
+        container.innerHTML = alertsList.map(a => `
+            <div class="alert-card flex items-start gap-3 p-4">
+                <div class="w-9 h-9 rounded-xl ${a.bg} flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i class="${a.icon} ${a.color} text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-white">${a.title}</p>
+                    <p class="text-xs text-slate-500 mt-0.5">${a.detail}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Overview alerts (max 3)
+    const overviewContainer = document.getElementById('overview-alerts');
+    const topAlerts = alertsList.slice(0, 3);
+    if (topAlerts.length === 0) {
+        overviewContainer.innerHTML = `<p class="text-xs text-slate-600 text-center py-3">لا توجد تنبيهات حالياً ✅</p>`;
+    } else {
+        overviewContainer.innerHTML = topAlerts.map(a => `
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-800/30">
+                <i class="${a.icon} ${a.color} text-xs"></i>
+                <span class="text-xs text-slate-300">${a.title}</span>
+            </div>
+        `).join('');
+    }
+}
+
+// ============================================
+// Activity Log
+// ============================================
+function renderActivityLog() {
+    const tbody = document.getElementById('activity-log');
+    tbody.innerHTML = '';
+    
+    (activityLog.length > 0 ? activityLog : []).forEach(log => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-xs text-slate-500 whitespace-nowrap">${log.time}</td>
+            <td><span class="text-xs font-medium text-indigo-300">${log.event}</span></td>
+            <td class="text-xs text-slate-400">${log.detail}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    if (activityLog.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-600 py-8 text-xs">لا يوجد سجل نشاط بعد</td></tr>';
+    }
+}
+
+// ============================================
+// Settings
+// ============================================
+function changePassword() {
+    const newPass = document.getElementById('new-pass').value;
+    const confirmPass = document.getElementById('confirm-pass').value;
+    if (!newPass || newPass.length < 4) return alert('كلمة المرور قصيرة جداً');
+    if (newPass !== confirmPass) return alert('كلمات المرور غير متطابقة');
+    localStorage.setItem('admin_pass', newPass);
+    alert('تم تغيير كلمة المرور بنجاح ✅');
+    logActivity('إعدادات', 'تم تغيير كلمة المرور');
+    document.getElementById('new-pass').value = '';
+    document.getElementById('confirm-pass').value = '';
+}
+
+function changeAccessCode() {
+    const newCode = document.getElementById('access-code').value.trim();
+    if (!newCode || newCode.length < 3) return alert('الكود قصير جداً - على الأقل 3 حروف');
+    localStorage.setItem('despro_admin_access_code', newCode);
+    document.getElementById('current-code-display').textContent = newCode;
+    alert('تم تحديث كود الدخول بنجاح ✅');
+    logActivity('إعدادات', 'تم تغيير كود الدخول السري');
+    document.getElementById('access-code').value = '';
+}
+
+function toggleCodeVisibility() {
+    const input = document.getElementById('access-code');
+    const eye = document.getElementById('code-eye');
+    if (input.type === 'password') {
+        input.type = 'text';
+        eye.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'text';
+        eye.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+// عرض الكود الحالي عند فتح الإعدادات
+setTimeout(() => {
+    const currentCode = localStorage.getItem('despro_admin_access_code') || 'despro-admin-2026';
+    const display = document.getElementById('current-code-display');
+    if (display) display.textContent = currentCode;
+}, 300);
+
+function saveSheetUrl() {
+    const url = document.getElementById('sheet-url').value.trim();
+    if (!url) return alert('ادخل رابط الشيت');
+    localStorage.setItem('admin_sheet_url', url);
+    alert('تم حفظ الرابط ✅ سيتم استخدامه في التحديث القادم');
+    logActivity('إعدادات', 'تم تحديث رابط Google Sheet');
+}
+
+function exportAllData() {
+    const data = {
+        subscribers: subscribers,
+        visitors: visitorData,
+        activity: activityLog,
+        exportDate: new Date().toISOString()
+    };
+    downloadFile(JSON.stringify(data, null, 2), 'despro_backup.json', 'application/json');
+    logActivity('تصدير', 'تم تصدير جميع البيانات');
+}
+
+function clearVisitorData() {
+    if (confirm('هل تريد مسح جميع بيانات الزوار؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+        localStorage.removeItem(VISITOR_KEY);
+        visitorData = {};
+        updateOverview();
+        updateVisitorChart();
+        updateVisitorSection();
+        logActivity('حذف', 'تم مسح بيانات الزوار');
+        alert('تم مسح البيانات ✅');
+    }
+}
+
+function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Load sheet URL if saved
+const savedSheetUrl = localStorage.getItem('admin_sheet_url');
+if (savedSheetUrl) {
+    setTimeout(() => {
+        const input = document.getElementById('sheet-url');
+        if (input) input.value = savedSheetUrl;
+    }, 500);
+}
+</script>
+
+</body>
+</html>
