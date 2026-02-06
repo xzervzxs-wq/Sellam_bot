@@ -392,6 +392,10 @@
                             <i class="fas fa-file-export"></i>
                             <span class="hidden sm:inline">تصدير</span>
                         </button>
+                        <button onclick="openGoogleSheet()" class="flex items-center gap-2 px-4 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs rounded-lg transition border border-blue-600/20">
+                            <i class="fas fa-table"></i>
+                            <span class="hidden sm:inline">فتح الشيت</span>
+                        </button>
                     </div>
                 </div>
 
@@ -1069,6 +1073,13 @@ function exportSubscribers() {
     });
     downloadFile(csv, 'subscribers.csv', 'text/csv');
     logActivity('تصدير', `تم تصدير ${subscribers.length} مشترك`);
+}
+
+function openGoogleSheet() {
+    // تحويل رابط CSV لرابط التعديل
+    const editUrl = 'https://docs.google.com/spreadsheets/d/1oOlAlGpXMhsHBaM7DjnOYcHj4MYqp3jllEETm8EeCLQ/edit';
+    window.open(editUrl, '_blank');
+    logActivity('شيت', 'تم فتح Google Sheet للتعديل');
 }
 
 // ============================================
