@@ -5007,13 +5007,6 @@
         return;
     }
 
-    // كود سري للدخول للوحة التحكم - لا يظهر أي زر
-    const adminAccessCode = localStorage.getItem('despro_admin_access_code') || 'despro-admin-2026';
-    if (code === adminAccessCode) {
-        window.location.href = 'cpanel.html';
-        return;
-    }
-
     if(loginBtn) loginBtn.disabled = true;
 
     // محاولة إظهار السبينر المدمج في الزر الجديد
