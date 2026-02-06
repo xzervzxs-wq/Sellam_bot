@@ -1289,22 +1289,25 @@ function renderActivityLog() {
     
     if (logins.length > 0) {
         logins.forEach(log => {
-            const time = new Date(log.timestamp);
-            const timeStr = time.toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' });
-            const member = subscribers.find(s => s.code.toLowerCase() === (log.code || '').toLowerCase());
-            const name = member ? member.name : 'غير معروف';
-            const deviceIcon = log.device === 'mobile' ? 'fa-mobile-alt text-indigo-400' : 
-                              log.device === 'tablet' ? 'fa-tablet text-purple-400' : 'fa-desktop text-blue-400';
-            const deviceName = log.device === 'mobile' ? 'جوال' : log.device === 'tablet' ? 'تابلت' : 'كمبيوتر';
-            
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="text-xs text-slate-500 whitespace-nowrap">${timeStr}</td>
-                <td class="text-xs font-medium text-green-400">${name}</td>
-                <td><code class="bg-slate-800 px-2 py-0.5 rounded text-xs text-cyan-300">${log.code || '-'}</code></td>
-                <td class="text-xs text-slate-400"><i class="fas ${deviceIcon} ml-1"></i>${deviceName}</td>
-            `;
-            loginsBody.appendChild(tr);
+            try {
+                const time = new Date(log.timestamp);
+                const timeStr = time.toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' });
+                const logCode = String(log.code || '').toLowerCase();
+                const member = subscribers.find(s => String(s.code).toLowerCase() === logCode);
+                const name = member ? member.name : 'غير معروف';
+                const deviceIcon = log.device === 'mobile' ? 'fa-mobile-alt text-indigo-400' : 
+                                  log.device === 'tablet' ? 'fa-tablet text-purple-400' : 'fa-desktop text-blue-400';
+                const deviceName = log.device === 'mobile' ? 'جوال' : log.device === 'tablet' ? 'تابلت' : 'كمبيوتر';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-xs text-slate-500 whitespace-nowrap">${timeStr}</td>
+                    <td class="text-xs font-medium text-green-400">${name}</td>
+                    <td><code class="bg-slate-800 px-2 py-0.5 rounded text-xs text-cyan-300">${log.code || '-'}</code></td>
+                    <td class="text-xs text-slate-400"><i class="fas ${deviceIcon} ml-1"></i>${deviceName}</td>
+                `;
+                loginsBody.appendChild(tr);
+            } catch(e) {}
         });
     } else {
         loginsBody.innerHTML = '<tr><td colspan="4" class="text-center text-slate-600 py-6 text-xs">لا يوجد تسجيلات دخول بعد</td></tr>';
