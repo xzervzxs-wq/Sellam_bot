@@ -382,70 +382,73 @@
     </div>
     
     <div id="save-modal">
-        <div class="w-full h-full max-w-[95vw] md:max-w-6xl max-h-[95vh] bg-slate-900 rounded-2xl shadow-2xl flex overflow-hidden border border-slate-700 mx-4">
+        <div class="w-full h-full max-w-[95vw] md:max-w-6xl max-h-[95vh] bg-slate-900 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-700 mx-4">
             
             <!-- القسم الأيمن: المعاينة -->
-            <div class="flex-1 bg-[#0f172a] relative p-6 flex items-center justify-center">
+            <div class="h-[35vh] md:h-auto md:flex-1 bg-[#0f172a] relative p-3 md:p-6 flex items-center justify-center shrink-0">
                 <!-- خلفية شبكية خفيفة -->
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px;"></div>
                 
-                <div class="relative shadow-2xl h-full w-full flex items-center justify-center z-10 pb-4">
-                    <img id="save-img" class="max-h-full max-w-full object-contain bg-white transition-transform duration-300 shadow-xl" alt="معاينة الطباعة">
+                <div class="relative shadow-2xl h-full w-full flex items-center justify-center z-10">
+                    <img id="save-img" class="max-h-full max-w-full object-contain bg-white transition-transform duration-300 shadow-xl rounded-lg" alt="معاينة الطباعة">
                 </div>
             </div>
 
             <!-- القسم الأيسر: الخيارات -->
-            <div class="w-[320px] bg-slate-800 border-r border-slate-700 flex flex-col z-20 shadow-xl">
+            <div class="flex-1 md:w-[320px] md:flex-none bg-slate-800 border-t md:border-t-0 md:border-r border-slate-700 flex flex-col z-20 shadow-xl overflow-hidden">
                  <!-- رأس القائمة -->
-                 <div class="p-6 pb-4 border-b border-slate-700/50">
-                     <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2">
+                 <div class="p-4 md:p-6 pb-3 md:pb-4 border-b border-slate-700/50">
+                     <h2 class="text-lg md:text-xl font-extrabold text-white mb-1 flex items-center gap-2">
                         <i class="fas fa-print text-[#6366f1]"></i> طباعة وتصدير
                      </h2>
-                     <p class="text-slate-400 text-[11px] font-bold">معاينة وتخصيص طباعة A4</p>
+                     <p class="text-slate-400 text-[10px] md:text-[11px] font-bold">معاينة وتخصيص طباعة A4</p>
                  </div>
                  
                  <!-- المحتوى القابل للتمرير -->
-                 <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                 <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
                      
-                     <!-- إعدادات النسخ -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-700/50">
-                         <div class="flex items-center justify-between mb-3">
-                             <label class="text-slate-200 text-xs font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
-                             <span class="text-sm text-slate-200 font-bold bg-slate-600/70 px-3 py-1 rounded-full" id="a4-max-text"></span>
-                         </div>
-                         
-                         <div class="flex items-center gap-2">
-                             <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-700 rounded-lg h-10 text-center font-bold text-white text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
-                         </div>
-                     </div>
-
-                     <!-- خيارات إضافية -->
-                     <div class="bg-slate-700/30 p-4 rounded-xl border border-slate-700/50 space-y-3">
-                         <label class="flex items-center justify-between cursor-pointer group select-none">
+                     <!-- إعدادات النسخ + خيارات إضافية في سطر واحد على الموبايل -->
+                     <div class="flex flex-row md:flex-col gap-3 md:gap-6">
+                         <!-- إعدادات النسخ -->
+                         <div class="flex-1 bg-slate-700/30 p-3 md:p-4 rounded-xl border border-slate-700/50">
+                             <div class="flex items-center justify-between mb-2 md:mb-3">
+                                 <label class="text-slate-200 text-[10px] md:text-xs font-bold"><i class="fas fa-copy ml-1"></i> عدد النسخ:</label>
+                                 <span class="text-[10px] md:text-sm text-slate-200 font-bold bg-slate-600/70 px-2 md:px-3 py-0.5 md:py-1 rounded-full" id="a4-max-text"></span>
+                             </div>
+                             
                              <div class="flex items-center gap-2">
-                                 <div class="w-8 h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
-                                     <i class="fas fa-scissors text-xs"></i>
+                                 <input type="text" inputmode="numeric" id="a4-count" class="w-full bg-slate-900 border border-slate-700 rounded-lg h-9 md:h-10 text-center font-bold text-white text-base md:text-lg focus:ring-1 focus:ring-[#6366f1] focus:border-[#6366f1] outline-none transition" oninput="this.value = arabicToEnglish(this.value); updateA4Count()" min="1">
+                             </div>
+                         </div>
+
+                         <!-- خيارات إضافية -->
+                         <div class="flex-1 bg-slate-700/30 p-3 md:p-4 rounded-xl border border-slate-700/50 space-y-2 md:space-y-3">
+                             <label class="flex items-center justify-between cursor-pointer group select-none">
+                                 <div class="flex items-center gap-2">
+                                     <div class="w-7 md:w-8 h-7 md:h-8 rounded-full bg-slate-600/50 flex items-center justify-center group-hover:bg-[#6366f1] transition duration-300 text-white">
+                                         <i class="fas fa-scissors text-[10px] md:text-xs"></i>
+                                     </div>
+                                     <span class="text-slate-200 text-[10px] md:text-xs font-bold group-hover:text-white transition">فواصل القص</span>
                                  </div>
-                                 <span class="text-slate-200 text-xs font-bold group-hover:text-white transition">فواصل القص</span>
-                             </div>
-                             <div class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="show-cut-lines" checked onchange="updateA4Count()" class="sr-only peer">
-                                <div class="w-9 h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#6366f1]"></div>
-                             </div>
-                         </label>
-                         
-                         <!-- Opacity Control for Cut Lines -->
-                         <div class="px-1 pt-2 pb-1">
-                             <div class="flex items-center gap-2">
-                                 <span class="text-[8px] text-slate-400 font-bold whitespace-nowrap">الشفافية:</span>
-                                 <input type="range" id="cut-lines-opacity" min="10" max="100" value="100" onchange="updateA4Count()" oninput="document.getElementById('opacity-value').innerText = this.value + '%'" class="flex-1 h-1.5 accent-[#6366f1] rounded-full" style="cursor: pointer;">
-                                 <span class="text-[8px] text-slate-400 font-bold w-5 text-right" id="opacity-value">100%</span>
+                                 <div class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="show-cut-lines" checked onchange="updateA4Count()" class="sr-only peer">
+                                    <div class="w-8 md:w-9 h-4 md:h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 md:after:h-4 after:w-3 md:after:w-4 after:transition-all peer-checked:bg-[#6366f1]"></div>
+                                 </div>
+                             </label>
+                             
+                             <!-- Opacity Control for Cut Lines -->
+                             <div class="px-1 pt-1 md:pt-2 pb-1">
+                                 <div class="flex items-center gap-2">
+                                     <span class="text-[7px] md:text-[8px] text-slate-400 font-bold whitespace-nowrap">الشفافية:</span>
+                                     <input type="range" id="cut-lines-opacity" min="10" max="100" value="100" onchange="updateA4Count()" oninput="document.getElementById('opacity-value').innerText = this.value + '%'" class="flex-1 h-1.5 accent-[#6366f1] rounded-full" style="cursor: pointer;">
+                                     <span class="text-[7px] md:text-[8px] text-slate-400 font-bold w-5 text-right" id="opacity-value">100%</span>
+                                 </div>
                              </div>
                          </div>
                      </div>
 
-                     <!-- ملاحظة -->
-                     <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                     <!-- ملاحظة - مخفية على الموبايل -->
+                     <div class="hidden md:block bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                          <p class="text-[10px] text-blue-200 leading-relaxed font-bold flex gap-2">
                              <i class="fas fa-info-circle mt-0.5"></i>
                              يتم ترتيب البطاقات تلقائياً لاستغلال مساحة الورقة بالكامل.
@@ -454,27 +457,28 @@
                  </div>
 
                  <!-- ذيل القائمة (الأزرار) -->
-                 <div class="p-6 pt-4 border-t border-slate-700/50 bg-slate-800 flex flex-col gap-3">
-                     <button onclick="printDesignDirect()" class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-[#6366f1]/25 border border-white/10 active:scale-[0.98] transition flex items-center justify-center gap-2 group">
+                 <div class="p-4 md:p-6 pt-3 md:pt-4 border-t border-slate-700/50 bg-slate-800 flex flex-col gap-2 md:gap-3">
+                     <!-- زر الطباعة الفورية - مخفي على الجوال -->
+                     <button onclick="printDesignDirect()" class="hidden md:flex w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-[#6366f1]/25 border border-white/10 active:scale-[0.98] transition items-center justify-center gap-2 group">
                         <i class="fas fa-print text-lg group-hover:animate-pulse"></i> <span>طباعة فورية</span>
                      </button>
                      
-                     <div class="grid grid-cols-2 gap-3">
-                         <button onclick="downloadImage()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/5 active:scale-[0.98]">
+                     <div class="grid grid-cols-2 gap-2 md:gap-3">
+                         <button onclick="downloadImage()" class="bg-slate-700 hover:bg-slate-600 text-white py-2.5 md:py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-[11px] md:text-xs border border-white/5 active:scale-[0.98]">
                             <i class="fas fa-image text-emerald-400"></i> صورة
                          </button>
-                         <button onclick="downloadPDF()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-white/5 active:scale-[0.98]">
+                         <button onclick="downloadPDF()" class="bg-slate-700 hover:bg-slate-600 text-white py-2.5 md:py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 text-[11px] md:text-xs border border-white/5 active:scale-[0.98]">
                             <i class="fas fa-file-pdf text-red-400"></i> PDF
                          </button>
                      </div>
 
-                     <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-xs font-bold py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-700 hover:border-slate-500">
+                     <button onclick="closeA4Modal()" class="w-full text-slate-400 hover:text-white text-[11px] md:text-xs font-bold py-2 md:py-2.5 transition text-center hover:bg-slate-700/50 rounded-xl border border-slate-700 hover:border-slate-500">
                          إغلاق النافذة
                      </button>
                      
                      <!-- زر Premium لغير المشتركين -->
                      <div id="premium-upgrade-btn">
-                         <a href="subscriptions.html" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-[#0f172a] px-4 py-3 rounded-xl border border-slate-700 hover:border-slate-500 transition-all shadow-md group">
+                         <a href="subscriptions.html" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-[#0f172a] px-4 py-2.5 md:py-3 rounded-xl border border-slate-700 hover:border-slate-500 transition-all shadow-md group">
                              <i class="fas fa-crown text-[#fbbf24] text-xs group-hover:scale-110 transition-transform"></i>
                              <span class="text-[10px] font-black tracking-[0.25em] bg-gradient-to-r from-[#fbbf24] via-[#fcd34d] to-[#fbbf24] bg-clip-text text-transparent">
                                  PREMIUM
