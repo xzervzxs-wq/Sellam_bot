@@ -424,10 +424,14 @@
             <!-- ====== قسم الزوار ====== -->
             <div id="section-visitors" class="section fade-in">
                 <!-- Visitor Summary Cards -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                     <div class="stat-card p-4 text-center">
-                        <p class="text-xs text-slate-500 mb-1">اليوم</p>
+                        <p class="text-xs text-slate-500 mb-1">زوار اليوم</p>
                         <p class="text-xl font-bold text-white" id="v-today">0</p>
+                    </div>
+                    <div class="stat-card p-4 text-center">
+                        <p class="text-xs text-slate-500 mb-1">دخلوا اليوم</p>
+                        <p class="text-xl font-bold text-green-400" id="v-logins-today">0</p>
                     </div>
                     <div class="stat-card p-4 text-center">
                         <p class="text-xs text-slate-500 mb-1">آخر 3 أيام</p>
@@ -635,9 +639,11 @@ const CORS_PROXIES = [
 ];
 const VISITOR_KEY = 'despro_visitors';
 const ACTIVITY_KEY = 'despro_activity';
+const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbxy-ZKyvF1Pq1JSiQdRZDJhKUQqT9kFixuFEAOiZRzDqqajfECIesOFrtOHti7p_psXiw/exec';
 
 let subscribers = [];
 let visitorData = {};
+let visitorRaw = [];
 let activityLog = [];
 
 // ============================================
@@ -722,7 +728,7 @@ async function initDashboard() {
     });
     
     // Load data
-    loadVisitorData();
+    await loadVisitorData();
     loadActivityLog();
     await loadSubscribers();
     
@@ -737,6 +743,7 @@ async function initDashboard() {
 async function refreshData() {
     const icon = document.getElementById('refresh-icon');
     icon.classList.add('fa-spin');
+    await loadVisitorData();
     await loadSubscribers();
     updateOverview();
     updateVisitorChart();
@@ -831,33 +838,42 @@ function getDaysLeft(expiryDate) {
 }
 
 // ============================================
-// Visitor Tracking
+// Visitor Tracking - Google Apps Script
 // ============================================
-function loadVisitorData() {
+async function loadVisitorData() {
     try {
-        visitorData = JSON.parse(localStorage.getItem(VISITOR_KEY) || '{}');
-    } catch (e) { visitorData = {}; }
+        const res = await fetch(TRACKING_URL);
+        visitorRaw = await res.json();
+        
+        // تحويل البيانات للصيغة القديمة
+        visitorData = {};
+        visitorRaw.forEach(row => {
+            const date = row.date;
+            if (!date) return;
+            if (!visitorData[date]) {
+                visitorData[date] = { count: 0, logins: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {}, codes: [] };
+            }
+            if (row.type === 'visit') {
+                visitorData[date].count++;
+            } else if (row.type === 'login') {
+                visitorData[date].logins++;
+                if (row.code) visitorData[date].codes.push(row.code);
+            }
+            
+            const device = row.device || 'desktop';
+            visitorData[date].devices[device] = (visitorData[date].devices[device] || 0) + 1;
+            
+            const hour = new Date(row.timestamp).getHours();
+            visitorData[date].hours[hour] = (visitorData[date].hours[hour] || 0) + 1;
+        });
+    } catch (e) { 
+        visitorData = {}; 
+        visitorRaw = [];
+    }
 }
 
 function recordVisit() {
-    loadVisitorData();
-    const today = new Date().toISOString().split('T')[0];
-    if (!visitorData[today]) {
-        visitorData[today] = { count: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {} };
-    }
-    visitorData[today].count++;
-    
-    // Device detection
-    const ua = navigator.userAgent;
-    if (/tablet|ipad/i.test(ua)) visitorData[today].devices.tablet++;
-    else if (/mobile|iphone|android/i.test(ua)) visitorData[today].devices.mobile++;
-    else visitorData[today].devices.desktop++;
-    
-    // Hour tracking
-    const hour = new Date().getHours();
-    visitorData[today].hours[hour] = (visitorData[today].hours[hour] || 0) + 1;
-    
-    localStorage.setItem(VISITOR_KEY, JSON.stringify(visitorData));
+    // التتبع يتم من app.js الحين
 }
 
 function getVisitorCount(days) {
@@ -1009,6 +1025,11 @@ function updateVisitorSection() {
     document.getElementById('v-3days').textContent = getVisitorCount(3);
     document.getElementById('v-7days').textContent = getVisitorCount(7);
     document.getElementById('v-30days').textContent = getVisitorCount(30);
+    
+    // Logins today
+    const today = new Date().toISOString().split('T')[0];
+    const loginsToday = visitorData[today]?.logins || 0;
+    document.getElementById('v-logins-today').textContent = loginsToday;
     
     let totalAll = 0;
     Object.values(visitorData).forEach(d => totalAll += d.count);
@@ -1314,15 +1335,7 @@ function exportAllData() {
 }
 
 function clearVisitorData() {
-    if (confirm('هل تريد مسح جميع بيانات الزوار؟ هذا الإجراء لا يمكن التراجع عنه.')) {
-        localStorage.removeItem(VISITOR_KEY);
-        visitorData = {};
-        updateOverview();
-        updateVisitorChart();
-        updateVisitorSection();
-        logActivity('حذف', 'تم مسح بيانات الزوار');
-        alert('تم مسح البيانات ✅');
-    }
+    alert('بيانات الزوار محفوظة في Google Sheet ولا يمكن حذفها من هنا.\\nافتح Google Sheet لحذف البيانات يدوياً.');
 }
 
 function downloadFile(content, filename, type) {
