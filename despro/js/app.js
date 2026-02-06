@@ -189,6 +189,33 @@
         let isSnappingEnabled = false;
         let currentZoom = 50; // متغير التحكم بـ zoom (الافتراضي 50%)
         window.currentZoom = currentZoom; // تصدير القيمة الأولية للعالم
+        // ============ تتبع الزوار - Google Apps Script ============
+        const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbxy-ZKyvF1Pq1JSiQdRZDJhKUQqT9kFixuFEAOiZRzDqqajfECIesOFrtOHti7p_psXiw/exec';
+        
+        function trackEvent(type, code = '') {
+            try {
+                const ua = navigator.userAgent;
+                let device = 'desktop';
+                if (/tablet|ipad/i.test(ua)) device = 'tablet';
+                else if (/mobile|iphone|android/i.test(ua)) device = 'mobile';
+                
+                fetch(TRACKING_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, code, device })
+                }).catch(() => {});
+            } catch(e) {}
+        }
+        
+        // تتبع الزيارة
+        (function() {
+            const sessionKey = 'despro_visited_' + new Date().toISOString().split('T')[0];
+            if (sessionStorage.getItem(sessionKey)) return;
+            sessionStorage.setItem(sessionKey, '1');
+            trackEvent('visit');
+        })();
+        // ==========================================
 
         // Crop variables
         let cropStartX = 0, cropStartY = 0;
@@ -5080,6 +5107,8 @@
                 // تعديل الـ tier إلى premium
                 setPremiumUser();
 
+                        // تتبع تسجيل الدخول
+                        trackEvent('login', code);
                 // تحديث العنوان
                 updateStudioName(userData.name);
 
