@@ -199,14 +199,25 @@
                 if (/tablet|ipad/i.test(ua)) device = 'tablet';
                 else if (/mobile|iphone|android/i.test(ua)) device = 'mobile';
                 
-                fetch(TRACKING_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type, code, device })
-                }).catch(() => {});
+                const img = new Image();
+                img.src = TRACKING_URL + '?action=track&type=' + encodeURIComponent(type) + '&code=' + encodeURIComponent(code) + '&device=' + encodeURIComponent(device) + '&t=' + Date.now();
             } catch(e) {}
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         // تتبع الزيارة
         (function() {
