@@ -242,6 +242,10 @@
                     <i class="fas fa-clock-rotate-left w-5 text-center text-purple-400"></i>
                     <span>سجل النشاط</span>
                 </button>
+                <button onclick="showSection('codes')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="codes">
+                    <i class="fas fa-key w-5 text-center text-cyan-400"></i>
+                    <span>توليد أكواد</span>
+                </button>
                 <button onclick="showSection('settings')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 text-sm" data-section="settings">
                     <i class="fas fa-gear w-5 text-center text-slate-400"></i>
                     <span>الإعدادات</span>
@@ -526,6 +530,60 @@
                 </div>
             </div>
 
+            <!-- ====== قسم توليد الأكواد ====== -->
+            <div id="section-codes" class="section fade-in">
+                <div class="chart-container p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-white"><i class="fas fa-key text-cyan-400 ml-2"></i>مولد الأكواد</h3>
+                        <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded-lg"><i class="fas fa-shield-halved ml-1"></i>محمي</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">توليد أكواد دخول عشوائية غير مستخدمة. الأكواد الموجودة عند المشتركين لن تظهر.</p>
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-slate-400">عدد الأكواد:</label>
+                            <select id="codes-count" class="bg-slate-800 text-slate-300 text-xs border border-slate-700 rounded-lg px-3 py-2 outline-none">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200" selected>200</option>
+                            </select>
+                        </div>
+                        <button onclick="generateCodes()" class="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-lg transition">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            توليد الأكواد
+                        </button>
+                        <button onclick="copyCodes()" id="copy-codes-btn" class="hidden flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded-lg transition">
+                            <i class="fas fa-copy"></i>
+                            نسخ الكل
+                        </button>
+                        <button onclick="exportCodes()" id="export-codes-btn" class="hidden flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/30 text-green-400 text-xs rounded-lg transition border border-green-600/20">
+                            <i class="fas fa-download"></i>
+                            تصدير
+                        </button>
+                    </div>
+                    <div id="codes-stats" class="hidden flex items-center gap-4 mb-4 p-3 bg-slate-800/50 rounded-xl">
+                        <div class="text-center">
+                            <p class="text-lg font-bold text-cyan-400" id="codes-generated">0</p>
+                            <p class="text-[10px] text-slate-500">تم توليده</p>
+                        </div>
+                        <div class="w-px h-8 bg-slate-700"></div>
+                        <div class="text-center">
+                            <p class="text-lg font-bold text-red-400" id="codes-used">0</p>
+                            <p class="text-[10px] text-slate-500">مستخدم</p>
+                        </div>
+                        <div class="w-px h-8 bg-slate-700"></div>
+                        <div class="text-center">
+                            <p class="text-lg font-bold text-green-400" id="codes-available">0</p>
+                            <p class="text-[10px] text-slate-500">متاح</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="codes-container" class="chart-container p-4 hidden">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2" id="codes-list"></div>
+                </div>
+            </div>
+
             <!-- ====== قسم الإعدادات ====== -->
             <div id="section-settings" class="section fade-in">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -658,6 +716,7 @@ function showSection(name) {
         visitors: 'الزوار',
         alerts: 'التنبيهات',
         activity: 'سجل النشاط',
+        codes: 'توليد أكواد',
         settings: 'الإعدادات'
     };
     document.getElementById('section-title').textContent = titles[name] || '';
@@ -1080,6 +1139,79 @@ function openGoogleSheet() {
     const editUrl = 'https://docs.google.com/spreadsheets/d/1oOlAlGpXMhsHBaM7DjnOYcHj4MYqp3jllEETm8EeCLQ/edit';
     window.open(editUrl, '_blank');
     logActivity('شيت', 'تم فتح Google Sheet للتعديل');
+}
+
+// ============================================
+// Code Generator
+// ============================================
+let generatedCodes = [];
+
+function generateCodes() {
+    const count = parseInt(document.getElementById('codes-count').value);
+    const usedCodes = new Set(subscribers.map(s => s.code.toLowerCase().trim()));
+    generatedCodes = [];
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    
+    let attempts = 0;
+    const maxAttempts = count * 10;
+    
+    while (generatedCodes.length < count && attempts < maxAttempts) {
+        let code = '';
+        for (let i = 0; i < 5; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        if (!usedCodes.has(code) && !generatedCodes.includes(code)) {
+            generatedCodes.push(code);
+        }
+        attempts++;
+    }
+    
+    // عرض الأكواد
+    const codesList = document.getElementById('codes-list');
+    codesList.innerHTML = generatedCodes.map(code => `
+        <div class="bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 text-center cursor-pointer hover:bg-slate-700/50 transition" onclick="copyCode('${code}')">
+            <code class="text-cyan-400 font-mono text-sm tracking-wider">${code}</code>
+        </div>
+    `).join('');
+    
+    // إظهار الإحصائيات
+    document.getElementById('codes-stats').classList.remove('hidden');
+    document.getElementById('codes-generated').textContent = generatedCodes.length;
+    document.getElementById('codes-used').textContent = usedCodes.size;
+    document.getElementById('codes-available').textContent = generatedCodes.length;
+    
+    // إظهار الأزرار والقائمة
+    document.getElementById('codes-container').classList.remove('hidden');
+    document.getElementById('copy-codes-btn').classList.remove('hidden');
+    document.getElementById('export-codes-btn').classList.remove('hidden');
+    
+    logActivity('أكواد', `تم توليد ${generatedCodes.length} كود جديد`);
+}
+
+function copyCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        showToast(`تم نسخ: ${code}`, 'success');
+    });
+}
+
+function copyCodes() {
+    const text = generatedCodes.join('\\n');
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(`تم نسخ ${generatedCodes.length} كود`, 'success');
+        logActivity('أكواد', `تم نسخ ${generatedCodes.length} كود`);
+    });
+}
+
+function exportCodes() {
+    const text = generatedCodes.join('\\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `codes_${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    logActivity('أكواد', `تم تصدير ${generatedCodes.length} كود`);
 }
 
 // ============================================
