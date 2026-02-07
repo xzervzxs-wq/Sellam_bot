@@ -1782,8 +1782,14 @@
         let eraserCanvas = null;
 
         window.onload = async () => {
-            await document.fonts.ready;
-            await inlineStyles();
+            // تأخير قصير ثم إخفاء شاشة البداية
+            setTimeout(() => {
+                document.getElementById('startup-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
+            }, 1500);
+            
+            try { await document.fonts.ready; } catch(e) {}
+            try { inlineStyles(); } catch(e) {} // بدون await
             resizeCardToFit();
             window.addEventListener('resize', resizeCardToFit);
             
@@ -1804,11 +1810,6 @@
             if (document.getElementById('mushaf-section').classList.contains('active')) {
                 initMushaf();
             }
-            
-            setTimeout(() => {
-                document.getElementById('startup-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('startup-overlay').remove(), 500);
-            }, 1000);
 
             try {
                 const res = await fetch('https://api.alquran.cloud/v1/surah');
