@@ -1470,7 +1470,7 @@
             }
         }
 
-        // --- SMART FALLBACK HANDLER ---
+        // --- ERROR HANDLER (No external fallback) ---
         function handleImageError(img, num, slideElement = null) {
             const padded = String(num).padStart(3, '0');
 
@@ -1481,21 +1481,13 @@
                  return;
             }
 
-            // Check what failed
-            if (img.src.includes(SVG_BASE_URL)) {
-                // It was the SVG source.
-                if (img.src.includes(padded + '.svg')) {
-                    // Try unpadded SVG
-                    img.src = `${SVG_BASE_URL}${num}.svg`;
-                } else {
-                    // Unpadded SVG failed too. Switch to PNG fallback.
-                    console.warn(`SVG failed for page ${num}, switching to PNG fallback.`);
-                    img.src = `https://surahquran.com/img/pages-quran/page${padded}.png`;
-                }
+            // Try unpadded SVG if padded failed
+            if (img.src.includes(padded + '.svg')) {
+                img.src = `${SVG_BASE_URL}${num}.svg`;
             } else {
-                // The PNG fallback failed too?
-                console.error("All image sources failed for page", num);
-                img.style.display = 'none'; // Hide broken image icon
+                // All attempts failed - show error
+                console.error("Failed to load page", num);
+                img.style.display = 'none';
                 const errDiv = document.createElement('div');
                 errDiv.className = 'absolute inset-0 flex items-center justify-center text-red-500 font-bold';
                 errDiv.innerText = 'خطأ في تحميل الصفحة';
