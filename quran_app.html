@@ -1244,7 +1244,7 @@
 
     <script>
         // ==================== MUSHAF VARIABLES - UPDATED FOR SVG ====================
-        const SVG_BASE_URL = './quran-svg-pages/';
+        const SVG_BASE_URL = 'https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/quran-svg-pages/';
         const TOTAL_PAGES = 604;
         let currentMushafPage = parseInt(localStorage.getItem('lastPage')) || 1;
         let mushafInitialized = false;
@@ -1789,7 +1789,7 @@
             
             // Load Quran Coordinates for Interactive Ayahs
             try {
-                const coordRes = await fetch('./ayat_map?v=' + Date.now());
+                const coordRes = await fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/ayat_map?v=' + Date.now());
                 if (coordRes.ok) {
                     quranCoordinates = await coordRes.json();
                     console.log("✅ Ayah coordinates loaded successfully - 585 pages");
