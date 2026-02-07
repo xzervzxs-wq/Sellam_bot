@@ -970,7 +970,7 @@
 
     <script>
         // Updated to RAW GitHub to handle spaces correctly
-        const SVG_BASE_URL = 'https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/quran/pages/';
+        const SVG_BASE_URL = 'https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/despro/quran/pages/';
         const TOTAL_PAGES = 604;
 
         let currentPage = parseInt(localStorage.getItem('lastPage')) || 1;
@@ -1030,7 +1030,7 @@
             // 1. Fetch Coordinates from External JSON
             // Added timestamp to prevent caching issues so updates appear instantly
             try {
-                const coordRes = await fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/quran/ayat_map?v=' + Date.now());
+                const coordRes = await fetch('https://raw.githubusercontent.com/xzervzxs-wq/Sellam_bot/main/despro/quran/ayat_map?v=' + Date.now());
                 if (coordRes.ok) {
                     quranCoordinates = await coordRes.json();
                     console.log("Coordinates loaded successfully");
