@@ -882,7 +882,7 @@ async function loadVisitorData() {
         visitorRaw.forEach(row => {
             // استخدام timestamp مباشرة (أدق من date)
             if (!row.timestamp) return;
-            const date = new Date(row.timestamp).toISOString().split('T')[0];
+            const date = getLocalDateKey(new Date(row.timestamp));
             
             if (!visitorData[date]) {
                 visitorData[date] = { count: 0, logins: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {}, codes: [] };
@@ -910,13 +910,18 @@ function recordVisit() {
     // التتبع يتم من app.js الحين
 }
 
+function getLocalDateKey(date) {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function getVisitorCount(days) {
     const now = new Date();
     let total = 0;
     for (let i = 0; i < days; i++) {
         const d = new Date(now);
         d.setDate(d.getDate() - i);
-        const key = d.toISOString().split('T')[0];
+        const key = getLocalDateKey(d);
         if (visitorData[key]) total += visitorData[key].count;
     }
     return total;
@@ -1061,7 +1066,7 @@ function updateVisitorSection() {
     document.getElementById('v-30days').textContent = getVisitorCount(30);
     
     // Logins today
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateKey(new Date());
     const loginsToday = visitorData[today]?.logins || 0;
     document.getElementById('v-logins-today').textContent = loginsToday;
     
