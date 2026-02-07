@@ -3193,5 +3193,20 @@
             if (mainHeight && mobileHeight) mobileHeight.value = mainHeight.value;
         });
     </script>
+    
+    <!-- تتبع الزوار - احتياطي -->
+    <script>
+    (function(){
+        try {
+            var key = 'despro_v_' + new Date().toISOString().split('T')[0];
+            if (sessionStorage.getItem(key)) return;
+            sessionStorage.setItem(key, '1');
+            var ua = navigator.userAgent;
+            var device = /mobile|iphone|android/i.test(ua) ? 'mobile' : (/tablet|ipad/i.test(ua) ? 'tablet' : 'desktop');
+            var img = new Image();
+            img.src = 'https://script.google.com/macros/s/AKfycbw9qEZ3FOkm33neW77s1dZfos4IZBb2EXoOUkOQSZHxTqThwSHQ9Ig8V8RMcxVE_ROH/exec?action=track&type=visit&code=&device=' + device + '&t=' + Date.now();
+        } catch(e) {}
+    })();
+    </script>
 </body>
 </html>
