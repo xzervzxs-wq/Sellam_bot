@@ -880,10 +880,9 @@ async function loadVisitorData() {
         // تحويل البيانات للصيغة القديمة
         visitorData = {};
         visitorRaw.forEach(row => {
-            // تحويل التاريخ لصيغة YYYY-MM-DD
-            let date = row.date || row.timestamp;
-            if (!date) return;
-            date = new Date(date).toISOString().split('T')[0];
+            // استخدام timestamp مباشرة (أدق من date)
+            if (!row.timestamp) return;
+            const date = new Date(row.timestamp).toISOString().split('T')[0];
             
             if (!visitorData[date]) {
                 visitorData[date] = { count: 0, logins: 0, devices: { mobile: 0, desktop: 0, tablet: 0 }, hours: {}, codes: [] };
