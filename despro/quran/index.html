@@ -1481,8 +1481,8 @@
             localStorage.setItem('lastPage', currentPage);
             checkBookmark();
             fetchPageData(num);
-            preloadPage(num + 1);
-            preloadPage(num - 1);
+            // Prefetch next 20 pages for offline reading
+            prefetchAhead(num, 20);
         }
 
         // --- NEW FUNCTION: Enable interactions on Inline SVG ---
@@ -1732,6 +1732,35 @@
             const padded = String(num).padStart(3, '0');
             const img = new Image();
             img.src = `${SVG_BASE_URL}${padded}.svg`;
+        }
+
+        // Prefetch multiple pages ahead for offline reading
+        function prefetchAhead(startPage, count) {
+            // Load pages gradually to not overwhelm the connection
+            let loaded = 0;
+            const loadNext = () => {
+                if (loaded >= count) return;
+                
+                const nextPage = startPage + loaded + 1;
+                const prevPage = startPage - loaded - 1;
+                
+                // Load forward
+                if (nextPage <= TOTAL_PAGES) {
+                    preloadPage(nextPage);
+                }
+                
+                // Also load one backward
+                if (prevPage >= 1 && loaded < 3) {
+                    preloadPage(prevPage);
+                }
+                
+                loaded++;
+                // Delay between loads to prevent network congestion
+                setTimeout(loadNext, 150);
+            };
+            
+            // Start prefetching after a short delay
+            setTimeout(loadNext, 500);
         }
 
         async function fetchPageData(num) {
