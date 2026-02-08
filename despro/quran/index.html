@@ -777,7 +777,7 @@
 
     </style>
 </head>
-<body class="designer-mode" onclick="handleGlobalClick(event)">
+<body onclick="handleGlobalClick(event)">
 
     <!-- ===== ONBOARDING TUTORIAL ===== -->
     <div id="onboarding-overlay">
@@ -865,9 +865,9 @@
     </div>
 
     <div id="startup-overlay" style="position:fixed; inset:0; background:#1a472a; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s;">
-        <i class="fas fa-kaaba text-[#c5a059] text-6xl mb-4 animate-pulse"></i>
-        <div class="text-white font-bold text-xl mt-4 font-serif">المصمم القرآني</div>
-        <div class="text-white/80 text-xs font-serif mt-1">النسخة الذكية</div>
+        <i class="fas fa-quran text-[#c5a059] text-6xl mb-4 animate-pulse"></i>
+        <div class="text-white font-bold text-xl mt-4 font-serif">المصحف الرقمي</div>
+        <div class="text-white/80 text-xs font-serif mt-1">القرآن الكريم</div>
 
         <!-- شريط التحميل (نفس نمط المودل) -->
         <div class="progress-container" style="width: 180px; margin-top: 25px; background: rgba(0,0,0,0.3);">
@@ -897,7 +897,7 @@
     </div>
 
     <!-- ===== MODE 1: READER (SVG) ===== -->
-    <div id="reader-view" class="view-section">
+    <div id="reader-view" class="view-section active">
 
         <!-- Top Bar -->
         <div class="top-search-bar">
@@ -1024,7 +1024,7 @@
     </div>
 
     <!-- ===== MODE 2: DESIGNER ===== -->
-    <div id="designer-view" class="view-section active">
+    <div id="designer-view" class="view-section">
         <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
             <!-- Sidebar -->
             <div class="lg:col-span-4 glass-panel p-5 rounded-3xl flex flex-col gap-5 h-fit relative z-50" onclick="event.stopPropagation()">
@@ -1121,7 +1121,7 @@
     <!-- Unified Bottom Nav (Fixed) -->
     <div class="tab-nav" id="bottom-nav">
         <!-- Reordered based on "Mshaf - Qibla - Designer" -->
-        <button class="tab-btn" id="btn-reader" onclick="switchMode('reader')">
+        <button class="tab-btn active" id="btn-reader" onclick="switchMode('reader')">
             <i class="fas fa-quran"></i>
             <span>المصحف</span>
         </button>
@@ -1130,7 +1130,7 @@
             <i class="fas fa-kaaba"></i>
             <span>القبلة</span>
         </button>
-        <button class="tab-btn active" id="btn-designer" onclick="switchMode('designer')">
+        <button class="tab-btn" id="btn-designer" onclick="switchMode('designer')">
             <i class="fas fa-palette"></i>
             <span>المصمم</span>
         </button>
