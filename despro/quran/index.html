@@ -634,9 +634,235 @@
             animation: fadeIn 1s infinite alternate;
         }
 
+        /* ===== ONBOARDING TUTORIAL ===== */
+        #onboarding-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        #onboarding-overlay.show { display: flex; opacity: 1; }
+
+        .onboarding-container {
+            width: 100%; max-width: 400px;
+            text-align: center;
+            color: white;
+        }
+
+        .onboarding-slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            animation: slideIn 0.5s ease;
+        }
+        .onboarding-slide.active { display: flex; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .onboarding-icon {
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, var(--green-deep), #2d6a4f);
+            border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 45px;
+            color: var(--gold-primary);
+            box-shadow: 0 15px 40px rgba(197, 160, 89, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .onboarding-title {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Cairo', sans-serif;
+            color: var(--gold-primary);
+            margin: 0;
+        }
+
+        .onboarding-desc {
+            font-size: 15px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.8;
+            padding: 0 10px;
+        }
+
+        .onboarding-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(197, 160, 89, 0.15);
+            border: 1px dashed rgba(197, 160, 89, 0.4);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: var(--gold-primary);
+            margin-top: 10px;
+        }
+
+        .onboarding-dots {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        .onboarding-dot {
+            width: 10px; height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .onboarding-dot.active {
+            background: var(--gold-primary);
+            transform: scale(1.3);
+        }
+
+        .onboarding-btns {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .onboarding-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+            border: none;
+        }
+
+        .onboarding-btn.primary {
+            background: linear-gradient(135deg, var(--gold-primary), #d4af61);
+            color: var(--green-deep);
+            box-shadow: 0 8px 25px rgba(197, 160, 89, 0.4);
+        }
+        .onboarding-btn.primary:active { transform: scale(0.95); }
+
+        .onboarding-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .onboarding-btn.secondary:active { background: rgba(255,255,255,0.15); }
+
+        .onboarding-skip {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .onboarding-skip:hover { color: white; }
+
     </style>
 </head>
 <body class="designer-mode" onclick="handleGlobalClick(event)">
+
+    <!-- ===== ONBOARDING TUTORIAL ===== -->
+    <div id="onboarding-overlay">
+        <span class="onboarding-skip" onclick="skipOnboarding()">تخطي ←</span>
+        <div class="onboarding-container">
+
+            <!-- Slide 1: Welcome -->
+            <div class="onboarding-slide active" data-slide="0">
+                <div class="onboarding-icon"><i class="fas fa-kaaba"></i></div>
+                <h2 class="onboarding-title">أهلاً بك في المصحف الرقمي</h2>
+                <p class="onboarding-desc">تطبيق شامل للقرآن الكريم مع التفسير والاستماع وتصميم البطاقات واتجاه القبلة</p>
+            </div>
+
+            <!-- Slide 2: Bottom Navigation -->
+            <div class="onboarding-slide" data-slide="1">
+                <div class="onboarding-icon"><i class="fas fa-hand-pointer"></i></div>
+                <h2 class="onboarding-title">الأقسام الرئيسية</h2>
+                <p class="onboarding-desc">في الشريط السفلي ثلاثة أزرار:</p>
+                <div class="onboarding-hint">
+                    <i class="fas fa-quran"></i> المصحف
+                    <span style="opacity:0.3">|</span>
+                    <i class="fas fa-kaaba"></i> القبلة
+                    <span style="opacity:0.3">|</span>
+                    <i class="fas fa-palette"></i> المصمم
+                </div>
+            </div>
+
+            <!-- Slide 3: Quran Reader -->
+            <div class="onboarding-slide" data-slide="2">
+                <div class="onboarding-icon"><i class="fas fa-quran"></i></div>
+                <h2 class="onboarding-title">قراءة المصحف</h2>
+                <p class="onboarding-desc">اسحب يميناً أو يساراً للتنقل بين الصفحات<br><br><strong>اضغط على أي آية</strong> لفتح التفسير أو الاستماع للقارئ</p>
+                <div class="onboarding-hint">
+                    <i class="fas fa-hand-point-up"></i> اضغط مطولاً = تفسير وصوت
+                </div>
+            </div>
+
+            <!-- Slide 4: Top Tools -->
+            <div class="onboarding-slide" data-slide="3">
+                <div class="onboarding-icon"><i class="fas fa-tools"></i></div>
+                <h2 class="onboarding-title">أدوات المصحف</h2>
+                <p class="onboarding-desc">في الشريط العلوي:</p>
+                <div class="onboarding-hint" style="flex-wrap: wrap; justify-content: center;">
+                    <span><i class="fas fa-search"></i> بحث</span>
+                    <span style="opacity:0.3">|</span>
+                    <span><i class="fas fa-bookmark"></i> علامة</span>
+                    <span style="opacity:0.3">|</span>
+                    <span><i class="fas fa-moon"></i> ليلي</span>
+                </div>
+            </div>
+
+            <!-- Slide 5: Designer -->
+            <div class="onboarding-slide" data-slide="4">
+                <div class="onboarding-icon"><i class="fas fa-palette"></i></div>
+                <h2 class="onboarding-title">المصمم القرآني</h2>
+                <p class="onboarding-desc">صمم بطاقات قرآنية احترافية!<br>اختر الآية، أضف خلفية وإطارات، ثم احفظ التصميم</p>
+                <div class="onboarding-hint">
+                    <i class="fas fa-magic"></i> بطاقات جاهزة للنشر
+                </div>
+            </div>
+
+            <!-- Slide 6: Done -->
+            <div class="onboarding-slide" data-slide="5">
+                <div class="onboarding-icon" style="background: linear-gradient(135deg, #c5a059, #d4af61);"><i class="fas fa-check" style="color: var(--green-deep);"></i></div>
+                <h2 class="onboarding-title">أنت جاهز!</h2>
+                <p class="onboarding-desc">استمتع بتلاوة القرآن الكريم<br>نسأل الله أن ينفعك به</p>
+            </div>
+
+            <!-- Dots -->
+            <div class="onboarding-dots">
+                <span class="onboarding-dot active" onclick="goToSlide(0)"></span>
+                <span class="onboarding-dot" onclick="goToSlide(1)"></span>
+                <span class="onboarding-dot" onclick="goToSlide(2)"></span>
+                <span class="onboarding-dot" onclick="goToSlide(3)"></span>
+                <span class="onboarding-dot" onclick="goToSlide(4)"></span>
+                <span class="onboarding-dot" onclick="goToSlide(5)"></span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="onboarding-btns">
+                <button class="onboarding-btn secondary" id="onboarding-prev" onclick="prevSlide()" style="display:none;">السابق</button>
+                <button class="onboarding-btn primary" id="onboarding-next" onclick="nextSlide()">التالي</button>
+            </div>
+        </div>
+    </div>
 
     <div id="startup-overlay" style="position:fixed; inset:0; background:#1a472a; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s;">
         <i class="fas fa-kaaba text-[#c5a059] text-6xl mb-4 animate-pulse"></i>
@@ -2105,6 +2331,77 @@
         async function exportCard() { deselect(); const card = document.getElementById('card'); const overlay = document.getElementById('export-overlay'); const modal = document.getElementById('save-modal'); const imgPreview = document.getElementById('save-img'); overlay.style.display = 'flex'; updateProgress(10, "جاري تحضير العناصر..."); const oldT = card.style.transform; try { card.style.transform = 'scale(1)'; document.querySelectorAll('.handle, .control-btn').forEach(e => e.style.display = 'none'); await document.fonts.ready; updateProgress(30, "جاري معالجة الصور..."); const imgs = card.querySelectorAll('img'); await Promise.all(Array.from(imgs).map(img => { if (img.complete) return Promise.resolve(); return new Promise(r => { img.onload = r; img.onerror = r; }); })); updateProgress(50, "جاري المعالجة الأولية..."); void card.offsetHeight; await new Promise(r => setTimeout(r, 500)); updateProgress(90, "إنشاء الصورة النهائية..."); await htmlToImage.toPng(card, { quality: 0.1 }); let url = await htmlToImage.toPng(card, { quality: 1.0, pixelRatio: 3, backgroundColor: '#ffffff', width: card.offsetWidth, height: card.offsetHeight, cacheBust: true, style: { transform: 'none', margin: 0 } }); imgPreview.src = url; await new Promise(r => { if(imgPreview.complete) { r(); } else { imgPreview.onload = r; imgPreview.onerror = r; } }); const hasContent = await checkIfImageLoaded(imgPreview); if (!hasContent) { await new Promise(r => setTimeout(r, 1500)); url = await htmlToImage.toPng(card, { quality: 1.0, pixelRatio: 3, backgroundColor: '#ffffff', width: card.offsetWidth, height: card.offsetHeight, cacheBust: true, style: { transform: 'none', margin: 0 } }); imgPreview.src = url; await new Promise(r => { if(imgPreview.complete) { r(); } else { imgPreview.onload = r; imgPreview.onerror = r; } }); } updateProgress(100, "تم!"); setTimeout(() => { overlay.style.display = 'none'; modal.style.display = 'flex'; }, 300); } catch(e) { console.error(e); alert('حدث خطأ بسيط في التصدير. حاول مرة أخرى.'); overlay.style.display = 'none'; } finally { card.style.transform = oldT; } }
         function downloadImage() { const link = document.createElement('a'); link.download = `quran-design-${Date.now()}.png`; link.href = document.getElementById('save-img').src; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
         function toggleEraserMode() {} function updateEraserSize() {} function toggleMagicMode() {} function updateMagicTolerance() {} function exitEraserMode() {}
+
+        // ===== ONBOARDING TUTORIAL SYSTEM =====
+        let currentSlide = 0;
+        const totalSlides = 6;
+
+        function showOnboarding() {
+            // Check if user has seen onboarding before
+            if (localStorage.getItem('onboardingComplete')) return;
+            
+            const overlay = document.getElementById('onboarding-overlay');
+            overlay.classList.add('show');
+        }
+
+        function hideOnboarding() {
+            const overlay = document.getElementById('onboarding-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                overlay.style.opacity = '';
+            }, 400);
+            localStorage.setItem('onboardingComplete', 'true');
+        }
+
+        function skipOnboarding() {
+            hideOnboarding();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlides();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            } else {
+                hideOnboarding();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        function updateSlides() {
+            // Update slides visibility
+            document.querySelectorAll('.onboarding-slide').forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+            });
+
+            // Update dots
+            document.querySelectorAll('.onboarding-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+
+            // Update buttons
+            const prevBtn = document.getElementById('onboarding-prev');
+            const nextBtn = document.getElementById('onboarding-next');
+
+            prevBtn.style.display = currentSlide > 0 ? 'block' : 'none';
+            nextBtn.textContent = currentSlide === totalSlides - 1 ? 'ابدأ الآن' : 'التالي';
+        }
+
+        // Show onboarding after startup animation
+        setTimeout(() => {
+            showOnboarding();
+        }, 1500);
 
         // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
