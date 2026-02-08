@@ -634,49 +634,209 @@
             animation: fadeIn 1s infinite alternate;
         }
 
-        /* ===== ONBOARDING TUTORIAL ===== */
-        #onboarding-overlay {
-            position: fixed; inset: 0;
+        /* ===== GUIDED TOUR SYSTEM ===== */
+        #tour-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999998;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #tour-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #tour-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999997;
+        }
+
+        #tour-spotlight {
+            position: absolute;
+            border-radius: 12px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85);
+            z-index: 999998;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        #tour-spotlight.pulse {
+            animation: spotlightPulse 2s infinite;
+        }
+
+        @keyframes spotlightPulse {
+            0%, 100% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85), 0 0 0 0 rgba(197, 160, 89, 0.4); }
+            50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85), 0 0 0 8px rgba(197, 160, 89, 0.6); }
+        }
+
+        #tour-tooltip {
+            position: absolute;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 2px solid var(--gold-primary);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 320px;
+            min-width: 280px;
+            z-index: 999999;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: tooltipAppear 0.4s ease;
+        }
+
+        @keyframes tooltipAppear {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        #tour-tooltip::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 2px solid var(--gold-primary);
+            border-right: none;
+            border-bottom: none;
+            transform: rotate(45deg);
+        }
+
+        #tour-tooltip.arrow-top::before { top: -10px; left: 50%; margin-left: -8px; transform: rotate(45deg); }
+        #tour-tooltip.arrow-bottom::before { bottom: -10px; left: 50%; margin-left: -8px; transform: rotate(-135deg); }
+        #tour-tooltip.arrow-left::before { left: -10px; top: 50%; margin-top: -8px; transform: rotate(-45deg); }
+        #tour-tooltip.arrow-right::before { right: -10px; top: 50%; margin-top: -8px; transform: rotate(135deg); }
+
+        .tour-step-badge {
+            display: inline-block;
+            background: var(--gold-primary);
+            color: #1a1a1a;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .tour-title {
+            color: var(--gold-primary);
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .tour-desc {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0 0 15px 0;
+        }
+
+        .tour-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(197, 160, 89, 0.15);
+            border: 1px dashed rgba(197, 160, 89, 0.4);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+        }
+
+        .tour-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tour-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Cairo', sans-serif;
+            border: none;
+        }
+
+        .tour-btn.primary {
+            background: linear-gradient(135deg, var(--gold-primary), #d4af61);
+            color: #1a1a1a;
+        }
+
+        .tour-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tour-btn:active { transform: scale(0.95); }
+
+        .tour-skip {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            cursor: pointer;
+            z-index: 1000000;
+            transition: 0.3s;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        .tour-skip:hover { color: white; background: rgba(0,0,0,0.7); }
+
+        .tour-progress {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 15px;
+        }
+
+        .tour-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .tour-dot.active {
+            background: var(--gold-primary);
+            transform: scale(1.3);
+        }
+
+        /* Welcome screen for tour */
+        #tour-welcome {
+            position: fixed;
+            inset: 0;
             background: rgba(0, 0, 0, 0.95);
             z-index: 999999;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        #onboarding-overlay.show { display: flex; opacity: 1; }
-
-        .onboarding-container {
-            width: 100%; max-width: 400px;
+            padding: 30px;
             text-align: center;
-            color: white;
         }
+        #tour-welcome.show { display: flex; }
 
-        .onboarding-slide {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            animation: slideIn 0.5s ease;
-        }
-        .onboarding-slide.active { display: flex; }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .onboarding-icon {
-            width: 100px; height: 100px;
+        .welcome-icon {
+            width: 100px;
+            height: 100px;
             background: linear-gradient(135deg, var(--green-deep), #2d6a4f);
             border-radius: 30px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 45px;
             color: var(--gold-primary);
-            box-shadow: 0 15px 40px rgba(197, 160, 89, 0.3);
+            margin-bottom: 20px;
             animation: float 3s ease-in-out infinite;
         }
 
@@ -685,183 +845,25 @@
             50% { transform: translateY(-10px); }
         }
 
-        .onboarding-title {
-            font-size: 24px;
-            font-weight: bold;
-            font-family: 'Cairo', sans-serif;
-            color: var(--gold-primary);
-            margin: 0;
-        }
-
-        .onboarding-desc {
-            font-size: 15px;
-            color: rgba(255,255,255,0.85);
-            line-height: 1.8;
-            padding: 0 10px;
-        }
-
-        .onboarding-hint {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(197, 160, 89, 0.15);
-            border: 1px dashed rgba(197, 160, 89, 0.4);
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 13px;
-            color: var(--gold-primary);
-            margin-top: 10px;
-        }
-
-        .onboarding-dots {
-            display: flex;
-            gap: 10px;
-            margin: 30px 0;
-        }
-
-        .onboarding-dot {
-            width: 10px; height: 10px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .onboarding-dot.active {
-            background: var(--gold-primary);
-            transform: scale(1.3);
-        }
-
-        .onboarding-btns {
-            display: flex;
-            gap: 12px;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .onboarding-btn {
-            flex: 1;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Cairo', sans-serif;
-            border: none;
-        }
-
-        .onboarding-btn.primary {
-            background: linear-gradient(135deg, var(--gold-primary), #d4af61);
-            color: var(--green-deep);
-            box-shadow: 0 8px 25px rgba(197, 160, 89, 0.4);
-        }
-        .onboarding-btn.primary:active { transform: scale(0.95); }
-
-        .onboarding-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .onboarding-btn.secondary:active { background: rgba(255,255,255,0.15); }
-
-        .onboarding-skip {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .onboarding-skip:hover { color: white; }
-
     </style>
 </head>
 <body onclick="handleGlobalClick(event)">
 
-    <!-- ===== ONBOARDING TUTORIAL ===== -->
-    <div id="onboarding-overlay">
-        <span class="onboarding-skip" onclick="skipOnboarding()">تخطي ←</span>
-        <div class="onboarding-container">
+    <!-- ===== GUIDED TOUR SYSTEM ===== -->
+    <!-- Welcome Screen -->
+    <div id="tour-welcome">
+        <div class="welcome-icon"><i class="fas fa-kaaba"></i></div>
+        <h2 style="color: var(--gold-primary); font-size: 26px; font-weight: bold; margin: 0 0 10px 0;">أهلاً بك في المصحف الرقمي</h2>
+        <p style="color: rgba(255,255,255,0.85); font-size: 15px; line-height: 1.8; max-width: 350px; margin-bottom: 30px;">تطبيق شامل للقرآن الكريم مع التفسير والاستماع وتصميم البطاقات</p>
+        <button onclick="startGuidedTour()" class="tour-btn primary" style="padding: 14px 50px; font-size: 16px;">ابدأ الجولة التعليمية</button>
+        <button onclick="skipTour()" style="background: none; border: none; color: rgba(255,255,255,0.5); margin-top: 15px; cursor: pointer; font-size: 13px;">تخطي ←</button>
+    </div>
 
-            <!-- Slide 1: Welcome -->
-            <div class="onboarding-slide active" data-slide="0">
-                <div class="onboarding-icon"><i class="fas fa-kaaba"></i></div>
-                <h2 class="onboarding-title">أهلاً بك في المصحف الرقمي</h2>
-                <p class="onboarding-desc">تطبيق شامل للقرآن الكريم مع التفسير والاستماع وتصميم البطاقات واتجاه القبلة</p>
-            </div>
-
-            <!-- Slide 2: Bottom Navigation -->
-            <div class="onboarding-slide" data-slide="1">
-                <div class="onboarding-icon"><i class="fas fa-hand-point-down"></i></div>
-                <h2 class="onboarding-title">الأقسام الرئيسية</h2>
-                <p class="onboarding-desc">في الشريط السفلي ثلاثة أزرار:</p>
-                <div class="onboarding-hint">
-                    <i class="fas fa-quran"></i> المصحف
-                    <span style="opacity:0.3">|</span>
-                    <i class="fas fa-kaaba"></i> القبلة
-                    <span style="opacity:0.3">|</span>
-                    <i class="fas fa-palette"></i> المصمم
-                </div>
-            </div>
-
-            <!-- Slide 3: Quran Reader -->
-            <div class="onboarding-slide" data-slide="2">
-                <div class="onboarding-icon"><i class="fas fa-quran"></i></div>
-                <h2 class="onboarding-title">قراءة المصحف</h2>
-                <p class="onboarding-desc">اسحب يميناً أو يساراً للتنقل بين الصفحات<br><br><strong>اضغط على أي آية</strong> لفتح التفسير أو الاستماع للقارئ</p>
-                <div class="onboarding-hint">
-                    <i class="fas fa-hand-point-up"></i> اضغط مطولاً = تفسير وصوت
-                </div>
-            </div>
-
-            <!-- Slide 4: Top Tools -->
-            <div class="onboarding-slide" data-slide="3">
-                <div class="onboarding-icon"><i class="fas fa-tools"></i></div>
-                <h2 class="onboarding-title">أدوات المصحف</h2>
-                <p class="onboarding-desc">في الشريط العلوي:</p>
-                <div class="onboarding-hint" style="flex-wrap: wrap; justify-content: center;">
-                    <span><i class="fas fa-search"></i> بحث</span>
-                    <span style="opacity:0.3">|</span>
-                    <span><i class="fas fa-bookmark"></i> علامة</span>
-                    <span style="opacity:0.3">|</span>
-                    <span><i class="fas fa-moon"></i> ليلي</span>
-                </div>
-            </div>
-
-            <!-- Slide 5: Designer -->
-            <div class="onboarding-slide" data-slide="4">
-                <div class="onboarding-icon"><i class="fas fa-palette"></i></div>
-                <h2 class="onboarding-title">المصمم القرآني</h2>
-                <p class="onboarding-desc">صمم بطاقات قرآنية احترافية!<br>اختر الآية، أضف خلفية وإطارات، ثم احفظ التصميم</p>
-                <div class="onboarding-hint">
-                    <i class="fas fa-magic"></i> بطاقات جاهزة للنشر
-                </div>
-            </div>
-
-            <!-- Slide 6: Done -->
-            <div class="onboarding-slide" data-slide="5">
-                <div class="onboarding-icon" style="background: linear-gradient(135deg, #c5a059, #d4af61);"><i class="fas fa-check" style="color: var(--green-deep);"></i></div>
-                <h2 class="onboarding-title">أنت جاهز!</h2>
-                <p class="onboarding-desc">استمتع بتلاوة القرآن الكريم<br>نسأل الله أن ينفعك به</p>
-            </div>
-
-            <!-- Dots -->
-            <div class="onboarding-dots">
-                <span class="onboarding-dot active" onclick="goToSlide(0)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(1)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(2)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(3)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(4)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(5)"></span>
-            </div>
-
-            <!-- Buttons -->
-            <div class="onboarding-btns">
-                <button class="onboarding-btn secondary" id="onboarding-prev" onclick="prevSlide()" style="display:none;">السابق</button>
-                <button class="onboarding-btn primary" id="onboarding-next" onclick="nextSlide()">التالي</button>
-            </div>
-        </div>
+    <!-- Tour Overlay with Spotlight -->
+    <div id="tour-overlay">
+        <span class="tour-skip" onclick="skipTour()">تخطي ←</span>
+        <div id="tour-spotlight"></div>
+        <div id="tour-tooltip"></div>
     </div>
 
     <div id="startup-overlay" style="position:fixed; inset:0; background:#254f0b; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s;">
@@ -2362,75 +2364,186 @@
         function downloadImage() { const link = document.createElement('a'); link.download = `quran-design-${Date.now()}.png`; link.href = document.getElementById('save-img').src; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
         function toggleEraserMode() {} function updateEraserSize() {} function toggleMagicMode() {} function updateMagicTolerance() {} function exitEraserMode() {}
 
-        // ===== ONBOARDING TUTORIAL SYSTEM =====
-        let currentSlide = 0;
-        const totalSlides = 6;
+        // ===== GUIDED TOUR SYSTEM =====
+        let tourStep = 0;
+        const tourSteps = [
+            {
+                target: '#bottom-nav',
+                title: 'الأقسام الرئيسية',
+                desc: 'هنا ثلاثة أقسام: <b>المصحف</b> للقراءة، <b>القبلة</b> لتحديد الاتجاه، <b>المصمم</b> لتصميم بطاقات',
+                hint: '<i class="fas fa-hand-point-down"></i> اضغط على أي قسم للانتقال إليه',
+                position: 'top',
+                action: null
+            },
+            {
+                target: '.top-search-bar',
+                title: 'شريط الأدوات',
+                desc: 'يحتوي على: <b>البحث</b> في الآيات، <b>العلامة المرجعية</b>، والوضع <b>الليلي</b>',
+                hint: '<i class="fas fa-search"></i> ابحث عن أي آية بالكلمات',
+                position: 'bottom',
+                action: null
+            },
+            {
+                target: '#quran-slider-container',
+                title: 'صفحات المصحف',
+                desc: 'اسحب <b>يميناً أو يساراً</b> للتنقل بين الصفحات',
+                hint: '<i class="fas fa-hand-point-left"></i> جرّب السحب الآن!',
+                position: 'center',
+                action: null
+            },
+            {
+                target: '#quran-slider-container',
+                title: 'الضغط على الآية',
+                desc: '<b>اضغط على أي آية</b> لفتح خيارات التفسير والاستماع',
+                hint: '<i class="fas fa-hand-pointer"></i> جرّب الضغط على آية!',
+                position: 'center',
+                action: 'showAyahDemo'
+            },
+            {
+                target: '#ayah-options-modal',
+                title: 'نافذة التفسير والاستماع',
+                desc: 'هنا تظهر خيارات <b>التفسير</b> و<b>الاستماع</b> للقارئ المفضل',
+                hint: '<i class="fas fa-book-open"></i> اختر التفسير أو القارئ',
+                position: 'top',
+                action: null
+            },
+            {
+                target: '#quran-slider-container',
+                title: 'ملء الشاشة',
+                desc: 'اضغط <b>مرتين متتاليتين</b> على الصفحة للدخول في وضع ملء الشاشة',
+                hint: '<i class="fas fa-expand"></i> ضغطتين = ملء الشاشة',
+                position: 'center',
+                action: null
+            }
+        ];
 
-        function showOnboarding() {
-            // Check if user has seen onboarding before
-            if (localStorage.getItem('onboardingComplete')) return;
-            
-            const overlay = document.getElementById('onboarding-overlay');
-            overlay.classList.add('show');
+        function showTourWelcome() {
+            if (localStorage.getItem('tourComplete')) return;
+            document.getElementById('tour-welcome').classList.add('show');
         }
 
-        function hideOnboarding() {
-            const overlay = document.getElementById('onboarding-overlay');
-            overlay.style.opacity = '0';
+        function startGuidedTour() {
+            document.getElementById('tour-welcome').classList.remove('show');
+            // Make sure we're in reader mode
+            switchMode('reader');
             setTimeout(() => {
-                overlay.classList.remove('show');
-                overlay.style.opacity = '';
-            }, 400);
-            localStorage.setItem('onboardingComplete', 'true');
+                tourStep = 0;
+                showTourStep();
+            }, 500);
         }
 
-        function skipOnboarding() {
-            hideOnboarding();
+        function skipTour() {
+            document.getElementById('tour-welcome').classList.remove('show');
+            document.getElementById('tour-overlay').classList.remove('active');
+            document.getElementById('ayah-options-modal').style.display = 'none';
+            localStorage.setItem('tourComplete', 'true');
         }
 
-        function goToSlide(index) {
-            currentSlide = index;
-            updateSlides();
+        function showTourStep() {
+            const step = tourSteps[tourStep];
+            const overlay = document.getElementById('tour-overlay');
+            const spotlight = document.getElementById('tour-spotlight');
+            const tooltip = document.getElementById('tour-tooltip');
+
+            // Execute action if needed
+            if (step.action === 'showAyahDemo') {
+                // Show the ayah options modal as demo
+                const modal = document.getElementById('ayah-options-modal');
+                modal.style.display = 'flex';
+                document.getElementById('selected-ayah-text').innerText = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+                document.getElementById('selected-ayah-ref').innerText = 'الفاتحة - الآية 1';
+            }
+
+            overlay.classList.add('active');
+
+            // Get target element
+            const target = document.querySelector(step.target);
+            if (!target) {
+                nextTourStep();
+                return;
+            }
+
+            const rect = target.getBoundingClientRect();
+            const padding = 8;
+
+            // Position spotlight
+            spotlight.style.top = (rect.top - padding) + 'px';
+            spotlight.style.left = (rect.left - padding) + 'px';
+            spotlight.style.width = (rect.width + padding * 2) + 'px';
+            spotlight.style.height = (rect.height + padding * 2) + 'px';
+            spotlight.classList.add('pulse');
+
+            // Build tooltip content
+            const dotsHtml = tourSteps.map((_, i) => 
+                `<span class="tour-dot ${i === tourStep ? 'active' : ''}"></span>`
+            ).join('');
+
+            tooltip.innerHTML = `
+                <span class="tour-step-badge">الخطوة ${tourStep + 1} من ${tourSteps.length}</span>
+                <h3 class="tour-title">${step.title}</h3>
+                <p class="tour-desc">${step.desc}</p>
+                <div class="tour-hint">${step.hint}</div>
+                <div class="tour-buttons">
+                    ${tourStep > 0 ? '<button class="tour-btn secondary" onclick="prevTourStep()">السابق</button>' : ''}
+                    <button class="tour-btn primary" onclick="nextTourStep()">${tourStep === tourSteps.length - 1 ? 'إنهاء الجولة' : 'التالي'}</button>
+                </div>
+                <div class="tour-progress">${dotsHtml}</div>
+            `;
+
+            // Position tooltip
+            positionTooltip(tooltip, rect, step.position);
         }
 
-        function nextSlide() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateSlides();
+        function positionTooltip(tooltip, targetRect, position) {
+            tooltip.className = 'tour-tooltip'; // Reset classes
+            const margin = 15;
+
+            if (position === 'bottom') {
+                tooltip.style.top = (targetRect.bottom + margin) + 'px';
+                tooltip.style.left = Math.max(10, targetRect.left + targetRect.width/2 - 160) + 'px';
+                tooltip.classList.add('arrow-top');
+            } else if (position === 'top') {
+                tooltip.style.top = 'auto';
+                tooltip.style.bottom = (window.innerHeight - targetRect.top + margin) + 'px';
+                tooltip.style.left = Math.max(10, targetRect.left + targetRect.width/2 - 160) + 'px';
+                tooltip.classList.add('arrow-bottom');
             } else {
-                hideOnboarding();
+                // center
+                tooltip.style.top = '50%';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
             }
         }
 
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlides();
+        function nextTourStep() {
+            // Close ayah modal if open
+            document.getElementById('ayah-options-modal').style.display = 'none';
+            
+            if (tourStep < tourSteps.length - 1) {
+                tourStep++;
+                showTourStep();
+            } else {
+                endTour();
             }
         }
 
-        function updateSlides() {
-            // Update slides visibility
-            document.querySelectorAll('.onboarding-slide').forEach((slide, i) => {
-                slide.classList.toggle('active', i === currentSlide);
-            });
-
-            // Update dots
-            document.querySelectorAll('.onboarding-dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentSlide);
-            });
-
-            // Update buttons
-            const prevBtn = document.getElementById('onboarding-prev');
-            const nextBtn = document.getElementById('onboarding-next');
-
-            prevBtn.style.display = currentSlide > 0 ? 'block' : 'none';
-            nextBtn.textContent = currentSlide === totalSlides - 1 ? 'ابدأ الآن' : 'التالي';
+        function prevTourStep() {
+            document.getElementById('ayah-options-modal').style.display = 'none';
+            if (tourStep > 0) {
+                tourStep--;
+                showTourStep();
+            }
         }
 
-        // Show onboarding after startup animation
+        function endTour() {
+            document.getElementById('tour-overlay').classList.remove('active');
+            document.getElementById('ayah-options-modal').style.display = 'none';
+            localStorage.setItem('tourComplete', 'true');
+        }
+
+        // Show tour after startup animation
         setTimeout(() => {
-            showOnboarding();
+            showTourWelcome();
         }, 1500);
 
         // Register Service Worker for PWA
