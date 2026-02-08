@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#1a472a">
+    <meta name="theme-color" content="#254f0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="تطبيق المصحف الرقمي - القرآن الكريم كاملاً مع إمكانية التصفح والبحث والاستماع">
@@ -23,7 +23,7 @@
     <style>
         :root {
             --gold-primary: #c5a059;
-            --green-deep: #1a472a;
+            --green-deep: #254f0b;
             --paper-bg: #fffbf2;
             --dark-bg: #2b2b2b;
             --panel-light: #fffbf2;
@@ -78,7 +78,7 @@
             height: 0; /* مخفي افتراضياً */
 
             /* تدرج لوني أخضر ملكي (نفس ثيم التطبيق) مع تأثير ثلاثي الأبعاد */
-            background: linear-gradient(90deg, #0d2818 0%, #1a472a 40%, #1a472a 60%, #0d2818 100%);
+            background: linear-gradient(90deg, #0d2818 0%, #254f0b 40%, #254f0b 60%, #0d2818 100%);
 
             /* قص الشريط من الأسفل (ذيل السمكة) */
             clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
@@ -305,7 +305,7 @@
         .juz-circle.completed {
             background: #c5a059;
             border-color: #e6c888;
-            color: #1a472a;
+            color: #254f0b;
             box-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
         }
         .juz-circle.active {
@@ -473,7 +473,7 @@
         .controls-row.active { display: flex; animation: slideDown 0.2s ease-out; }
         .btn-tool { background: white; border: 1px solid #efe9d9; color: var(--green-deep); padding: 8px; border-radius: 12px; font-weight: bold; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-tool:active { transform: scale(0.95); background: #f0fdf4; }
-        .design-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: linear-gradient(135deg, #1a472a, #2d6a4f); color: white; font-weight: bold; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .design-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: linear-gradient(135deg, #254f0b, #2d6a4f); color: white; font-weight: bold; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         #eraser-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 200 !important; }
         .cursor-crosshair { cursor: crosshair !important; }
         .progress-container { width: 80%; max-width: 300px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin-top: 15px; overflow: hidden; }
@@ -557,7 +557,7 @@
         .qibla-compass-container {
             width: 280px; height: 280px;
             position: relative;
-            background: radial-gradient(circle at center, #1a472a 0%, #0f2e1b 100%);
+            background: radial-gradient(circle at center, #254f0b 0%, #0f2e1b 100%);
             border-radius: 50%;
             border: 8px solid #c5a059;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.5);
@@ -624,7 +624,7 @@
         .compass-center {
             position: absolute; width: 12px; height: 12px;
             background: #c5a059; border-radius: 50%;
-            border: 2px solid #1a472a; z-index: 10;
+            border: 2px solid #254f0b; z-index: 10;
         }
 
         /* Calibration Message */
@@ -950,7 +950,7 @@
         <!-- Verse List Sheet -->
         <div id="verse-list-sheet" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">
             <div class="sheet-header" style="justify-content: center; position: relative;">
-                <span class="font-bold text-[#1a472a]" id="sheet-title">اضغط على الآية للتفسير</span>
+                <span class="font-bold text-[#254f0b]" id="sheet-title">اضغط على الآية للتفسير</span>
                 <button onclick="closeVerseSheet()" class="text-red-500 font-bold px-3" style="position: absolute; left: 10px;">✕</button>
             </div>
 
@@ -1031,16 +1031,16 @@
             <div class="lg:col-span-4 glass-panel p-5 rounded-3xl flex flex-col gap-5 h-fit relative z-50" onclick="event.stopPropagation()">
                 <div class="flex items-center justify-between border-b border-[#efe9d9] pb-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-[#1a472a] rounded-xl flex items-center justify-center text-[#c5a059] shadow-lg"><i class="fas fa-quran text-2xl"></i></div>
-                        <div><h1 class="font-bold text-[#1a472a] text-xl font-serif">المصمم القرآني</h1><p class="text-[11px] text-[#c5a059] font-bold">يهدي للتي هي أقوم</p></div>
+                        <div class="w-12 h-12 bg-[#254f0b] rounded-xl flex items-center justify-center text-[#c5a059] shadow-lg"><i class="fas fa-quran text-2xl"></i></div>
+                        <div><h1 class="font-bold text-[#254f0b] text-xl font-serif">المصمم القرآني</h1><p class="text-[11px] text-[#c5a059] font-bold">يهدي للتي هي أقوم</p></div>
                     </div>
                 </div>
                 <!-- Tools -->
                 <div class="bg-[#fdfbf7] p-4 rounded-2xl border border-[#efe9d9] space-y-3">
-                    <select id="surah-select" onchange="loadDesignerAyahs()" class="w-full p-2 bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#1a472a]"><option>اختر السورة...</option></select>
+                    <select id="surah-select" onchange="loadDesignerAyahs()" class="w-full p-2 bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#254f0b]"><option>اختر السورة...</option></select>
 
                     <div class="flex items-center justify-between mb-2">
-                        <label class="flex items-center gap-2 text-xs font-bold text-[#1a472a] cursor-pointer">
+                        <label class="flex items-center gap-2 text-xs font-bold text-[#254f0b] cursor-pointer">
                             <input type="checkbox" id="range-toggle" onchange="toggleDesignerRangeMode()" class="accent-[#c5a059]">
                             <span>آيات متعددة</span>
                         </label>
@@ -1048,17 +1048,17 @@
 
                     <div class="flex gap-2">
                          <!-- From Ayah -->
-                         <select id="ayah-select" class="flex-[3] p-2 bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#1a472a]"><option>الآية...</option></select>
+                         <select id="ayah-select" class="flex-[3] p-2 bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#254f0b]"><option>الآية...</option></select>
 
                          <!-- To Ayah (Hidden by default) -->
-                         <select id="ayah-select-end" class="flex-[3] p-2 bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#1a472a] hidden"><option>إلى...</option></select>
+                         <select id="ayah-select-end" class="flex-[3] p-2 bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#254f0b] hidden"><option>إلى...</option></select>
 
-                         <button onclick="addAyah()" class="bg-[#1a472a] text-white px-4 rounded text-xs">إضافة</button>
+                         <button onclick="addAyah()" class="bg-[#254f0b] text-white px-4 rounded text-xs">إضافة</button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-4 gap-2">
-                    <label class="btn-tool cursor-pointer col-span-2 flex-row justify-center gap-2 bg-[#1a472a] text-white"><i class="far fa-image text-white"></i> <span>خلفية</span><input type="file" onchange="addImageLayer(this)" class="hidden" accept="image/*"></label>
+                    <label class="btn-tool cursor-pointer col-span-2 flex-row justify-center gap-2 bg-[#254f0b] text-white"><i class="far fa-image text-white"></i> <span>خلفية</span><input type="file" onchange="addImageLayer(this)" class="hidden" accept="image/*"></label>
                     <label class="btn-tool cursor-pointer"><i class="fas fa-camera"></i> صورة<input type="file" onchange="addRegularImage(this)" class="hidden" accept="image/*"></label>
                     <button onclick="addExtraText()" class="btn-tool"><i class="fas fa-font"></i> نص</button>
                     <button onclick="addFrame()" class="btn-tool"><i class="far fa-square"></i> إطار</button>
@@ -1073,15 +1073,15 @@
                 </button>
 
                 <!-- Desktop Export -->
-                <button onclick="exportCard()" class="hidden md:flex bg-[#1a472a] text-white w-full py-4 rounded-xl shadow-lg font-bold text-lg hover:bg-[#143620] items-center justify-center gap-2 transition mt-auto">
+                <button onclick="exportCard()" class="hidden md:flex bg-[#254f0b] text-white w-full py-4 rounded-xl shadow-lg font-bold text-lg hover:bg-[#143620] items-center justify-center gap-2 transition mt-auto">
                     <i class="fas fa-file-export text-[#c5a059]"></i> حفظ التصميم النهائي
                 </button>
 
                 <!-- Menus -->
                 <div id="shape-menu-content" class="hidden bg-white p-3 rounded-xl border border-[#efe9d9] absolute top-full left-0 right-0 z-50 shadow-xl mt-2 flex gap-2 justify-center">
-                    <button onclick="addShape('square')" class="p-2 border rounded hover:bg-gray-50 text-xs font-bold flex flex-col items-center"><i class="fas fa-square text-[#1a472a]"></i> مربع</button>
-                    <button onclick="addShape('circle')" class="p-2 border rounded hover:bg-gray-50 text-xs font-bold flex flex-col items-center"><i class="fas fa-circle text-[#1a472a]"></i> دائرة</button>
-                    <button onclick="addShape('triangle')" class="p-2 border rounded hover:bg-gray-50 text-xs font-bold flex flex-col items-center"><i class="fas fa-play text-[#1a472a] -rotate-90"></i> مثلث</button>
+                    <button onclick="addShape('square')" class="p-2 border rounded hover:bg-gray-50 text-xs font-bold flex flex-col items-center"><i class="fas fa-square text-[#254f0b]"></i> مربع</button>
+                    <button onclick="addShape('circle')" class="p-2 border rounded hover:bg-gray-50 text-xs font-bold flex flex-col items-center"><i class="fas fa-circle text-[#254f0b]"></i> دائرة</button>
+                    <button onclick="addShape('triangle')" class="p-2 border rounded hover:bg-gray-50 text-xs font-bold flex flex-col items-center"><i class="fas fa-play text-[#254f0b] -rotate-90"></i> مثلث</button>
                 </div>
                 <div id="size-menu-content" class="hidden bg-white p-3 rounded-xl border border-[#efe9d9] absolute top-full left-0 right-0 z-50 shadow-xl mt-2">
                     <div class="grid grid-cols-3 gap-2">
@@ -1095,19 +1095,19 @@
             <div class="lg:col-span-8 flex flex-col gap-4">
                 <div class="glass-panel p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 sticky top-2 z-30" onclick="event.stopPropagation()">
                     <div class="flex items-center gap-2 bg-[#fdfbf7] p-1 rounded-xl border border-[#efe9d9]">
-                        <button onclick="undoAction()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-[#1a472a]"><i class="fas fa-undo"></i></button>
-                        <button onclick="redoAction()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-[#1a472a]"><i class="fas fa-redo"></i></button>
+                        <button onclick="undoAction()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-[#254f0b]"><i class="fas fa-undo"></i></button>
+                        <button onclick="redoAction()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-[#254f0b]"><i class="fas fa-redo"></i></button>
                     </div>
                     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                        <button id="btn-grad" onclick="toggleGradient()" class="px-3 py-2 rounded-lg text-xs font-bold bg-white border border-[#efe9d9] text-[#1a472a] flex items-center gap-2"><i class="fas fa-adjust text-[#c5a059]"></i> تدرج</button>
-                        <button onclick="toggleBg()" id="btn-bg" class="px-3 py-2 rounded-lg text-xs font-bold bg-white border border-[#efe9d9] text-[#1a472a]">شفافية</button>
-                        <button id="btn-eraser" onclick="toggleEraserMode()" class="px-3 py-2 rounded-lg text-xs font-bold bg-white border border-[#efe9d9] text-[#1a472a] flex items-center gap-2"><i class="fas fa-eraser text-[#c5a059]"></i> الممحاة</button>
+                        <button id="btn-grad" onclick="toggleGradient()" class="px-3 py-2 rounded-lg text-xs font-bold bg-white border border-[#efe9d9] text-[#254f0b] flex items-center gap-2"><i class="fas fa-adjust text-[#c5a059]"></i> تدرج</button>
+                        <button onclick="toggleBg()" id="btn-bg" class="px-3 py-2 rounded-lg text-xs font-bold bg-white border border-[#efe9d9] text-[#254f0b]">شفافية</button>
+                        <button id="btn-eraser" onclick="toggleEraserMode()" class="px-3 py-2 rounded-lg text-xs font-bold bg-white border border-[#efe9d9] text-[#254f0b] flex items-center gap-2"><i class="fas fa-eraser text-[#c5a059]"></i> الممحاة</button>
                     </div>
                     <!-- Controls -->
                     <div id="grad-controls" class="controls-row"><span class="text-[10px] font-bold">اللون:</span><button onclick="setGradientColor('black')" class="w-6 h-6 rounded bg-black border border-gray-300"></button><button onclick="setGradientColor('white')" class="w-6 h-6 rounded bg-white border border-gray-300"></button><input type="range" min="0" max="1" step="0.1" value="0.8" oninput="setGradientOpacity(this.value)" class="w-20 accent-[#c5a059]"></div>
-                    <div id="eraser-controls" class="controls-row"><span class="text-[10px] font-bold">حجم:</span><input type="range" min="5" max="100" value="30" oninput="updateEraserSize(this.value)" class="w-20 accent-[#1a472a]"><button id="btn-magic" onclick="toggleMagicMode()" class="px-2 py-1 rounded bg-white border border-[#efe9d9] text-[10px] font-bold flex items-center gap-1"><i class="fas fa-magic"></i> سحرية</button><div id="magic-tol-wrap" class="hidden items-center gap-1"><span class="text-[10px]">دقة:</span><input type="range" min="1" max="100" value="30" oninput="updateMagicTolerance(this.value)" class="w-16 accent-[#c5a059]"></div><button onclick="exitEraserMode()" class="bg-gray-200 px-3 py-1 rounded text-[10px] font-bold">إنهاء</button></div>
+                    <div id="eraser-controls" class="controls-row"><span class="text-[10px] font-bold">حجم:</span><input type="range" min="5" max="100" value="30" oninput="updateEraserSize(this.value)" class="w-20 accent-[#254f0b]"><button id="btn-magic" onclick="toggleMagicMode()" class="px-2 py-1 rounded bg-white border border-[#efe9d9] text-[10px] font-bold flex items-center gap-1"><i class="fas fa-magic"></i> سحرية</button><div id="magic-tol-wrap" class="hidden items-center gap-1"><span class="text-[10px]">دقة:</span><input type="range" min="1" max="100" value="30" oninput="updateMagicTolerance(this.value)" class="w-16 accent-[#c5a059]"></div><button onclick="exitEraserMode()" class="bg-gray-200 px-3 py-1 rounded text-[10px] font-bold">إنهاء</button></div>
                     <div id="frame-controls" class="controls-row"><div class="flex items-center gap-2"><span class="text-[10px] font-bold">لون الحد:</span><input type="color" id="border-color" oninput="updateStyle('borderColor', this.value)" class="w-6 h-6 rounded border border-gray-300 cursor-pointer p-0"></div><div class="flex items-center gap-1"><span class="text-[10px] font-bold">سمك:</span><input type="range" id="border-width" min="0" max="20" value="2" oninput="updateStyle('borderWidth', this.value + 'px')" class="w-16 accent-[#c5a059]"></div><div class="flex items-center gap-2"><span class="text-[10px] font-bold">تعبئة:</span><input type="color" id="bg-color" oninput="updateStyle('backgroundColor', this.value)" class="w-6 h-6 rounded border border-gray-300 cursor-pointer p-0"></div><button onclick="deleteActive()" class="bg-red-50 text-red-600 px-2 py-1 rounded text-[10px] font-bold border border-red-100 flex items-center gap-1 hover:bg-red-100"><i class="fas fa-trash-alt text-xs"></i></button></div>
-                    <div id="top-font-controls" class="controls-row justify-between"><div class="flex items-center gap-2 flex-1"><i class="fas fa-text-height text-[#c5a059]"></i><input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px')" class="w-full accent-[#1a472a]"></div><select id="top-font-family" onchange="updateStyle('fontFamily', this.value)" class="bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#1a472a] max-w-[100px]"><option value="'Amiri', serif">النسخ</option><option value="'Aref Ruqaa', serif">الرقعة</option><option value="'Cairo', sans-serif">كايرو</option></select></div>
+                    <div id="top-font-controls" class="controls-row justify-between"><div class="flex items-center gap-2 flex-1"><i class="fas fa-text-height text-[#c5a059]"></i><input type="range" id="top-font-size" min="10" max="150" value="35" oninput="updateStyle('fontSize', this.value + 'px')" class="w-full accent-[#254f0b]"></div><select id="top-font-family" onchange="updateStyle('fontFamily', this.value)" class="bg-white border border-[#efe9d9] rounded-lg text-xs font-bold py-1 px-2 outline-none text-[#254f0b] max-w-[100px]"><option value="'Amiri', serif">النسخ</option><option value="'Aref Ruqaa', serif">الرقعة</option><option value="'Cairo', sans-serif">كايرو</option></select></div>
                     <div id="quick-props" class="controls-row justify-center gap-4"><div class="flex items-center gap-2"><span class="text-[10px] font-bold">لون العنصر:</span><input type="color" id="quick-color" oninput="updateStyle('color', this.value)" class="w-8 h-8 rounded-full border-2 border-white shadow-sm overflow-hidden p-0 cursor-pointer"></div><button onclick="deleteActive()" class="bg-red-50 text-red-600 px-4 py-1 rounded-full text-xs font-bold border border-red-100 flex items-center gap-1 hover:bg-red-100"><i class="fas fa-trash-alt"></i> حذف</button></div>
                 </div>
                 <div class="preview-area shadow-inner bg-[#f4f4f4]" onclick="deselect(event)">
@@ -1190,7 +1190,7 @@
             </div>
 
             <p id="start-compass-btn" style="display:none;" class="text-center w-full">
-                <button onclick="requestCompassPermission()" class="bg-[#c5a059] text-[#1a472a] font-bold py-2 px-6 rounded-full text-sm hover:scale-105 transition">تفعيل البوصلة</button>
+                <button onclick="requestCompassPermission()" class="bg-[#c5a059] text-[#254f0b] font-bold py-2 px-6 rounded-full text-sm hover:scale-105 transition">تفعيل البوصلة</button>
             </p>
 
             <button onclick="stopQiblaTracking(); document.getElementById('qibla-modal').style.display='none'" class="mt-4 text-white/50 hover:text-white text-sm border-b border-transparent hover:border-white transition pb-1">إغلاق</button>
@@ -2323,12 +2323,12 @@
         function toggleGradient() { hasGradient = !hasGradient; document.getElementById('card-gradient').style.display = hasGradient ? 'block' : 'none'; document.getElementById('grad-controls').classList.toggle('active', hasGradient); document.getElementById('btn-grad').classList.toggle('border-[#c5a059]', hasGradient); saveState(); }
         function setGradientColor(c) { const end = c==='white' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.95)'; const start = c==='white' ? 'rgba(255,255,255,0)' : 'rgba(0,0,0,0)'; document.getElementById('card-gradient').style.background = `linear-gradient(to top, ${end}, ${start})`; saveState(); }
         function setGradientOpacity(v) { document.getElementById('card-gradient').style.opacity = v; saveState(); }
-        function toggleBg() { isTransparent = !isTransparent; document.getElementById('card').style.backgroundColor = isTransparent ? 'transparent' : 'white'; document.getElementById('btn-bg').classList.toggle('bg-[#1a472a]', isTransparent); document.getElementById('btn-bg').classList.toggle('text-white', isTransparent); saveState(); }
+        function toggleBg() { isTransparent = !isTransparent; document.getElementById('card').style.backgroundColor = isTransparent ? 'transparent' : 'white'; document.getElementById('btn-bg').classList.toggle('bg-[#254f0b]', isTransparent); document.getElementById('btn-bg').classList.toggle('text-white', isTransparent); saveState(); }
         function toggleShapeMenu() { document.getElementById('shape-menu-content').classList.toggle('hidden'); document.getElementById('size-menu-content').classList.add('hidden'); }
         function toggleSizeMenu() { document.getElementById('size-menu-content').classList.toggle('hidden'); document.getElementById('shape-menu-content').classList.add('hidden'); }
         function setCardSize(w, h, l) { const card = document.getElementById('card'); card.style.width = w+'px'; card.style.height = h+'px'; document.getElementById('size-label').innerText = l; document.getElementById('size-menu-content').classList.add('hidden'); resizeCardToFit(); saveState(); }
         function addExtraText() { addText(); }
-        function addFrame() { const w = createWrapper('frame-layer'); w.style.borderColor='#1a472a'; w.style.borderWidth='2px'; w.style.width='200px'; w.style.height='200px'; document.getElementById('card').appendChild(w); selectEl(w); setupInteract(w); saveState(); }
+        function addFrame() { const w = createWrapper('frame-layer'); w.style.borderColor='#254f0b'; w.style.borderWidth='2px'; w.style.width='200px'; w.style.height='200px'; document.getElementById('card').appendChild(w); selectEl(w); setupInteract(w); saveState(); }
         function addShape(type) { const w = createWrapper('frame-layer'); w.style.width='150px'; w.style.height='150px'; w.dataset.shape = type; if(type === 'square') { w.style.backgroundColor='#c5a059'; w.style.borderRadius='0'; } else if(type === 'circle') { w.style.backgroundColor='#c5a059'; w.style.borderRadius='50%'; } else if(type === 'triangle') { w.style.backgroundColor='transparent'; const content = w.querySelector('.content-wrapper'); content.style.backgroundColor = '#c5a059'; content.style.clipPath = 'polygon(50% 0%, 0% 100%, 100% 100%)'; content.style.width = '100%'; content.style.height = '100%'; } document.getElementById('card').appendChild(w); document.getElementById('shape-menu-content').classList.add('hidden'); selectEl(w); setupInteract(w); saveState(); }
         function updateProgress(percent, text) { const bar = document.getElementById('export-progress'); const pText = document.getElementById('progress-text'); const status = document.getElementById('export-status'); if(bar) bar.style.width = percent + '%'; if(pText) pText.innerText = percent + '%'; if(status) status.innerText = text; }
         async function checkIfImageLoaded(imgElement) {
