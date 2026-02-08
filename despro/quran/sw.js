@@ -1,10 +1,11 @@
-const CACHE_NAME = 'quran-app-v2';
+const CACHE_NAME = 'quran-app-v3';
 const PAGES_CACHE = 'quran-pages-v1';
 const urlsToCache = [
   '/quran/',
   '/quran/index.html',
   '/quran/manifest.json',
-  '/quran/ayat_map'
+  '/quran/ayat_map',
+  '/quran/quranlogo.png'
 ];
 
 // Install event - cache essential files
