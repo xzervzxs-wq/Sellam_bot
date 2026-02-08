@@ -786,17 +786,15 @@
 
             <!-- Slide 1: Welcome -->
             <div class="onboarding-slide active" data-slide="0">
-                <div class="onboarding-icon"><i class="fas fa-kaaba"></i></div>
-                <h2 class="onboarding-title">أهلاً بك في المصحف الرقمي</h2>
-                <p class="onboarding-desc">تطبيق شامل للقرآن الكريم مع التفسير والاستماع وتصميم البطاقات واتجاه القبلة</p>
+                <div class="onboarding-icon"><i class="fas fa-quran"></i></div>
+                <h2 class="onboarding-title">المصحف الرقمي</h2>
+                <p class="onboarding-desc">القرآن الكريم مع التفسير والاستماع</p>
             </div>
 
             <!-- Slide 2: Bottom Navigation -->
             <div class="onboarding-slide" data-slide="1">
-                <div class="onboarding-icon"><i class="fas fa-hand-point-down"></i></div>
-                <h2 class="onboarding-title">الأقسام الرئيسية</h2>
-                <p class="onboarding-desc">في الشريط السفلي ثلاثة أزرار:</p>
-                <div class="onboarding-hint">
+                <h2 class="onboarding-title" style="font-size: 18px;">الأقسام الرئيسية ⬇️</h2>
+                <div class="onboarding-hint" style="margin-top: 5px;">
                     <i class="fas fa-quran"></i> المصحف
                     <span style="opacity:0.3">|</span>
                     <i class="fas fa-kaaba"></i> القبلة
@@ -805,45 +803,34 @@
                 </div>
             </div>
 
-            <!-- Slide 3: Quran Reader -->
+            <!-- Slide 3: Press on Verse (IMPORTANT) -->
             <div class="onboarding-slide" data-slide="2">
-                <div class="onboarding-icon"><i class="fas fa-quran"></i></div>
-                <h2 class="onboarding-title">قراءة المصحف</h2>
-                <p class="onboarding-desc">اسحب يميناً أو يساراً للتنقل بين الصفحات<br><br><strong>اضغط على أي آية</strong> لفتح التفسير أو الاستماع للقارئ</p>
-                <div class="onboarding-hint">
-                    <i class="fas fa-hand-point-up"></i> اضغط مطولاً = تفسير وصوت
+                <h2 class="onboarding-title" style="font-size: 18px;">👆 اضغط على أي آية</h2>
+                <p class="onboarding-desc" style="font-size: 13px; margin-bottom: 8px;">ستظهر لك هذه النافذة:</p>
+                
+                <!-- Mini Demo Modal -->
+                <div style="background: white; border-radius: 14px; padding: 12px; width: 180px; box-shadow: 0 8px 25px rgba(0,0,0,0.25);">
+                    <div style="text-align: center; color: #888; font-size: 10px; margin-bottom: 8px;">الفاتحة - آية 1</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                        <div style="background: #f5f5f5; border-radius: 8px; padding: 10px 6px; text-align: center;">
+                            <i class="fas fa-book-open" style="color: var(--green-deep); font-size: 16px;"></i>
+                            <div style="font-size: 10px; color: #333; margin-top: 4px; font-weight: bold;">التفسير</div>
+                        </div>
+                        <div style="background: #f5f5f5; border-radius: 8px; padding: 10px 6px; text-align: center;">
+                            <i class="fas fa-volume-up" style="color: var(--green-deep); font-size: 16px;"></i>
+                            <div style="font-size: 10px; color: #333; margin-top: 4px; font-weight: bold;">استماع</div>
+                        </div>
+                    </div>
                 </div>
+                
+                <p class="onboarding-desc" style="font-size: 12px; margin-top: 10px; opacity: 0.8;">↔️ اسحب للتنقل بين الصفحات</p>
             </div>
 
-            <!-- Slide 4: Top Tools -->
+            <!-- Slide 4: Done -->
             <div class="onboarding-slide" data-slide="3">
-                <div class="onboarding-icon"><i class="fas fa-tools"></i></div>
-                <h2 class="onboarding-title">أدوات المصحف</h2>
-                <p class="onboarding-desc">في الشريط العلوي:</p>
-                <div class="onboarding-hint" style="flex-wrap: wrap; justify-content: center;">
-                    <span><i class="fas fa-search"></i> بحث</span>
-                    <span style="opacity:0.3">|</span>
-                    <span><i class="fas fa-bookmark"></i> علامة</span>
-                    <span style="opacity:0.3">|</span>
-                    <span><i class="fas fa-moon"></i> ليلي</span>
-                </div>
-            </div>
-
-            <!-- Slide 5: Designer -->
-            <div class="onboarding-slide" data-slide="4">
-                <div class="onboarding-icon"><i class="fas fa-palette"></i></div>
-                <h2 class="onboarding-title">المصمم القرآني</h2>
-                <p class="onboarding-desc">صمم بطاقات قرآنية احترافية!<br>اختر الآية، أضف خلفية وإطارات، ثم احفظ التصميم</p>
-                <div class="onboarding-hint">
-                    <i class="fas fa-magic"></i> بطاقات جاهزة للنشر
-                </div>
-            </div>
-
-            <!-- Slide 6: Done -->
-            <div class="onboarding-slide" data-slide="5">
                 <div class="onboarding-icon" style="background: linear-gradient(135deg, #c5a059, #d4af61);"><i class="fas fa-check" style="color: var(--green-deep);"></i></div>
                 <h2 class="onboarding-title">أنت جاهز!</h2>
-                <p class="onboarding-desc">استمتع بتلاوة القرآن الكريم<br>نسأل الله أن ينفعك به</p>
+                <p class="onboarding-desc">نسأل الله أن ينفعك به</p>
             </div>
 
             <!-- Dots -->
@@ -852,8 +839,6 @@
                 <span class="onboarding-dot" onclick="goToSlide(1)"></span>
                 <span class="onboarding-dot" onclick="goToSlide(2)"></span>
                 <span class="onboarding-dot" onclick="goToSlide(3)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(4)"></span>
-                <span class="onboarding-dot" onclick="goToSlide(5)"></span>
             </div>
 
             <!-- Buttons -->
@@ -2364,7 +2349,7 @@
 
         // ===== ONBOARDING TUTORIAL SYSTEM =====
         let currentSlide = 0;
-        const totalSlides = 6;
+        const totalSlides = 4;
 
         function showOnboarding() {
             // Check if user has seen onboarding before
