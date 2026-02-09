@@ -6,12 +6,15 @@ workflows:
       events:
         - push
     scripts:
+      - name: Install dependencies
+        script: |
+          npm install -g @bubblewrap/cli
       - name: Build AAB
         script: |
-          echo "Building Android App Bundle"
-          ./gradlew bundleRelease
+          cd /home/builder/work/Sellam_bot/Sellam_bot
+          bubblewrap build
     artifacts:
-      - app/build/outputs/**/*.aab
+      - app-release.aab
     publishing:
       email:
         recipients:
