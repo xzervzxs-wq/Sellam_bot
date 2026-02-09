@@ -1,0 +1,25 @@
+workflows:
+  android-aab:
+    name: Build Android AAB
+    max_build_duration: 120
+    environment:
+      android_home: $ANDROID_HOME
+      JAVA_HOME: $JAVA_HOME
+    triggering:
+      events:
+        - push
+      branch:
+        include_patterns:
+          - main
+    scripts:
+      - name: Build AAB
+        script: |
+          echo "Building Android App Bundle"
+          ./gradlew bundleRelease
+    artifacts:
+      - app/build/outputs/**/*.aab
+      - app/build/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - xzervzxs@gmail.com
