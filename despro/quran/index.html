@@ -1405,6 +1405,16 @@
             }
         }
 
+        // Fetch with timeout to prevent hanging forever
+        function fetchWithTimeout(url, timeout = 5000) {
+            return Promise.race([
+                fetch(url),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), timeout)
+                )
+            ]);
+        }
+
         async function loadPage(num, direction = 'none') {
             if(isNavigating) return;
             if(num < 1) num = 1; if(num > TOTAL_PAGES) num = TOTAL_PAGES;
@@ -1418,58 +1428,65 @@
             const slide = document.createElement('div');
             slide.className = 'quran-page-slide';
 
-            // --- UPDATED LOADING LOGIC FOR INTERACTIVE PAGES ---
-            if (quranCoordinates[paddedNum]) {
-                // If this page has coordinates, we fetch the SVG code and inject it INLINE
-                try {
-                    const response = await fetch(url);
-                    const svgText = await response.text();
-                    slide.innerHTML = svgText;
+            try {
+                // --- UPDATED LOADING LOGIC FOR INTERACTIVE PAGES ---
+                if (quranCoordinates[paddedNum]) {
+                    // If this page has coordinates, we fetch the SVG code and inject it INLINE
+                    try {
+                        const response = await fetchWithTimeout(url, 5000);
+                        const svgText = await response.text();
+                        slide.innerHTML = svgText;
 
-                    // Fix SVG attributes to be responsive
-                    const svgElement = slide.querySelector('svg');
-                    if (svgElement) {
-                        svgElement.setAttribute('width', '100%');
-                        svgElement.setAttribute('height', '100%');
-                        svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                        // Fix SVG attributes to be responsive
+                        const svgElement = slide.querySelector('svg');
+                        if (svgElement) {
+                            svgElement.setAttribute('width', '100%');
+                            svgElement.setAttribute('height', '100%');
+                            svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                        }
+
+                        // Apply interaction logic for this page
+                        enableInlineInteractions(paddedNum, slide);
+
+                    } catch (e) {
+                        // Fallback if fetch fails - use image tag instead
+                        slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${num}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${num})">`;
                     }
-
-                    // Apply interaction logic for this page
-                    enableInlineInteractions(paddedNum, slide);
-
-                } catch (e) {
-                    // Fallback if fetch fails
-                    handleImageError({style:{}}, num, slide);
+                } else {
+                    // Normal loading (Image tag) for pages without coordinates
+                    slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${num}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${num})">`;
                 }
-            } else {
-                // Normal loading (Image tag) for pages without coordinates
-                slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${num}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${num})">`;
+
+                if(direction === 'next') slide.style.transform = 'translateX(-100%)';
+                else if(direction === 'prev') slide.style.transform = 'translateX(100%)';
+                else slide.style.transform = 'translateX(0)';
+
+                container.appendChild(slide);
+                void slide.offsetWidth;
+
+                const oldSlide = container.firstElementChild;
+                if (direction !== 'none' && oldSlide && oldSlide !== slide) {
+                    slide.style.transform = 'translateX(0)';
+                    if (direction === 'next') oldSlide.style.transform = 'translateX(100%)';
+                    else oldSlide.style.transform = 'translateX(-100%)';
+                    setTimeout(() => { if(oldSlide) oldSlide.remove(); }, 200);
+                } else {
+                    if(oldSlide && oldSlide !== slide) oldSlide.remove();
+                }
+
+                currentPage = num;
+                localStorage.setItem('lastPage', currentPage);
+                checkBookmark();
+                fetchPageData(num);
+                // Prefetch next 20 pages for offline reading
+                prefetchAhead(num, 20);
+
+            } catch (e) {
+                console.error('Error loading page:', e);
+            } finally {
+                // Always unlock navigation - prevents freezing
+                setTimeout(() => { isNavigating = false; }, 250);
             }
-
-            if(direction === 'next') slide.style.transform = 'translateX(-100%)';
-            else if(direction === 'prev') slide.style.transform = 'translateX(100%)';
-            else slide.style.transform = 'translateX(0)';
-
-            container.appendChild(slide);
-            void slide.offsetWidth;
-
-            const oldSlide = container.firstElementChild;
-            if (direction !== 'none' && oldSlide && oldSlide !== slide) {
-                slide.style.transform = 'translateX(0)';
-                if (direction === 'next') oldSlide.style.transform = 'translateX(100%)';
-                else oldSlide.style.transform = 'translateX(-100%)';
-                setTimeout(() => { if(oldSlide) oldSlide.remove(); isNavigating = false; }, 200);
-            } else {
-                if(oldSlide && oldSlide !== slide) oldSlide.remove();
-                isNavigating = false;
-            }
-
-            currentPage = num;
-            localStorage.setItem('lastPage', currentPage);
-            checkBookmark();
-            fetchPageData(num);
-            // Prefetch next 20 pages for offline reading
-            prefetchAhead(num, 20);
         }
 
         // --- NEW FUNCTION: Enable interactions on Inline SVG ---
@@ -1714,40 +1731,55 @@
             }
         }
 
-        function preloadPage(num) {
+        // Preload and cache a page for offline use
+        async function preloadPage(num) {
             if(num < 1 || num > TOTAL_PAGES) return;
             const padded = String(num).padStart(3, '0');
-            const img = new Image();
-            img.src = `${SVG_BASE_URL}${padded}.svg`;
+            const url = `${SVG_BASE_URL}${padded}.svg`;
+            
+            try {
+                // Try to cache using Service Worker cache API
+                const cache = await caches.open('quran-pages-v1');
+                const cached = await cache.match(url);
+                if (cached) return; // Already cached, skip
+                
+                // Fetch and store in cache
+                const response = await fetchWithTimeout(url, 8000);
+                if (response && response.ok) {
+                    await cache.put(url, response.clone());
+                }
+            } catch(e) {
+                // Silent fail for preload - will try again later
+            }
         }
 
         // Prefetch multiple pages ahead for offline reading
         function prefetchAhead(startPage, count) {
             // Load pages gradually to not overwhelm the connection
             let loaded = 0;
-            const loadNext = () => {
+            const loadNext = async () => {
                 if (loaded >= count) return;
                 
                 const nextPage = startPage + loaded + 1;
                 const prevPage = startPage - loaded - 1;
                 
-                // Load forward
+                // Load forward (priority)
                 if (nextPage <= TOTAL_PAGES) {
-                    preloadPage(nextPage);
+                    await preloadPage(nextPage);
                 }
                 
-                // Also load one backward
+                // Also load one backward (first 3 only)
                 if (prevPage >= 1 && loaded < 3) {
-                    preloadPage(prevPage);
+                    preloadPage(prevPage); // Don't await backward
                 }
                 
                 loaded++;
                 // Delay between loads to prevent network congestion
-                setTimeout(loadNext, 150);
+                setTimeout(loadNext, 200);
             };
             
             // Start prefetching after a short delay
-            setTimeout(loadNext, 500);
+            setTimeout(loadNext, 300);
         }
 
         async function fetchPageData(num) {
