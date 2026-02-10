@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a3c2f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>مُعين الحُفاظ</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Kufi+Arabic:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            /* منع تحديد النص ليظهر كتطبيق */
+            user-select: none; 
+        }
+        .font-amiri { font-family: 'Amiri', serif; }
+        .font-kufi { font-family: 'Noto Kufi Arabic', sans-serif; }
+        
+        /* تخصيص السكرول بار */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1efe9; }
+        ::-webkit-scrollbar-thumb { background: #c5bda5; border-radius: 4px; }
+        
+        /* دعم الآيفون والأجهزة الحديثة */
+        .safe-padding-top {
+            padding-top: env(safe-area-inset-top);
+        }
+    </style>
+</head>
+<body class="bg-[#f8f5f0] text-[#2d2d2d] h-screen flex flex-col overflow-hidden">
+
+    <div id="root" class="h-full flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- أيقونات SVG مدمجة لتقليل حجم الملف وعدم الاعتماد على مكتبات خارجية ---
+        const Icons = {
+            Play: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>,
+            Pause: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>,
+            RefreshCw: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>,
+            BookOpen: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>,
+            Book: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
+            Volume2: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>,
+            Settings: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
+            Repeat: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
+        };
+
+        const MueenApp = () => {
+            // --- الحالة (State) ---
+            const [surahs, setSurahs] = useState([]);
+            const [selectedSurah, setSelectedSurah] = useState(null);
+            const [ayahsText, setAyahsText] = useState([]);
+            
+            // إعدادات الحفظ
+            const [startAyah, setStartAyah] = useState(1);
+            const [endAyah, setEndAyah] = useState(1);
+            const [repeatCount, setRepeatCount] = useState(3);
+            const [reciter, setReciter] = useState('Husary_128kbps');
+            
+            // حالة التشغيل
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [currentAyahNum, setCurrentAyahNum] = useState(1);
+            const [currentRepeat, setCurrentRepeat] = useState(1);
+            const [isLoading, setIsLoading] = useState(true);
+            const [error, setError] = useState(null);
+
+            const audioRef = useRef(null);
+
+            const reciters = [
+                { id: 'Husary_128kbps', name: 'محمود خليل الحصري' },
+                { id: 'Minshawy_Murattal_128kbps', name: 'محمد صديق المنشاوي' },
+                { id: 'Alafasy_128kbps', name: 'مشاري العفاسي' },
+                { id: 'Basfar_128kbps', name: 'عبدالله بصفر' },
+                { id: 'Abdul_Basit_Murattal_192kbps', name: 'عبدالباسط عبدالصمد' },
+                { id: 'Hudhaify_128kbps', name: 'علي الحذيفي' },
+            ];
+
+            // --- جلب البيانات ---
+            useEffect(() => {
+                fetch('https://api.alquran.cloud/v1/surah')
+                .then(res => res.json())
+                .then(data => {
+                    setSurahs(data.data);
+                    setSelectedSurah(data.data[0]); // الفاتحة
+                    setIsLoading(false);
+                })
+                .catch(err => {
+                    setError('تأكد من الاتصال بالإنترنت');
+                    setIsLoading(false);
+                });
+            }, []);
+
+            useEffect(() => {
+                if (!selectedSurah) return;
+                setStartAyah(1);
+                setEndAyah(selectedSurah.numberOfAyahs);
+                setCurrentAyahNum(1);
+                setIsPlaying(false);
+                setCurrentRepeat(1);
+
+                fetch(`https://api.alquran.cloud/v1/surah/${selectedSurah.number}`)
+                .then(res => res.json())
+                .then(data => {
+                    setAyahsText(data.data.ayahs);
+                })
+                .catch(err => console.error("Error fetching ayahs text:", err));
+            }, [selectedSurah]);
+
+            // --- منطق الصوت ---
+            const getAudioUrl = (surahNum, ayahNum) => {
+                const s = String(surahNum).padStart(3, '0');
+                const a = String(ayahNum).padStart(3, '0');
+                return `https://everyayah.com/data/${reciter}/${s}${a}.mp3`;
+            };
+
+            const handlePlayPause = () => {
+                if (isPlaying) {
+                    audioRef.current.pause();
+                    setIsPlaying(false);
+                } else {
+                    audioRef.current.play();
+                    setIsPlaying(true);
+                }
+            };
+
+            const handleAudioEnded = () => {
+                if (currentAyahNum >= endAyah) {
+                    if (currentRepeat < repeatCount) {
+                        setCurrentRepeat(prev => prev + 1);
+                        setCurrentAyahNum(startAyah);
+                    } else {
+                        setIsPlaying(false);
+                        setCurrentRepeat(1);
+                        setCurrentAyahNum(startAyah);
+                    }
+                } else {
+                    setCurrentAyahNum(prev => prev + 1);
+                }
+            };
+
+            useEffect(() => {
+                if (isPlaying && audioRef.current) {
+                    audioRef.current.src = getAudioUrl(selectedSurah.number, currentAyahNum);
+                    audioRef.current.play();
+                }
+            }, [currentAyahNum, currentRepeat]);
+
+            // تغيير القارئ أثناء التشغيل
+             useEffect(() => {
+                if(audioRef.current && selectedSurah) {
+                    const wasPlaying = isPlaying;
+                    audioRef.current.src = getAudioUrl(selectedSurah.number, currentAyahNum);
+                    if(wasPlaying) audioRef.current.play();
+                }
+            }, [reciter]);
+
+
+            if (isLoading) return (
+                <div className="flex h-full items-center justify-center bg-[#fdfbf7] text-[#2c3e30]">
+                    <div className="text-center animate-pulse">
+                        <Icons.BookOpen size={48} className="mx-auto mb-4 opacity-50 text-[#8a7e67]" />
+                        <p className="text-xl font-amiri">جاري تحميل المصحف...</p>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="flex flex-col h-full bg-[#f8f5f0]">
+                    
+                    {/* الرأس */}
+                    <header className="safe-padding-top bg-gradient-to-r from-[#1a3c2f] via-[#2c4c3b] to-[#3e2723] text-[#f2eadd] shadow-xl border-b-4 border-[#b89c68] shrink-0">
+                        <div className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-[#122b22] p-2 rounded-xl border border-[#b89c68]/30 shadow-inner">
+                                    <Icons.BookOpen size={24} className="text-[#b89c68]" />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-bold font-kufi text-[#e8dfcc]">مُعين الحُفاظ</h1>
+                                    <p className="text-[10px] text-[#b89c68] font-kufi opacity-90 leading-none mt-1">رفيقك في رحلة الحفظ</p>
+                                </div>
+                            </div>
+                            <div className="text-xs text-[#b89c68] font-kufi bg-[#122b22]/50 px-3 py-1 rounded-full border border-[#b89c68]/20">
+                                {selectedSurah ? selectedSurah.name : ''}
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* المحتوى الرئيسي القابل للتمرير */}
+                    <main className="flex-1 overflow-y-auto p-4 space-y-4">
+                        
+                        {/* بطاقة التحكم */}
+                        <div className="bg-white rounded-2xl shadow-md border border-[#e6e2d6] overflow-hidden">
+                            {/* الصف العلوي: السورة والقارئ */}
+                            <div className="p-4 bg-[#fcfaf7] border-b border-[#ece8de] flex flex-col gap-3">
+                                <div className="w-full">
+                                    <label className="block text-xs font-bold text-[#8a7e67] mb-1 font-kufi">السورة</label>
+                                    <div className="relative">
+                                        <select 
+                                            value={selectedSurah?.number} 
+                                            onChange={(e) => {
+                                                const surah = surahs.find(s => s.number === parseInt(e.target.value));
+                                                setSelectedSurah(surah);
+                                            }}
+                                            className="w-full p-2.5 pr-4 pl-10 rounded-lg border-[#dcd6c5] bg-white text-[#2c3e30] font-amiri text-lg shadow-sm outline-none appearance-none"
+                                        >
+                                            {surahs.map(s => (
+                                                <option key={s.number} value={s.number}>{s.number}. {s.name}</option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#b89c68]">
+                                            <Icons.Settings size={14} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-full">
+                                    <label className="block text-xs font-bold text-[#8a7e67] mb-1 font-kufi">القارئ</label>
+                                    <div className="relative">
+                                        <select 
+                                            value={reciter}
+                                            onChange={(e) => setReciter(e.target.value)}
+                                            className="w-full p-2.5 pr-4 pl-10 rounded-lg border-[#dcd6c5] bg-white text-[#2c3e30] font-kufi text-sm shadow-sm outline-none appearance-none"
+                                        >
+                                            {reciters.map(r => (
+                                                <option key={r.id} value={r.id}>{r.name}</option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#b89c68]">
+                                            <Icons.Volume2 size={14} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 space-y-6 bg-gradient-to-b from-white to-[#fcfcf9]">
+                                {/* النطاق */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs text-[#8a7e67] mb-1 font-kufi">من الآية</label>
+                                        <select 
+                                            value={startAyah}
+                                            onChange={(e) => {
+                                                const val = parseInt(e.target.value);
+                                                setStartAyah(val);
+                                                if(val > endAyah) setEndAyah(val);
+                                                setCurrentAyahNum(val); 
+                                            }}
+                                            className="w-full p-2 rounded-lg border-[#dcd6c5] text-center font-bold text-[#2c3e30] bg-[#fdfbf7] outline-none font-sans appearance-none"
+                                        >
+                                            {selectedSurah && Array.from({length: selectedSurah.numberOfAyahs}, (_, i) => i + 1).map(num => (
+                                                <option key={num} value={num}>{num}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-[#8a7e67] mb-1 font-kufi">إلى الآية</label>
+                                        <select 
+                                            value={endAyah}
+                                            onChange={(e) => {
+                                                const val = parseInt(e.target.value);
+                                                setEndAyah(val);
+                                            }}
+                                            className="w-full p-2 rounded-lg border-[#dcd6c5] text-center font-bold text-[#2c3e30] bg-[#fdfbf7] outline-none font-sans appearance-none"
+                                        >
+                                            {selectedSurah && Array.from({length: selectedSurah.numberOfAyahs}, (_, i) => i + 1).map(num => (
+                                                <option key={num} value={num} disabled={num < startAyah}>{num}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* التكرار */}
+                                <div>
+                                    <label className="block text-xs text-[#8a7e67] mb-2 font-kufi flex justify-between items-center">
+                                        <span>عدد التكرار</span>
+                                        <span className="bg-[#b89c68]/10 text-[#8a754e] px-2 py-0.5 rounded text-[10px] font-bold">
+                                            {repeatCount === 100 ? '∞' : repeatCount}
+                                        </span>
+                                    </label>
+                                    <input 
+                                        type="range" 
+                                        min="1" 
+                                        max="20" 
+                                        value={repeatCount} 
+                                        onChange={(e) => setRepeatCount(parseInt(e.target.value))}
+                                        className="w-full accent-[#b89c68] cursor-pointer h-2 bg-[#e6e2d6] rounded-lg appearance-none"
+                                    />
+                                </div>
+
+                                {/* المشغل */}
+                                <div className="bg-[#f4f1ea] rounded-xl border border-[#e6e2d6] p-4 flex flex-col items-center justify-center relative shadow-inner">
+                                    <div className="w-full flex justify-between text-[10px] font-kufi text-[#8a7e67] mb-2">
+                                        <div className="flex items-center gap-1">
+                                            <Icons.Repeat size={10} />
+                                            <span>{currentRepeat}/{repeatCount}</span>
+                                        </div>
+                                        <div>{currentAyahNum} / {selectedSurah?.numberOfAyahs}</div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-6">
+                                        <button 
+                                            onClick={() => {
+                                                setIsPlaying(false);
+                                                setCurrentAyahNum(startAyah);
+                                                setCurrentRepeat(1);
+                                            }}
+                                            className="p-2 text-[#a39b85] hover:text-[#c0392b] transition-colors"
+                                        >
+                                            <Icons.RefreshCw size={20} />
+                                        </button>
+
+                                        <button 
+                                            onClick={handlePlayPause}
+                                            className={`w-14 h-14 rounded-full shadow-md transition-transform active:scale-95 flex items-center justify-center border-2 ${
+                                                isPlaying 
+                                                ? 'bg-[#fcfaf7] border-[#dcd6c5] text-[#b89c68]' 
+                                                : 'bg-[#1a3c2f] border-[#1a3c2f] text-[#f2eadd]'
+                                            }`}
+                                        >
+                                            {isPlaying ? <Icons.Pause size={24} fill="currentColor" /> : <Icons.Play size={24} fill="currentColor" className="ml-1" />}
+                                        </button>
+                                    </div>
+                                    <audio 
+                                        ref={audioRef} 
+                                        src={selectedSurah ? getAudioUrl(selectedSurah.number, currentAyahNum) : ''}
+                                        onEnded={handleAudioEnded}
+                                        preload="auto"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* عرض الآية */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#e6e2d6] text-center min-h-[220px] flex flex-col items-center justify-center relative overflow-hidden">
+                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#b89c68]/20 via-[#b89c68]/40 to-[#b89c68]/20"></div>
+                             {ayahsText.length > 0 ? (
+                                <div className="w-full">
+                                    <p className="text-2xl md:text-3xl font-amiri leading-[2.6] text-[#2c3e30]" dir="rtl">
+                                        {ayahsText[currentAyahNum - 1]?.text}
+                                    </p>
+                                    <div className="mt-6 flex items-center justify-center gap-2 text-[#b89c68]">
+                                        <span className="font-amiri text-lg">﴿</span>
+                                        <span className="text-xs font-sans font-bold pt-1 text-[#8a7e67]">{currentAyahNum}</span>
+                                        <span className="font-amiri text-lg">﴾</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-[#a39b85] font-kufi text-sm">جاري التحميل...</p>
+                            )}
+                             <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#b89c68]/20 via-[#b89c68]/40 to-[#b89c68]/20"></div>
+                        </div>
+
+                        <div className="pb-8 text-center opacity-60">
+                             <p className="text-[10px] text-[#5c5446] font-kufi">مُعين الحُفاظ • اللهم اجعل القرآن ربيع قلوبنا</p>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MueenApp />);
+    </script>
+</body>
+</html>
