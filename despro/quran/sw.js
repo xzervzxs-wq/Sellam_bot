@@ -1,5 +1,5 @@
-const CACHE_NAME = 'quran-app-v4';
-const PAGES_CACHE = 'quran-pages-v1';
+const CACHE_NAME = 'quran-app-v5';
+const PAGES_CACHE = 'quran-pages-v2';
 const urlsToCache = [
   '/quran/',
   '/quran/index.html',

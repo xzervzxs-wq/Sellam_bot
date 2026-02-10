@@ -1739,7 +1739,7 @@
             
             try {
                 // Try to cache using Service Worker cache API
-                const cache = await caches.open('quran-pages-v1');
+                const cache = await caches.open('quran-pages-v2');
                 const cached = await cache.match(url);
                 if (cached) return; // Already cached, skip
                 
