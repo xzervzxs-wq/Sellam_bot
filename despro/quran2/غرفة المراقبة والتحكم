@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غرفة المراقبة و التحكم CCTV</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM2I4MmY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE2Ljc1IDguNzVhMyAzIDAgMSAxLTUuNSAwIDMgMyAwIDAgMSA1LjUgMHoiLz48cGF0aCBkPSJNMiAxM2gyIi8+PHBhdGggZD0iTTQgMTNhMyAzIDAgMCAwIDMtM1Y3YTMgMyAwIDAgMSAzLTNoN2EzIDMgMCAwIDEgMyAzdjExYTMgMyAwIDAgMS0zIDNIOWEzIDMgMCAwIDEtMy0zdi0yIi8+PC9zdmc+">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gray: { 950: '#030712' },
+                        slate: { 850: '#151e2e' }
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        html:not(.dark) body {
+            background-color: #f1f5f9;
+            color: #020617;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        html:not(.dark) ::-webkit-scrollbar-track { background: #cbd5e1; }
+        html:not(.dark) ::-webkit-scrollbar-thumb { background: #64748b; }
+        html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ICONS DATA (Embedded for Offline Use) ---
+        const ICONS_DATA = {
+            Video: "M23 7l-7 5 7 5V7z M14 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z",
+            Activity: "M22 12h-4l-3 9L9 3l-3 9H2",
+            ArrowRight: "M5 12h14 M12 5l7 7-7 7",
+            CheckCircle: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3",
+            Clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l4 2",
+            AlertTriangle: "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01",
+            XCircle: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M15 9l-6 6 M9 9l6 6",
+            Edit3: "M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z",
+            Settings: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
+            Save: "M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z M17 21v-8H7v8 M7 3v5h8V3",
+            Trash2: "M3 6h18 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M10 11v6 M14 11v6",
+            X: "M18 6L6 18 M6 6l12 12",
+            Plus: "M12 5v14 M5 12h14",
+            Lock: "M19 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2z M7 11V7a5 5 0 0 1 10 0v4",
+            Cctv: "M16.75 8.75a3 3 0 1 1-5.5 0 3 3 0 0 1 5.5 0z M2 13h2 M4 13a3 3 0 0 0 3-3V7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-2",
+            ShieldCheck: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M9 12l2 2 4-4",
+            UserCog: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M19 13a1.94 1.94 0 0 0-1.1-3.6 1.94 1.94 0 0 0-3.2 2.7 1.94 1.94 0 0 0 4.3.9z",
+            Key: "M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4",
+            Eye: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
+            Hash: "M4 9h16 M4 15h16 M10 3L8 21 M16 3l-2 18",
+            Database: "M3 6c0 1.66 4.03 3 9 3s9-1.34 9-3V18c0 1.66-4.03 3-9 3s-9-1.34-9-3V6z M3 6c0-1.66 4.03-3 9-3s9 1.34 9 3",
+            Download: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3",
+            Upload: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12",
+            HardDrive: "M22 12H2 M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z M6 16h.01 M10 16h.01",
+            ClipboardList: "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z M8 12h8 M8 16h8 M8 8h1",
+            CheckSquare: "M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11",
+            FileVideo: "M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z M10 11l5 3-5 3v-6z",
+            Wrench: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z",
+            PenTool: "M12 19l7-7 3 3-7 7-3-3z M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z M2 2l7.586 7.586 M11 11l-4 4",
+            Disc: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+            Camera: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+            Shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+            Lightbulb: "M9 18h6 M10 22h4 M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 12 2a4.65 4.65 0 0 0-4.5 9.5c.75.76 1.22 1.52 1.4 2.5h6.2z",
+            Sun: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z",
+            Moon: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
+            Building: "M3 21h18M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M3 7v14M21 7v14M9 3v18M15 3v18M7 7h2M7 11h2M7 15h2M15 7h2M15 11h2M15 15h2",
+            Phone: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z",
+            User: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"
+        };
+
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const pathData = ICONS_DATA[name];
+            if (!pathData) return null;
+            return (
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width={size} 
+                    height={size} 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className={className}
+                >
+                    <path d={pathData} />
+                </svg>
+            );
+        };
+        const getIcon = (name, props = {}) => <Icon name={name} {...props} />;
+
+        // --- Signature Pad ---
+        const SignaturePad = ({ onSave, onClear }) => {
+            const canvasRef = useRef(null);
+            const [isDrawing, setIsDrawing] = useState(false);
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const resize = () => {
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width; canvas.height = rect.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.lineWidth = 2; ctx.lineCap = 'round';
+                    ctx.strokeStyle = document.documentElement.classList.contains('dark') ? 'white' : '#000000';
+                };
+                resize(); window.addEventListener('resize', resize);
+                return () => window.removeEventListener('resize', resize);
+            }, []);
+            const getCoords = (e) => { const r = canvasRef.current.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+            const start = (e) => { const {x,y} = getCoords(e.nativeEvent); const ctx = canvasRef.current.getContext('2d'); ctx.beginPath(); ctx.moveTo(x,y); setIsDrawing(true); };
+            const draw = (e) => { if(!isDrawing)return; const {x,y} = getCoords(e.nativeEvent); const ctx = canvasRef.current.getContext('2d'); ctx.lineTo(x,y); ctx.stroke(); };
+            const stop = () => { if(isDrawing) { canvasRef.current.getContext('2d').closePath(); setIsDrawing(false); } };
+            return (
+                <div className="flex flex-col gap-2">
+                    <div className="border border-gray-600 bg-white dark:bg-gray-800 rounded h-40 w-full shadow-inner overflow-hidden cursor-crosshair">
+                        <canvas ref={canvasRef} onMouseDown={start} onMouseMove={draw} onMouseUp={stop} onMouseLeave={stop} className="w-full h-full block"/>
+                    </div>
+                    <div className="flex gap-2 text-xs">
+                        <button type="button" onClick={() => onSave(canvasRef.current.toDataURL())} className="bg-blue-600 px-3 py-1 rounded text-white hover:bg-blue-500 font-bold">تأكيد التوقيع</button>
+                        <button type="button" onClick={() => { const ctx = canvasRef.current.getContext('2d'); ctx.clearRect(0,0,canvasRef.current.width,canvasRef.current.height); onClear(); }} className="bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white px-3 py-1 rounded hover:bg-gray-400 font-bold">مسح</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Data ---
+        const INITIAL_SCREENS = Array.from({ length: 12 }, (_, i) => ({
+            id: i + 1, charId: String.fromCharCode(65 + i), name: `شاشة العرض ${i + 1}`, status: 'active', statusReason: '', 
+            cameras: Array.from({ length: 10 }, (_, j) => ({
+                id: `${i + 1}-${j + 1}`, number: j + 1, name: `كاميرا ${j + 1}`, code: `CAM-${i + 1}-${j + 1}`, status: 'active', note: '', lastUpdate: '10:00',
+                storage: { dailyHours: '24', retentionDays: '30' }, incidents: [], inspections: [], recordings: [], maintenance: []
+            }))
+        }));
+        const INITIAL_USERS = [{ id: 1, name: 'Admin', code: '1234', role: 'admin' }];
+        const INITIAL_EXTERNAL = [];
+
+        // --- Video Placeholder ---
+        const VideoPlaceholder = ({ id, code, status }) => {
+            let borderColor = 'border-gray-300 dark:border-gray-800';
+            let statusText = '', statusColor = 'text-gray-600 dark:text-gray-500';
+            if(status==='active'){ borderColor='border-green-500/50'; statusText='● LIVE'; statusColor='text-green-600 dark:text-green-500'; }
+            else if(status==='error'){ borderColor='border-red-500/50'; statusText='○ OFFLINE'; statusColor='text-red-600 dark:text-red-500'; }
+            else if(status==='warning'){ borderColor='border-orange-500/50'; statusText='⚠ DISABLED'; statusColor='text-orange-600 dark:text-orange-500'; }
+            return (
+                <div className={`relative w-full h-32 bg-slate-200 dark:bg-gray-900 rounded-md overflow-hidden border-2 ${borderColor} group transition-all duration-300 shadow-inner`}>
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-500 dark:text-gray-700 group-hover:text-gray-700 dark:group-hover:text-gray-600 transition-colors">{getIcon('Video', {size:32})}</div>
+                    <div className={`absolute top-2 left-2 text-xs font-bold font-mono ${statusColor} ${status==='active'?'animate-pulse':''}`}>{statusText}</div>
+                    <div className="absolute bottom-2 right-2 text-xs text-gray-700 dark:text-gray-500 font-bold font-mono bg-white/90 dark:bg-black/50 px-1 rounded shadow-sm">{code || `CAM-${id}`}</div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none"></div>
+                </div>
+            );
+        };
+
+        // --- Main Component ---
+        function SecurityDashboard() {
+            // Theme
+            const [theme, setTheme] = useState('dark');
+            useEffect(() => { document.documentElement.classList.toggle('dark', theme === 'dark'); }, [theme]);
+            const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+            // State
+            const load = (k, d) => { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : d; } catch { return d; } };
+            const [users, setUsers] = useState(() => load('cctv_users', INITIAL_USERS));
+            const [externalDepts, setExternalDepts] = useState(() => load('cctv_external', INITIAL_EXTERNAL));
+            const [currentUser, setCurrentUser] = useState(null);
+            const [accessCode, setAccessCode] = useState('');
+            const [loginError, setLoginError] = useState(false);
+            const [showAdminPanel, setShowAdminPanel] = useState(false);
+            const [showExternalPanel, setShowExternalPanel] = useState(false);
+            const [selectedCameraForControl, setSelectedCameraForControl] = useState(null);
+            const [activeControlTab, setActiveControlTab] = useState('storage');
+            const [screens, setScreens] = useState(() => load('cctv_screens', INITIAL_SCREENS));
+            const [selectedScreenId, setSelectedScreenId] = useState(null);
+            const [currentTime, setCurrentTime] = useState(new Date());
+            const [isEditMode, setIsEditMode] = useState(false);
+            
+            // Forms & Modals
+            const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: null, id: null, secId: null, title: '', message: '' });
+            const [editingItem, setEditingItem] = useState(null);
+            const [incidentForm, setIncidentForm] = useState({ section: '', reporter: '', action: '', employee: '' });
+            const [inspectionForm, setInspectionForm] = useState({ imageQuality: true, recordingStatus: true, lensClean: true, timeSync: true, notes: '' });
+            const [maintenanceForm, setMaintenanceForm] = useState({ action: '', technician: '' });
+            const [recordingForm, setRecordingForm] = useState({ recNum: '', reason: '', entity: '', signature: null });
+            
+            // External Dept Form
+            const [newExternal, setNewExternal] = useState({ deptName: '', camCount: '', storage: '', manager: '', phone: '' });
+
+            // Admin Panel State
+            const [adminNewCode, setAdminNewCode] = useState('');
+            const [newUser, setNewUser] = useState({ name: '', code: '', role: 'viewer' });
+            const [userEditModal, setUserEditModal] = useState({ isOpen: false, user: null });
+            const fileInputRef = useRef(null);
+
+            useEffect(() => { localStorage.setItem('cctv_screens', JSON.stringify(screens)); }, [screens]);
+            useEffect(() => { localStorage.setItem('cctv_users', JSON.stringify(users)); }, [users]);
+            useEffect(() => { localStorage.setItem('cctv_external', JSON.stringify(externalDepts)); }, [externalDepts]);
+            useEffect(() => { const t = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(t); }, []);
+
+            // Login/Logout
+            const handleLogin = (e) => { e.preventDefault(); const u = users.find(x => x.code === accessCode); if(u){ setCurrentUser(u); setLoginError(false); setAccessCode(''); } else setLoginError(true); };
+            const handleLogout = () => { setCurrentUser(null); setSelectedScreenId(null); setIsEditMode(false); setShowAdminPanel(false); setShowExternalPanel(false); setSelectedCameraForControl(null); };
+
+            // Updates
+            const updateCameraData = (sid, cid, sec, data, isEdit = false, delId = null) => {
+                setScreens(prev => prev.map(s => s.id !== sid ? s : { ...s, cameras: s.cameras.map(c => c.id !== cid ? c : {
+                    ...c, [sec]: sec === 'storage' ? { ...c.storage, ...data } : (delId !== null ? (c[sec]||[]).filter(x => x.id !== delId) : (isEdit ? (c[sec]||[]).map(x => x.id === data.id ? data : x) : [data, ...(c[sec]||[])]))
+                })}));
+            };
+            const updateCameraInfo = (sid, cid, field, val) => {
+                setScreens(prev => prev.map(s => s.id !== sid ? s : { ...s, cameras: s.cameras.map(c => c.id !== cid ? c : { ...c, [field]: val, lastUpdate: new Date().toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit'}) }) }));
+            };
+            const updateScreen = (sid, field, val) => { setScreens(prev => prev.map(s => s.id !== sid ? s : { ...s, [field]: val })); };
+            const updateStorage = (field, value) => { updateCameraData(selectedCameraForControl.screenId, selectedCameraForControl.camera.id, 'storage', { [field]: value }); };
+
+            // Handlers
+            const askDelete = (type, id, secId = null, title = "تأكيد الحذف", msg = "هل أنت متأكد من إتمام عملية الحذف؟ لا يمكن التراجع.") => {
+                setDeleteModal({ isOpen: true, type, id, secId, title, message: msg });
+            };
+            const executeDelete = () => {
+                const { type, id, secId } = deleteModal;
+                if (type === 'screen') { setScreens(prev => prev.filter(s => s.id !== id)); setSelectedScreenId(null); setIsEditMode(false); }
+                else if (type === 'camera') { setScreens(prev => prev.map(s => s.id !== id ? s : { ...s, cameras: s.cameras.filter(c => c.id !== secId) })); }
+                else if (type === 'user') { setUsers(users.filter(u => u.id !== id)); }
+                else if (type === 'external') { setExternalDepts(externalDepts.filter(d => d.id !== id)); }
+                else if (['incident', 'recording', 'maintenance'].includes(type)) {
+                    updateCameraData(selectedCameraForControl.screenId, selectedCameraForControl.camera.id, type === 'incident' ? 'incidents' : type === 'recording' ? 'recordings' : 'maintenance', {}, false, id);
+                }
+                else if (type === 'reset') { setScreens(INITIAL_SCREENS); setUsers(INITIAL_USERS); setExternalDepts(INITIAL_EXTERNAL); alert('تمت إعادة ضبط المصنع بنجاح'); }
+                setDeleteModal({ ...deleteModal, isOpen: false });
+            };
+
+            const handleBack = () => { setSelectedScreenId(null); setIsEditMode(false); };
+            const addNewScreen = () => { const newId = screens.length > 0 ? Math.max(...screens.map(s => s.id)) + 1 : 1; const newScreen = { id: newId, charId: String.fromCharCode(65 + (screens.length % 26)), name: `شاشة جديدة ${newId}`, location: '', status: 'active', cameras: [{ id: `${newId}-1`, number: 1, name: 'كاميرا 1', code: `CAM-${newId}-1`, status: 'active', note: '', lastUpdate: new Date().toLocaleTimeString('en-US'), storage: {dailyHours: 24, retentionDays: 30}, incidents: [], inspections: [], recordings: [], maintenance: [] }] }; setScreens([...screens, newScreen]); };
+            const addNewCamera = (screenId) => { setScreens(prev => prev.map(s => s.id !== screenId ? s : { ...s, cameras: [...s.cameras, { id: `${screenId}-${Date.now()}`, number: s.cameras.length + 1, name: `كاميرا ${s.cameras.length + 1}`, code: `CAM-${screenId}-${s.cameras.length + 1}`, status: 'active', note: '', lastUpdate: new Date().toLocaleTimeString('en-US'), storage: {dailyHours: 24, retentionDays: 30}, incidents: [], inspections: [], recordings: [], maintenance: [] }] })); };
+            const getScreenStatusInfo = (status) => { switch (status) { case 'active': return { color: 'text-green-600 dark:text-green-500', icon: getIcon('CheckCircle', {size:14}), text: 'متصل' }; case 'warning': return { color: 'text-orange-600 dark:text-orange-500', icon: getIcon('AlertTriangle', {size:14}), text: 'صيانة' }; case 'error': return { color: 'text-red-600 dark:text-red-500', icon: getIcon('XCircle', {size:14}), text: 'غير متصل' }; default: return { color: 'text-gray-500', icon: getIcon('Activity', {size:14}), text: 'مجهول' }; } };
+            
+            // Maintenance Update
+            const handleAddMaintenance = (e) => { 
+                e.preventDefault(); 
+                if(!maintenanceForm.technician) { alert('يرجى إدخال اسم الفني'); return; }
+                const data = { 
+                    id: editingItem ? editingItem.id : Date.now(), 
+                    date: new Date().toLocaleDateString('en-US'), 
+                    day: new Date().toLocaleDateString('ar-SA', { weekday: 'long' }), 
+                    time: new Date().toLocaleTimeString('en-US'), 
+                    ...maintenanceForm 
+                }; 
+                updateCameraData(selectedCameraForControl.screenId, selectedCameraForControl.camera.id, 'maintenance', data, !!editingItem); 
+                setMaintenanceForm({ action: '', technician: '' }); 
+                setEditingItem(null); 
+            };
+
+            // External Dept Handlers
+            const handleAddExternal = (e) => {
+                e.preventDefault();
+                if(newExternal.deptName && newExternal.manager) {
+                    setExternalDepts([...externalDepts, { id: Date.now(), ...newExternal }]);
+                    setNewExternal({ deptName: '', camCount: '', storage: '', manager: '', phone: '' });
+                }
+            };
+
+            // Admin Handlers
+            const handleAddUser = (e) => { e.preventDefault(); if (newUser.name && newUser.code) { setUsers([...users, { id: Date.now(), ...newUser }]); setNewUser({ name: '', code: '', role: 'viewer' }); } };
+            const handleUpdateAdminCode = (e) => { e.preventDefault(); if (adminNewCode) { setUsers(users.map(u => u.role === 'admin' ? { ...u, code: adminNewCode } : u)); setAdminNewCode(''); alert('تم تحديث رمز المدير بنجاح'); } };
+            const openEditUser = (user) => { setUserEditModal({ isOpen: true, user: { ...user } }); };
+            const saveEditedUser = () => { if (userEditModal.user) { setUsers(users.map(u => u.id === userEditModal.user.id ? userEditModal.user : u)); setUserEditModal({ isOpen: false, user: null }); } };
+
+            const handleExportData = () => { const data = { screens, users, externalDepts, exportDate: new Date().toISOString() }; const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })); const link = document.createElement('a'); link.href = url; link.download = `CCTV_Backup.json`; link.click(); };
+            
+            const handleImportData = (event) => { 
+                const file = event.target.files[0]; 
+                if (!file) return; 
+                const reader = new FileReader(); 
+                reader.onload = (e) => { 
+                    try { 
+                        const d = JSON.parse(e.target.result); 
+                        if (d.screens && d.users) { 
+                            if (window.confirm('هل أنت متأكد من استعادة النسخة الاحتياطية؟')) {
+                                setScreens(d.screens); 
+                                setUsers(d.users); 
+                                if(d.externalDepts) setExternalDepts(d.externalDepts);
+                                alert('تمت الاستعادة بنجاح'); 
+                            }
+                        }
+                    } catch (err) { alert('خطأ في قراءة الملف'); } 
+                }; 
+                reader.readAsText(file); 
+                event.target.value = null; 
+            };
+
+            const activeScreen = screens.find(s => s.id === selectedScreenId);
+            const isAdmin = currentUser?.role === 'admin';
+            const currentControlledCamera = selectedCameraForControl ? screens.find(s => s.id === selectedCameraForControl.screenId)?.cameras.find(c => c.id === selectedCameraForControl.camera.id) : null;
+
+            // --- Views ---
+
+            // 1. Login View
+            if (!currentUser) return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-900 dark:text-gray-100 transition-colors duration-300 relative overflow-hidden" dir="rtl">
+                    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                        <div className="absolute -top-[10%] -right-[10%] w-96 h-96 bg-brand-500/10 dark:bg-brand-500/20 rounded-full blur-3xl"></div>
+                    </div>
+                    <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-8 rounded-2xl shadow-xl dark:shadow-2xl relative overflow-hidden transition-all duration-300 z-10">
+                        <button onClick={toggleTheme} className="absolute top-4 left-4 p-2 text-slate-700 dark:text-gray-400 hover:text-slate-900 dark:hover:text-gray-200 transition-colors z-20">
+                            {theme === 'dark' ? getIcon('Sun', {size:20}) : getIcon('Moon', {size:20})}
+                        </button>
+                        <div className="flex flex-col items-center gap-6 relative z-10">
+                            <div className="w-20 h-20 bg-slate-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-gray-700 shadow-inner">
+                                {getIcon('Cctv', {size:40, className:"text-blue-600 dark:text-blue-500"})}
+                            </div>
+                            <div className="text-center space-y-2">
+                                <h1 className="text-2xl font-black text-slate-900 dark:text-white">غرفة المراقبة و التحكم CCTV</h1>
+                                <p className="text-slate-600 dark:text-gray-400 text-sm font-bold">إدارة الأمن والسلامة - الأمن الصحي</p>
+                            </div>
+                            <form onSubmit={handleLogin} className="w-full space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-700 dark:text-gray-500 uppercase mr-1">رمز الدخول</label>
+                                    <div className="relative">
+                                        <div className="absolute right-3 top-3 text-slate-500 dark:text-gray-500">{getIcon('Lock', {size:18})}</div>
+                                        <input type="password" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} className="w-full bg-white dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded-lg py-3 pr-10 pl-4 text-center tracking-[0.5em] text-xl font-bold text-slate-900 dark:text-white focus:border-blue-500 outline-none transition-all placeholder-slate-400 dark:placeholder-gray-600 shadow-sm" placeholder="••••" autoFocus />
+                                    </div>
+                                </div>
+                                {loginError && <div className="text-red-600 dark:text-red-500 text-xs text-center font-bold bg-red-100 dark:bg-red-500/10 py-2 rounded animate-pulse">رمز الدخول غير صحيح</div>}
+                                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transform active:scale-95 transition-all">
+                                    {getIcon('ShieldCheck', {size:20})} تسجيل الدخول
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // 2. Admin View
+            if (showAdminPanel) return (
+                <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100 p-6" dir="rtl">
+                    <DeleteConfirmationModal />
+                    <EditUserModal />
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">{getIcon('UserCog', {className:"text-blue-500"})} لوحة إدارة النظام</h2>
+                            <button onClick={() => setShowAdminPanel(false)} className="text-gray-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">{getIcon('ArrowRight', {size:18})} عودة للمراقبة</button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-xl">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-yellow-600 dark:text-yellow-500">{getIcon('Key', {size:18})} تحديث رمز المدير الحالي</h3>
+                                <form onSubmit={handleUpdateAdminCode} className="space-y-4">
+                                    <input type="text" value={adminNewCode} onChange={(e) => setAdminNewCode(e.target.value)} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded p-2 text-slate-900 dark:text-white" placeholder="الرمز الجديد..." />
+                                    <button className="w-full bg-yellow-100 dark:bg-yellow-600/20 text-yellow-700 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-600/50 hover:bg-yellow-500 hover:text-white py-2 rounded font-bold transition-colors">تحديث</button>
+                                </form>
+                            </div>
+                            <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-xl">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-blue-600 dark:text-blue-500">{getIcon('Plus', {size:18})} إضافة عضوية جديدة</h3>
+                                <form onSubmit={handleAddUser} className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input type="text" value={newUser.name} onChange={(e) => setNewUser({...newUser, name: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded p-2 text-slate-900 dark:text-white" placeholder="الاسم" required />
+                                        <input type="text" value={newUser.code} onChange={(e) => setNewUser({...newUser, code: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded p-2 text-slate-900 dark:text-white" placeholder="الرمز" required />
+                                    </div>
+                                    <select value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded p-2 text-slate-900 dark:text-white cursor-pointer"><option value="viewer">مشاهد (عادية)</option><option value="admin">مدير (صلاحيات كاملة)</option></select>
+                                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold transition-colors">إضافة</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-xl">
+                            <h3 className="text-lg font-bold mb-4 text-slate-700 dark:text-gray-300">قائمة العضويات</h3>
+                            <div className="overflow-x-auto"><table className="w-full text-right text-sm text-slate-600 dark:text-gray-300"><thead><tr className="border-b border-slate-200 dark:border-gray-800"><th>الاسم</th><th>الرمز</th><th>الصلاحية</th><th>تحكم</th></tr></thead><tbody>{users.map(u => (<tr key={u.id} className="border-b border-slate-200 dark:border-gray-800 last:border-0 hover:bg-slate-50 dark:hover:bg-gray-800/50 transition-colors"><td className="py-3 font-bold">{u.name}</td><td className="py-3 font-mono">{u.code}</td><td className="py-3"><span className={`px-2 py-1 rounded text-xs font-bold ${u.role === 'admin' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-500' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>{u.role === 'admin' ? 'مدير' : 'مشاهد'}</span></td><td className="py-3 flex gap-2">{u.role !== 'admin' || (u.role === 'admin' && u.id !== 1) ? (<><button onClick={() => openEditUser(u)} className="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors" title="تعديل">{getIcon('Edit3', {size:16})}</button><button onClick={() => handleDeleteUser(u.id)} className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-full transition-colors" title="حذف">{getIcon('Trash2', {size:16})}</button></>) : <span className="text-xs text-gray-400">المدير الرئيسي</span>}</td></tr>))}</tbody></table></div>
+                        </div>
+                        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-xl flex items-center justify-between">
+                             <h3 className="text-lg font-bold flex items-center gap-2 text-green-600 dark:text-green-500">{getIcon('Database', {size:18})} النسخ الاحتياطي</h3>
+                             <div className="flex gap-4">
+                                 <button onClick={handleExportData} className="bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 text-slate-700 dark:text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold"><Icon name="Download" size={18} /> تصدير</button>
+                                 <input type="file" id="import-file-input" accept=".json,.txt" ref={fileInputRef} onChange={handleImportData} className="hidden" />
+                                 <button onClick={() => document.getElementById('import-file-input').click()} className="bg-green-100 dark:bg-green-600/20 border border-green-200 dark:border-green-600/50 text-green-700 dark:text-green-500 px-4 py-2 rounded-lg flex items-center gap-2 font-bold"><Icon name="Upload" size={18} /> استيراد</button>
+                             </div>
+                        </div>
+                        <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 p-6 rounded-xl mt-6 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-bold text-red-600 dark:text-red-500 flex items-center gap-2">{getIcon('AlertTriangle', {size:18})} منطقة الخطر</h3>
+                                <p className="text-sm text-slate-500 dark:text-gray-400">حذف جميع البيانات واستعادة ضبط المصنع</p>
+                            </div>
+                            <button onClick={() => askDelete('reset', null, null, 'إعادة ضبط المصنع', 'تحذير: سيتم حذف كل شيء. هل أنت متأكد؟')} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-600/20">
+                                {getIcon('Trash2', {size:18})} إعادة تعيين النظام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // 3. External Departments View (Redesigned)
+            if (showExternalPanel) return (
+                <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100 p-6 transition-colors duration-500" dir="rtl">
+                    <DeleteConfirmationModal />
+                    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex items-center justify-between border-b border-slate-200 dark:border-gray-800 pb-6">
+                            <div>
+                                <h2 className="text-3xl font-black flex items-center gap-4 text-slate-900 dark:text-white">
+                                    <div className="bg-purple-600 text-white p-3 rounded-2xl shadow-lg shadow-purple-600/20">{getIcon('Building', {size:32})}</div>
+                                    إدارة كاميرات الأقسام الخارجية
+                                </h2>
+                                <p className="text-slate-500 dark:text-gray-500 mt-2 font-medium mr-16">إدارة وتوثيق الأنظمة الأمنية خارج نطاق إدارة الأمن</p>
+                            </div>
+                            <button onClick={() => setShowExternalPanel(false)} className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white px-5 py-3 rounded-2xl flex items-center gap-2 font-bold transition-all shadow-sm hover:shadow-md">
+                                {getIcon('ArrowRight', {size:20})} عودة للمراقبة
+                            </button>
+                        </div>
+
+                        {isAdmin && (
+                            <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-8 rounded-[2rem] shadow-xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                                <h3 className="text-xl font-black mb-8 flex items-center gap-3 text-slate-800 dark:text-gray-200">
+                                    {getIcon('Plus', {size:24, className:"text-purple-500"})} تسجيل بيانات قسم جديد
+                                </h3>
+                                <form onSubmit={handleAddExternal} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-500 dark:text-gray-500 uppercase px-1">إسم القسم</label>
+                                        <div className="relative">
+                                            <div className="absolute right-3 top-3.5 text-slate-400">{getIcon('Building', {size:18})}</div>
+                                            <input type="text" placeholder="مثلاً: المستودعات" value={newExternal.deptName} onChange={e => setNewExternal({...newExternal, deptName: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl py-3 pr-11 pl-4 text-slate-900 dark:text-white focus:border-purple-500 outline-none transition-all placeholder-slate-400 font-bold" required />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-500 dark:text-gray-500 uppercase px-1">عدد الكاميرات</label>
+                                        <div className="relative">
+                                            <div className="absolute right-3 top-3.5 text-slate-400">{getIcon('Video', {size:18})}</div>
+                                            <input type="number" placeholder="0" value={newExternal.camCount} onChange={e => setNewExternal({...newExternal, camCount: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl py-3 pr-11 pl-4 text-slate-900 dark:text-white focus:border-purple-500 outline-none transition-all font-bold" required />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-500 dark:text-gray-500 uppercase px-1">مدة التخزين</label>
+                                        <div className="relative">
+                                            <div className="absolute right-3 top-3.5 text-slate-400">{getIcon('Database', {size:18})}</div>
+                                            <input type="text" placeholder="مثلاً: 30 يوم" value={newExternal.storage} onChange={e => setNewExternal({...newExternal, storage: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl py-3 pr-11 pl-4 text-slate-900 dark:text-white focus:border-purple-500 outline-none transition-all font-bold" required />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-500 dark:text-gray-500 uppercase px-1">إسم المسؤول</label>
+                                        <div className="relative">
+                                            <div className="absolute right-3 top-3.5 text-slate-400">{getIcon('User', {size:18})}</div>
+                                            <input type="text" placeholder="الاسم الرباعي" value={newExternal.manager} onChange={e => setNewExternal({...newExternal, manager: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl py-3 pr-11 pl-4 text-slate-900 dark:text-white focus:border-purple-500 outline-none transition-all font-bold" required />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-500 dark:text-gray-500 uppercase px-1">رقم الجوال</label>
+                                        <div className="relative">
+                                            <div className="absolute right-3 top-3.5 text-slate-400">{getIcon('Phone', {size:18})}</div>
+                                            <input type="text" placeholder="05XXXXXXXX" value={newExternal.phone} onChange={e => setNewExternal({...newExternal, phone: e.target.value})} className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl py-3 pr-11 pl-4 text-slate-900 dark:text-white focus:border-purple-500 outline-none transition-all font-bold text-left" dir="ltr" required />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-end">
+                                        <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3.5 rounded-xl font-black transition-all shadow-lg shadow-purple-600/30 transform active:scale-[0.98]">
+                                            إضافة البيانات الآن
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-[2rem] shadow-xl overflow-hidden">
+                            <div className="p-6 border-b border-slate-100 dark:border-gray-800 flex justify-between items-center bg-slate-50/50 dark:bg-gray-800/20">
+                                <h3 className="text-lg font-black text-slate-700 dark:text-gray-300 flex items-center gap-2">
+                                    {getIcon('Activity', {size:18, className:"text-green-500"})} السجل النشط للأقسام الخارجية
+                                </h3>
+                                <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-slate-200 dark:border-gray-700 text-xs font-black text-slate-500">
+                                    إجمالي الأقسام: {externalDepts.length}
+                                </span>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-right">
+                                    <thead>
+                                        <tr className="text-slate-400 dark:text-gray-500 text-xs font-black border-b border-slate-100 dark:border-gray-800 uppercase tracking-widest">
+                                            <th className="p-6">القسم</th>
+                                            <th className="p-6 text-center">العدد</th>
+                                            <th className="p-6 text-center">التخزين</th>
+                                            <th className="p-6">المسؤول عن النظام</th>
+                                            <th className="p-6">التواصل</th>
+                                            {isAdmin && <th className="p-6 text-left">التحكم</th>}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
+                                        {externalDepts.map(dept => (
+                                            <tr key={dept.id} className="hover:bg-slate-50 dark:hover:bg-gray-800/40 transition-all duration-300">
+                                                <td className="p-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center font-bold">
+                                                            {dept.deptName.charAt(0)}
+                                                        </div>
+                                                        <span className="font-black text-slate-800 dark:text-gray-100">{dept.deptName}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-6 text-center">
+                                                    <span className="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-400 px-3 py-1.5 rounded-lg font-black text-sm border border-slate-200 dark:border-gray-700">
+                                                        {dept.camCount}
+                                                    </span>
+                                                </td>
+                                                <td className="p-6 text-center">
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="font-bold text-slate-700 dark:text-gray-300">{dept.storage}</span>
+                                                        <div className="w-12 h-1 bg-purple-500/20 rounded-full mt-1 overflow-hidden">
+                                                            <div className="w-2/3 h-full bg-purple-500"></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="p-6 font-bold text-slate-700 dark:text-gray-300">{dept.manager}</td>
+                                                <td className="p-6">
+                                                    <a href={`tel:${dept.phone}`} className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-mono font-black hover:underline underline-offset-4">
+                                                        {getIcon('Phone', {size:14})} {dept.phone}
+                                                    </a>
+                                                </td>
+                                                {isAdmin && (
+                                                    <td className="p-6 text-left">
+                                                        <button onClick={() => askDelete('external', dept.id, null, 'حذف قسم خارجي', 'هل تريد بالتأكيد حذف بيانات هذا القسم من السجل؟')} className="p-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
+                                                            {getIcon('Trash2', {size:20})}
+                                                        </button>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ))}
+                                        {externalDepts.length === 0 && (
+                                            <tr>
+                                                <td colSpan="6" className="p-20 text-center">
+                                                    <div className="flex flex-col items-center opacity-30">
+                                                        {getIcon('Building', {size:64})}
+                                                        <p className="mt-4 font-black text-xl italic">لا توجد سجلات للأقسام الخارجية حالياً</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // 4. Global Delete Modal
+            function DeleteConfirmationModal() {
+                return deleteModal.isOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl transform scale-100 transition-all">
+                            <div className="flex flex-col items-center text-center gap-4">
+                                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center text-red-600 dark:text-red-500 mb-2">
+                                    {getIcon('Trash2', {size:32})}
+                                </div>
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white">{deleteModal.title}</h3>
+                                <p className="text-slate-600 dark:text-gray-400 text-sm">{deleteModal.message}</p>
+                                <div className="flex gap-3 w-full mt-4">
+                                    <button onClick={() => setDeleteModal({...deleteModal, isOpen: false})} className="flex-1 px-4 py-3 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-gray-300 font-bold hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors">إلغاء</button>
+                                    <button onClick={executeDelete} className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-600/20 transition-colors">حذف</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // 5. User Edit Modal
+            function EditUserModal() {
+                return userEditModal.isOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl transform scale-100 transition-all">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">{getIcon('UserCog', {size:24, className:"text-blue-500"})} تعديل العضوية</h3>
+                                <button onClick={() => setUserEditModal({ isOpen: false, user: null })} className="text-slate-500 hover:text-slate-900 dark:hover:text-white">{getIcon('X', {size:24})}</button>
+                            </div>
+                            <div className="space-y-4">
+                                <div><label className="text-xs font-bold text-slate-500 mb-1 block">الاسم</label><input type="text" value={userEditModal.user.name} onChange={(e) => setUserEditModal({...userEditModal, user: {...userEditModal.user, name: e.target.value}})} className="w-full bg-slate-50 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg p-2 text-slate-900 dark:text-white" /></div>
+                                <div><label className="text-xs font-bold text-slate-500 mb-1 block">الرمز السري</label><input type="text" value={userEditModal.user.code} onChange={(e) => setUserEditModal({...userEditModal, user: {...userEditModal.user, code: e.target.value}})} className="w-full bg-slate-50 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg p-2 text-slate-900 dark:text-white" /></div>
+                                <div><label className="text-xs font-bold text-slate-500 mb-1 block">الصلاحية</label><select value={userEditModal.user.role} onChange={(e) => setUserEditModal({...userEditModal, user: {...userEditModal.user, role: e.target.value}})} className="w-full bg-slate-50 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg p-2 text-slate-900 dark:text-white cursor-pointer"><option value="viewer">مشاهد (عادية)</option><option value="admin">مدير (صلاحيات كاملة)</option></select></div>
+                                <button onClick={saveEditedUser} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl mt-4">حفظ التعديلات</button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // 6. Main Dashboard View
+            return (
+                <div dir="rtl" className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100 font-sans selection:bg-blue-500 selection:text-white relative flex flex-col transition-colors duration-300">
+                    <DeleteConfirmationModal />
+                    
+                    {/* Camera Control Modal */}
+                    {selectedCameraForControl && currentControlledCamera && (
+                        <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+                            <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+                                <div className="bg-slate-100 dark:bg-gray-800 p-4 flex justify-between items-center border-b border-slate-200 dark:border-gray-700">
+                                    <div><h2 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">{getIcon('Cctv', {className:"text-blue-500"})}{currentControlledCamera.name}</h2></div>
+                                    <button onClick={() => { setSelectedCameraForControl(null); setEditingItem(null); }} className="p-2 hover:bg-slate-200 dark:hover:bg-gray-700 rounded-lg text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{getIcon('X', {size:24})}</button>
+                                </div>
+                                <div className="flex flex-1 overflow-hidden">
+                                    <div className="w-64 bg-slate-50 dark:bg-gray-950 border-l border-slate-200 dark:border-gray-800 flex flex-col p-2 gap-2 overflow-y-auto">
+                                        {[{ id: 'storage', icon: 'HardDrive', label: 'سعة التسجيل', color: 'blue' },{ id: 'incidents', icon: 'ClipboardList', label: 'سجل البلاغات', color: 'red' },{ id: 'inspection', icon: 'CheckSquare', label: 'الفحص اليومي', color: 'green' },{ id: 'recordings', icon: 'FileVideo', label: 'إدارة التسجيلات', color: 'purple' },{ id: 'maintenance', icon: 'Wrench', label: 'سجل الصيانة', color: 'orange' }].map(tab => (
+                                            <button key={tab.id} onClick={() => setActiveControlTab(tab.id)} className={`p-3 rounded-lg text-right flex items-center gap-3 transition-colors ${activeControlTab === tab.id ? `bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-sm` : 'hover:bg-slate-200 dark:hover:bg-gray-800'}`}>
+                                                <div className={`p-2 rounded ${activeControlTab === tab.id ? `bg-${tab.color}-500 text-white` : `bg-${tab.color}-100 dark:bg-${tab.color}-900/30 text-${tab.color}-600 dark:text-${tab.color}-400`}`}>{getIcon(tab.icon, {size:18})}</div><span className={`text-sm font-bold ${activeControlTab === tab.id ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-gray-400'}`}>{tab.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="flex-1 bg-slate-50/50 dark:bg-gray-900 p-6 overflow-y-auto">
+                                        {activeControlTab === 'storage' && <div className="space-y-6"><h3 className="text-lg font-bold text-blue-500 border-b border-slate-200 dark:border-gray-800 pb-2">سعة التسجيل والتخزين</h3><div className="grid grid-cols-2 gap-6"><div className="bg-white dark:bg-gray-950 p-6 rounded-xl border border-slate-200 dark:border-gray-800 text-center shadow-sm"><div className="mx-auto text-yellow-500 mb-2 flex justify-center">{getIcon('Clock', {size:32})}</div><h4 className="text-slate-500 dark:text-gray-400 text-sm mb-2">مدة التسجيل اليومية</h4>{isAdmin ? <input type="number" value={currentControlledCamera.storage?.dailyHours || 24} onChange={(e) => updateStorage('dailyHours', e.target.value)} className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded px-2 py-1 text-center text-xl font-bold w-24 text-slate-900 dark:text-white" /> : <span className="text-2xl font-bold">{currentControlledCamera.storage?.dailyHours}</span>}<span className="text-sm text-gray-500 mr-2">ساعة / يوم</span></div><div className="bg-white dark:bg-gray-950 p-6 rounded-xl border border-slate-200 dark:border-gray-800 text-center shadow-sm"><div className="mx-auto text-green-500 mb-2 flex justify-center">{getIcon('Database', {size:32})}</div><h4 className="text-slate-500 dark:text-gray-400 text-sm mb-2">مدة الاحتفاظ بالتسجيلات</h4>{isAdmin ? <input type="number" value={currentControlledCamera.storage?.retentionDays || 30} onChange={(e) => updateStorage('retentionDays', e.target.value)} className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded px-2 py-1 text-center text-xl font-bold w-24 text-slate-900 dark:text-white" /> : <span className="text-2xl font-bold">{currentControlledCamera.storage?.retentionDays}</span>}<span className="text-sm text-gray-500 mr-2">يوم / شهر</span></div></div></div>}
+                                        {activeControlTab === 'incidents' && <div className="space-y-6"><h3 className="text-lg font-bold text-red-500 border-b border-slate-200 dark:border-gray-800 pb-2">سجل البلاغات وقاعدة بيانات الحوادث</h3>{isAdmin && <div className="bg-white dark:bg-gray-950 p-4 rounded-xl border border-slate-200 dark:border-gray-800 mb-6 shadow-sm"><form onSubmit={(e)=>{e.preventDefault(); handleAddIncident(e);}} className="grid grid-cols-2 gap-4"><input type="text" placeholder="القسم" className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={incidentForm.section} onChange={e=>setIncidentForm({...incidentForm, section:e.target.value})}/><input type="text" placeholder="اسم المبلغ" className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={incidentForm.reporter} onChange={e=>setIncidentForm({...incidentForm, reporter:e.target.value})}/><input type="text" placeholder="الإجراء المتخذ" className="col-span-2 bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={incidentForm.action} onChange={e=>setIncidentForm({...incidentForm, action:e.target.value})}/><input type="text" placeholder="الموظف المستلم" className="col-span-2 bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={incidentForm.employee} onChange={e=>setIncidentForm({...incidentForm, employee:e.target.value})}/><button className="col-span-2 bg-red-600 text-white rounded p-2 text-sm font-bold">إضافة</button></form></div>}
+                                        <div className="overflow-x-auto"><table className="w-full text-right text-sm text-slate-600 dark:text-gray-300"><thead><tr className="border-b border-slate-200 dark:border-gray-800"><th className="pb-2">التاريخ</th><th className="pb-2">القسم</th><th className="pb-2">المبلغ</th><th className="pb-2">الإجراء</th><th className="pb-2">الموظف</th>{isAdmin && <th className="pb-2"></th>}</tr></thead><tbody>{currentControlledCamera.incidents?.map(inc=>(<tr key={inc.id} className="border-b border-slate-200 dark:border-gray-800 last:border-0"><td className="py-2">{inc.date}<br/><span className="text-xs text-gray-500">{inc.time}</span></td><td className="py-2">{inc.section}</td><td className="py-2">{inc.reporter}</td><td className="py-2 font-bold text-slate-900 dark:text-white">{inc.action}</td><td className="py-2">{inc.employee}</td>{isAdmin && <td className="py-2"><button onClick={()=>askDelete('incident', inc.id, null, 'حذف بلاغ', 'حذف هذا البلاغ نهائياً؟')} className="text-red-500 p-1 hover:bg-red-50 rounded-full">{getIcon('Trash2', {size:14})}</button></td>}</tr>))}</tbody></table></div></div>}
+                                        {activeControlTab === 'inspection' && <div className="space-y-6"><h3 className="text-lg font-bold text-green-500 border-b border-slate-200 dark:border-gray-800 pb-2">برنامج الفحص اليومي (Checklist)</h3>{isAdmin && <div className="bg-white dark:bg-gray-950 p-4 rounded-xl border border-slate-200 dark:border-gray-800 mb-6 shadow-sm"><div className="grid grid-cols-2 gap-4 mb-4">{['imageQuality', 'recordingStatus', 'lensClean', 'timeSync'].map(key => (<label key={key} className="flex items-center gap-2 cursor-pointer p-2 border border-slate-200 dark:border-gray-700 rounded hover:bg-slate-50 dark:hover:bg-gray-900"><input type="checkbox" checked={inspectionForm[key]} onChange={e => setInspectionForm({...inspectionForm, [key]: e.target.checked})} className="accent-green-500 w-5 h-5"/><span className="text-sm text-slate-700 dark:text-gray-300">{key === 'imageQuality' ? 'جودة الصورة' : key === 'recordingStatus' ? 'حالة التسجيل' : key === 'lensClean' ? 'نظافة العدسة' : 'تطابق الوقت'}</span></label>))}</div><input type="text" placeholder="ملاحظات إضافية..." className="w-full bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm mb-3 text-slate-900 dark:text-white" value={inspectionForm.notes} onChange={e=>setInspectionForm({...inspectionForm, notes:e.target.value})}/><button onClick={handleAddInspection} className="w-full bg-green-600 hover:bg-green-500 text-white rounded p-2 text-sm font-bold">حفظ الفحص</button></div>}<div className="space-y-2">{currentControlledCamera.inspections?.map((insp) => (<div key={insp.id} className="bg-white dark:bg-gray-950 p-3 rounded border border-slate-200 dark:border-gray-800 flex justify-between items-center shadow-sm"><div className="flex items-center gap-4"><div className={`p-2 rounded-full ${insp.result === 'تعمل بامتياز' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>{insp.result === 'تعمل بامتياز' ? getIcon('CheckCircle', {size:16}) : getIcon('AlertTriangle', {size:16})}</div><div><p className="text-sm font-bold text-slate-800 dark:text-white">{insp.date}</p><p className="text-xs text-slate-500">الفاحص: {insp.inspector}</p></div></div><div className="text-left"><span className={`font-bold text-sm ${insp.result === 'تعمل بامتياز' ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>{insp.result}</span>{insp.details.notes && <p className="text-xs text-yellow-600 dark:text-yellow-500 max-w-[150px] truncate">{insp.details.notes}</p>}</div></div>))}</div></div>}
+                                        {activeControlTab === 'recordings' && <div className="space-y-6"><h3 className="text-lg font-bold text-purple-500 border-b border-slate-200 dark:border-gray-800 pb-2">إدارة التسجيلات وتسليم الفيديو</h3>{isAdmin && <div className="bg-white dark:bg-gray-950 p-4 rounded-xl border border-slate-200 dark:border-gray-800 mb-6 shadow-sm"><div className="grid grid-cols-2 gap-3 mb-3"><input type="text" placeholder="رقم التسجيل" className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={recordingForm.recNum} onChange={e => setRecordingForm({...recordingForm, recNum: e.target.value})}/><input type="text" placeholder="السبب / الواقعة" className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={recordingForm.reason} onChange={e => setRecordingForm({...recordingForm, reason: e.target.value})}/><input type="text" placeholder="الجهة الطالبة / المستلم" className="col-span-2 bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={recordingForm.entity} onChange={e => setRecordingForm({...recordingForm, entity: e.target.value})}/></div><div className="mb-3">{recordingForm.signature ? (<div className="border border-green-500 rounded p-2 bg-green-50 dark:bg-green-900/10 flex justify-between items-center text-slate-900 dark:text-white"><span className="text-xs text-green-600 font-bold">تم التوقيع</span><button onClick={() => setRecordingForm({...recordingForm, signature: null})} className="text-xs text-red-500 underline">مسح</button></div>) : (<SignaturePad onSave={(sig) => setRecordingForm({...recordingForm, signature: sig})} onClear={() => {}} />)}</div><button onClick={handleAddRecording} className="w-full bg-purple-600 text-white font-bold py-2 rounded hover:bg-purple-500">حفظ السجل</button></div>}<div className="space-y-3">{currentControlledCamera.recordings?.map((rec) => (<div key={rec.id} className="bg-white dark:bg-gray-950 p-3 rounded border border-slate-200 dark:border-gray-800 flex justify-between items-start shadow-sm"><div><div className="flex items-center gap-2 mb-1"><span className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs px-2 py-0.5 rounded font-mono">#{rec.recNum}</span><span className="text-xs text-gray-500">{rec.date}</span></div><p className="font-bold text-sm mt-1 text-slate-900 dark:text-white">{rec.reason}</p><p className="text-xs text-slate-500">الجهة: {rec.entity}</p>{isAdmin && <button onClick={()=>askDelete('recording', rec.id, null, 'حذف سجل', 'حذف هذا السجل نهائياً؟')} className="text-red-500 text-xs mt-2 hover:underline flex items-center gap-1"><Icon name="Trash2" size={12}/> حذف</button>}</div><div className="text-center"><p className="text-[10px] text-gray-500 mb-1">توقيع المستلم</p><div className="w-24 h-10 border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-1 flex items-center justify-center overflow-hidden rounded"><img src={rec.signature} className="max-h-full max-w-full"/></div><span className="text-[10px] text-slate-400">{rec.handoverTime}</span></div></div>))}</div></div>}
+                                        {activeControlTab === 'maintenance' && <div className="space-y-6"><h3 className="text-lg font-bold text-orange-500 border-b border-slate-200 dark:border-gray-800 pb-2">سجل الصيانة</h3>{isAdmin && <div className="bg-white dark:bg-gray-950 p-4 rounded-xl border border-slate-200 dark:border-gray-800 mb-6 flex flex-col gap-3 shadow-sm"><div className="grid grid-cols-1 md:grid-cols-2 gap-3"><input type="text" placeholder="إسم الفني" className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white font-bold" value={maintenanceForm.technician} onChange={e => setMaintenanceForm({...maintenanceForm, technician: e.target.value})} /><input type="text" placeholder="الإجراء المتخذ (صيانة / استبدال...)" className="bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded p-2 text-sm text-slate-900 dark:text-white" value={maintenanceForm.action} onChange={e => setMaintenanceForm({...maintenanceForm, action: e.target.value})} /></div><button onClick={handleAddMaintenance} className="bg-orange-600 hover:bg-orange-500 text-white rounded px-4 py-2 text-sm font-bold transition-all shadow-md">حفظ سجل الصيانة</button></div>}<div className="overflow-x-auto"><table className="w-full text-right text-sm text-slate-600 dark:text-gray-300"><thead><tr className="border-b border-slate-200 dark:border-gray-800"><th className="pb-2">التاريخ</th><th className="pb-2">الإجراء</th><th className="pb-2">الفني</th>{isAdmin && <th className="pb-2"></th>}</tr></thead><tbody>{currentControlledCamera.maintenance?.map((m) => (<tr key={m.id} className="border-b border-slate-200 dark:border-gray-800 last:border-0"><td className="py-2 text-gray-500">{m.date}<br/><span className="text-[10px]">{m.time}</span></td><td className="py-2 font-bold text-slate-900 dark:text-white">{m.action}</td><td className="py-2 font-black text-orange-600 dark:text-orange-400">{m.technician}</td>{isAdmin && <td className="py-2"><button onClick={()=>askDelete('maintenance', m.id, null, 'حذف سجل', 'حذف هذا السجل نهائياً؟')} className="text-red-500 p-1 hover:bg-red-50 rounded-full">{getIcon('Trash2', {size:14})}</button></td>}</tr>))}</tbody></table></div></div>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Header */}
+                    <header className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-800 p-4 flex justify-between items-center sticky top-0 z-50 shadow-sm transition-colors duration-300">
+                        <div className="flex items-center gap-4"><div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-blue-500/20 shadow-lg">{getIcon('Cctv', {className:"text-white", size:24})}</div><div><h1 className="text-xl font-bold tracking-wide text-slate-900 dark:text-white">غرفة المراقبة و التحكم CCTV</h1><p className="text-xs text-slate-500 dark:text-gray-400 flex items-center gap-2"><span className={`w-2 h-2 rounded-full ${isAdmin ? 'bg-yellow-500' : 'bg-blue-500'} animate-pulse`}></span>{isAdmin ? 'تسجيل دخول: مدير النظام' : `مرحباً، ${currentUser.name}`}</p></div></div>
+                        <div className="flex items-center gap-3">
+                            {isAdmin && (
+                                <>
+                                    <button onClick={() => setShowExternalPanel(true)} title="إدارة الأقسام الخارجية" className="h-[42px] w-[42px] flex items-center justify-center bg-slate-100 dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 text-slate-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-xl border border-slate-300 dark:border-gray-700 transition-all shadow-sm">
+                                        {getIcon('Building', {size:24})}
+                                    </button>
+                                    <button onClick={() => setShowAdminPanel(true)} className="h-[42px] flex items-center gap-2 text-xs bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 text-yellow-600 dark:text-yellow-500 px-4 rounded-xl border border-slate-300 dark:border-gray-700 transition-colors font-black">
+                                        {getIcon('UserCog', {size:16})} admin
+                                    </button>
+                                </>
+                            )}
+                            <button onClick={handleLogout} className="text-slate-400 hover:text-red-500 text-xs px-2 transition-colors">{getIcon('Lock', {size:14})}</button>
+                            <div className="bg-slate-100 dark:bg-gray-800 px-4 h-[42px] rounded-xl border border-slate-300 dark:border-gray-700 flex items-center gap-2">
+                                {getIcon('Clock', {size:16, className:"text-slate-400"})}
+                                <span className="text-xl font-bold text-slate-800 dark:text-white">{currentTime.toLocaleTimeString('en-US', {hour12:false})}</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Section */}
+                    <main className="p-6 flex-grow">
+                        {!selectedScreenId ? (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center"><div><h2 className="text-lg text-slate-700 dark:text-gray-300 border-r-4 border-blue-500 pr-3 inline-block ml-3 font-black">نظرة عامة على شاشات المراقبة</h2></div>{isAdmin && <button onClick={addNewScreen} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all active:scale-95 text-sm font-black">{getIcon('Plus', {size:18})} <span>إضافة شاشة رئيسية</span></button>}</div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" dir="ltr">{screens.map((screen) => (<button dir="rtl" key={screen.id} onClick={() => setSelectedScreenId(screen.id)} className={`group relative bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 border ${screen.status === 'active' ? 'border-slate-200 dark:border-gray-800' : 'border-red-200 dark:border-red-900/50'} hover:border-blue-500/50 rounded-2xl p-5 transition-all duration-300 text-right flex flex-col gap-3 hover:-translate-y-1 hover:shadow-xl`}><div className="flex justify-between w-full items-start"><div className="bg-slate-100 dark:bg-gray-800 w-12 h-12 rounded-xl flex items-center justify-center font-black text-2xl text-slate-500 dark:text-gray-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-inner">{screen.charId}</div><div className={`px-2 py-1 rounded-lg border bg-slate-50 dark:bg-gray-950 text-[10px] font-black ${screen.status === 'active' ? 'border-slate-200 dark:border-gray-800 text-gray-500' : 'border-red-200 dark:border-red-900 text-red-500'}`}>{screen.status === 'active' ? 'ONLINE' : 'OFFLINE'}</div></div><div><h3 className="font-black text-lg text-slate-800 dark:text-gray-100 group-hover:text-blue-500 transition-colors truncate">{screen.name}</h3>{screen.status !== 'active' && screen.statusReason && <p className="text-xs text-orange-600 dark:text-orange-400 truncate mt-1">⚠ {screen.statusReason}</p>}</div><div className="w-full h-px bg-slate-100 dark:bg-gray-800 my-1"></div><div className="flex justify-between items-center w-full text-xs text-slate-400 dark:text-gray-500 font-bold"><span>{screen.cameras.length} كاميرات</span><span className={`flex items-center gap-1 ${getScreenStatusInfo(screen.status).color}`}>{getScreenStatusInfo(screen.status).text}</span></div></button>))}</div>
+                            </div>
+                        ) : (
+                            <div className="animate-in fade-in zoom-in duration-300">
+                                <div className="flex justify-between items-center mb-6">
+                                    <button onClick={handleBack} className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors group px-3 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-gray-900 font-bold">{getIcon('ArrowRight', {size:20})} <span>العودة للرئيسية</span></button>
+                                    {isAdmin ? <button onClick={() => setIsEditMode(!isEditMode)} className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border transition-all duration-300 font-black ${isEditMode ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-white dark:bg-gray-900 border-slate-300 dark:border-gray-700 text-slate-600 dark:text-gray-400 hover:border-blue-500'}`}>{isEditMode ? <><Icon name="Save" size={18} /> <span>إنهاء وحفظ</span></> : <><Icon name="Settings" size={18} /> <span>تعديل الإعدادات</span></>}</button> : <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-gray-800 rounded-xl border border-slate-300 dark:border-gray-700 text-slate-500 text-xs font-bold"><Icon name="Eye" size={14} /> <span>وضع العرض</span></div>}
+                                </div>
+
+                                {activeScreen && (
+                                    <div className={`bg-white dark:bg-gray-900 border rounded-[2rem] overflow-hidden shadow-2xl transition-all duration-500 relative ${isEditMode ? 'border-blue-500/50 ring-4 ring-blue-500/10' : 'border-slate-200 dark:border-gray-800'}`}>
+                                        <div className="bg-slate-50 dark:bg-gray-800/40 p-8 border-b border-slate-200 dark:border-gray-800 relative">
+                                            {isEditMode && (<button onClick={() => askDelete('screen', activeScreen.id, null, 'حذف الشاشة', 'تحذير: سيتم حذف الشاشة وجميع الكاميرات المرتبطة بها نهائياً.')} className="absolute top-6 left-6 p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white rounded-2xl transition-all shadow-sm" title="حذف الشاشة"><Icon name="Trash2" size={24} /></button>)}
+                                            {isEditMode ? (
+                                                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start animate-in fade-in duration-300">
+                                                    <div className="flex flex-col gap-2"><label className="text-[10px] text-blue-500 uppercase font-black px-1">رمز الشاشة</label><input type="text" value={activeScreen.charId} onChange={(e) => updateScreen(activeScreen.id, 'charId', e.target.value)} className="bg-white dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 outline-none font-black text-center text-xl" maxLength={3} /></div>
+                                                    <div className="flex flex-col gap-2 lg:col-span-2"><label className="text-[10px] text-blue-500 uppercase font-black px-1">مسمى الشاشة</label><input type="text" value={activeScreen.name} onChange={(e) => updateScreen(activeScreen.id, 'name', e.target.value)} className="bg-white dark:bg-gray-950 border border-slate-300 dark:border-gray-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 outline-none font-black text-lg" /></div>
+                                                    <div className="flex flex-col gap-2">
+                                                        <label className="text-[10px] text-blue-500 uppercase font-black px-1">حالة الاتصال</label>
+                                                        <div className="flex bg-slate-200 dark:bg-gray-950 p-1.5 rounded-xl border border-slate-300 dark:border-gray-800">
+                                                            <button onClick={() => updateScreen(activeScreen.id, 'status', 'active')} className={`flex-1 py-2.5 rounded-lg flex items-center justify-center transition-all ${activeScreen.status === 'active' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'text-slate-500'}`}><Icon name="CheckCircle" size={20}/></button>
+                                                            <button onClick={() => updateScreen(activeScreen.id, 'status', 'warning')} className={`flex-1 py-2.5 rounded-lg flex items-center justify-center transition-all ${activeScreen.status === 'warning' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-slate-500'}`}><Icon name="AlertTriangle" size={20}/></button>
+                                                            <button onClick={() => updateScreen(activeScreen.id, 'status', 'error')} className={`flex-1 py-2.5 rounded-lg flex items-center justify-center transition-all ${activeScreen.status === 'error' ? 'bg-red-600 text-white shadow-lg shadow-red-600/20' : 'text-slate-500'}`}><Icon name="XCircle" size={20}/></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="bg-blue-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-600/20">{activeScreen.charId}</span>
+                                                            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{activeScreen.name}</h2>
+                                                        </div>
+                                                        {activeScreen.status !== 'active' && activeScreen.statusReason && <p className="text-orange-600 dark:text-orange-400 text-sm mt-4 font-black bg-orange-100 dark:bg-orange-900/20 px-4 py-2 rounded-xl border border-orange-200 dark:border-orange-500/30 inline-block animate-pulse">⚠ سبب التوقف: {activeScreen.statusReason}</p>}
+                                                    </div>
+                                                    <div className={`px-6 py-3 rounded-2xl border-2 flex items-center gap-3 font-black text-sm tracking-widest ${activeScreen.status === 'active' ? 'bg-green-500/10 border-green-500/20 text-green-600' : 'bg-red-500/10 border-red-500/20 text-red-600'}`}>
+                                                        <div className={`w-3 h-3 rounded-full ${activeScreen.status === 'active' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                                                        {activeScreen.status === 'active' ? 'SYSTEM LIVE' : 'SYSTEM OFFLINE'}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="p-8">
+                                            {isEditMode && <div className="mb-8 flex flex-wrap items-center justify-between gap-4 bg-blue-50 dark:bg-blue-900/10 p-6 rounded-2xl border border-blue-200 dark:border-blue-900/30"><div className="text-sm text-blue-700 dark:text-blue-400 font-black flex items-center gap-3">{getIcon('Edit3', {size:20})} التحكم في وحدات الكاميرات التابعة</div><button onClick={() => addNewCamera(activeScreen.id)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-black shadow-lg shadow-blue-600/30 transition-all active:scale-95">{getIcon('Plus', {size:20})} إضافة وحدة كاميرا</button></div>}
+                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                                                {activeScreen.cameras.map((cam) => (
+                                                    <div key={cam.id} className={`bg-white dark:bg-gray-950 border rounded-3xl p-5 flex flex-col sm:flex-row gap-6 transition-all duration-500 ${isEditMode ? 'border-blue-300 dark:border-blue-900 shadow-lg' : 'border-slate-100 dark:border-gray-800 hover:border-blue-400 dark:hover:border-blue-900 shadow-sm hover:shadow-xl'}`}>
+                                                        <div className="w-full sm:w-56 flex-shrink-0 group"><VideoPlaceholder id={cam.id} code={cam.code} status={cam.status} /></div>
+                                                        <div className="flex-1 flex flex-col justify-between">
+                                                            <div>
+                                                                <div className="flex justify-between items-start mb-3">
+                                                                    <div className="flex flex-col gap-1 w-full pl-4">
+                                                                        {isEditMode ? (
+                                                                            <div className="space-y-3 animate-in slide-in-from-right-2">
+                                                                                <input type="text" value={cam.code} onChange={(e) => updateCameraInfo(activeScreen.id, cam.id, 'code', e.target.value)} className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white font-black focus:border-blue-500 outline-none" placeholder="كود الكاميرا" />
+                                                                                <input type="text" value={cam.name} onChange={(e) => updateCameraInfo(activeScreen.id, cam.id, 'name', e.target.value)} className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-lg px-3 py-1.5 text-sm text-slate-900 dark:text-white font-black focus:border-blue-500 outline-none" placeholder="إسم الكاميرا" />
+                                                                            </div>
+                                                                        ) : (
+                                                                            <h3 className="text-xl font-black text-slate-800 dark:text-gray-100 leading-tight">{cam.name}</h3>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="bg-slate-100 dark:bg-gray-800 text-slate-400 px-3 py-1 rounded-lg text-[10px] font-black tracking-widest border border-slate-200 dark:border-gray-700">#{cam.number}</div>
+                                                                </div>
+                                                                <button onClick={() => setSelectedCameraForControl({ screenId: activeScreen.id, camera: cam })} className="w-full bg-slate-50 dark:bg-gray-900 hover:bg-blue-600 hover:text-white text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-gray-800 rounded-2xl py-3 text-xs font-black flex items-center justify-center gap-3 transition-all duration-300 mb-3 shadow-sm">{getIcon('Settings', {size:16})} مركز إدارة البيانات والتقارير</button>
+                                                            </div>
+                                                            <div className="mt-auto">
+                                                                {isEditMode ? (
+                                                                    <div className="flex gap-2 w-full animate-in fade-in pt-3 border-t border-slate-100 dark:border-gray-900">
+                                                                        <div className="flex gap-1.5 flex-1">
+                                                                            <button onClick={() => updateCameraInfo(activeScreen.id, cam.id, 'status', 'active')} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${cam.status === 'active' ? 'bg-green-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-gray-800 text-slate-400'}`}>{getIcon('CheckCircle', {size:16})}</button>
+                                                                            <button onClick={() => updateCameraInfo(activeScreen.id, cam.id, 'status', 'warning')} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${cam.status === 'warning' ? 'bg-orange-500 text-white shadow-lg' : 'bg-slate-100 dark:bg-gray-800 text-slate-400'}`}>{getIcon('AlertTriangle', {size:16})}</button>
+                                                                            <button onClick={() => updateCameraInfo(activeScreen.id, cam.id, 'status', 'error')} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${cam.status === 'error' ? 'bg-red-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-gray-800 text-slate-400'}`}>{getIcon('XCircle', {size:16})}</button>
+                                                                        </div>
+                                                                        <button onClick={() => confirmDeleteCamera(activeScreen.id, cam.id)} className="w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">{getIcon('Trash2', {size:18})}</button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex justify-between items-center pt-3 border-t border-slate-50 dark:border-gray-900/50">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <div className={`w-2.5 h-2.5 rounded-full ${cam.status === 'active' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'} animate-pulse`}></div>
+                                                                            <span className={`text-[10px] font-black ${cam.status === 'active' ? 'text-green-600' : 'text-red-600'}`}>{cam.status === 'active' ? 'OPERATIONAL' : 'FAULT DETECTED'}</span>
+                                                                        </div>
+                                                                        <span className="text-[9px] text-slate-400 font-black tracking-tighter">LAST UPDATED: {cam.lastUpdate}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="bg-white dark:bg-gray-900 border-t border-slate-200 dark:border-gray-800 py-6 px-10 mt-auto w-full transition-colors duration-300">
+                        <div className="flex flex-row justify-between items-center w-full text-[11px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">
+                            <div className="flex items-center gap-3 opacity-80"><div className="p-1.5 bg-yellow-500/10 rounded-lg">{getIcon('Lightbulb', {size:16, className:"text-yellow-500"})}</div><span>فكرة و إشراف : أنوار العايد - سارة الحربي</span></div>
+                            <div className="flex items-center gap-3"><div className="p-1.5 bg-blue-600/10 rounded-lg">{getIcon('Shield', {size:16, className:"text-blue-600 dark:text-blue-500"})}</div><span>إدارة الأمن و السلامة - 2025</span></div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SecurityDashboard />);
+    </script>
+</body>
+</html>

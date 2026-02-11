@@ -1,0 +1,734 @@
+import React, { useState, useEffect } from 'react';
+import { BookOpen, CheckCircle, ChevronRight, ChevronLeft, Flame, Settings, ArrowLeft, Info, Share2, Moon, X, Minus, Plus, Star, ChevronDown, Loader2, WifiOff, Award, Calendar, History, Book, Palette, Home } from 'lucide-react';
+
+// --- بيانات بداية صفحات جميع السور ---
+const SURAH_DATA = {
+  1: { name: "سورة الفاتحة", page: 1 }, 2: { name: "سورة البقرة", page: 2 }, 3: { name: "سورة آل عمران", page: 50 },
+  4: { name: "سورة النساء", page: 77 }, 5: { name: "سورة المائدة", page: 106 }, 6: { name: "سورة الأنعام", page: 128 },
+  7: { name: "سورة الأعراف", page: 151 }, 8: { name: "سورة الأنفال", page: 177 }, 9: { name: "سورة التوبة", page: 187 },
+  10: { name: "سورة يونس", page: 208 }, 11: { name: "سورة هود", page: 221 }, 12: { name: "سورة يوسف", page: 235 },
+  13: { name: "سورة الرعد", page: 249 }, 14: { name: "سورة إبراهيم", page: 255 }, 15: { name: "سورة الحجر", page: 262 },
+  16: { name: "سورة النحل", page: 267 }, 17: { name: "سورة الإسراء", page: 282 }, 18: { name: "سورة الكهف", page: 293 },
+  19: { name: "سورة مريم", page: 305 }, 20: { name: "سورة طه", page: 312 }, 21: { name: "سورة الأنبياء", page: 322 },
+  22: { name: "سورة الحج", page: 332 }, 23: { name: "سورة المؤمنون", page: 342 }, 24: { name: "سورة النور", page: 350 },
+  25: { name: "سورة الفرقان", page: 359 }, 26: { name: "سورة الشعراء", page: 367 }, 27: { name: "سورة النمل", page: 377 },
+  28: { name: "سورة القصص", page: 385 }, 29: { name: "سورة العنكبوت", page: 396 }, 30: { name: "سورة الروم", page: 404 },
+  31: { name: "سورة لقمان", page: 411 }, 32: { name: "سورة السجدة", page: 415 }, 33: { name: "سورة الأحزاب", page: 418 },
+  34: { name: "سورة سبأ", page: 428 }, 35: { name: "سورة فاطر", page: 434 }, 36: { name: "سورة يس", page: 440 },
+  37: { name: "سورة الصافات", page: 446 }, 38: { name: "سورة ص", page: 453 }, 39: { name: "سورة الزمر", page: 458 },
+  40: { name: "سورة غافر", page: 467 }, 41: { name: "سورة فصلت", page: 477 }, 42: { name: "سورة الشورى", page: 483 },
+  43: { name: "سورة الزخرف", page: 489 }, 44: { name: "سورة الدخان", page: 496 }, 45: { name: "سورة الجاثية", page: 499 },
+  46: { name: "سورة الأحقاف", page: 502 }, 47: { name: "سورة محمد", page: 507 }, 48: { name: "سورة الفتح", page: 511 },
+  49: { name: "سورة الحجرات", page: 515 }, 50: { name: "سورة ق", page: 518 }, 51: { name: "سورة الذاريات", page: 520 },
+  52: { name: "سورة الطور", page: 523 }, 53: { name: "سورة النجم", page: 526 }, 54: { name: "سورة القمر", page: 528 },
+  55: { name: "سورة الرحمن", page: 531 }, 56: { name: "سورة الواقعة", page: 534 }, 57: { name: "سورة الحديد", page: 537 },
+  58: { name: "سورة المجادلة", page: 542 }, 59: { name: "سورة الحشر", page: 545 }, 60: { name: "سورة الممتحنة", page: 549 },
+  61: { name: "سورة الصف", page: 551 }, 62: { name: "سورة الجمعة", page: 553 }, 63: { name: "سورة المنافقون", page: 554 },
+  64: { name: "سورة التغابن", page: 556 }, 65: { name: "سورة الطلاق", page: 558 }, 66: { name: "سورة التحريم", page: 560 },
+  67: { name: "سورة الملك", page: 562 }, 68: { name: "سورة القلم", page: 564 }, 69: { name: "سورة الحاقة", page: 566 },
+  70: { name: "سورة المعارج", page: 568 }, 71: { name: "سورة نوح", page: 570 }, 72: { name: "سورة الجن", page: 572 },
+  73: { name: "سورة المزمل", page: 574 }, 74: { name: "سورة المدثر", page: 575 }, 75: { name: "سورة القيامة", page: 577 },
+  76: { name: "سورة الإنسان", page: 578 }, 77: { name: "سورة المرسلات", page: 580 }, 78: { name: "سورة النبأ", page: 582 },
+  79: { name: "سورة النازعات", page: 583 }, 80: { name: "سورة عبس", page: 585 }, 81: { name: "سورة التكوير", page: 586 },
+  82: { name: "سورة الانفطار", page: 587 }, 83: { name: "سورة المطففين", page: 587 }, 84: { name: "سورة الانشقاق", page: 589 },
+  85: { name: "سورة البروج", page: 590 }, 86: { name: "سورة الطارق", page: 591 }, 87: { name: "سورة الأعلى", page: 591 },
+  88: { name: "سورة الغاشية", page: 592 }, 89: { name: "سورة الفجر", page: 593 }, 90: { name: "سورة البلد", page: 594 },
+  91: { name: "سورة الشمس", page: 595 }, 92: { name: "سورة الليل", page: 595 }, 93: { name: "سورة الضحى", page: 596 },
+  94: { name: "سورة الشرح", page: 596 }, 95: { name: "سورة التين", page: 597 }, 96: { name: "سورة العلق", page: 597 },
+  97: { name: "سورة القدر", page: 598 }, 98: { name: "سورة البينة", page: 598 }, 99: { name: "سورة الزلزلة", page: 599 },
+  100: { name: "سورة العاديات", page: 599 }, 101: { name: "سورة القارعة", page: 600 }, 102: { name: "سورة التكاثر", page: 600 },
+  103: { name: "سورة العصر", page: 601 }, 104: { name: "سورة الهمزة", page: 601 }, 105: { name: "سورة الفيل", page: 601 },
+  106: { name: "سورة قريش", page: 602 }, 107: { name: "سورة الماعون", page: 602 }, 108: { name: "سورة الكوثر", page: 602 },
+  109: { name: "سورة الكافرون", page: 603 }, 110: { name: "سورة النصر", page: 603 }, 111: { name: "سورة المسد", page: 603 },
+  112: { name: "سورة الإخلاص", page: 604 }, 113: { name: "سورة الفلق", page: 604 }, 114: { name: "سورة الناس", page: 604 }
+};
+
+const SURAHS_LIST = Object.entries(SURAH_DATA).map(([id, data]) => ({
+  id: Number(id),
+  name: data.name,
+  page: data.page
+}));
+
+const MUTASHABIH_DB = {
+  6: "تنبيه: (وما يخدعون) - في موضع آخر (وما يضلون إلا أنفسهم)",
+  7: "تنبيه: (ولهم عذاب عظيم) - ختمت الآية بالعظمة، بينما في آية 10 (عذاب أليم)",
+};
+
+export default function App() {
+  // --- States Initialization ---
+  const [activeTab, setActiveTab] = useState('wird'); // Tabs: mushaf, wird, designer
+  const [currentView, setCurrentView] = useState('home'); 
+  
+  const [streak, setStreak] = useState(() => parseInt(localStorage.getItem('wird_streak')) || 0);
+  const [dailyGoal, setDailyGoal] = useState(() => parseInt(localStorage.getItem('wird_dailyGoal')) || 5);
+  const [currentPageNum, setCurrentPageNum] = useState(() => parseInt(localStorage.getItem('wird_currentPage')) || 1);
+  const [startPageGoal, setStartPageGoal] = useState(() => parseInt(localStorage.getItem('wird_startPage')) || 1);
+  const [pagesReadToday, setPagesReadToday] = useState(0); 
+  const [lastReadDate, setLastReadDate] = useState(() => localStorage.getItem('wird_lastReadDate') || "");
+  const [achievementLog, setAchievementLog] = useState(() => JSON.parse(localStorage.getItem('wird_history')) || []);
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false); 
+  const [showMutashabih, setShowMutashabih] = useState(false);
+  const [isGoalReachedModalOpen, setIsGoalReachedModalOpen] = useState(false);
+
+  // --- إدارة البيانات ---
+  const [pageVerses, setPageVerses] = useState([]);
+  const [headerTitle, setHeaderTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // --- حفظ البيانات عند التغيير ---
+  useEffect(() => { localStorage.setItem('wird_dailyGoal', dailyGoal); }, [dailyGoal]);
+  useEffect(() => { localStorage.setItem('wird_currentPage', currentPageNum); }, [currentPageNum]);
+  useEffect(() => { localStorage.setItem('wird_streak', streak); }, [streak]);
+  useEffect(() => { localStorage.setItem('wird_startPage', startPageGoal); }, [startPageGoal]);
+  useEffect(() => { localStorage.setItem('wird_lastReadDate', lastReadDate); }, [lastReadDate]);
+  useEffect(() => { localStorage.setItem('wird_history', JSON.stringify(achievementLog)); }, [achievementLog]);
+
+  const toArabicNumerals = (num) => num.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+
+  const cacheNextPages = async (startPage) => {
+    for (let i = 1; i <= 20; i++) {
+      const targetPage = startPage + i;
+      if (targetPage > 604) break;
+      const cacheKey = `quran_page_${targetPage}`;
+      if (localStorage.getItem(cacheKey)) continue;
+      try {
+        const response = await fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?page_number=${targetPage}`);
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+        }
+      } catch (e) { console.log("Caching failed for page", targetPage); }
+    }
+  };
+
+  const fetchPageData = async (pageNum) => {
+    setIsLoading(true);
+    setError(null);
+    setShowMutashabih(false);
+
+    const cacheKey = `quran_page_${pageNum}`;
+    const cachedData = localStorage.getItem(cacheKey);
+
+    if (cachedData) {
+      processData(JSON.parse(cachedData));
+      setIsLoading(false);
+      cacheNextPages(pageNum);
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?page_number=${pageNum}`);
+      if (!response.ok) throw new Error("فشل الاتصال بالخادم");
+      
+      const data = await response.json();
+      try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+
+      processData(data);
+      cacheNextPages(pageNum);
+
+    } catch (err) {
+      console.error(err);
+      setError("تأكد من اتصالك بالإنترنت");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const processData = (data) => {
+    setPageVerses(data.verses);
+    const startingSurahVerse = data.verses.find(v => v.verse_key.split(':')[1] === '1');
+    if (startingSurahVerse) {
+      const surahId = startingSurahVerse.verse_key.split(':')[0];
+      setHeaderTitle(SURAH_DATA[surahId]?.name);
+    } else {
+      const firstVerseKey = data.verses[0].verse_key;
+      const chapterId = firstVerseKey.split(':')[0];
+      setHeaderTitle(SURAH_DATA[chapterId]?.name);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === 'wird' && currentView === 'reading') {
+      fetchPageData(currentPageNum);
+    }
+  }, [currentPageNum, currentView, activeTab]);
+
+  // --- Placeholder Views ---
+  const MushafView = () => (
+    <div className="flex flex-col items-center justify-center h-full p-6 text-center animate-fade-in">
+        <div className="w-24 h-24 bg-stone-100 rounded-full flex items-center justify-center mb-6">
+            <Book className="w-10 h-10 text-stone-400" />
+        </div>
+        <h2 className="text-2xl font-bold font-cairo text-[#1A4D2E] mb-2">المصحف الشريف</h2>
+        <p className="text-[#8C8A84] font-cairo">صفحة المصحف الكامل قادمة قريباً بإذن الله</p>
+    </div>
+  );
+
+  const DesignerView = () => (
+    <div className="flex flex-col items-center justify-center h-full p-6 text-center animate-fade-in">
+        <div className="w-24 h-24 bg-stone-100 rounded-full flex items-center justify-center mb-6">
+            <Palette className="w-10 h-10 text-stone-400" />
+        </div>
+        <h2 className="text-2xl font-bold font-cairo text-[#1A4D2E] mb-2">المصمم الإسلامي</h2>
+        <p className="text-[#8C8A84] font-cairo">أدوات تصميم البطاقات والخلفيات قادمة قريباً</p>
+    </div>
+  );
+
+  // --- Components ---
+  const SurahHeader = ({ surahId }) => {
+    const name = SURAH_DATA[surahId]?.name || "سورة";
+    return (
+      <div className="w-full my-10 flex flex-col items-center animate-fade-in select-none">
+        <div className="relative w-full max-w-[280px] h-14 flex items-center justify-center bg-[#FDFBF7] border-y-2 border-[#D4AF37] mb-4">
+          <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#D4AF37] rotate-45"></div>
+          <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#D4AF37] rotate-45"></div>
+          <span className="text-[#1A4D2E] font-cairo font-black text-xl z-10 bg-[#FDFBF7] px-6">
+             {name}
+          </span>
+        </div>
+        {Number(surahId) !== 9 && (
+          <p className="font-amiri text-2xl text-[#1A4D2E] mb-2 opacity-90">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
+        )}
+      </div>
+    );
+  };
+
+  const VerseMarker = ({ number }) => (
+    <span className="inline-flex relative items-center justify-center w-[34px] h-[34px] mx-1.5 align-middle select-none translate-y-2">
+      <svg viewBox="0 0 36 36" className="w-full h-full text-[#D4AF37]">
+         <circle cx="18" cy="18" r="17" fill="none" stroke="currentColor" strokeWidth="1" />
+         <circle cx="18" cy="18" r="13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5"/>
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[13px] font-bold text-[#1A4D2E] pt-1 font-sans leading-none">
+        {toArabicNumerals(number)}
+      </span>
+    </span>
+  );
+
+  const saveAchievement = () => {
+    const today = new Date();
+    const newLog = {
+      id: Date.now(),
+      date: today.toLocaleDateString('ar-SA', { weekday: 'long', month: 'long', day: 'numeric' }),
+      time: today.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+      pages: pagesReadToday,
+    };
+    
+    setAchievementLog(prev => [newLog, ...prev]);
+
+    const dateStr = today.toDateString();
+    if (lastReadDate !== dateStr) {
+      setStreak(prev => prev + 1);
+      setLastReadDate(dateStr);
+    }
+  };
+
+  const handleGoalReached = () => {
+    setIsGoalReachedModalOpen(true);
+  };
+
+  // --- Modals ---
+  const SettingsModal = () => {
+    const [tempGoal, setTempGoal] = useState(dailyGoal);
+    const [tempStartPage, setTempStartPage] = useState(startPageGoal);
+
+    const handleSave = () => {
+      setDailyGoal(tempGoal);
+      setStartPageGoal(tempStartPage);
+      setCurrentPageNum(tempStartPage);
+      setPagesReadToday(0);
+      setIsSettingsOpen(false);
+    };
+
+    return (
+      <div className="absolute inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" dir="rtl">
+        <div className="bg-[#FDFBF7] w-full sm:w-11/12 rounded-t-[30px] sm:rounded-[30px] p-6 shadow-2xl animate-slide-up border-t-4 border-[#D4AF37] max-h-[85vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-xl font-bold text-[#1A4D2E] font-cairo">إعدادات الورد</h3>
+            <button onClick={() => setIsSettingsOpen(false)} className="p-2 bg-[#E8E6E1] rounded-full hover:bg-[#D4AF37] hover:text-white transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">بداية الورد من</label>
+              <div className="relative">
+                <select 
+                  onChange={(e) => setTempStartPage(Number(e.target.value))}
+                  value={SURAHS_LIST.find(s => s.page === tempStartPage)?.page || tempStartPage}
+                  className="w-full p-4 bg-white border border-[#E8E6E1] rounded-2xl appearance-none font-cairo font-bold text-[#1A4D2E] focus:outline-none focus:border-[#D4AF37]"
+                >
+                  {SURAHS_LIST.map(surah => (
+                    <option key={surah.id} value={surah.page}>{surah.name}</option>
+                  ))}
+                </select>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#D4AF37]">
+                  <ChevronDown className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">عدد الصفحات اليومي</label>
+              <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-[#E8E6E1] shadow-sm">
+                <button 
+                  onClick={() => setTempGoal(prev => Math.max(1, prev - 1))}
+                  className="w-12 h-12 bg-[#F5F3EF] rounded-xl flex items-center justify-center text-[#1A4D2E] active:scale-95 transition hover:bg-[#E8E6E1]"
+                >
+                  <Minus className="w-5 h-5" />
+                </button>
+                <span className="text-3xl font-bold text-[#1A4D2E] font-cairo">{tempGoal}</span>
+                <button 
+                  onClick={() => setTempGoal(prev => prev + 1)}
+                  className="w-12 h-12 bg-[#1A4D2E] rounded-xl shadow-lg shadow-[#1A4D2E]/20 flex items-center justify-center text-[#D4AF37] active:scale-95 transition hover:bg-[#143d24]"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <button 
+              onClick={handleSave}
+              className="w-full py-4 bg-gradient-to-r from-[#1A4D2E] to-[#25663E] text-white rounded-2xl font-bold font-cairo mt-6 active:scale-95 transition shadow-lg shadow-[#1A4D2E]/20 border border-[#1A4D2E]"
+            >
+              حفظ التغييرات
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const HistoryModal = () => (
+    <div className="absolute inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" dir="rtl">
+      <div className="bg-[#FDFBF7] w-full sm:w-11/12 h-[80vh] rounded-t-[30px] sm:rounded-[30px] p-6 shadow-2xl animate-slide-up border-t-4 border-[#D4AF37] flex flex-col">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <History className="w-6 h-6 text-[#1A4D2E]" />
+            <h3 className="text-xl font-bold text-[#1A4D2E] font-cairo">سجل إنجازاتك</h3>
+          </div>
+          <button onClick={() => setIsHistoryOpen(false)} className="p-2 bg-[#E8E6E1] rounded-full hover:bg-[#D4AF37] hover:text-white transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+          {achievementLog.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-[#8C8A84] opacity-70">
+              <BookOpen className="w-16 h-16 mb-4 opacity-50" />
+              <p className="font-cairo text-lg">لم تسجل أي إنجاز بعد</p>
+            </div>
+          ) : (
+            achievementLog.map((log) => (
+              <div key={log.id} className="bg-white p-4 rounded-2xl border border-[#E8E6E1] shadow-sm flex justify-between items-center hover:border-[#D4AF37]/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#F5F3EF] rounded-xl flex items-center justify-center text-[#1A4D2E]">
+                    <CheckCircle className="w-6 h-6 text-[#D4AF37]" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#1A4D2E] font-cairo text-sm sm:text-base">{log.date}</p>
+                    <p className="text-xs text-[#8C8A84] mt-0.5">{log.time}</p>
+                  </div>
+                </div>
+                <div className="text-center bg-[#1A4D2E]/5 px-3 py-1 rounded-lg">
+                  <p className="text-lg font-bold text-[#1A4D2E] font-cairo">{log.pages}</p>
+                  <p className="text-[10px] text-[#8C8A84]">صفحات</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const GoalReachedModal = () => (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4" dir="rtl">
+      <div className="bg-white w-full max-w-sm rounded-[30px] p-8 shadow-2xl animate-slide-up relative overflow-hidden text-center border-2 border-[#D4AF37]">
+        <div className="absolute top-0 left-0 w-full h-full opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+        <div className="relative z-10">
+          <div className="w-20 h-20 bg-[#1A4D2E] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#1A4D2E]/30 animate-bounce-slow">
+            <Award className="w-10 h-10 text-[#D4AF37]" />
+          </div>
+          <h3 className="text-2xl font-black text-[#1A4D2E] font-cairo mb-2">أحسنت صنعاً!</h3>
+          <p className="text-[#8C8A84] font-cairo mb-8 leading-relaxed">
+            لقد أتممت وردك اليومي ({dailyGoal} صفحات). هل تود تسجيل هذا الإنجاز؟
+          </p>
+          <div className="space-y-3">
+            <button 
+              onClick={() => { 
+                saveAchievement(); 
+                setIsGoalReachedModalOpen(false); 
+                setCurrentView('completed'); 
+              }}
+              className="w-full py-3.5 bg-[#1A4D2E] text-white rounded-xl font-bold font-cairo shadow-lg shadow-[#1A4D2E]/20 active:scale-95 transition"
+            >
+              إنهاء الورد وتسجيل الإنجاز
+            </button>
+            <button 
+              onClick={() => setIsGoalReachedModalOpen(false)}
+              className="w-full py-3.5 bg-white text-[#1A4D2E] border-2 border-[#1A4D2E]/10 rounded-xl font-bold font-cairo hover:bg-[#FDFBF7] active:scale-95 transition"
+            >
+              أرغب في الاستزادة
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const HomeView = () => (
+    <div className="flex flex-col h-full p-6 animate-fade-in bg-[#FDFBF7]" dir="rtl">
+      <div className="flex justify-between items-center mb-10 pt-4">
+        <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-[#1A4D2E] to-[#0F2E1B] rounded-2xl flex items-center justify-center rotate-3 shadow-lg border border-[#D4AF37]/30">
+                <Moon className="w-7 h-7 text-[#D4AF37] fill-[#D4AF37]" />
+            </div>
+            <div>
+                <h1 className="text-2xl font-black text-[#1A4D2E] font-cairo leading-none mb-1">وِردُك اليومي</h1>
+                <p className="text-[#8C8A84] text-xs font-semibold font-cairo tracking-wide">
+                  {new Date().toLocaleDateString('ar-SA', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </p>
+            </div>
+        </div>
+        <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="w-12 h-12 rounded-2xl border border-[#D4AF37]/30 bg-white flex items-center justify-center hover:bg-[#FDFBF7] active:scale-95 transition shadow-sm text-[#D4AF37]"
+        >
+          <Settings className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="bg-[#1A4D2E] rounded-[32px] p-1 text-white shadow-xl shadow-[#1A4D2E]/20 mb-10 relative overflow-hidden group cursor-default transition-transform hover:scale-[1.02]">
+        <div className="bg-gradient-to-br from-[#1A4D2E] to-[#0D2916] rounded-[28px] p-7 h-full relative z-10 border border-[#ffffff]/10">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+          <div className="relative z-10 flex justify-between items-center">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Star className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" />
+                <p className="text-[#D4AF37] text-sm font-cairo font-bold tracking-wide">إنجاز متواصل</p>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setIsHistoryOpen(true); }}
+                  className="mr-2 p-1 bg-[#D4AF37]/20 rounded-full hover:bg-[#D4AF37]/40 transition-colors"
+                  title="سجل الإنجازات"
+                >
+                  <History className="w-3 h-3 text-[#D4AF37]" />
+                </button>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-black font-cairo tracking-tight text-white">{streak}</span>
+                <span className="text-lg opacity-80 font-cairo text-[#E8E6E1]">يوماً</span>
+              </div>
+            </div>
+            <div className="w-16 h-16 bg-[#D4AF37]/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-[#D4AF37]/30">
+              <Flame className="w-8 h-8 text-[#D4AF37] fill-[#D4AF37]" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center relative">
+        <div className="relative w-64 h-64 flex items-center justify-center mb-12">
+          <div className="absolute inset-0 bg-[#D4AF37]/5 rounded-full blur-xl"></div>
+          <svg className="w-full h-full transform -rotate-90 drop-shadow-2xl">
+            <circle cx="128" cy="128" r="100" stroke="#E8E6E1" strokeWidth="12" fill="none" />
+            <circle 
+              cx="128" cy="128" r="100" 
+              stroke="#D4AF37" 
+              strokeWidth="12" 
+              fill="none" 
+              strokeDasharray={2 * Math.PI * 100}
+              strokeDashoffset={2 * Math.PI * 100 * (1 - pagesReadToday/dailyGoal)}
+              className="transition-all duration-1000 ease-out"
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute flex flex-col items-center">
+            <span className="text-6xl font-black text-[#1A4D2E] font-cairo">{pagesReadToday}</span>
+            <span className="text-[#8C8A84] text-sm font-bold mt-2 font-cairo tracking-wide bg-white/50 px-3 py-1 rounded-full border border-[#D4AF37]/20">
+              {pagesReadToday} / {dailyGoal}
+            </span>
+          </div>
+        </div>
+        <button 
+          onClick={() => setCurrentView('reading')}
+          className="w-full bg-[#1A4D2E] text-white py-5 rounded-2xl font-bold text-xl shadow-xl shadow-[#1A4D2E]/30 active:scale-[0.98] transition-all flex items-center justify-center gap-3 font-cairo border border-[#D4AF37]/30 hover:bg-[#143d24] relative overflow-hidden"
+        >
+          <span className="absolute top-0 right-0 w-20 h-full bg-gradient-to-l from-[#ffffff]/10 to-transparent"></span>
+          <BookOpen className="w-6 h-6 text-[#D4AF37]" />
+          <span className="relative z-10">{pagesReadToday > 0 ? 'متابعة الورد' : 'ابدأ القراءة'}</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  const ReadingView = () => {
+    const handleNext = () => {
+      if (currentPageNum < 604) {
+        const nextPage = currentPageNum + 1;
+        const nextPagesRead = pagesReadToday + 1;
+        
+        if (nextPagesRead === dailyGoal) {
+          handleGoalReached();
+        }
+        
+        setCurrentPageNum(nextPage);
+        setPagesReadToday(nextPagesRead);
+      } else {
+        setPagesReadToday(dailyGoal);
+        setCurrentView('completed');
+      }
+    };
+
+    const handlePrev = () => {
+      if (currentPageNum > 1) {
+        setCurrentPageNum(prev => prev - 1);
+      }
+    };
+
+    const currentMutashabih = MUTASHABIH_DB[currentPageNum];
+
+    return (
+      <div className="flex flex-col h-full bg-[#FDFBF7]" dir="rtl">
+        <div className="px-6 py-5 flex justify-between items-center border-b border-[#D4AF37]/20 bg-[#FDFBF7]/90 backdrop-blur-md sticky top-0 z-20">
+          <button onClick={() => setCurrentView('home')} className="p-2 rounded-full hover:bg-[#E8E6E1] active:scale-90 transition">
+            <ArrowLeft className="w-6 h-6 text-[#1A4D2E] rotate-180" />
+          </button>
+          <div className="text-center">
+            {isLoading ? (
+               <div className="h-6 w-24 bg-[#E8E6E1] animate-pulse rounded"></div>
+            ) : (
+               <h2 className="text-[#1A4D2E] font-bold font-cairo text-lg">{headerTitle}</h2>
+            )}
+            <div className="flex items-center justify-center gap-2 mt-1">
+               <span className="h-[1px] w-8 bg-[#D4AF37]/40"></span>
+               <p className="text-xs text-[#D4AF37] font-bold font-cairo">صفحة {toArabicNumerals(currentPageNum)}</p>
+               <span className="h-[1px] w-8 bg-[#D4AF37]/40"></span>
+            </div>
+          </div>
+          <div className="w-10"></div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center relative">
+          <div className="w-full max-w-lg min-h-[500px] h-auto mb-10 px-2 sm:px-0">
+             <div className="w-full h-full flex flex-col items-center py-4 relative min-h-[480px]">
+                <div className="text-center w-full relative z-10 flex-1 flex flex-col items-center">
+                    {isLoading && (
+                      <div className="flex flex-col items-center gap-4 mt-20">
+                        <Loader2 className="w-10 h-10 text-[#D4AF37] animate-spin" />
+                        <p className="text-[#8C8A84] font-cairo text-sm">جاري جلب الآيات...</p>
+                      </div>
+                    )}
+                    {error && (
+                      <div className="flex flex-col items-center gap-4 text-red-800 bg-red-50 p-6 rounded-2xl border border-red-100 mt-20">
+                        <WifiOff className="w-8 h-8 opacity-50" />
+                        <p className="font-cairo font-bold">{error}</p>
+                        <button onClick={() => fetchPageData(currentPageNum)} className="text-sm underline">إعادة المحاولة</button>
+                      </div>
+                    )}
+                    {!isLoading && !error && (
+                      <div className="font-amiri text-2xl md:text-4xl text-[#1A1A1A] leading-[2.8] text-justify tracking-wide selection:bg-[#D4AF37]/20 w-full pb-8" dir="rtl">
+                        {pageVerses.map((verse) => {
+                          const verseNum = verse.verse_key.split(':')[1];
+                          const surahId = verse.verse_key.split(':')[0];
+                          return (
+                            <React.Fragment key={verse.id}>
+                              {verseNum === '1' && <SurahHeader surahId={surahId} />}
+                              <span className="inline">
+                                {verse.text_uthmani} <VerseMarker number={verseNum} />
+                              </span>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    )}
+                </div>
+             </div>
+          </div>
+          {currentMutashabih && !isLoading && (
+            <div className="mt-8 w-full max-w-md animate-slide-up mb-6">
+              <button 
+                onClick={() => setShowMutashabih(!showMutashabih)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all mx-auto shadow-sm font-cairo border
+                  ${showMutashabih 
+                    ? 'bg-[#FEF9E7] text-[#B58D1D] border-[#D4AF37]/40' 
+                    : 'bg-white text-[#8C8A84] border-[#E8E6E1] hover:border-[#D4AF37]/40'}`}
+              >
+                <Info className="w-4 h-4" />
+                {showMutashabih ? 'إخفاء التوجيه' : 'تنبيه متشابه'}
+              </button>
+              {showMutashabih && (
+                <div className="mt-4 p-5 bg-[#FEF9E7] border border-[#D4AF37]/20 rounded-2xl text-center text-[#5C5A54] text-sm shadow-md animate-fade-in relative font-cairo leading-relaxed">
+                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#FEF9E7] border-t border-l border-[#D4AF37]/20 rotate-45"></div>
+                   <p><strong className="text-[#B58D1D]">فائدة: </strong>{currentMutashabih}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="p-5 bg-white border-t border-[#E8E6E1] pb-8 sm:pb-5 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)]">
+          <div className="flex justify-between items-center max-w-md mx-auto" dir="ltr">
+             <button 
+              onClick={handlePrev}
+              disabled={currentPageNum === 1 || isLoading}
+              className="w-14 h-14 flex items-center justify-center rounded-2xl text-[#8C8A84] disabled:opacity-30 hover:bg-[#FDFBF7] border border-transparent hover:border-[#D4AF37]/20 transition"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+            <div className="flex flex-col items-center gap-2 w-full px-6">
+              <span className="text-xs text-[#D4AF37] font-bold font-cairo tracking-widest">{pagesReadToday} / {dailyGoal} من الورد</span>
+              <div className="h-2 w-full bg-[#E8E6E1] rounded-full overflow-hidden" dir="rtl">
+                <div 
+                  className="h-full bg-[#D4AF37] transition-all duration-500 ease-out rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                  style={{ width: `${Math.min((pagesReadToday / dailyGoal) * 100, 100)}%` }}
+                ></div>
+              </div>
+            </div>
+            <button 
+              onClick={handleNext}
+              disabled={isLoading}
+              className="w-14 h-14 flex items-center justify-center rounded-2xl bg-[#1A4D2E] text-[#D4AF37] shadow-lg shadow-[#1A4D2E]/20 active:scale-95 transition hover:bg-[#143d24] border border-[#D4AF37]/30"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const CompletedView = () => (
+    <div className="flex flex-col h-full items-center justify-center p-8 bg-[#1A4D2E] text-white text-center animate-fade-in relative overflow-hidden" dir="rtl">
+      <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+      <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#D4AF37]/20 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+      <div className="relative z-10 flex flex-col items-center w-full max-w-md">
+        <div className="w-32 h-32 bg-white/5 rounded-[30px] rotate-6 flex items-center justify-center mb-10 animate-bounce-slow backdrop-blur-md border border-[#D4AF37]/30 shadow-2xl">
+          <CheckCircle className="w-16 h-16 text-[#D4AF37] -rotate-6" />
+        </div>
+        <h2 className="text-4xl font-black font-cairo mb-3 text-white">فتح الله عليك</h2>
+        <p className="text-[#E8E6E1] mb-12 text-lg font-cairo opacity-90">أتممت وردك اليومي بنجاح وتقبل الله منك</p>
+        <div className="bg-[#0F2E1B]/50 backdrop-blur-md rounded-[24px] p-6 w-full mb-8 border border-[#D4AF37]/20 shadow-xl">
+          <div className="flex justify-between items-center mb-4 border-b border-[#ffffff]/10 pb-4">
+            <span className="text-[#E8E6E1] font-cairo">الصفحات المنجزة</span>
+            <span className="font-bold text-2xl font-cairo text-[#D4AF37]">{pagesReadToday}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[#E8E6E1] font-cairo">الوقت المستغرق</span>
+            <span className="font-bold text-2xl font-cairo text-[#D4AF37]">12 دقيقة</span>
+          </div>
+        </div>
+        <div className="flex gap-4 w-full">
+          <button 
+            onClick={() => { setPagesReadToday(0); setCurrentView('home'); }}
+            className="flex-1 bg-[#FDFBF7] text-[#1A4D2E] py-4 rounded-2xl font-bold font-cairo hover:bg-[#E8E6E1] active:scale-95 transition shadow-lg border border-[#D4AF37]"
+          >
+            العودة للرئيسية
+          </button>
+          <button className="p-4 bg-[#D4AF37]/20 rounded-2xl hover:bg-[#D4AF37]/30 active:scale-95 transition border border-[#D4AF37]/40 backdrop-blur-sm text-[#D4AF37]">
+            <Share2 className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-[#E0DCD5] font-sans">
+      <div className="w-full max-w-md h-[850px] bg-[#FDFBF7] shadow-2xl overflow-hidden relative rounded-none sm:rounded-[40px] border-[#D4AF37]/20 sm:border-[8px] flex flex-col">
+        
+        <style>
+          {`
+            @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;500;700;800;900&display=swap');
+            
+            .font-amiri { font-family: 'Amiri', serif; }
+            .font-cairo { font-family: 'Cairo', sans-serif; }
+            body { font-family: 'Cairo', sans-serif; } 
+            
+            .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+            .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+            .animate-bounce-slow { animation: float 6s ease-in-out infinite; }
+            .animate-spin { animation: spin 1s linear infinite; }
+            
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes slideUp {
+              from { opacity: 0; transform: translateY(30px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes float {
+              0% { transform: translateY(0px) rotate(6deg); }
+              50% { transform: translateY(-12px) rotate(6deg); }
+              100% { transform: translateY(0px) rotate(6deg); }
+            }
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+          `}
+        </style>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-hidden relative">
+            {activeTab === 'wird' && (
+                currentView === 'home' ? <HomeView /> : 
+                currentView === 'reading' ? <ReadingView /> : 
+                <CompletedView />
+            )}
+            {activeTab === 'mushaf' && <MushafView />}
+            {activeTab === 'designer' && <DesignerView />}
+        </div>
+
+        {/* Bottom Navigation Bar - Refined Design */}
+        <div className="bg-white border-t border-[#E8E6E1] px-10 py-3 flex justify-between items-center shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.05)] z-30 rounded-t-3xl relative" dir="rtl">
+            
+            {/* Mushaf (Right) */}
+            <button 
+                onClick={() => setActiveTab('mushaf')}
+                className={`group flex flex-col items-center gap-1.5 transition-all w-16 ${activeTab === 'mushaf' ? 'text-[#1A4D2E]' : 'text-[#8C8A84] hover:text-[#1A4D2E]/70'}`}
+            >
+                <div className="relative">
+                    <Book className={`w-6 h-6 transition-transform duration-300 ${activeTab === 'mushaf' ? '-translate-y-1' : ''}`} strokeWidth={activeTab === 'mushaf' ? 2.5 : 2} />
+                    {activeTab === 'mushaf' && <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-fade-in"></span>}
+                </div>
+                <span className={`text-[11px] font-bold font-cairo transition-all ${activeTab === 'mushaf' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>المصحف</span>
+            </button>
+
+            {/* Daily Wird (Center - Main) */}
+            <button 
+                onClick={() => setActiveTab('wird')}
+                className={`group flex flex-col items-center gap-1.5 transition-all w-16 ${activeTab === 'wird' ? 'text-[#1A4D2E]' : 'text-[#8C8A84] hover:text-[#1A4D2E]/70'}`}
+            >
+                <div className="relative">
+                    <Moon className={`w-6 h-6 transition-transform duration-300 ${activeTab === 'wird' ? '-translate-y-1 fill-current' : ''}`} strokeWidth={activeTab === 'wird' ? 2.5 : 2} />
+                    {activeTab === 'wird' && <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-fade-in"></span>}
+                </div>
+                <span className={`text-[11px] font-bold font-cairo transition-all ${activeTab === 'wird' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>الورد</span>
+            </button>
+
+            {/* Designer (Left) */}
+            <button 
+                onClick={() => setActiveTab('designer')}
+                className={`group flex flex-col items-center gap-1.5 transition-all w-16 ${activeTab === 'designer' ? 'text-[#1A4D2E]' : 'text-[#8C8A84] hover:text-[#1A4D2E]/70'}`}
+            >
+                <div className="relative">
+                    <Palette className={`w-6 h-6 transition-transform duration-300 ${activeTab === 'designer' ? '-translate-y-1' : ''}`} strokeWidth={activeTab === 'designer' ? 2.5 : 2} />
+                    {activeTab === 'designer' && <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-fade-in"></span>}
+                </div>
+                <span className={`text-[11px] font-bold font-cairo transition-all ${activeTab === 'designer' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>المصمم</span>
+            </button>
+        </div>
+        
+        {/* Modals */}
+        {isSettingsOpen && <SettingsModal />}
+        {isHistoryOpen && <HistoryModal />}
+        {isGoalReachedModalOpen && <GoalReachedModal />}
+
+      </div>
+    </div>
+  );
+}
