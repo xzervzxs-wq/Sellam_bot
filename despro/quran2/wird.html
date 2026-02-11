@@ -334,8 +334,7 @@ function App() {
   const [showMutashabih, setShowMutashabih] = useState(false);
   const [isGoalReachedModalOpen, setIsGoalReachedModalOpen] = useState(false);
   
-  // Reminder System
-  const [showReminderModal, setShowReminderModal] = useState(false);
+  // Daily Reminder Notifications
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('wird_notifications') === 'true');
   const [reminderTime, setReminderTime] = useState(() => localStorage.getItem('wird_reminderTime') || '18:00');
 
@@ -353,22 +352,7 @@ function App() {
   useEffect(() => { localStorage.setItem('wird_notifications', notificationsEnabled); }, [notificationsEnabled]);
   useEffect(() => { localStorage.setItem('wird_reminderTime', reminderTime); }, [reminderTime]);
 
-  // Check if user hasn't read today and show reminder
-  useEffect(() => {
-    const today = new Date().toDateString();
-    const lastShownReminder = localStorage.getItem('wird_lastReminderShown');
-    
-    if (lastReadDate !== today && lastShownReminder !== today) {
-      // Show reminder after 2 seconds
-      const timer = setTimeout(() => {
-        setShowReminderModal(true);
-        localStorage.setItem('wird_lastReminderShown', today);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [lastReadDate]);
-
-  // Request notification permission and schedule
+  // Request notification permission
   const requestNotificationPermission = async () => {
     if (!('Notification' in window)) {
       alert('متصفحك لا يدعم الإشعارات');
@@ -657,47 +641,6 @@ function App() {
       </div>
     );
   };
-  
-  // Reminder Modal - Shows when user hasn't read today
-  const ReminderModal = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4" dir="rtl">
-      <div className="bg-white w-full max-w-sm rounded-[30px] p-8 shadow-2xl animate-slide-up relative overflow-hidden text-center border-2 border-[#D4AF37]">
-        <div className="absolute top-0 left-0 w-full h-full opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-        <div className="relative z-10">
-          <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#B8960F] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-bounce-slow">
-            <Bell className="w-10 h-10 text-white" />
-          </div>
-          <h3 className="text-2xl font-black text-[#1A4D2E] font-cairo mb-2">السلام عليكم! 🌙</h3>
-          <p className="text-[#8C8A84] font-cairo mb-4 leading-relaxed">
-            لم تقرأ وردك اليوم بعد
-          </p>
-          {streak > 0 && (
-            <div className="bg-[#1A4D2E]/10 rounded-2xl p-4 mb-6">
-              <p className="text-[#1A4D2E] font-cairo text-sm">
-                لديك سلسلة <span className="font-black text-lg text-[#D4AF37]">{streak}</span> يوم متواصل!
-              </p>
-              <p className="text-[#8C8A84] text-xs mt-1">حافظ عليها ولا تقطعها 💪</p>
-            </div>
-          )}
-          <div className="space-y-3">
-            <button 
-              onClick={() => { setShowReminderModal(false); setCurrentView('reading'); }}
-              className="w-full py-4 bg-[#1A4D2E] text-white rounded-xl font-bold font-cairo shadow-lg shadow-[#1A4D2E]/20 active:scale-95 transition flex items-center justify-center gap-2"
-            >
-              <BookOpen className="w-5 h-5 text-[#D4AF37]" />
-              ابدأ القراءة الآن
-            </button>
-            <button 
-              onClick={() => setShowReminderModal(false)}
-              className="w-full py-3 bg-white text-[#8C8A84] border border-[#E8E6E1] rounded-xl font-cairo hover:bg-[#FDFBF7] active:scale-95 transition text-sm"
-            >
-              لاحقاً
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const HistoryModal = () => (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" dir="rtl">
@@ -1058,7 +1001,6 @@ function App() {
       {isSettingsOpen && <SettingsModal />}
       {isHistoryOpen && <HistoryModal />}
       {isGoalReachedModalOpen && <GoalReachedModal />}
-      {showReminderModal && <ReminderModal />}
     </div>
   );
 }
