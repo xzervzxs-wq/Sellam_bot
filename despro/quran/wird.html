@@ -333,10 +333,6 @@ function App() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [showMutashabih, setShowMutashabih] = useState(false);
   const [isGoalReachedModalOpen, setIsGoalReachedModalOpen] = useState(false);
-  
-  // Daily Reminder Notifications
-  const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('wird_notifications') === 'true');
-  const [reminderTime, setReminderTime] = useState(() => localStorage.getItem('wird_reminderTime') || '18:00');
 
   const [pageVerses, setPageVerses] = useState([]);
   const [headerTitle, setHeaderTitle] = useState("");
@@ -349,69 +345,6 @@ function App() {
   useEffect(() => { localStorage.setItem('wird_startPage', startPageGoal); }, [startPageGoal]);
   useEffect(() => { localStorage.setItem('wird_lastReadDate', lastReadDate); }, [lastReadDate]);
   useEffect(() => { localStorage.setItem('wird_history', JSON.stringify(achievementLog)); }, [achievementLog]);
-  useEffect(() => { localStorage.setItem('wird_notifications', notificationsEnabled); }, [notificationsEnabled]);
-  useEffect(() => { localStorage.setItem('wird_reminderTime', reminderTime); }, [reminderTime]);
-
-  // Request notification permission
-  const requestNotificationPermission = async () => {
-    // Enable the setting first (works even without browser support)
-    setNotificationsEnabled(true);
-    
-    // Then try to get actual notification permission if supported
-    if ('Notification' in window) {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          showTestNotification();
-        }
-      } catch (e) {
-        console.log('Notification permission request failed:', e);
-      }
-    }
-    return true;
-  };
-
-  const showTestNotification = () => {
-    new Notification('الورد اليومي 📖', {
-      body: 'تم تفعيل التذكيرات! سنذكرك بوردك اليومي إن شاء الله',
-      icon: 'icons/icon-192.png',
-      badge: 'icons/icon-72.png',
-      tag: 'wird-test',
-      dir: 'rtl'
-    });
-  };
-
-  // Check and send notification based on time
-  useEffect(() => {
-    if (!notificationsEnabled) return;
-    
-    const checkTime = () => {
-      const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const today = now.toDateString();
-      const lastNotification = localStorage.getItem('wird_lastNotificationSent');
-      
-      if (currentTime === reminderTime && lastReadDate !== today && lastNotification !== today) {
-        if (Notification.permission === 'granted') {
-          new Notification('حان وقت وردك! 📖', {
-            body: `لم تقرأ وردك اليوم بعد. هيا نحافظ على سلسلة ${streak} يوم!`,
-            icon: 'icons/icon-192.png',
-            badge: 'icons/icon-72.png',
-            tag: 'wird-reminder',
-            dir: 'rtl',
-            requireInteraction: true
-          });
-          localStorage.setItem('wird_lastNotificationSent', today);
-        }
-      }
-    };
-    
-    // Check every minute
-    const interval = setInterval(checkTime, 60000);
-    checkTime(); // Check immediately
-    
-    return () => clearInterval(interval);
-  }, [notificationsEnabled, reminderTime, lastReadDate, streak]);
 
   const toArabicNumerals = (num) => num.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
 
@@ -594,45 +527,6 @@ function App() {
             </div>
             
             {/* Notification Settings */}
-            <div className="border-t border-[#E8E6E1] pt-6">
-              <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">التذكير اليومي</label>
-              <div className="bg-white p-4 rounded-2xl border border-[#E8E6E1] shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {notificationsEnabled ? <Bell className="w-5 h-5 text-[#1A4D2E]" /> : <BellOff className="w-5 h-5 text-[#8C8A84]" />}
-                    <span className="font-cairo font-bold text-[#1A4D2E]">تفعيل الإشعارات</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (!notificationsEnabled) {
-                        requestNotificationPermission();
-                      } else {
-                        setNotificationsEnabled(false);
-                      }
-                    }}
-                    className={`w-14 h-8 rounded-full transition-all ${notificationsEnabled ? 'bg-[#1A4D2E]' : 'bg-[#E8E6E1]'} relative`}
-                  >
-                    <div className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow ${notificationsEnabled ? 'right-1' : 'left-1'}`}></div>
-                  </button>
-                </div>
-                
-                {notificationsEnabled && (
-                  <div className="flex items-center justify-between pt-2 border-t border-[#E8E6E1]">
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-5 h-5 text-[#D4AF37]" />
-                      <span className="font-cairo text-sm text-[#8C8A84]">وقت التذكير</span>
-                    </div>
-                    <input
-                      type="time"
-                      value={reminderTime}
-                      onChange={(e) => setReminderTime(e.target.value)}
-                      className="bg-[#F5F3EF] px-3 py-2 rounded-xl font-cairo text-[#1A4D2E] border border-[#E8E6E1] focus:outline-none focus:border-[#D4AF37]"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-            
             <button 
               onClick={handleSave}
               className="w-full py-4 bg-gradient-to-r from-[#1A4D2E] to-[#25663E] text-white rounded-2xl font-bold font-cairo mt-6 active:scale-95 transition shadow-lg shadow-[#1A4D2E]/20 border border-[#1A4D2E]"
@@ -978,52 +872,6 @@ function App() {
             <span className="text-[#E8E6E1] font-cairo">الوقت المستغرق</span>
             <span className="font-bold text-2xl font-cairo text-[#D4AF37]">12 دقيقة</span>
           </div>
-        </div>
-
-        {/* Daily Reminder Toggle */}
-        <div className="bg-[#0F2E1B]/50 backdrop-blur-md rounded-[24px] p-5 w-full mb-8 border border-[#D4AF37]/20 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#D4AF37]/20 rounded-xl flex items-center justify-center">
-                <Bell className="w-5 h-5 text-[#D4AF37]" />
-              </div>
-              <div>
-                <p className="text-white font-cairo font-bold text-sm">التذكير اليومي</p>
-                <p className="text-[#E8E6E1]/70 text-xs font-cairo">نذكرك بوردك كل يوم</p>
-              </div>
-            </div>
-            <button
-              onClick={async () => {
-                if (!notificationsEnabled) {
-                  // Turn ON first
-                  setNotificationsEnabled(true);
-                  
-                  // Then try to get notification permission
-                  if ('Notification' in window && Notification.permission !== 'granted') {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                      new Notification('تم تفعيل التذكير! 📖', {
-                        body: 'سنذكرك بوردك اليومي الساعة ' + reminderTime,
-                        icon: 'icons/icon-192.png',
-                        dir: 'rtl'
-                      });
-                    }
-                  }
-                } else {
-                  setNotificationsEnabled(false);
-                }
-              }}
-              className={`w-14 h-8 rounded-full transition-all ${notificationsEnabled ? 'bg-[#D4AF37]' : 'bg-white/20'} relative`}
-            >
-              <div className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow ${notificationsEnabled ? 'right-1' : 'left-1'}`}></div>
-            </button>
-          </div>
-          {notificationsEnabled && (
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[#E8E6E1]/70 text-xs font-cairo">وقت التذكير</span>
-              <span className="text-[#D4AF37] font-cairo font-bold">{reminderTime}</span>
-            </div>
-          )}
         </div>
 
         <div className="flex gap-4 w-full">
