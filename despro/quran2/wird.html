@@ -977,6 +977,51 @@ function App() {
           </div>
         </div>
 
+        {/* Daily Reminder Toggle */}
+        <div className="bg-[#0F2E1B]/50 backdrop-blur-md rounded-[24px] p-5 w-full mb-8 border border-[#D4AF37]/20 shadow-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#D4AF37]/20 rounded-xl flex items-center justify-center">
+                <Bell className="w-5 h-5 text-[#D4AF37]" />
+              </div>
+              <div>
+                <p className="text-white font-cairo font-bold text-sm">التذكير اليومي</p>
+                <p className="text-[#E8E6E1]/70 text-xs font-cairo">نذكرك بوردك كل يوم</p>
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                if (!notificationsEnabled) {
+                  if (!('Notification' in window)) {
+                    alert('متصفحك لا يدعم الإشعارات');
+                    return;
+                  }
+                  const permission = await Notification.requestPermission();
+                  if (permission === 'granted') {
+                    setNotificationsEnabled(true);
+                    new Notification('تم تفعيل التذكير! 📖', {
+                      body: 'سنذكرك بوردك اليومي الساعة ' + reminderTime,
+                      icon: 'icons/icon-192.png',
+                      dir: 'rtl'
+                    });
+                  }
+                } else {
+                  setNotificationsEnabled(false);
+                }
+              }}
+              className={`w-14 h-8 rounded-full transition-all ${notificationsEnabled ? 'bg-[#D4AF37]' : 'bg-white/20'} relative`}
+            >
+              <div className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow ${notificationsEnabled ? 'right-1' : 'left-1'}`}></div>
+            </button>
+          </div>
+          {notificationsEnabled && (
+            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span className="text-[#E8E6E1]/70 text-xs font-cairo">وقت التذكير</span>
+              <span className="text-[#D4AF37] font-cairo font-bold">{reminderTime}</span>
+            </div>
+          )}
+        </div>
+
         <div className="flex gap-4 w-full">
           <button 
             onClick={() => { setPagesReadToday(0); setCurrentView('home'); }}
