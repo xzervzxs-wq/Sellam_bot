@@ -1107,19 +1107,18 @@
 
     <!-- Unified Bottom Nav (Fixed) -->
     <div class="tab-nav" id="bottom-nav">
-        <!-- Reordered based on "Mshaf - Qibla - Wird" -->
+        <!-- Order: المصحف يمين - الورد وسط - القبلة يسار -->
         <button class="tab-btn active" id="btn-reader" onclick="switchMode('reader')">
             <i class="fas fa-quran"></i>
             <span>المصحف</span>
         </button>
-        <!-- UPDATED: Added ID for JS targeting -->
-        <button class="tab-btn" id="btn-qibla" onclick="getQibla()">
-            <i class="fas fa-kaaba"></i>
-            <span>القبلة</span>
-        </button>
         <button class="tab-btn" id="btn-wird" onclick="window.location.href='wird.html'">
             <i class="fas fa-book-open"></i>
             <span>الورد اليومي</span>
+        </button>
+        <button class="tab-btn" id="btn-qibla" onclick="getQibla()">
+            <i class="fas fa-kaaba"></i>
+            <span>القبلة</span>
         </button>
     </div>
 
