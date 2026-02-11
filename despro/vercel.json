@@ -1,4 +1,8 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/wird", "destination": "/quran2/wird.html" },
+    { "source": "/quran", "destination": "/quran2/index.html" }
+  ]
 }
