@@ -40,14 +40,6 @@
         .font-amiri { font-family: 'Amiri', serif; }
         .font-cairo { font-family: 'Cairo', sans-serif; }
         
-        /* Fix select dropdown size on mobile */
-        select {
-            max-height: 200px;
-        }
-        select option {
-            padding: 10px;
-        }
-        
         .animate-fade-in { animation: fadeIn 0.5s ease-out; }
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .animate-bounce-slow { animation: float 6s ease-in-out infinite; }
@@ -459,8 +451,6 @@ function App() {
   const SettingsModal = () => {
     const [tempGoal, setTempGoal] = useState(dailyGoal);
     const [tempStartPage, setTempStartPage] = useState(startPageGoal);
-    const [showSurahList, setShowSurahList] = useState(false);
-    const selectedSurah = SURAHS_LIST.find(s => s.page === tempStartPage) || SURAHS_LIST[0];
 
     const handleSave = () => {
       setDailyGoal(tempGoal);
@@ -472,81 +462,56 @@ function App() {
 
     return (
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" dir="rtl">
-        <div className="bg-[#FDFBF7] w-full sm:w-11/12 sm:max-w-md rounded-t-[30px] sm:rounded-[30px] p-6 shadow-2xl animate-slide-up border-t-4 border-[#D4AF37] max-h-[85vh] overflow-hidden flex flex-col">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-[#FDFBF7] w-full sm:w-11/12 sm:max-w-md rounded-t-[30px] sm:rounded-[30px] p-6 shadow-2xl animate-slide-up border-t-4 border-[#D4AF37] max-h-[85vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-8">
             <h3 className="text-xl font-bold text-[#1A4D2E] font-cairo">إعدادات الورد</h3>
             <button onClick={() => setIsSettingsOpen(false)} className="p-2 bg-[#E8E6E1] rounded-full hover:bg-[#D4AF37] hover:text-white transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
-          
-          {!showSurahList ? (
-            <div className="space-y-6 flex-1 overflow-y-auto">
-              <div>
-                <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">بداية الورد من</label>
-                <button 
-                  onClick={() => setShowSurahList(true)}
-                  className="w-full p-4 bg-white border border-[#E8E6E1] rounded-2xl font-cairo font-bold text-[#1A4D2E] flex items-center justify-between hover:border-[#D4AF37] transition-colors"
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">بداية الورد من</label>
+              <div className="relative">
+                <select 
+                  onChange={(e) => setTempStartPage(Number(e.target.value))}
+                  value={SURAHS_LIST.find(s => s.page === tempStartPage)?.page || tempStartPage}
+                  className="w-full p-4 bg-white border border-[#E8E6E1] rounded-2xl appearance-none font-cairo font-bold text-[#1A4D2E] focus:outline-none focus:border-[#D4AF37]"
                 >
-                  <span>{selectedSurah.name}</span>
-                  <ChevronDown className="w-5 h-5 text-[#D4AF37]" />
-                </button>
-              </div>
-              <div>
-                <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">عدد الصفحات اليومي</label>
-                <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-[#E8E6E1] shadow-sm">
-                  <button 
-                    onClick={() => setTempGoal(prev => Math.max(1, prev - 1))}
-                    className="w-12 h-12 bg-[#F5F3EF] rounded-xl flex items-center justify-center text-[#1A4D2E] active:scale-95 transition hover:bg-[#E8E6E1]"
-                  >
-                    <Minus className="w-5 h-5" />
-                  </button>
-                  <span className="text-3xl font-bold text-[#1A4D2E] font-cairo">{tempGoal}</span>
-                  <button 
-                    onClick={() => setTempGoal(prev => prev + 1)}
-                    className="w-12 h-12 bg-[#1A4D2E] rounded-xl shadow-lg shadow-[#1A4D2E]/20 flex items-center justify-center text-[#D4AF37] active:scale-95 transition hover:bg-[#143d24]"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
+                  {SURAHS_LIST.map(surah => (
+                    <option key={surah.id} value={surah.page}>{surah.name}</option>
+                  ))}
+                </select>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#D4AF37]">
+                  <ChevronDown className="w-5 h-5" />
                 </div>
               </div>
-              <button 
-                onClick={handleSave}
-                className="w-full py-4 bg-gradient-to-r from-[#1A4D2E] to-[#25663E] text-white rounded-2xl font-bold font-cairo mt-6 active:scale-95 transition shadow-lg shadow-[#1A4D2E]/20 border border-[#1A4D2E]"
-              >
-                حفظ التغييرات
-              </button>
             </div>
-          ) : (
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="flex items-center gap-3 mb-4">
+            <div>
+              <label className="block text-sm text-[#8C8A84] mb-3 font-cairo font-bold">عدد الصفحات اليومي</label>
+              <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-[#E8E6E1] shadow-sm">
                 <button 
-                  onClick={() => setShowSurahList(false)}
-                  className="p-2 bg-[#E8E6E1] rounded-full hover:bg-[#D4AF37] hover:text-white transition-colors"
+                  onClick={() => setTempGoal(prev => Math.max(1, prev - 1))}
+                  className="w-12 h-12 bg-[#F5F3EF] rounded-xl flex items-center justify-center text-[#1A4D2E] active:scale-95 transition hover:bg-[#E8E6E1]"
                 >
-                  <ArrowLeft className="w-5 h-5 rotate-180" />
+                  <Minus className="w-5 h-5" />
                 </button>
-                <span className="font-cairo font-bold text-[#1A4D2E]">اختر السورة</span>
-              </div>
-              <div className="flex-1 overflow-y-auto space-y-2 pb-4">
-                {SURAHS_LIST.map(surah => (
-                  <button 
-                    key={surah.id}
-                    onClick={() => { setTempStartPage(surah.page); setShowSurahList(false); }}
-                    className={`w-full p-4 rounded-xl font-cairo text-right transition-all flex items-center justify-between
-                      ${tempStartPage === surah.page 
-                        ? 'bg-[#1A4D2E] text-white' 
-                        : 'bg-white border border-[#E8E6E1] text-[#1A4D2E] hover:border-[#D4AF37]'}`}
-                  >
-                    <span className="font-bold">{surah.name}</span>
-                    <span className={`text-sm ${tempStartPage === surah.page ? 'text-[#D4AF37]' : 'text-[#8C8A84]'}`}>
-                      صفحة {surah.page}
-                    </span>
-                  </button>
-                ))}
+                <span className="text-3xl font-bold text-[#1A4D2E] font-cairo">{tempGoal}</span>
+                <button 
+                  onClick={() => setTempGoal(prev => prev + 1)}
+                  className="w-12 h-12 bg-[#1A4D2E] rounded-xl shadow-lg shadow-[#1A4D2E]/20 flex items-center justify-center text-[#D4AF37] active:scale-95 transition hover:bg-[#143d24]"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
               </div>
             </div>
-          )}
+            <button 
+              onClick={handleSave}
+              className="w-full py-4 bg-gradient-to-r from-[#1A4D2E] to-[#25663E] text-white rounded-2xl font-bold font-cairo mt-6 active:scale-95 transition shadow-lg shadow-[#1A4D2E]/20 border border-[#1A4D2E]"
+            >
+              حفظ التغييرات
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -743,7 +708,7 @@ function App() {
     const currentMutashabih = MUTASHABIH_DB[currentPageNum];
 
     return (
-      <div className="flex flex-col h-full bg-[#FDFBF7] pb-20" dir="rtl">
+      <div className="flex flex-col h-full bg-[#FDFBF7]" dir="rtl">
         <div className="px-6 py-5 flex justify-between items-center border-b border-[#D4AF37]/20 bg-[#FDFBF7]/90 backdrop-blur-md sticky top-0 z-20">
           <button onClick={() => setCurrentView('home')} className="p-2 rounded-full hover:bg-[#E8E6E1] active:scale-90 transition">
             <ArrowLeft className="w-6 h-6 text-[#1A4D2E] rotate-180" />
@@ -764,7 +729,7 @@ function App() {
           <div className="w-10"></div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center relative">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center relative pb-48">
           
           <div className="w-full max-w-2xl min-h-[500px] h-auto mb-10 px-2 sm:px-0">
              
@@ -829,7 +794,7 @@ function App() {
           )}
         </div>
 
-        <div className="p-5 bg-white border-t border-[#E8E6E1] pb-24 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] fixed bottom-14 left-0 right-0">
+        <div className="p-5 bg-white border-t border-[#E8E6E1] shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] fixed bottom-16 left-0 right-0 z-30">
           <div className="flex justify-between items-center max-w-md mx-auto" dir="ltr">
              <button 
               onClick={handlePrev}
