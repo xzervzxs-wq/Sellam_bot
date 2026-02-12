@@ -2,6 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/quran2/wird", "destination": "/quran2/wird.html" }
+    { "source": "/quran2/wird", "destination": "/quran2/wird.html" },
+    { "source": "/quran/ayah_mapper", "destination": "/quran/ayah_mapper.html" },
+    { "source": "/quran2/ayah_mapper", "destination": "/quran2/ayah_mapper.html" }
   ]
 }
