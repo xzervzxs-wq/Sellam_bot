@@ -1,0 +1,18 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/despro/quran/pages/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/despro/quran2/wird", "destination": "/despro/quran2/wird.html" },
+    { "source": "/despro/quran/ayah_mapper", "destination": "/despro/quran/ayah_mapper.html" },
+    { "source": "/despro/quran2/ayah_mapper", "destination": "/despro/quran2/ayah_mapper.html" }
+  ]
+}
