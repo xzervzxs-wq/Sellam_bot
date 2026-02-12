@@ -178,6 +178,19 @@
             background-repeat: no-repeat; background-position: left .7em top 50%; background-size: .65em auto;
         }
 
+        /* iPhone/iOS Fix - Dropdown Menu Fix (Safari only) */
+        @supports (-webkit-touch-callout: none) {
+            .surah-quick-select {
+                padding-bottom: 8px;
+                -webkit-appearance: menulist;
+                -webkit-user-select: text;
+            }
+            .top-bar-section-1 {
+                position: relative;
+                z-index: 1000;
+            }
+        }
+
         .top-bar-section-2 { flex: 1; position: relative; }
         .search-input {
             width: 100%; background: rgba(255,255,255,0.15);
