@@ -1,6 +1,15 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/quran/pages/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/quran2/wird", "destination": "/quran2/wird.html" },
     { "source": "/quran/ayah_mapper", "destination": "/quran/ayah_mapper.html" },
