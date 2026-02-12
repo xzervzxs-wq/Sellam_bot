@@ -9957,63 +9957,63 @@
     }
   },
   "312": {
-    "path26": {
+    "path30": {
       "surah": 19,
       "ayah": 96
     },
-    "path30": {
+    "path34": {
       "surah": 19,
       "ayah": 97
     },
-    "path34": {
+    "path38": {
       "surah": 19,
       "ayah": 98
     },
-    "path38": {
+    "path42": {
       "surah": 20,
       "ayah": 1
     },
-    "path42": {
+    "path46": {
       "surah": 20,
       "ayah": 2
     },
-    "path46": {
+    "path50": {
       "surah": 20,
       "ayah": 3
     },
-    "path50": {
+    "path54": {
       "surah": 20,
       "ayah": 4
     },
-    "path54": {
+    "path58": {
       "surah": 20,
       "ayah": 5
     },
-    "path58": {
+    "path62": {
       "surah": 20,
       "ayah": 6
     },
-    "path62": {
+    "path66": {
       "surah": 20,
       "ayah": 7
     },
-    "path66": {
+    "path70": {
       "surah": 20,
       "ayah": 8
     },
-    "path70": {
+    "path74": {
       "surah": 20,
       "ayah": 9
     },
-    "path74": {
+    "path78": {
       "surah": 20,
       "ayah": 10
     },
-    "path78": {
+    "path82": {
       "surah": 20,
       "ayah": 11
     },
-    "path82": {
+    "path86": {
       "surah": 20,
       "ayah": 12
     }
@@ -10179,55 +10179,55 @@
     }
   },
   "315": {
-    "path26": {
+    "path74": {
       "surah": 20,
       "ayah": 52
     },
-    "path30": {
+    "path26": {
       "surah": 20,
       "ayah": 53
     },
-    "path34": {
+    "path30": {
       "surah": 20,
       "ayah": 54
     },
-    "path38": {
+    "path34": {
       "surah": 20,
       "ayah": 55
     },
-    "path42": {
+    "path38": {
       "surah": 20,
       "ayah": 56
     },
-    "path46": {
+    "path42": {
       "surah": 20,
       "ayah": 57
     },
-    "path50": {
+    "path46": {
       "surah": 20,
       "ayah": 58
     },
-    "path54": {
+    "path50": {
       "surah": 20,
       "ayah": 59
     },
-    "path58": {
+    "path54": {
       "surah": 20,
       "ayah": 60
     },
-    "path62": {
+    "path58": {
       "surah": 20,
       "ayah": 61
     },
-    "path66": {
+    "path62": {
       "surah": 20,
       "ayah": 62
     },
-    "path70": {
+    "path66": {
       "surah": 20,
       "ayah": 63
     },
-    "path74": {
+    "path70": {
       "surah": 20,
       "ayah": 64
     }
@@ -10837,36 +10837,119 @@
       "surah": 21,
       "ayah": 74
     },
-    "path30": {
+    "path54": {
       "surah": 21,
       "ayah": 75
     },
-    "path34": {
+    "path30": {
       "surah": 21,
       "ayah": 76
     },
-    "path38": {
+    "path34": {
       "surah": 21,
       "ayah": 77
     },
-    "path42": {
+    "path38": {
       "surah": 21,
       "ayah": 78
     },
-    "path46": {
+    "path42": {
       "surah": 21,
       "ayah": 79
     },
-    "path50": {
+    "path46": {
       "surah": 21,
       "ayah": 80
     },
-    "path54": {
+    "path50": {
       "surah": 21,
       "ayah": 81
     }
   },
   "329": {
+    "path22": {
+      "surah": 21,
+      "ayah": 82
+    },
+    "path26": {
+      "surah": 21,
+      "ayah": 83
+    },
+    "path30": {
+      "surah": 21,
+      "ayah": 84
+    },
+    "path34": {
+      "surah": 21,
+      "ayah": 85
+    },
+    "path38": {
+      "surah": 21,
+      "ayah": 86
+    },
+    "path42": {
+      "surah": 21,
+      "ayah": 87
+    },
+    "path46": {
+      "surah": 21,
+      "ayah": 88
+    },
+    "path50": {
+      "surah": 21,
+      "ayah": 89
+    },
+    "path58": {
+      "surah": 21,
+      "ayah": 90
+    }
+  },
+  "330": {
+    "path342": {
+      "surah": 21,
+      "ayah": 91
+    },
+    "path326": {
+      "surah": 21,
+      "ayah": 92
+    },
+    "path310": {
+      "surah": 21,
+      "ayah": 93
+    },
+    "path294": {
+      "surah": 21,
+      "ayah": 94
+    },
+    "path278": {
+      "surah": 21,
+      "ayah": 95
+    },
+    "path262": {
+      "surah": 21,
+      "ayah": 96
+    },
+    "path246": {
+      "surah": 21,
+      "ayah": 97
+    },
+    "path230": {
+      "surah": 21,
+      "ayah": 98
+    },
+    "path214": {
+      "surah": 21,
+      "ayah": 99
+    },
+    "path198": {
+      "surah": 21,
+      "ayah": 100
+    },
+    "path182": {
+      "surah": 21,
+      "ayah": 101
+    }
+  },
     "path26": {
       "surah": 21,
       "ayah": 82
@@ -10951,23 +11034,23 @@
     }
   },
   "332": {
-    "path26": {
+    "path30": {
       "surah": 22,
       "ayah": 1
     },
-    "path30": {
+    "path34": {
       "surah": 22,
       "ayah": 2
     },
-    "path34": {
+    "path38": {
       "surah": 22,
       "ayah": 3
     },
-    "path38": {
+    "path42": {
       "surah": 22,
       "ayah": 4
     },
-    "path42": {
+    "path46": {
       "surah": 22,
       "ayah": 5
     }
@@ -11283,71 +11366,71 @@
     }
   },
   "342": {
-    "path26": {
+    "path30": {
       "surah": 23,
       "ayah": 1
     },
-    "path30": {
+    "path34": {
       "surah": 23,
       "ayah": 2
     },
-    "path34": {
+    "path38": {
       "surah": 23,
       "ayah": 3
     },
-    "path38": {
+    "path42": {
       "surah": 23,
       "ayah": 4
     },
-    "path42": {
+    "path46": {
       "surah": 23,
       "ayah": 5
     },
-    "path46": {
+    "path50": {
       "surah": 23,
       "ayah": 6
     },
-    "path50": {
+    "path54": {
       "surah": 23,
       "ayah": 7
     },
-    "path54": {
+    "path58": {
       "surah": 23,
       "ayah": 8
     },
-    "path58": {
+    "path62": {
       "surah": 23,
       "ayah": 9
     },
-    "path62": {
+    "path66": {
       "surah": 23,
       "ayah": 10
     },
-    "path66": {
+    "path70": {
       "surah": 23,
       "ayah": 11
     },
-    "path70": {
+    "path74": {
       "surah": 23,
       "ayah": 12
     },
-    "path74": {
+    "path78": {
       "surah": 23,
       "ayah": 13
     },
-    "path78": {
+    "path82": {
       "surah": 23,
       "ayah": 14
     },
-    "path82": {
+    "path86": {
       "surah": 23,
       "ayah": 15
     },
-    "path86": {
+    "path90": {
       "surah": 23,
       "ayah": 16
     },
-    "path90": {
+    "path94": {
       "surah": 23,
       "ayah": 17
     }
