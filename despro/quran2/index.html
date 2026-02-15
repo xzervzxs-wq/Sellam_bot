@@ -1450,15 +1450,10 @@
 
         // === نظام 5 شرائح (3 أمام + حالية + 1 سابقة) ===
         let slides = { prev: null, current: null, next1: null, next2: null, next3: null };
-        let slideCache = {}; // كاش للصفحات المحملة
+        let svgCache = {}; // كاش لنص الـ SVG فقط (وليس DOM)
 
         async function createSlide(pageNum) {
             if (pageNum < 1 || pageNum > TOTAL_PAGES) return null;
-            
-            // استخدم الكاش إذا موجود
-            if (slideCache[pageNum]) {
-                return slideCache[pageNum].cloneNode(true);
-            }
 
             const paddedNum = String(pageNum).padStart(3, '0');
             const url = `${SVG_BASE_URL}${paddedNum}.svg`;
@@ -1468,8 +1463,16 @@
 
             try {
                 if (quranCoordinates[paddedNum]) {
-                    const response = await fetchWithTimeout(url, 5000);
-                    const svgText = await response.text();
+                    // استخدم الكاش للـ SVG text إذا موجود
+                    let svgText;
+                    if (svgCache[pageNum]) {
+                        svgText = svgCache[pageNum];
+                    } else {
+                        const response = await fetchWithTimeout(url, 5000);
+                        svgText = await response.text();
+                        svgCache[pageNum] = svgText; // حفظ النص فقط
+                    }
+                    
                     slide.innerHTML = svgText;
 
                     const svgElement = slide.querySelector('svg');
@@ -1480,14 +1483,24 @@
                     }
                     enableInlineInteractions(paddedNum, slide);
                 } else {
-                    slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${pageNum}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${pageNum})">`;
+                    // للصور: نضيف class loaded مباشرة بعد التحميل
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.draggable = false;
+                    img.alt = `صفحة ${pageNum}`;
+                    img.onload = function() { this.classList.add('loaded'); };
+                    img.onerror = function() { handleImageError(this, pageNum); };
+                    slide.appendChild(img);
                 }
                 
-                // حفظ في الكاش
-                slideCache[pageNum] = slide.cloneNode(true);
-                
             } catch (e) {
-                slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${pageNum}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${pageNum})">`;
+                const img = document.createElement('img');
+                img.src = url;
+                img.draggable = false;
+                img.alt = `صفحة ${pageNum}`;
+                img.onload = function() { this.classList.add('loaded'); };
+                img.onerror = function() { handleImageError(this, pageNum); };
+                slide.appendChild(img);
             }
 
             return slide;
