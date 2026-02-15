@@ -123,13 +123,28 @@
             display: flex; justify-content: center; align-items: center;
         }
 
+        /* === نظام الشرائح الثلاث للتنقل الانسيابي === */
         .quran-page-slide {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             background-color: var(--paper-bg);
-            transition: transform 0.2s ease-out; will-change: transform;
+            will-change: transform;
             padding: 10px; box-sizing: border-box;
+            /* بدون transition - نتحكم فيه من JS */
+        }
+
+        .quran-page-slide.slide-prev {
+            transform: translateX(100%); /* RTL: الصفحة السابقة على اليمين */
+        }
+        .quran-page-slide.slide-current {
+            transform: translateX(0);
+        }
+        .quran-page-slide.slide-next {
+            transform: translateX(-100%); /* RTL: الصفحة التالية على اليسار */
+        }
+        .quran-page-slide.animating {
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .quran-page-slide img, .quran-page-slide svg {
@@ -1428,78 +1443,209 @@
             ]);
         }
 
+        // === نظام الشرائح الثلاث الجديد ===
+        let slides = { prev: null, current: null, next: null };
+        let slideCache = {}; // كاش للصفحات المحملة
+
+        async function createSlide(pageNum) {
+            if (pageNum < 1 || pageNum > TOTAL_PAGES) return null;
+            
+            // استخدم الكاش إذا موجود
+            if (slideCache[pageNum]) {
+                return slideCache[pageNum].cloneNode(true);
+            }
+
+            const paddedNum = String(pageNum).padStart(3, '0');
+            const url = `${SVG_BASE_URL}${paddedNum}.svg`;
+            const slide = document.createElement('div');
+            slide.className = 'quran-page-slide';
+            slide.dataset.page = pageNum;
+
+            try {
+                if (quranCoordinates[paddedNum]) {
+                    const response = await fetchWithTimeout(url, 5000);
+                    const svgText = await response.text();
+                    slide.innerHTML = svgText;
+
+                    const svgElement = slide.querySelector('svg');
+                    if (svgElement) {
+                        svgElement.setAttribute('width', '100%');
+                        svgElement.setAttribute('height', '100%');
+                        svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    }
+                    enableInlineInteractions(paddedNum, slide);
+                } else {
+                    slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${pageNum}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${pageNum})">`;
+                }
+                
+                // حفظ في الكاش
+                slideCache[pageNum] = slide.cloneNode(true);
+                
+            } catch (e) {
+                slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${pageNum}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${pageNum})">`;
+            }
+
+            return slide;
+        }
+
         async function loadPage(num, direction = 'none') {
             if(isNavigating) return;
             if(num < 1) num = 1; if(num > TOTAL_PAGES) num = TOTAL_PAGES;
 
             const container = document.getElementById('quran-slider-container');
-            const paddedNum = String(num).padStart(3, '0');
-            const url = `${SVG_BASE_URL}${paddedNum}.svg`;
-
             isNavigating = true;
 
-            const slide = document.createElement('div');
-            slide.className = 'quran-page-slide';
-
             try {
-                // --- UPDATED LOADING LOGIC FOR INTERACTIVE PAGES ---
-                if (quranCoordinates[paddedNum]) {
-                    // If this page has coordinates, we fetch the SVG code and inject it INLINE
-                    try {
-                        const response = await fetchWithTimeout(url, 5000);
-                        const svgText = await response.text();
-                        slide.innerHTML = svgText;
+                // تحميل الصفحة الحالية والمجاورتين
+                const [prevSlide, currSlide, nextSlide] = await Promise.all([
+                    createSlide(num - 1),
+                    createSlide(num),
+                    createSlide(num + 1)
+                ]);
 
-                        // Fix SVG attributes to be responsive
-                        const svgElement = slide.querySelector('svg');
-                        if (svgElement) {
-                            svgElement.setAttribute('width', '100%');
-                            svgElement.setAttribute('height', '100%');
-                            svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-                        }
+                // مسح الحاوية
+                container.innerHTML = '';
 
-                        // Apply interaction logic for this page
-                        enableInlineInteractions(paddedNum, slide);
-
-                    } catch (e) {
-                        // Fallback if fetch fails - use image tag instead
-                        slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${num}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${num})">`;
-                    }
+                // إعداد الشرائح
+                if (prevSlide) {
+                    prevSlide.classList.add('slide-prev');
+                    container.appendChild(prevSlide);
+                    slides.prev = prevSlide;
                 } else {
-                    // Normal loading (Image tag) for pages without coordinates
-                    slide.innerHTML = `<img src="${url}" draggable="false" alt="صفحة ${num}" onload="this.classList.add('loaded')" onerror="handleImageError(this, ${num})">`;
+                    slides.prev = null;
                 }
 
-                if(direction === 'next') slide.style.transform = 'translateX(-100%)';
-                else if(direction === 'prev') slide.style.transform = 'translateX(100%)';
-                else slide.style.transform = 'translateX(0)';
+                if (currSlide) {
+                    currSlide.classList.add('slide-current');
+                    container.appendChild(currSlide);
+                    slides.current = currSlide;
+                }
 
-                container.appendChild(slide);
-                void slide.offsetWidth;
-
-                const oldSlide = container.firstElementChild;
-                if (direction !== 'none' && oldSlide && oldSlide !== slide) {
-                    slide.style.transform = 'translateX(0)';
-                    if (direction === 'next') oldSlide.style.transform = 'translateX(100%)';
-                    else oldSlide.style.transform = 'translateX(-100%)';
-                    setTimeout(() => { if(oldSlide) oldSlide.remove(); }, 200);
+                if (nextSlide) {
+                    nextSlide.classList.add('slide-next');
+                    container.appendChild(nextSlide);
+                    slides.next = nextSlide;
                 } else {
-                    if(oldSlide && oldSlide !== slide) oldSlide.remove();
+                    slides.next = null;
                 }
 
                 currentPage = num;
                 localStorage.setItem('lastPage', currentPage);
                 checkBookmark();
                 fetchPageData(num);
-                // Prefetch next 20 pages for offline reading
                 prefetchAhead(num, 20);
 
             } catch (e) {
                 console.error('Error loading page:', e);
             } finally {
-                // Always unlock navigation - prevents freezing
-                setTimeout(() => { isNavigating = false; }, 250);
+                setTimeout(() => { isNavigating = false; }, 100);
             }
+        }
+
+        // التنقل السلس للصفحة التالية
+        async function smoothNextPage() {
+            if (isNavigating || currentPage >= TOTAL_PAGES) return;
+            isNavigating = true;
+
+            const container = document.getElementById('quran-slider-container');
+
+            // تفعيل الأنيميشن
+            if (slides.prev) slides.prev.classList.add('animating');
+            if (slides.current) slides.current.classList.add('animating');
+            if (slides.next) slides.next.classList.add('animating');
+
+            // تحريك الشرائح
+            requestAnimationFrame(() => {
+                if (slides.prev) slides.prev.style.transform = 'translateX(200%)';
+                if (slides.current) slides.current.style.transform = 'translateX(100%)';
+                if (slides.next) slides.next.style.transform = 'translateX(0)';
+            });
+
+            // انتظار انتهاء الأنيميشن
+            await new Promise(resolve => setTimeout(resolve, 350));
+
+            currentPage++;
+
+            // إعادة ترتيب الشرائح
+            if (slides.prev) slides.prev.remove();
+            slides.prev = slides.current;
+            slides.current = slides.next;
+
+            if (slides.prev) {
+                slides.prev.classList.remove('slide-current', 'animating');
+                slides.prev.classList.add('slide-prev');
+                slides.prev.style.transform = '';
+            }
+            if (slides.current) {
+                slides.current.classList.remove('slide-next', 'animating');
+                slides.current.classList.add('slide-current');
+                slides.current.style.transform = '';
+            }
+
+            // تحميل الصفحة التالية الجديدة
+            slides.next = await createSlide(currentPage + 1);
+            if (slides.next) {
+                slides.next.classList.add('slide-next');
+                container.appendChild(slides.next);
+            }
+
+            localStorage.setItem('lastPage', currentPage);
+            checkBookmark();
+            fetchPageData(currentPage);
+            isNavigating = false;
+        }
+
+        // التنقل السلس للصفحة السابقة
+        async function smoothPrevPage() {
+            if (isNavigating || currentPage <= 1) return;
+            isNavigating = true;
+
+            const container = document.getElementById('quran-slider-container');
+
+            // تفعيل الأنيميشن
+            if (slides.prev) slides.prev.classList.add('animating');
+            if (slides.current) slides.current.classList.add('animating');
+            if (slides.next) slides.next.classList.add('animating');
+
+            // تحريك الشرائح
+            requestAnimationFrame(() => {
+                if (slides.prev) slides.prev.style.transform = 'translateX(0)';
+                if (slides.current) slides.current.style.transform = 'translateX(-100%)';
+                if (slides.next) slides.next.style.transform = 'translateX(-200%)';
+            });
+
+            // انتظار انتهاء الأنيميشن
+            await new Promise(resolve => setTimeout(resolve, 350));
+
+            currentPage--;
+
+            // إعادة ترتيب الشرائح
+            if (slides.next) slides.next.remove();
+            slides.next = slides.current;
+            slides.current = slides.prev;
+
+            if (slides.next) {
+                slides.next.classList.remove('slide-current', 'animating');
+                slides.next.classList.add('slide-next');
+                slides.next.style.transform = '';
+            }
+            if (slides.current) {
+                slides.current.classList.remove('slide-prev', 'animating');
+                slides.current.classList.add('slide-current');
+                slides.current.style.transform = '';
+            }
+
+            // تحميل الصفحة السابقة الجديدة
+            slides.prev = await createSlide(currentPage - 1);
+            if (slides.prev) {
+                slides.prev.classList.add('slide-prev');
+                container.insertBefore(slides.prev, container.firstChild);
+            }
+
+            localStorage.setItem('lastPage', currentPage);
+            checkBookmark();
+            fetchPageData(currentPage);
+            isNavigating = false;
         }
 
         // --- NEW FUNCTION: Enable interactions on Inline SVG ---
@@ -1866,8 +2012,8 @@
             return num.toString().split('').map(d => arabicNums[d]).join('');
         }
 
-        function nextPage() { if(currentPage < TOTAL_PAGES) loadPage(currentPage + 1, 'next'); }
-        function prevPage() { if(currentPage > 1) loadPage(currentPage - 1, 'prev'); }
+        function nextPage() { smoothNextPage(); }
+        function prevPage() { smoothPrevPage(); }
 
         // --- UPDATED QIBLA COMPASS LOGIC ---
         let qiblaTracker = { lat: 0, lon: 0, qiblaDir: 0 };
@@ -2007,93 +2153,106 @@
             let startY = 0;
             let isDragging = false;
             let pressTimer;
-            let lastTap = 0; // متغير لحساب وقت النقر المزدوج
+            let lastTap = 0;
+            let dragOffset = 0; // المسافة المسحوبة
 
             // Touch Start
             reader.addEventListener('touchstart', e => {
-                // Ignore touches on UI elements
                 if(e.target.closest('#verse-list-sheet') || e.target.closest('#tafsir-modal') || e.target.closest('#ayah-options-modal') || e.target.closest('.tab-nav') || e.target.closest('.top-search-bar')) return;
+                if(isNavigating) return;
 
-                // Stop any current transition immediately
-                const currentSlide = container.querySelector('.quran-page-slide');
-                if(currentSlide) {
-                    currentSlide.style.transition = 'none';
-                }
+                // إيقاف أي أنيميشن جاري
+                if (slides.prev) { slides.prev.classList.remove('animating'); slides.prev.style.transition = 'none'; }
+                if (slides.current) { slides.current.classList.remove('animating'); slides.current.style.transition = 'none'; }
+                if (slides.next) { slides.next.classList.remove('animating'); slides.next.style.transition = 'none'; }
 
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 currentX = startX;
                 isDragging = false;
                 isDraggingGesture = false;
+                dragOffset = 0;
 
-                // Long press logic (for menu/hint)
                 pressTimer = setTimeout(() => {
                     if(!isImmersive && !isDragging) { openVerseSheet(); showHint(); }
                 }, 500);
             }, {passive: false});
 
-            // Touch Move
+            // Touch Move - تحريك كل الشرائح معاً
             reader.addEventListener('touchmove', e => {
-                 if(e.target.closest('#verse-list-sheet') || e.target.closest('#tafsir-modal') || e.target.closest('#ayah-options-modal') || e.target.closest('.tab-nav') || e.target.closest('.top-search-bar')) return;
+                if(e.target.closest('#verse-list-sheet') || e.target.closest('#tafsir-modal') || e.target.closest('#ayah-options-modal') || e.target.closest('.tab-nav') || e.target.closest('.top-search-bar')) return;
+                if(isNavigating) return;
 
                 const x = e.touches[0].clientX;
                 const y = e.touches[0].clientY;
                 const deltaX = x - startX;
                 const deltaY = y - startY;
 
-                // Determine if scrolling horizontal (Drag detection)
                 if (!isDragging) {
-                    // Threshold adjusted to 20px (balanced feel)
-                    if (Math.abs(deltaX) > 20 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (Math.abs(deltaX) > 15 && Math.abs(deltaX) > Math.abs(deltaY)) {
                         isDragging = true;
-                        isDraggingGesture = true; // Block clicks
-                        clearTimeout(pressTimer); // Cancel long press
+                        isDraggingGesture = true;
+                        clearTimeout(pressTimer);
                     }
                 }
 
-                // If Dragging, Move the Slide Visually
                 if (isDragging) {
-                    e.preventDefault(); // Stop vertical scroll/zoom
+                    e.preventDefault();
                     currentX = x;
-                    const currentSlide = container.querySelector('.quran-page-slide');
-                    if(currentSlide) {
-                        currentSlide.style.transform = `translateX(${deltaX}px)`;
-                    }
+                    dragOffset = deltaX;
+
+                    // === تحريك كل الشرائح معاً بسلاسة ===
+                    const screenWidth = window.innerWidth;
+                    
+                    // حدود السحب
+                    if (currentPage <= 1 && deltaX < 0) dragOffset = deltaX * 0.3; // مقاومة عند أول صفحة
+                    if (currentPage >= TOTAL_PAGES && deltaX > 0) dragOffset = deltaX * 0.3; // مقاومة عند آخر صفحة
+
+                    if (slides.prev) slides.prev.style.transform = `translateX(calc(100% + ${dragOffset}px))`;
+                    if (slides.current) slides.current.style.transform = `translateX(${dragOffset}px)`;
+                    if (slides.next) slides.next.style.transform = `translateX(calc(-100% + ${dragOffset}px))`;
                 }
             }, {passive: false});
 
-            // Touch End
+            // Touch End - إكمال الحركة أو الرجوع
             reader.addEventListener('touchend', e => {
                 if(e.target.closest('#verse-list-sheet') || e.target.closest('#tafsir-modal') || e.target.closest('#ayah-options-modal') || e.target.closest('.tab-nav') || e.target.closest('.top-search-bar')) return;
 
                 clearTimeout(pressTimer);
 
-                const currentSlide = container.querySelector('.quran-page-slide');
-                // Re-enable transition for smooth snap back or exit
-                if(currentSlide) currentSlide.style.transition = 'transform 0.3s ease-out';
-
                 const diff = currentX - startX;
-                const threshold = window.innerWidth * 0.25; // Adjusted to 25% for easier page flip
+                const threshold = window.innerWidth * 0.2; // 20% من الشاشة للتبديل
+                const velocity = Math.abs(diff) / 200; // حساب السرعة
 
                 if (isDragging) {
-                    // --- Logic for Swipe ---
-                    if (Math.abs(diff) > threshold) {
-                        if (diff > 0) nextPage();
-                        else prevPage();
+                    // تفعيل الأنيميشن للإكمال
+                    const transitionStyle = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    if (slides.prev) slides.prev.style.transition = transitionStyle;
+                    if (slides.current) slides.current.style.transition = transitionStyle;
+                    if (slides.next) slides.next.style.transition = transitionStyle;
+
+                    // التبديل إذا تجاوز الحد أو السرعة عالية
+                    if (Math.abs(diff) > threshold || velocity > 0.5) {
+                        if (diff > 0 && currentPage < TOTAL_PAGES) {
+                            // سحب لليمين = الصفحة التالية (تقليب المصحف كالكتاب العربي)
+                            completeSwipeToNext();
+                        } else if (diff < 0 && currentPage > 1) {
+                            // سحب لليسار = الصفحة السابقة
+                            completeSwipeToPrev();
+                        } else {
+                            // رجوع للوضع الأصلي
+                            snapBack();
+                        }
                     } else {
-                        // Snap back if threshold not met
-                        if(currentSlide) currentSlide.style.transform = 'translateX(0)';
+                        snapBack();
                     }
                 } else {
-                    // --- Logic for Tap (Double Tap) ---
+                    // Double Tap للوضع الغامر
                     const now = new Date().getTime();
                     const timeDiff = now - lastTap;
-
-                    // إذا كان الفرق بين النقرتين أقل من 300 ملي ثانية ولم يكن هناك سحب
                     if (timeDiff < 300 && timeDiff > 0) {
                         toggleImmersiveMode();
                     }
-
                     lastTap = now;
                 }
 
@@ -2101,9 +2260,101 @@
                 setTimeout(() => { isDraggingGesture = false; }, 50);
             });
 
-            // REMOVED: Click listeners for nav zones as they are removed
-            // document.querySelector('.nav-right').onclick = () => !isImmersive && prevPage();
-            // document.querySelector('.nav-left').onclick = () => !isImmersive && nextPage();
+            // === دوال مساعدة للسحب ===
+            function snapBack() {
+                if (slides.prev) slides.prev.style.transform = 'translateX(100%)';
+                if (slides.current) slides.current.style.transform = 'translateX(0)';
+                if (slides.next) slides.next.style.transform = 'translateX(-100%)';
+            }
+
+            async function completeSwipeToNext() {
+                if (isNavigating) return;
+                isNavigating = true;
+
+                // إكمال الحركة
+                if (slides.prev) slides.prev.style.transform = 'translateX(200%)';
+                if (slides.current) slides.current.style.transform = 'translateX(100%)';
+                if (slides.next) slides.next.style.transform = 'translateX(0)';
+
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                currentPage++;
+
+                // إعادة الترتيب
+                if (slides.prev) slides.prev.remove();
+                slides.prev = slides.current;
+                slides.current = slides.next;
+
+                // إزالة الـ transition وإعادة تعيين الأنماط
+                if (slides.prev) {
+                    slides.prev.style.transition = 'none';
+                    slides.prev.classList.remove('slide-current');
+                    slides.prev.classList.add('slide-prev');
+                    slides.prev.style.transform = '';
+                }
+                if (slides.current) {
+                    slides.current.style.transition = 'none';
+                    slides.current.classList.remove('slide-next');
+                    slides.current.classList.add('slide-current');
+                    slides.current.style.transform = '';
+                }
+
+                // تحميل الصفحة التالية الجديدة
+                slides.next = await createSlide(currentPage + 1);
+                if (slides.next) {
+                    slides.next.classList.add('slide-next');
+                    container.appendChild(slides.next);
+                }
+
+                localStorage.setItem('lastPage', currentPage);
+                checkBookmark();
+                fetchPageData(currentPage);
+                isNavigating = false;
+            }
+
+            async function completeSwipeToPrev() {
+                if (isNavigating) return;
+                isNavigating = true;
+
+                // إكمال الحركة
+                if (slides.prev) slides.prev.style.transform = 'translateX(0)';
+                if (slides.current) slides.current.style.transform = 'translateX(-100%)';
+                if (slides.next) slides.next.style.transform = 'translateX(-200%)';
+
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                currentPage--;
+
+                // إعادة الترتيب
+                if (slides.next) slides.next.remove();
+                slides.next = slides.current;
+                slides.current = slides.prev;
+
+                if (slides.next) {
+                    slides.next.style.transition = 'none';
+                    slides.next.classList.remove('slide-current');
+                    slides.next.classList.add('slide-next');
+                    slides.next.style.transform = '';
+                }
+                if (slides.current) {
+                    slides.current.style.transition = 'none';
+                    slides.current.classList.remove('slide-prev');
+                    slides.current.classList.add('slide-current');
+                    slides.current.style.transform = '';
+                }
+
+                // تحميل الصفحة السابقة الجديدة
+                slides.prev = await createSlide(currentPage - 1);
+                if (slides.prev) {
+                    slides.prev.classList.add('slide-prev');
+                    container.insertBefore(slides.prev, container.firstChild);
+                }
+
+                localStorage.setItem('lastPage', currentPage);
+                checkBookmark();
+                fetchPageData(currentPage);
+                isNavigating = false;
+            }
         }
 
         function showHint() {
