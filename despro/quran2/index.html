@@ -123,7 +123,7 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* === نظام الشرائح الثلاث للتنقل الانسيابي === */
+        /* === نظام 5 شرائح للتنقل الانسيابي (3 أمام + حالية + 1 سابقة) === */
         .quran-page-slide {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -131,17 +131,22 @@
             background-color: var(--paper-bg);
             will-change: transform;
             padding: 10px; box-sizing: border-box;
-            /* بدون transition - نتحكم فيه من JS */
         }
 
         .quran-page-slide.slide-prev {
-            transform: translateX(100%); /* RTL: الصفحة السابقة على اليمين */
+            transform: translateX(100%); /* الصفحة السابقة على اليمين */
         }
         .quran-page-slide.slide-current {
             transform: translateX(0);
         }
-        .quran-page-slide.slide-next {
-            transform: translateX(-100%); /* RTL: الصفحة التالية على اليسار */
+        .quran-page-slide.slide-next1 {
+            transform: translateX(-100%); /* الصفحة التالية الأولى */
+        }
+        .quran-page-slide.slide-next2 {
+            transform: translateX(-200%); /* الصفحة التالية الثانية */
+        }
+        .quran-page-slide.slide-next3 {
+            transform: translateX(-300%); /* الصفحة التالية الثالثة */
         }
         .quran-page-slide.animating {
             transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -1443,8 +1448,8 @@
             ]);
         }
 
-        // === نظام الشرائح الثلاث الجديد ===
-        let slides = { prev: null, current: null, next: null };
+        // === نظام 5 شرائح (3 أمام + حالية + 1 سابقة) ===
+        let slides = { prev: null, current: null, next1: null, next2: null, next3: null };
         let slideCache = {}; // كاش للصفحات المحملة
 
         async function createSlide(pageNum) {
@@ -1496,11 +1501,13 @@
             isNavigating = true;
 
             try {
-                // تحميل الصفحة الحالية والمجاورتين
-                const [prevSlide, currSlide, nextSlide] = await Promise.all([
+                // تحميل 5 صفحات: 1 سابقة + حالية + 3 تالية
+                const [prevSlide, currSlide, next1Slide, next2Slide, next3Slide] = await Promise.all([
                     createSlide(num - 1),
                     createSlide(num),
-                    createSlide(num + 1)
+                    createSlide(num + 1),
+                    createSlide(num + 2),
+                    createSlide(num + 3)
                 ]);
 
                 // مسح الحاوية
@@ -1521,12 +1528,28 @@
                     slides.current = currSlide;
                 }
 
-                if (nextSlide) {
-                    nextSlide.classList.add('slide-next');
-                    container.appendChild(nextSlide);
-                    slides.next = nextSlide;
+                if (next1Slide) {
+                    next1Slide.classList.add('slide-next1');
+                    container.appendChild(next1Slide);
+                    slides.next1 = next1Slide;
                 } else {
-                    slides.next = null;
+                    slides.next1 = null;
+                }
+
+                if (next2Slide) {
+                    next2Slide.classList.add('slide-next2');
+                    container.appendChild(next2Slide);
+                    slides.next2 = next2Slide;
+                } else {
+                    slides.next2 = null;
+                }
+
+                if (next3Slide) {
+                    next3Slide.classList.add('slide-next3');
+                    container.appendChild(next3Slide);
+                    slides.next3 = next3Slide;
+                } else {
+                    slides.next3 = null;
                 }
 
                 currentPage = num;
@@ -1549,19 +1572,18 @@
 
             const container = document.getElementById('quran-slider-container');
 
-            // تفعيل الأنيميشن
-            if (slides.prev) slides.prev.classList.add('animating');
-            if (slides.current) slides.current.classList.add('animating');
-            if (slides.next) slides.next.classList.add('animating');
+            // تفعيل الأنيميشن على كل الشرائح
+            Object.values(slides).forEach(s => { if(s) s.classList.add('animating'); });
 
-            // تحريك الشرائح
+            // تحريك كل الشرائح خطوة للأمام
             requestAnimationFrame(() => {
                 if (slides.prev) slides.prev.style.transform = 'translateX(200%)';
                 if (slides.current) slides.current.style.transform = 'translateX(100%)';
-                if (slides.next) slides.next.style.transform = 'translateX(0)';
+                if (slides.next1) slides.next1.style.transform = 'translateX(0)';
+                if (slides.next2) slides.next2.style.transform = 'translateX(-100%)';
+                if (slides.next3) slides.next3.style.transform = 'translateX(-200%)';
             });
 
-            // انتظار انتهاء الأنيميشن
             await new Promise(resolve => setTimeout(resolve, 350));
 
             currentPage++;
@@ -1569,24 +1591,37 @@
             // إعادة ترتيب الشرائح
             if (slides.prev) slides.prev.remove();
             slides.prev = slides.current;
-            slides.current = slides.next;
+            slides.current = slides.next1;
+            slides.next1 = slides.next2;
+            slides.next2 = slides.next3;
 
+            // تنظيف الأنماط
             if (slides.prev) {
                 slides.prev.classList.remove('slide-current', 'animating');
                 slides.prev.classList.add('slide-prev');
                 slides.prev.style.transform = '';
             }
             if (slides.current) {
-                slides.current.classList.remove('slide-next', 'animating');
+                slides.current.classList.remove('slide-next1', 'animating');
                 slides.current.classList.add('slide-current');
                 slides.current.style.transform = '';
             }
+            if (slides.next1) {
+                slides.next1.classList.remove('slide-next2', 'animating');
+                slides.next1.classList.add('slide-next1');
+                slides.next1.style.transform = '';
+            }
+            if (slides.next2) {
+                slides.next2.classList.remove('slide-next3', 'animating');
+                slides.next2.classList.add('slide-next2');
+                slides.next2.style.transform = '';
+            }
 
-            // تحميل الصفحة التالية الجديدة
-            slides.next = await createSlide(currentPage + 1);
-            if (slides.next) {
-                slides.next.classList.add('slide-next');
-                container.appendChild(slides.next);
+            // تحميل الصفحة التالية الجديدة (next3)
+            slides.next3 = await createSlide(currentPage + 3);
+            if (slides.next3) {
+                slides.next3.classList.add('slide-next3');
+                container.appendChild(slides.next3);
             }
 
             localStorage.setItem('lastPage', currentPage);
@@ -1602,37 +1637,49 @@
 
             const container = document.getElementById('quran-slider-container');
 
-            // تفعيل الأنيميشن
-            if (slides.prev) slides.prev.classList.add('animating');
-            if (slides.current) slides.current.classList.add('animating');
-            if (slides.next) slides.next.classList.add('animating');
+            // تفعيل الأنيميشن على كل الشرائح
+            Object.values(slides).forEach(s => { if(s) s.classList.add('animating'); });
 
-            // تحريك الشرائح
+            // تحريك كل الشرائح خطوة للخلف
             requestAnimationFrame(() => {
                 if (slides.prev) slides.prev.style.transform = 'translateX(0)';
                 if (slides.current) slides.current.style.transform = 'translateX(-100%)';
-                if (slides.next) slides.next.style.transform = 'translateX(-200%)';
+                if (slides.next1) slides.next1.style.transform = 'translateX(-200%)';
+                if (slides.next2) slides.next2.style.transform = 'translateX(-300%)';
+                if (slides.next3) slides.next3.style.transform = 'translateX(-400%)';
             });
 
-            // انتظار انتهاء الأنيميشن
             await new Promise(resolve => setTimeout(resolve, 350));
 
             currentPage--;
 
             // إعادة ترتيب الشرائح
-            if (slides.next) slides.next.remove();
-            slides.next = slides.current;
+            if (slides.next3) slides.next3.remove();
+            slides.next3 = slides.next2;
+            slides.next2 = slides.next1;
+            slides.next1 = slides.current;
             slides.current = slides.prev;
 
-            if (slides.next) {
-                slides.next.classList.remove('slide-current', 'animating');
-                slides.next.classList.add('slide-next');
-                slides.next.style.transform = '';
-            }
+            // تنظيف الأنماط
             if (slides.current) {
                 slides.current.classList.remove('slide-prev', 'animating');
                 slides.current.classList.add('slide-current');
                 slides.current.style.transform = '';
+            }
+            if (slides.next1) {
+                slides.next1.classList.remove('slide-current', 'animating');
+                slides.next1.classList.add('slide-next1');
+                slides.next1.style.transform = '';
+            }
+            if (slides.next2) {
+                slides.next2.classList.remove('slide-next1', 'animating');
+                slides.next2.classList.add('slide-next2');
+                slides.next2.style.transform = '';
+            }
+            if (slides.next3) {
+                slides.next3.classList.remove('slide-next2', 'animating');
+                slides.next3.classList.add('slide-next3');
+                slides.next3.style.transform = '';
             }
 
             // تحميل الصفحة السابقة الجديدة
@@ -2161,10 +2208,10 @@
                 if(e.target.closest('#verse-list-sheet') || e.target.closest('#tafsir-modal') || e.target.closest('#ayah-options-modal') || e.target.closest('.tab-nav') || e.target.closest('.top-search-bar')) return;
                 if(isNavigating) return;
 
-                // إيقاف أي أنيميشن جاري
-                if (slides.prev) { slides.prev.classList.remove('animating'); slides.prev.style.transition = 'none'; }
-                if (slides.current) { slides.current.classList.remove('animating'); slides.current.style.transition = 'none'; }
-                if (slides.next) { slides.next.classList.remove('animating'); slides.next.style.transition = 'none'; }
+                // إيقاف أي أنيميشن جاري على كل الشرائح
+                Object.values(slides).forEach(s => {
+                    if(s) { s.classList.remove('animating'); s.style.transition = 'none'; }
+                });
 
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
@@ -2201,16 +2248,16 @@
                     currentX = x;
                     dragOffset = deltaX;
 
-                    // === تحريك كل الشرائح معاً بسلاسة ===
-                    const screenWidth = window.innerWidth;
-                    
+                    // === تحريك كل الـ 5 شرائح معاً بسلاسة ===
                     // حدود السحب
-                    if (currentPage <= 1 && deltaX < 0) dragOffset = deltaX * 0.3; // مقاومة عند أول صفحة
-                    if (currentPage >= TOTAL_PAGES && deltaX > 0) dragOffset = deltaX * 0.3; // مقاومة عند آخر صفحة
+                    if (currentPage <= 1 && deltaX < 0) dragOffset = deltaX * 0.3;
+                    if (currentPage >= TOTAL_PAGES && deltaX > 0) dragOffset = deltaX * 0.3;
 
                     if (slides.prev) slides.prev.style.transform = `translateX(calc(100% + ${dragOffset}px))`;
                     if (slides.current) slides.current.style.transform = `translateX(${dragOffset}px)`;
-                    if (slides.next) slides.next.style.transform = `translateX(calc(-100% + ${dragOffset}px))`;
+                    if (slides.next1) slides.next1.style.transform = `translateX(calc(-100% + ${dragOffset}px))`;
+                    if (slides.next2) slides.next2.style.transform = `translateX(calc(-200% + ${dragOffset}px))`;
+                    if (slides.next3) slides.next3.style.transform = `translateX(calc(-300% + ${dragOffset}px))`;
                 }
             }, {passive: false});
 
@@ -2221,33 +2268,26 @@
                 clearTimeout(pressTimer);
 
                 const diff = currentX - startX;
-                const threshold = window.innerWidth * 0.2; // 20% من الشاشة للتبديل
-                const velocity = Math.abs(diff) / 200; // حساب السرعة
+                const threshold = window.innerWidth * 0.2;
+                const velocity = Math.abs(diff) / 200;
 
                 if (isDragging) {
-                    // تفعيل الأنيميشن للإكمال
+                    // تفعيل الأنيميشن للإكمال على كل الشرائح
                     const transitionStyle = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    if (slides.prev) slides.prev.style.transition = transitionStyle;
-                    if (slides.current) slides.current.style.transition = transitionStyle;
-                    if (slides.next) slides.next.style.transition = transitionStyle;
+                    Object.values(slides).forEach(s => { if(s) s.style.transition = transitionStyle; });
 
-                    // التبديل إذا تجاوز الحد أو السرعة عالية
                     if (Math.abs(diff) > threshold || velocity > 0.5) {
                         if (diff > 0 && currentPage < TOTAL_PAGES) {
-                            // سحب لليمين = الصفحة التالية (تقليب المصحف كالكتاب العربي)
                             completeSwipeToNext();
                         } else if (diff < 0 && currentPage > 1) {
-                            // سحب لليسار = الصفحة السابقة
                             completeSwipeToPrev();
                         } else {
-                            // رجوع للوضع الأصلي
                             snapBack();
                         }
                     } else {
                         snapBack();
                     }
                 } else {
-                    // Double Tap للوضع الغامر
                     const now = new Date().getTime();
                     const timeDiff = now - lastTap;
                     if (timeDiff < 300 && timeDiff > 0) {
@@ -2264,17 +2304,21 @@
             function snapBack() {
                 if (slides.prev) slides.prev.style.transform = 'translateX(100%)';
                 if (slides.current) slides.current.style.transform = 'translateX(0)';
-                if (slides.next) slides.next.style.transform = 'translateX(-100%)';
+                if (slides.next1) slides.next1.style.transform = 'translateX(-100%)';
+                if (slides.next2) slides.next2.style.transform = 'translateX(-200%)';
+                if (slides.next3) slides.next3.style.transform = 'translateX(-300%)';
             }
 
             async function completeSwipeToNext() {
                 if (isNavigating) return;
                 isNavigating = true;
 
-                // إكمال الحركة
+                // إكمال الحركة لكل الشرائح
                 if (slides.prev) slides.prev.style.transform = 'translateX(200%)';
                 if (slides.current) slides.current.style.transform = 'translateX(100%)';
-                if (slides.next) slides.next.style.transform = 'translateX(0)';
+                if (slides.next1) slides.next1.style.transform = 'translateX(0)';
+                if (slides.next2) slides.next2.style.transform = 'translateX(-100%)';
+                if (slides.next3) slides.next3.style.transform = 'translateX(-200%)';
 
                 await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -2283,9 +2327,11 @@
                 // إعادة الترتيب
                 if (slides.prev) slides.prev.remove();
                 slides.prev = slides.current;
-                slides.current = slides.next;
+                slides.current = slides.next1;
+                slides.next1 = slides.next2;
+                slides.next2 = slides.next3;
 
-                // إزالة الـ transition وإعادة تعيين الأنماط
+                // تنظيف الأنماط
                 if (slides.prev) {
                     slides.prev.style.transition = 'none';
                     slides.prev.classList.remove('slide-current');
@@ -2294,16 +2340,28 @@
                 }
                 if (slides.current) {
                     slides.current.style.transition = 'none';
-                    slides.current.classList.remove('slide-next');
+                    slides.current.classList.remove('slide-next1');
                     slides.current.classList.add('slide-current');
                     slides.current.style.transform = '';
                 }
+                if (slides.next1) {
+                    slides.next1.style.transition = 'none';
+                    slides.next1.classList.remove('slide-next2');
+                    slides.next1.classList.add('slide-next1');
+                    slides.next1.style.transform = '';
+                }
+                if (slides.next2) {
+                    slides.next2.style.transition = 'none';
+                    slides.next2.classList.remove('slide-next3');
+                    slides.next2.classList.add('slide-next2');
+                    slides.next2.style.transform = '';
+                }
 
                 // تحميل الصفحة التالية الجديدة
-                slides.next = await createSlide(currentPage + 1);
-                if (slides.next) {
-                    slides.next.classList.add('slide-next');
-                    container.appendChild(slides.next);
+                slides.next3 = await createSlide(currentPage + 3);
+                if (slides.next3) {
+                    slides.next3.classList.add('slide-next3');
+                    container.appendChild(slides.next3);
                 }
 
                 localStorage.setItem('lastPage', currentPage);
@@ -2319,28 +2377,45 @@
                 // إكمال الحركة
                 if (slides.prev) slides.prev.style.transform = 'translateX(0)';
                 if (slides.current) slides.current.style.transform = 'translateX(-100%)';
-                if (slides.next) slides.next.style.transform = 'translateX(-200%)';
+                if (slides.next1) slides.next1.style.transform = 'translateX(-200%)';
+                if (slides.next2) slides.next2.style.transform = 'translateX(-300%)';
+                if (slides.next3) slides.next3.style.transform = 'translateX(-400%)';
 
                 await new Promise(resolve => setTimeout(resolve, 300));
 
                 currentPage--;
 
                 // إعادة الترتيب
-                if (slides.next) slides.next.remove();
-                slides.next = slides.current;
+                if (slides.next3) slides.next3.remove();
+                slides.next3 = slides.next2;
+                slides.next2 = slides.next1;
+                slides.next1 = slides.current;
                 slides.current = slides.prev;
 
-                if (slides.next) {
-                    slides.next.style.transition = 'none';
-                    slides.next.classList.remove('slide-current');
-                    slides.next.classList.add('slide-next');
-                    slides.next.style.transform = '';
-                }
+                // تنظيف الأنماط
                 if (slides.current) {
                     slides.current.style.transition = 'none';
                     slides.current.classList.remove('slide-prev');
                     slides.current.classList.add('slide-current');
                     slides.current.style.transform = '';
+                }
+                if (slides.next1) {
+                    slides.next1.style.transition = 'none';
+                    slides.next1.classList.remove('slide-current');
+                    slides.next1.classList.add('slide-next1');
+                    slides.next1.style.transform = '';
+                }
+                if (slides.next2) {
+                    slides.next2.style.transition = 'none';
+                    slides.next2.classList.remove('slide-next1');
+                    slides.next2.classList.add('slide-next2');
+                    slides.next2.style.transform = '';
+                }
+                if (slides.next3) {
+                    slides.next3.style.transition = 'none';
+                    slides.next3.classList.remove('slide-next2');
+                    slides.next3.classList.add('slide-next3');
+                    slides.next3.style.transform = '';
                 }
 
                 // تحميل الصفحة السابقة الجديدة
