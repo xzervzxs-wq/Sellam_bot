@@ -123,6 +123,16 @@
             display: flex; justify-content: center; align-items: center;
         }
 
+        /* === وضع أفقي (Landscape) - السكرول للقراءة بخط كبير === */
+        @media screen and (orientation: landscape) {
+            #quran-slider-container {
+                overflow-y: auto !important;
+                overflow-x: hidden;
+                align-items: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
         /* === نظام 5 شرائح للتنقل الانسيابي (3 أمام + حالية + 1 سابقة) === */
         .quran-page-slide {
             position: absolute; top: 0; left: 0;
@@ -165,17 +175,28 @@
 
         /* === وضع أفقي (Landscape) - للقراءة بخط كبير === */
         @media screen and (orientation: landscape) {
-            .quran-page-slide {
-                overflow-y: auto;
+            #quran-slider-container {
+                overflow-y: auto !important;
                 overflow-x: hidden;
-                align-items: flex-start;
                 -webkit-overflow-scrolling: touch;
+                align-items: flex-start !important;
+            }
+            .quran-page-slide {
+                position: relative !important;
+                height: auto !important;
+                min-height: auto;
+                transform: none !important;
+            }
+            .quran-page-slide:not(.slide-current) {
+                display: none !important;
+            }
+            .quran-page-slide.slide-current {
+                display: flex !important;
             }
             .quran-page-slide img, .quran-page-slide svg {
-                width: 100%;
-                height: auto;
-                max-height: none;
-                object-fit: fill;
+                width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
             }
         }
 
