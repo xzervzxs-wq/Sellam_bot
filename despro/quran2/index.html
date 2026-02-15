@@ -982,7 +982,7 @@
             <!-- 3. Tools -->
             <div class="top-bar-section-3">
                 <button id="bookmark-btn" class="tool-btn" onclick="toggleBookmark()" title="حفظ العلامة"><i class="fas fa-bookmark"></i></button>
-                <button id="btn-tafsir-toggle" class="tool-btn" onclick="toggleVerseSheet()" title="تفسير"><i class="fas fa-book-open-reader"></i></button>
+                <button id="share-page-btn" class="tool-btn" onclick="sharePageAsImage()" title="مشاركة الصفحة"><i class="fas fa-share-alt"></i></button>
                 <button id="dark-mode-btn" class="tool-btn" onclick="toggleDarkMode()" title="ليلي"><i class="fas fa-moon" id="dark-mode-icon"></i></button>
             </div>
         </div>
@@ -2278,8 +2278,9 @@
                 isDraggingGesture = false;
                 dragOffset = 0;
 
+                // Long press disabled - tap on ayah to see tafsir
                 pressTimer = setTimeout(() => {
-                    if(!isImmersive && !isDragging) { openVerseSheet(); showHint(); }
+                    // Removed: openVerseSheet() - not needed anymore
                 }, 500);
             }, {passive: false});
 
@@ -2510,10 +2511,83 @@
             }
         }
 
+        // Share page as image function
+        async function sharePageAsImage() {
+            const currentSlide = slides.current;
+            if (!currentSlide) return;
+            
+            const shareBtn = document.getElementById('share-page-btn');
+            shareBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                // Get the SVG element
+                const svgElement = currentSlide.querySelector('svg, object, img');
+                if (!svgElement) {
+                    alert('لم يتم العثور على الصفحة');
+                    shareBtn.innerHTML = '<i class="fas fa-share-alt"></i>';
+                    return;
+                }
+                
+                // Create a temporary container with proper styling
+                const container = document.createElement('div');
+                container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; background:#fffbf2; padding:20px; border-radius:10px;';
+                
+                // Clone the page content
+                const clone = currentSlide.cloneNode(true);
+                clone.style.cssText = 'position:relative; width:400px; height:auto; transform:none;';
+                container.appendChild(clone);
+                
+                // Add page number watermark
+                const watermark = document.createElement('div');
+                watermark.style.cssText = 'text-align:center; padding:10px; font-family:Cairo,sans-serif; color:#666; font-size:14px;';
+                watermark.textContent = `صفحة ${currentPage} - المصحف الرقمي`;
+                container.appendChild(watermark);
+                
+                document.body.appendChild(container);
+                
+                // Use html-to-image library
+                const dataUrl = await htmlToImage.toPng(container, {
+                    backgroundColor: '#fffbf2',
+                    quality: 1,
+                    pixelRatio: 2
+                });
+                
+                document.body.removeChild(container);
+                
+                // Convert to blob for sharing
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `quran-page-${currentPage}.png`, { type: 'image/png' });
+                
+                // Try Web Share API first (mobile)
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: `صفحة ${currentPage} من المصحف الرقمي`,
+                        text: `صفحة ${currentPage} من القرآن الكريم`,
+                        files: [file]
+                    });
+                } else {
+                    // Fallback: download the image
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = `quran-page-${currentPage}.png`;
+                    link.click();
+                }
+            } catch (error) {
+                console.error('Share error:', error);
+                // If user cancelled, don't show error
+                if (error.name !== 'AbortError') {
+                    alert('حدث خطأ أثناء المشاركة');
+                }
+            } finally {
+                shareBtn.innerHTML = '<i class="fas fa-share-alt"></i>';
+            }
+        }
+
         function openVerseSheet() {
             const sheet = document.getElementById('verse-list-sheet');
             const list = document.getElementById('verse-list-content');
-            document.getElementById('btn-tafsir-toggle').classList.add('active');
+            // btn-tafsir-toggle removed, no need to add active class
 
             if(pageAyahsData.length > 0) {
                 list.innerHTML = pageAyahsData.map((ayah, index) => `
@@ -2527,7 +2601,7 @@
 
         function closeVerseSheet() {
             document.getElementById('verse-list-sheet').classList.remove('active');
-            document.getElementById('btn-tafsir-toggle').classList.remove('active');
+            // btn-tafsir-toggle removed
         }
 
         async function selectVerseForTafsir(globalNum, surahNum, ayahNum, text) {
