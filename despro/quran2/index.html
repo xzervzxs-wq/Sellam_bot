@@ -2513,50 +2513,76 @@
 
         // Share page as image function
         async function sharePageAsImage() {
-            const currentSlide = slides.current;
-            if (!currentSlide) return;
-            
             const shareBtn = document.getElementById('share-page-btn');
             shareBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             
             try {
-                // Get the SVG element
-                const svgElement = currentSlide.querySelector('svg, object, img');
-                if (!svgElement) {
+                // Get SVG from cache or current slide
+                let svgText = svgCache[currentPage];
+                
+                if (!svgText) {
+                    // Try to get from current slide
+                    const currentSlide = slides.current;
+                    const svgEl = currentSlide?.querySelector('svg');
+                    if (svgEl) {
+                        svgText = svgEl.outerHTML;
+                    } else {
+                        // Fetch it
+                        const pageStr = String(currentPage).padStart(3, '0');
+                        const response = await fetch(`${SVG_BASE_URL}${pageStr}.svg`);
+                        svgText = await response.text();
+                    }
+                }
+                
+                if (!svgText) {
                     alert('لم يتم العثور على الصفحة');
                     shareBtn.innerHTML = '<i class="fas fa-share-alt"></i>';
                     return;
                 }
                 
-                // Create a temporary container with proper styling
-                const container = document.createElement('div');
-                container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; background:#fffbf2; padding:20px; border-radius:10px;';
+                // Create canvas to render SVG
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
                 
-                // Clone the page content
-                const clone = currentSlide.cloneNode(true);
-                clone.style.cssText = 'position:relative; width:400px; height:auto; transform:none;';
-                container.appendChild(clone);
+                // Set canvas size (high resolution)
+                const width = 800;
+                const height = 1200;
+                canvas.width = width;
+                canvas.height = height;
                 
-                // Add page number watermark
-                const watermark = document.createElement('div');
-                watermark.style.cssText = 'text-align:center; padding:10px; font-family:Cairo,sans-serif; color:#666; font-size:14px;';
-                watermark.textContent = `صفحة ${currentPage} - المصحف الرقمي`;
-                container.appendChild(watermark);
+                // Draw background
+                ctx.fillStyle = '#fffbf2';
+                ctx.fillRect(0, 0, width, height);
                 
-                document.body.appendChild(container);
+                // Create image from SVG
+                const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+                const svgUrl = URL.createObjectURL(svgBlob);
                 
-                // Use html-to-image library
-                const dataUrl = await htmlToImage.toPng(container, {
-                    backgroundColor: '#fffbf2',
-                    quality: 1,
-                    pixelRatio: 2
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = svgUrl;
                 });
                 
-                document.body.removeChild(container);
+                // Draw SVG image on canvas with padding
+                const padding = 30;
+                const imgWidth = width - (padding * 2);
+                const imgHeight = height - 100; // Leave space for watermark
+                ctx.drawImage(img, padding, padding, imgWidth, imgHeight);
                 
-                // Convert to blob for sharing
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
+                URL.revokeObjectURL(svgUrl);
+                
+                // Add watermark
+                ctx.fillStyle = '#666';
+                ctx.font = '20px Cairo, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`صفحة ${currentPage} - المصحف الرقمي`, width / 2, height - 30);
+                
+                // Convert to blob
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1));
                 const file = new File([blob], `quran-page-${currentPage}.png`, { type: 'image/png' });
                 
                 // Try Web Share API first (mobile)
@@ -2568,6 +2594,7 @@
                     });
                 } else {
                     // Fallback: download the image
+                    const dataUrl = canvas.toDataURL('image/png');
                     const link = document.createElement('a');
                     link.href = dataUrl;
                     link.download = `quran-page-${currentPage}.png`;
@@ -2575,7 +2602,6 @@
                 }
             } catch (error) {
                 console.error('Share error:', error);
-                // If user cancelled, don't show error
                 if (error.name !== 'AbortError') {
                     alert('حدث خطأ أثناء المشاركة');
                 }
