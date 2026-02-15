@@ -163,6 +163,22 @@
         .quran-page-slide img { pointer-events: none; }
         .quran-page-slide img.loaded, .quran-page-slide svg { opacity: 1; }
 
+        /* === وضع أفقي (Landscape) - للقراءة بخط كبير === */
+        @media screen and (orientation: landscape) {
+            .quran-page-slide {
+                overflow-y: auto;
+                overflow-x: hidden;
+                align-items: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+            .quran-page-slide img, .quran-page-slide svg {
+                width: 100%;
+                height: auto;
+                max-height: none;
+                object-fit: fill;
+            }
+        }
+
         /* Interactive Paths Style */
         .interactive-path {
             cursor: pointer;
