@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "charId": "A",
+        "name": "شاشة العرض 1",
+        "status": "active",
+        "statusReason": "",
+        "cameras": [
+            {
+                "id": "1-1",
+                "number": 1,
+                "name": "كاميرا 1",
+                "code": "CAM-1-1",
+                "status": "active",
+                "note": "",
+                "lastUpdate": "10:00",
+                "location": "",
+                "storage": {
+                    "dailyHours": "24",
+                    "retentionDays": "30"
+                },
+                "incidents": [],
+                "inspections": [],
+                "recordings": [],
+                "maintenance": []
+            },
+            {
+                "id": "1-2",
+                "number": 2,
+                "name": "كاميرا 2",
+                "code": "CAM-1-2",
+                "status": "active",
+                "note": "",
+                "lastUpdate": "10:00",
+                "location": "",
+                "storage": {
+                    "dailyHours": "24",
+                    "retentionDays": "30"
+                },
+                "incidents": [],
+                "inspections": [],
+                "recordings": [],
+                "maintenance": []
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "charId": "B",
+        "name": "شاشة العرض 2",
+        "status": "active",
+        "statusReason": "",
+        "cameras": [
+            {
+                "id": "2-1",
+                "number": 1,
+                "name": "كاميرا 1",
+                "code": "CAM-2-1",
+                "status": "active",
+                "note": "",
+                "lastUpdate": "10:00",
+                "location": "",
+                "storage": {
+                    "dailyHours": "24",
+                    "retentionDays": "30"
+                },
+                "incidents": [],
+                "inspections": [],
+                "recordings": [],
+                "maintenance": []
+            }
+        ]
+    }
+]
