@@ -22308,6 +22308,10 @@
     "path138": {
       "surah": 70,
       "ayah": 39
+    },
+    "path142": {
+      "surah": 70,
+      "ayah": 40
     }
   },
   "570": {
@@ -22447,55 +22451,55 @@
     }
   },
   "572": {
-    "path26": {
+    "path30": {
       "surah": 72,
       "ayah": 1
     },
-    "path30": {
+    "path34": {
       "surah": 72,
       "ayah": 2
     },
-    "path34": {
+    "path38": {
       "surah": 72,
       "ayah": 3
     },
-    "path38": {
+    "path42": {
       "surah": 72,
       "ayah": 4
     },
-    "path42": {
+    "path46": {
       "surah": 72,
       "ayah": 5
     },
-    "path46": {
+    "path50": {
       "surah": 72,
       "ayah": 6
     },
-    "path50": {
+    "path54": {
       "surah": 72,
       "ayah": 7
     },
-    "path54": {
+    "path58": {
       "surah": 72,
       "ayah": 8
     },
-    "path58": {
+    "path62": {
       "surah": 72,
       "ayah": 9
     },
-    "path62": {
+    "path66": {
       "surah": 72,
       "ayah": 10
     },
-    "path66": {
+    "path70": {
       "surah": 72,
       "ayah": 11
     },
-    "path70": {
+    "path74": {
       "surah": 72,
       "ayah": 12
     },
-    "path74": {
+    "path78": {
       "surah": 72,
       "ayah": 13
     }
@@ -22563,79 +22567,79 @@
     }
   },
   "574": {
-    "path22": {
+    "path26": {
       "surah": 73,
       "ayah": 1
     },
-    "path26": {
+    "path30": {
       "surah": 73,
       "ayah": 2
     },
-    "path30": {
+    "path34": {
       "surah": 73,
       "ayah": 3
     },
-    "path34": {
+    "path38": {
       "surah": 73,
       "ayah": 4
     },
-    "path38": {
+    "path42": {
       "surah": 73,
       "ayah": 5
     },
-    "path42": {
+    "path46": {
       "surah": 73,
       "ayah": 6
     },
-    "path46": {
+    "path50": {
       "surah": 73,
       "ayah": 7
     },
-    "path50": {
+    "path54": {
       "surah": 73,
       "ayah": 8
     },
-    "path54": {
+    "path58": {
       "surah": 73,
       "ayah": 9
     },
-    "path58": {
+    "path62": {
       "surah": 73,
       "ayah": 10
     },
-    "path62": {
+    "path66": {
       "surah": 73,
       "ayah": 11
     },
-    "path66": {
+    "path70": {
       "surah": 73,
       "ayah": 12
     },
-    "path70": {
+    "path74": {
       "surah": 73,
       "ayah": 13
     },
-    "path74": {
+    "path78": {
       "surah": 73,
       "ayah": 14
     },
-    "path78": {
+    "path82": {
       "surah": 73,
       "ayah": 15
     },
-    "path82": {
+    "path86": {
       "surah": 73,
       "ayah": 16
     },
-    "path86": {
+    "path90": {
       "surah": 73,
       "ayah": 17
     },
-    "path90": {
+    "path94": {
       "surah": 73,
       "ayah": 18
     },
-    "path94": {
+    "path98": {
       "surah": 73,
       "ayah": 19
     }
@@ -22712,6 +22716,128 @@
     "path98": {
       "surah": 74,
       "ayah": 17
+    },
+    "path102": {
+      "surah": 74,
+      "ayah": 18
+    }
+  },
+  "576": {
+    "path22": {
+      "surah": 74,
+      "ayah": 19
+    },
+    "path26": {
+      "surah": 74,
+      "ayah": 20
+    },
+    "path30": {
+      "surah": 74,
+      "ayah": 21
+    },
+    "path34": {
+      "surah": 74,
+      "ayah": 22
+    },
+    "path38": {
+      "surah": 74,
+      "ayah": 23
+    },
+    "path42": {
+      "surah": 74,
+      "ayah": 24
+    },
+    "path46": {
+      "surah": 74,
+      "ayah": 25
+    },
+    "path50": {
+      "surah": 74,
+      "ayah": 26
+    },
+    "path54": {
+      "surah": 74,
+      "ayah": 27
+    },
+    "path58": {
+      "surah": 74,
+      "ayah": 28
+    },
+    "path134": {
+      "surah": 74,
+      "ayah": 29
+    },
+    "path62": {
+      "surah": 74,
+      "ayah": 30
+    },
+    "path66": {
+      "surah": 74,
+      "ayah": 31
+    },
+    "path70": {
+      "surah": 74,
+      "ayah": 32
+    },
+    "path74": {
+      "surah": 74,
+      "ayah": 33
+    },
+    "path78": {
+      "surah": 74,
+      "ayah": 34
+    },
+    "path82": {
+      "surah": 74,
+      "ayah": 35
+    },
+    "path86": {
+      "surah": 74,
+      "ayah": 36
+    },
+    "path90": {
+      "surah": 74,
+      "ayah": 37
+    },
+    "path94": {
+      "surah": 74,
+      "ayah": 38
+    },
+    "path98": {
+      "surah": 74,
+      "ayah": 39
+    },
+    "path102": {
+      "surah": 74,
+      "ayah": 40
+    },
+    "path106": {
+      "surah": 74,
+      "ayah": 41
+    },
+    "path110": {
+      "surah": 74,
+      "ayah": 42
+    },
+    "path114": {
+      "surah": 74,
+      "ayah": 43
+    },
+    "path118": {
+      "surah": 74,
+      "ayah": 44
+    },
+    "path122": {
+      "surah": 74,
+      "ayah": 45
+    },
+    "path126": {
+      "surah": 74,
+      "ayah": 46
+    },
+    "path130": {
+      "surah": 74,
+      "ayah": 47
     }
   },
   "577": {
@@ -22829,107 +22955,107 @@
     }
   },
   "578": {
-    "path26": {
+    "path30": {
       "surah": 75,
       "ayah": 20
     },
-    "path30": {
+    "path34": {
       "surah": 75,
       "ayah": 21
     },
-    "path34": {
+    "path38": {
       "surah": 75,
       "ayah": 22
     },
-    "path38": {
+    "path42": {
       "surah": 75,
       "ayah": 23
     },
-    "path42": {
+    "path46": {
       "surah": 75,
       "ayah": 24
     },
-    "path46": {
+    "path50": {
       "surah": 75,
       "ayah": 25
     },
-    "path50": {
+    "path54": {
       "surah": 75,
       "ayah": 26
     },
-    "path54": {
+    "path58": {
       "surah": 75,
       "ayah": 27
     },
-    "path58": {
+    "path62": {
       "surah": 75,
       "ayah": 28
     },
-    "path62": {
+    "path66": {
       "surah": 75,
       "ayah": 29
     },
-    "path66": {
+    "path70": {
       "surah": 75,
       "ayah": 30
     },
-    "path70": {
+    "path74": {
       "surah": 75,
       "ayah": 31
     },
-    "path74": {
+    "path78": {
       "surah": 75,
       "ayah": 32
     },
-    "path78": {
+    "path82": {
       "surah": 75,
       "ayah": 33
     },
-    "path82": {
+    "path86": {
       "surah": 75,
       "ayah": 34
     },
-    "path86": {
+    "path90": {
       "surah": 75,
       "ayah": 35
     },
-    "path90": {
+    "path94": {
       "surah": 75,
       "ayah": 36
     },
-    "path94": {
+    "path98": {
       "surah": 75,
       "ayah": 37
     },
-    "path98": {
+    "path102": {
       "surah": 75,
       "ayah": 38
     },
-    "path102": {
+    "path106": {
       "surah": 75,
       "ayah": 39
     },
-    "path106": {
+    "path110": {
       "surah": 75,
       "ayah": 40
     },
-    "path110": {
+    "path114": {
       "surah": 76,
       "ayah": 1
     },
-    "path114": {
+    "path118": {
       "surah": 76,
       "ayah": 2
     },
-    "path118": {
+    "path122": {
       "surah": 76,
       "ayah": 3
     },
-    "path122": {
+    "path126": {
       "surah": 76,
       "ayah": 4
     },
-    "path126": {
+    "path130": {
       "surah": 76,
       "ayah": 5
     }
@@ -22999,121 +23125,121 @@
       "surah": 76,
       "ayah": 21
     },
-    "path90": {
+    "path102": {
       "surah": 76,
       "ayah": 22
     },
-    "path94": {
+    "path90": {
       "surah": 76,
       "ayah": 23
     },
-    "path98": {
+    "path94": {
       "surah": 76,
       "ayah": 24
     },
-    "path102": {
+    "path98": {
       "surah": 76,
       "ayah": 25
     }
   },
   "580": {
-    "path22": {
+    "path26": {
       "surah": 76,
       "ayah": 26
     },
-    "path26": {
+    "path30": {
       "surah": 76,
       "ayah": 27
     },
-    "path30": {
+    "path34": {
       "surah": 76,
       "ayah": 28
     },
-    "path34": {
+    "path38": {
       "surah": 76,
       "ayah": 29
     },
-    "path38": {
+    "path42": {
       "surah": 76,
       "ayah": 30
     },
-    "path42": {
+    "path46": {
       "surah": 76,
       "ayah": 31
     },
-    "path46": {
+    "path50": {
       "surah": 77,
       "ayah": 1
     },
-    "path50": {
+    "path54": {
       "surah": 77,
       "ayah": 2
     },
-    "path54": {
+    "path58": {
       "surah": 77,
       "ayah": 3
     },
-    "path58": {
+    "path62": {
       "surah": 77,
       "ayah": 4
     },
-    "path62": {
+    "path66": {
       "surah": 77,
       "ayah": 5
     },
-    "path66": {
+    "path70": {
       "surah": 77,
       "ayah": 6
     },
-    "path70": {
+    "path74": {
       "surah": 77,
       "ayah": 7
     },
-    "path74": {
+    "path78": {
       "surah": 77,
       "ayah": 8
     },
-    "path78": {
+    "path82": {
       "surah": 77,
       "ayah": 9
     },
-    "path82": {
+    "path86": {
       "surah": 77,
       "ayah": 10
     },
-    "path86": {
+    "path90": {
       "surah": 77,
       "ayah": 11
     },
-    "path90": {
+    "path94": {
       "surah": 77,
       "ayah": 12
     },
-    "path94": {
+    "path98": {
       "surah": 77,
       "ayah": 13
     },
-    "path98": {
+    "path102": {
       "surah": 77,
       "ayah": 14
     },
-    "path102": {
+    "path106": {
       "surah": 77,
       "ayah": 15
     },
-    "path106": {
+    "path110": {
       "surah": 77,
       "ayah": 16
     },
-    "path110": {
+    "path114": {
       "surah": 77,
       "ayah": 17
     },
-    "path114": {
+    "path118": {
       "surah": 77,
       "ayah": 18
     },
-    "path118": {
+    "path122": {
       "surah": 77,
       "ayah": 19
     }
