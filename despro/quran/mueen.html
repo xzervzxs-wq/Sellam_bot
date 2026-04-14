@@ -68,13 +68,15 @@
             // إعدادات الحفظ
             const [startAyah, setStartAyah] = useState(1);
             const [endAyah, setEndAyah] = useState(1);
-            const [repeatCount, setRepeatCount] = useState(3);
+            const [repeatCount, setRepeatCount] = useState(1); // تكرار المقطع
+            const [ayahRepeatCount, setAyahRepeatCount] = useState(3); // تكرار الآية الواحدة
             const [reciter, setReciter] = useState('Husary_128kbps');
             
             // حالة التشغيل
             const [isPlaying, setIsPlaying] = useState(false);
             const [currentAyahNum, setCurrentAyahNum] = useState(1);
-            const [currentRepeat, setCurrentRepeat] = useState(1);
+            const [currentRepeat, setCurrentRepeat] = useState(1); // العداد الحالي لتكرار المقطع
+            const [currentAyahRepeat, setCurrentAyahRepeat] = useState(1); // العداد الحالي لتكرار الآية
             const [isLoading, setIsLoading] = useState(true);
             const [error, setError] = useState(null);
 
@@ -87,6 +89,8 @@
                 { id: 'Basfar_128kbps', name: 'عبدالله بصفر' },
                 { id: 'Abdul_Basit_Murattal_192kbps', name: 'عبدالباسط عبدالصمد' },
                 { id: 'Hudhaify_128kbps', name: 'علي الحذيفي' },
+                { id: 'Abdurrahmaan_As-Sudais_192kbps', name: 'عبدالرحمن السديس' },
+                { id: 'Saood_ash-Shuraym_128kbps', name: 'سعود الشريم' },
             ];
 
             // --- جلب البيانات ---
@@ -111,6 +115,7 @@
                 setCurrentAyahNum(1);
                 setIsPlaying(false);
                 setCurrentRepeat(1);
+                setCurrentAyahRepeat(1); // تصفير عداد الآية عند تغيير السورة
 
                 fetch(`https://api.alquran.cloud/v1/surah/${selectedSurah.number}`)
                 .then(res => res.json())
@@ -149,7 +154,9 @@
                 } else {
                     // تحديث الرابط للتأكد قبل التشغيل
                     if(audioRef.current && selectedSurah) {
-                         audioRef.current.src = getAudioUrl(selectedSurah.number, currentAyahNum);
+                         if (audioRef.current.src !== getAudioUrl(selectedSurah.number, currentAyahNum)) {
+                             audioRef.current.src = getAudioUrl(selectedSurah.number, currentAyahNum);
+                         }
                          safePlay();
                     }
                     setIsPlaying(true);
@@ -157,17 +164,29 @@
             };
 
             const handleAudioEnded = () => {
-                if (currentAyahNum >= endAyah) {
-                    if (currentRepeat < repeatCount) {
-                        setCurrentRepeat(prev => prev + 1);
-                        setCurrentAyahNum(startAyah);
-                    } else {
-                        setIsPlaying(false);
-                        setCurrentRepeat(1);
-                        setCurrentAyahNum(startAyah);
+                // إذا لم تنتهِ تكرارات الآية الواحدة
+                if (currentAyahRepeat < ayahRepeatCount) {
+                    setCurrentAyahRepeat(prev => prev + 1);
+                    if (audioRef.current) {
+                        audioRef.current.currentTime = 0; // إعادة الآية من البداية
+                        safePlay();
                     }
                 } else {
-                    setCurrentAyahNum(prev => prev + 1);
+                    // انتهت تكرارات الآية، ننتقل للآية التالية أو نكرر المقطع
+                    setCurrentAyahRepeat(1); // تصفير عداد الآية الحالية
+
+                    if (currentAyahNum >= endAyah) {
+                        if (currentRepeat < repeatCount) {
+                            setCurrentRepeat(prev => prev + 1);
+                            setCurrentAyahNum(startAyah);
+                        } else {
+                            setIsPlaying(false);
+                            setCurrentRepeat(1);
+                            setCurrentAyahNum(startAyah);
+                        }
+                    } else {
+                        setCurrentAyahNum(prev => prev + 1);
+                    }
                 }
             };
 
@@ -283,7 +302,8 @@
                                                 const val = parseInt(e.target.value);
                                                 setStartAyah(val);
                                                 if(val > endAyah) setEndAyah(val);
-                                                setCurrentAyahNum(val); 
+                                                setCurrentAyahNum(val);
+                                                setCurrentAyahRepeat(1); // تصفير تكرار الآية عند تغيير النطاق
                                             }}
                                             className="w-full p-2 rounded-lg border-[#dcd6c5] text-center font-bold text-[#2c3e30] bg-[#fdfbf7] outline-none font-sans appearance-none"
                                         >
@@ -309,34 +329,61 @@
                                     </div>
                                 </div>
 
-                                {/* التكرار - التصميم الجديد: مربع رقم مع أزرار أسهم */}
-                                <div>
-                                    <label className="block text-sm font-bold text-[#8a7e67] mb-2 font-kufi">
-                                        عدد مرات التكرار
-                                    </label>
-                                    <div className="flex items-center gap-3">
-                                        {/* مربع الرقم الكبير */}
-                                        <div className="flex-1 bg-[#f4f1ea] border border-[#dcd6c5] rounded-xl h-20 flex items-center justify-center shadow-inner relative overflow-hidden">
-                                            <span className="text-4xl font-bold text-[#2c3e30] font-sans z-10">
-                                                {repeatCount}
-                                            </span>
-                                            <span className="absolute bottom-2 text-[10px] text-[#b89c68] font-kufi opacity-60">مرات</span>
+                                {/* التكرار - التصميم المزدوج (للآية والمقطع) يناسب الأطفال */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    {/* تكرار الآية الواحدة */}
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-[#8a7e67] mb-2 font-kufi text-center">
+                                            تكرار الآية الواحدة 
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 bg-[#f4f1ea] border border-[#dcd6c5] rounded-xl h-14 flex items-center justify-center shadow-inner relative overflow-hidden">
+                                                <span className="text-2xl font-bold text-[#2c3e30] font-sans z-10">
+                                                    {ayahRepeatCount}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col gap-1 h-14">
+                                                <button 
+                                                    onClick={() => setAyahRepeatCount(Math.min(20, ayahRepeatCount + 1))}
+                                                    className="w-10 flex-1 bg-white border border-[#dcd6c5] rounded-lg shadow-sm flex items-center justify-center text-[#1a3c2f] hover:bg-[#e8f5e9] active:scale-95 transition-all"
+                                                >
+                                                    <Icons.ChevronUp size={18} strokeWidth={3} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => setAyahRepeatCount(Math.max(1, ayahRepeatCount - 1))}
+                                                    className="w-10 flex-1 bg-white border border-[#dcd6c5] rounded-lg shadow-sm flex items-center justify-center text-[#b89c68] hover:bg-[#fff8e1] active:scale-95 transition-all"
+                                                >
+                                                    <Icons.ChevronDown size={18} strokeWidth={3} />
+                                                </button>
+                                            </div>
                                         </div>
+                                    </div>
 
-                                        {/* أزرار الأسهم */}
-                                        <div className="flex flex-col gap-2 h-20">
-                                            <button 
-                                                onClick={() => setRepeatCount(Math.min(20, repeatCount + 1))}
-                                                className="flex-1 w-14 bg-white border border-[#dcd6c5] rounded-lg shadow-sm flex items-center justify-center text-[#1a3c2f] hover:bg-[#e8f5e9] active:scale-95 transition-all"
-                                            >
-                                                <Icons.ChevronUp size={24} strokeWidth={3} />
-                                            </button>
-                                            <button 
-                                                onClick={() => setRepeatCount(Math.max(1, repeatCount - 1))}
-                                                className="flex-1 w-14 bg-white border border-[#dcd6c5] rounded-lg shadow-sm flex items-center justify-center text-[#b89c68] hover:bg-[#fff8e1] active:scale-95 transition-all"
-                                            >
-                                                <Icons.ChevronDown size={24} strokeWidth={3} />
-                                            </button>
+                                    {/* تكرار المقطع كامل */}
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-[#8a7e67] mb-2 font-kufi text-center">
+                                            تكرار المقطع 
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 bg-[#f4f1ea] border border-[#dcd6c5] rounded-xl h-14 flex items-center justify-center shadow-inner relative overflow-hidden">
+                                                <span className="text-2xl font-bold text-[#2c3e30] font-sans z-10">
+                                                    {repeatCount}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col gap-1 h-14">
+                                                <button 
+                                                    onClick={() => setRepeatCount(Math.min(20, repeatCount + 1))}
+                                                    className="w-10 flex-1 bg-white border border-[#dcd6c5] rounded-lg shadow-sm flex items-center justify-center text-[#1a3c2f] hover:bg-[#e8f5e9] active:scale-95 transition-all"
+                                                >
+                                                    <Icons.ChevronUp size={18} strokeWidth={3} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => setRepeatCount(Math.max(1, repeatCount - 1))}
+                                                    className="w-10 flex-1 bg-white border border-[#dcd6c5] rounded-lg shadow-sm flex items-center justify-center text-[#b89c68] hover:bg-[#fff8e1] active:scale-95 transition-all"
+                                                >
+                                                    <Icons.ChevronDown size={18} strokeWidth={3} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -344,11 +391,17 @@
                                 {/* المشغل */}
                                 <div className="bg-[#f4f1ea] rounded-xl border border-[#e6e2d6] p-4 flex flex-col items-center justify-center relative shadow-inner">
                                     <div className="w-full flex justify-between text-[10px] font-kufi text-[#8a7e67] mb-2">
-                                        <div className="flex items-center gap-1">
-                                            <Icons.Repeat size={10} />
-                                            <span>{currentRepeat}/{repeatCount}</span>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-1" title="تكرار المقطع">
+                                                <Icons.RefreshCw size={10} />
+                                                <span>{currentRepeat}/{repeatCount}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1" title="تكرار الآية">
+                                                <Icons.Repeat size={10} />
+                                                <span>{currentAyahRepeat}/{ayahRepeatCount}</span>
+                                            </div>
                                         </div>
-                                        <div>{currentAyahNum} / {selectedSurah?.numberOfAyahs}</div>
+                                        <div>الآية {currentAyahNum} / {selectedSurah?.numberOfAyahs}</div>
                                     </div>
                                     
                                     <div className="flex items-center gap-6">
@@ -357,6 +410,7 @@
                                                 setIsPlaying(false);
                                                 setCurrentAyahNum(startAyah);
                                                 setCurrentRepeat(1);
+                                                setCurrentAyahRepeat(1); // تصفير العداد الجديد
                                             }}
                                             className="p-2 text-[#a39b85] hover:text-[#c0392b] transition-colors"
                                         >
