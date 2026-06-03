@@ -1994,13 +1994,11 @@
 
                 let finalCanvasW, finalCanvasH, cols, rows;
 
-                if (landscapeCount > portraitCount) {
-                    finalCanvasW = A4_HEIGHT; finalCanvasH = A4_WIDTH;
-                    cols = landscapeCols; rows = landscapeRows;
-                } else {
-                    finalCanvasW = A4_WIDTH; finalCanvasH = A4_HEIGHT;
-                    cols = portraitCols; rows = portraitRows;
-                }
+                // دائماً استخدم Portrait (الطول)
+finalCanvasW = A4_WIDTH;
+finalCanvasH = A4_HEIGHT;
+cols = portraitCols;
+rows = portraitRows;
 
                 currentA4Layout = {
                     canvasW: finalCanvasW, canvasH: finalCanvasH,
