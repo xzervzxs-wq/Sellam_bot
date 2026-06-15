@@ -1,0 +1,23 @@
+{
+  "name": "despro-studio",
+  "version": "1.0.0",
+  "description": "Professional Design Studio for Arabic Typography",
+  "type": "module",
+  "main": "js/app.js",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Build process coming soon'",
+    "start": "python -m http.server 8000"
+  },
+  "keywords": [
+    "design",
+    "studio",
+    "arabic",
+    "typography",
+    "quranic"
+  ],
+  "author": "Sellam_bot",
+  "license": "Proprietary",
+  "devDependencies": {},
+  "dependencies": {}
+}
